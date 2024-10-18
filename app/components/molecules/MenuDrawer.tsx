@@ -35,10 +35,10 @@ export const MenuDrawer: FC<Props> = memo((props) => {
             <Button w="100%" onClick={onClickHome}>
               Home
             </Button>
-            <Button w="100%" onClick={onClickReception}>
+            <Button w="100%" onClick={onClickRegister}>
               商品登録
             </Button>
-            <Button w="100%" onClick={onClickRegister}>
+            <Button w="100%" onClick={onClickReception}>
               受付
             </Button>
             <Button w="100%" onClick={onClickKitchen}>

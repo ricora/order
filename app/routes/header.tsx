@@ -27,7 +27,7 @@ export default function Header() {
 
   return (
     <>
-      <Flex bg="teal.500" padding={{ base: 3, md: 5 }}>
+      <Flex bg="teal.500" padding={{ base: 3, lg: 5 }}>
         <MenuIconButton onOpen={onOpen} />
         <Heading _hover={{ cursor: "pointer" }}>
           <Link to="/">Order for Jazz Club</Link>

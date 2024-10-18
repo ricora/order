@@ -14,7 +14,7 @@ export const MenuIconButton: FC<Props> = memo(({ onOpen }) => {
       icon={<HamburgerIcon />}
       size="sm"
       variant="unstyled"
-      display={{ base: "block", md: "none" }}
+      display={{ base: "block", lg: "none" }}
       onClick={onOpen}
     />
   )
