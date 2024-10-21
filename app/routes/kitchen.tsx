@@ -19,36 +19,27 @@ import {
   updateOrderStatus,
 } from "~/crud/crud_orders"
 import { readProduct } from "~/crud/crud_products"
+import { useKitchenData } from "~/hooks/useKitchenData"
+import { TypeDetail } from "~/type/typedetail"
+import { TypeOrder } from "~/type/typeorder"
+import { TypeProduct } from "~/type/typeproduct"
 
 export default function Kitchen() {
-  const {
-    orders: orders,
-    details: details,
-    products: products,
-  } = useLoaderData<typeof loader>()
+  const initialData = useLoaderData<{
+    orders: TypeOrder[]
+    details: TypeDetail[]
+    products: TypeProduct[]
+  }>()
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const { orders, details, products } = useKitchenData(
+    initialData.orders,
+    initialData.details,
+    initialData.products,
+  )
+
   const filteredOrders = orders.filter((order) => order.status !== "finish")
-
-  // const fetcher = useFetcher();
-
-  // useEffect(() => {
-  //   const ws = new WebSocket("ws://localhost:8000");
-
-  //   ws.onmessage = (event) => {
-  //     const message = JSON.parse(event.data);
-  //     if (
-  //       (message.type === "UPDATE" && message.table === "Orders") ||
-  //       message.table === "Order_details" ||
-  //       message.table === "Products"
-  //     ) {
-  //       // サーバーから再度データを取得
-  //       fetcher.load("/kitchen");
-  //     }
-  //   };
-
-  //   return () => ws.close();
-  // }, [fetcher]);
 
   return (
     <>
