@@ -19,6 +19,6 @@ jobs:
       - name: Setup tools
         uses: jdx/mise-action@v2
       - name: Install dependencies
-        uses: bun install --frozen-lockfile
+        run: bun install --frozen-lockfile
       - name: Run TypeScript type check
-        uses: bun run tsc --noEmit --pretty
+        run: bun run tsc --noEmit --pretty
