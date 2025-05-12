@@ -5,7 +5,8 @@
     "dev": "vite",
     "build": "vite build --mode client && vite build",
     "preview": "wrangler dev",
-    "deploy": "bun run build && wrangler deploy"
+    "deploy": "bun run build && wrangler deploy",
+    "type-check": "tsc --noEmit"
   },
   "private": true,
   "dependencies": {
