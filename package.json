@@ -6,8 +6,8 @@
     "build": "vite build --mode client && vite build",
     "preview": "wrangler dev",
     "deploy": "bun run build && wrangler deploy",
-    "check": "biome check ./app",
-    "check:write": "biome check --write ./app",
+    "check": "biome check .",
+    "check:write": "biome check --write .",
     "type-check": "tsc --noEmit"
   },
   "private": true,
