@@ -7,7 +7,8 @@
     "preview": "wrangler dev",
     "deploy": "bun run build && wrangler deploy",
     "check": "biome check ./app",
-    "check:write": "biome check --write ./app"
+    "check:write": "biome check --write ./app",
+    "type-check": "tsc --noEmit"
   },
   "private": true,
   "dependencies": {
