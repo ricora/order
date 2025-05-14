@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        task: [type-check, biome]
+        task: [type-check, biome, build]
       fail-fast: false
     steps:
       - name: Checkout the repository
@@ -30,3 +30,6 @@ jobs:
       - name: Run Biome
         if: matrix.task == 'biome'
         run: bun run biome ci .
+      - name: Build
+        if: matrix.task == 'build'
+        run: bun run build
