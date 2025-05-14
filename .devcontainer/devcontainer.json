@@ -1,0 +1,21 @@
+{
+  "name": "order",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/mise:1": {}
+  },
+  "onCreateCommand": [
+    "bash",
+    "-c",
+    "echo 'eval \"$(mise activate bash)\"' >> ~/.bashrc && mise install"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "biomejs.biome",
+        "esbenp.prettier-vscode",
+        "github.vscode-github-actions"
+      ]
+    }
+  }
+}
