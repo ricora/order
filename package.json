@@ -4,8 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --mode client && vite build",
-    "preview": "wrangler dev",
-    "deploy": "bun run build && wrangler deploy",
+    "preview": "bun run --cwd=dist index.js",
     "check": "biome check .",
     "check:write": "biome check --write .",
     "type-check": "tsc --noEmit"
@@ -22,7 +21,6 @@
     "@hono/vite-dev-server": "0.19.0",
     "@tailwindcss/vite": "4.1.6",
     "tailwindcss": "4.1.6",
-    "vite": "6.3.5",
-    "wrangler": "4.14.4"
+    "vite": "6.3.5"
   }
 }
