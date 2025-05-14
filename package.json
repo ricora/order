@@ -5,11 +5,13 @@
     "dev": "vite",
     "build": "vite build --mode client && vite build",
     "preview": "bun run --cwd=dist index.js",
-    "check": "biome check .",
-    "check:write": "biome check --write .",
+    "check": "biome check . && bun run prettier:format",
+    "check:write": "biome check --write . && bun run prettier:format:write",
     "type-check": "tsc --noEmit",
-    "format": "prettier --ignore-path .prettierignore --ignore-path .gitignore --write . && biome format --write .",
-    "prettier": "prettier --ignore-path .prettierignore --ignore-path .gitignore --check ."
+    "format": "biome format . && bun run prettier:format",
+    "format:write": "biome format --write . && bun run prettier:format:write",
+    "prettier:format": "prettier --ignore-path .prettierignore --ignore-path .gitignore --check .",
+    "prettier:format:write": "prettier --ignore-path .prettierignore --ignore-path .gitignore --write ."
   },
   "private": true,
   "dependencies": {
