@@ -1,5 +1,5 @@
-import { jsxRenderer } from 'hono/jsx-renderer'
-import { Link, Script } from 'honox/server'
+import { jsxRenderer } from "hono/jsx-renderer"
+import { Link, Script } from "honox/server"
 
 export default jsxRenderer(({ children }) => {
   return (
