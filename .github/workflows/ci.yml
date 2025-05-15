@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        task: [type-check, biome, build]
+        task: [type-check, biome, build, prettier]
       fail-fast: false
     steps:
       - name: Checkout the repository
@@ -33,3 +33,6 @@ jobs:
       - name: Build
         if: matrix.task == 'build'
         run: bun run build
+      - name: Run Prettier
+        if: matrix.task == 'prettier'
+        run: bun run prettier:format
