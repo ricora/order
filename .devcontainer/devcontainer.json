@@ -7,7 +7,7 @@
   "onCreateCommand": [
     "bash",
     "-c",
-    "grep -qxF 'eval \"$(mise activate bash)\"' ~/.bashrc || echo 'eval \"$(mise activate bash)\"' >> ~/.bashrc && mise install"
+    "/usr/local/bin/mise trust && grep -qxF 'eval \"$(mise activate bash)\"' ~/.bashrc || echo 'eval \"$(mise activate bash)\"' >> ~/.bashrc && mise install"
   ],
   "customizations": {
     "vscode": {
