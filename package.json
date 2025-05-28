@@ -15,8 +15,12 @@
   },
   "private": true,
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "hono": "^4.7.9",
-    "honox": "^0.1.40"
+    "honox": "^0.1.40",
+    "lucide-react": "^0.511.0",
+    "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
@@ -26,6 +30,7 @@
     "prettier": "3.5.3",
     "prettier-plugin-toml": "2.0.5",
     "tailwindcss": "4.1.7",
+    "tw-animate-css": "^1.3.0",
     "vite": "6.3.5"
   }
 }

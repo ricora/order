@@ -13,7 +13,11 @@
     "lib": ["ESNext", "DOM"],
     "types": ["vite/client", "@cloudflare/workers-types/2023-07-01"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./app/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }

@@ -1,3 +1,4 @@
+import path from "node:path"
 import build from "@hono/vite-build/bun"
 import adapter from "@hono/vite-dev-server/bun"
 import tailwindcss from "@tailwindcss/vite"
@@ -13,4 +14,9 @@ export default defineConfig({
     tailwindcss(),
     build(),
   ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./app"),
+    },
+  },
 })
