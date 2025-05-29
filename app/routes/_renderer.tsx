@@ -12,7 +12,7 @@ export default reactRenderer(({ children, title }) => {
         <Script src="/app/client.ts" async />
         {title && <title>{title}</title>}
       </head>
-      <body>{children}</body>
+      <body className="">{children}</body>
     </html>
   )
 })
