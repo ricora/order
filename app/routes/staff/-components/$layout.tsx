@@ -107,7 +107,7 @@ const StaffSidebar: FC<StaffSidebarProps> = ({ pathname }) => {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/staff">
-                <div className="grid aspect-square size-8 place-items-center rounded-">
+                <div className="grid aspect-square size-8 place-items-center rounded-md">
                   <ChefHatIcon className="size-6" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
