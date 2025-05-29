@@ -6,7 +6,7 @@ const handler: ErrorHandler = (e, c) => {
   }
   console.error(e.message)
   c.status(500)
-  return c.render("Internal Server Error")
+  return c.render(<div>"Internal Server Error"</div>)
 }
 
 export default handler
