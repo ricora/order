@@ -1,11 +1,11 @@
 import { Button } from "@/islands/ui/button"
-import { useState } from "react"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/islands/ui/tooltip"
+import { useState } from "react"
 
 export default function Counter() {
   const [count, setCount] = useState(0)
