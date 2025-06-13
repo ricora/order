@@ -4,8 +4,8 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/islands/ui/breadcrumb"
-import { Separator } from "@/islands/ui/separator"
+} from "@/components/shadcn-ui/breadcrumb"
+import { Separator } from "@/components/shadcn-ui/$separator"
 import {
   Sidebar,
   SidebarContent,
@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/islands/ui/sidebar"
+} from "@/components/shadcn-ui/$sidebar"
 import {
   BarChart3,
   ChefHat,

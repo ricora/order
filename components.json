@@ -11,9 +11,9 @@
     "prefix": ""
   },
   "aliases": {
-    "components": "@/islands",
+    "components": "@/components",
     "utils": "@/lib/utils",
-    "ui": "@/islands/ui",
+    "ui": "@/components/shadcn-ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },

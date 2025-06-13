@@ -1,28 +1,26 @@
-"use client"
-
 import { Slot } from "@radix-ui/react-slot"
 import { type VariantProps, cva } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
 import * as React from "react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Button } from "@/islands/ui/button"
-import { Input } from "@/islands/ui/input"
-import { Separator } from "@/islands/ui/separator"
+import { Button } from "@/components/shadcn-ui/button"
+import { Input } from "@/components/shadcn-ui/input"
+import { Separator } from "@/components/shadcn-ui/$separator"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/islands/ui/sheet"
-import { Skeleton } from "@/islands/ui/skeleton"
+} from "@/components/shadcn-ui/sheet"
+import { Skeleton } from "@/components/shadcn-ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/islands/ui/tooltip"
+} from "@/components/shadcn-ui/tooltip"
 import { cn } from "@/lib/utils"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
