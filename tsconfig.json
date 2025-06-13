@@ -11,9 +11,13 @@
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": false,
     "lib": ["ESNext", "DOM"],
-    "types": ["vite/client", "@cloudflare/workers-types/2023-07-01"],
+    "types": ["vite/client"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./app/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }
