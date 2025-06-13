@@ -3,25 +3,25 @@ import { type VariantProps, cva } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
 import * as React from "react"
 
-import { Separator } from "@/components/shadcn-ui/$separator"
-import { Button } from "@/components/shadcn-ui/button"
-import { Input } from "@/components/shadcn-ui/input"
+import { Separator } from "@/shadcn-ui/components/$separator"
+import { Button } from "@/shadcn-ui/components/button"
+import { Input } from "@/shadcn-ui/components/input"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/shadcn-ui/sheet"
-import { Skeleton } from "@/components/shadcn-ui/skeleton"
+} from "@/shadcn-ui/components/sheet"
+import { Skeleton } from "@/shadcn-ui/components/skeleton"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/shadcn-ui/tooltip"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { cn } from "@/lib/utils"
+} from "@/shadcn-ui/components/tooltip"
+import { useIsMobile } from "@/shadcn-ui/hooks/use-mobile"
+import { cn } from "@/shadcn-ui/lib/utils"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7

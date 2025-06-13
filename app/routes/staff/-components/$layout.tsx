@@ -1,4 +1,4 @@
-import { Separator } from "@/components/shadcn-ui/$separator"
+import { Separator } from "@/shadcn-ui/components/$separator"
 import {
   Sidebar,
   SidebarContent,
@@ -11,14 +11,14 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/shadcn-ui/$sidebar"
+} from "@/shadcn-ui/components/$sidebar"
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/components/shadcn-ui/breadcrumb"
+} from "@/shadcn-ui/components/breadcrumb"
 import {
   BarChart3,
   ChefHat,
