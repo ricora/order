@@ -29,7 +29,7 @@
         "@types/node": "22.15.33",
         "@types/react": "19.1.8",
         "@types/react-dom": "19.1.6",
-        "prettier": "3.6.1",
+        "prettier": "3.6.2",
         "prettier-plugin-toml": "2.0.5",
         "tailwindcss": "4.1.11",
         "tw-animate-css": "1.3.4",
@@ -504,7 +504,7 @@
 
     "precinct": ["precinct@12.1.2", "", { "dependencies": { "@dependents/detective-less": "^5.0.0", "commander": "^12.1.0", "detective-amd": "^6.0.0", "detective-cjs": "^6.0.0", "detective-es6": "^5.0.0", "detective-postcss": "^7.0.0", "detective-sass": "^6.0.0", "detective-scss": "^5.0.0", "detective-stylus": "^5.0.0", "detective-typescript": "^13.0.0", "detective-vue2": "^2.0.3", "module-definition": "^6.0.0", "node-source-walk": "^7.0.0", "postcss": "^8.4.40", "typescript": "^5.5.4" }, "bin": { "precinct": "bin/cli.js" } }, "sha512-x2qVN3oSOp3D05ihCd8XdkIPuEQsyte7PSxzLqiRgktu79S5Dr1I75/S+zAup8/0cwjoiJTQztE9h0/sWp9bJQ=="],
 
-    "prettier": ["prettier@3.6.1", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-5xGWRa90Sp2+x1dQtNpIpeOQpTDBs9cZDmA/qs2vDNN2i18PdapqY7CmBeyLlMuGqXJRIOPaCaVZTLNQRWUH/A=="],
+    "prettier": ["prettier@3.6.2", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ=="],
 
     "prettier-plugin-toml": ["prettier-plugin-toml@2.0.5", "", { "dependencies": { "@taplo/lib": "^0.5.0" }, "peerDependencies": { "prettier": "^3.0.3" } }, "sha512-WjXXKQyY4TdXWHU1v73UJxK/oDLSppf+b9KrSVl2kC4ZOr9CIVPKTQ/JxttgbYMaH8r3ihw7WYhMpI1EFa1obg=="],
 
