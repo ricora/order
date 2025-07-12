@@ -1,5 +1,5 @@
 import { Button } from "@/shadcn-ui/components/button"
-import { Table, Grid3X3, Plus } from "lucide-react"
+import { Grid3X3, Plus, Table } from "lucide-react"
 
 type ViewModeToggleProps = {
   viewMode: "table" | "card"

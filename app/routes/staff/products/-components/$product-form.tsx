@@ -1,19 +1,17 @@
-"use client"
-
 import type React from "react"
 
-import { useState } from "react"
-import { Button } from "@/shadcn-ui/components/button"
-import { Input } from "@/shadcn-ui/components/input"
-import { Label } from "@/shadcn-ui/components/label"
 import { Badge } from "@/shadcn-ui/components/badge"
+import { Button } from "@/shadcn-ui/components/button"
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/shadcn-ui/components/card"
-import { X, Plus } from "lucide-react"
+import { Input } from "@/shadcn-ui/components/input"
+import { Label } from "@/shadcn-ui/components/label"
+import { Plus, X } from "lucide-react"
+import { useState } from "react"
 import type { Product, ProductFormData } from "../-lib/product"
 
 type ProductFormProps = {

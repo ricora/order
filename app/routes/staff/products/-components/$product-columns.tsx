@@ -1,13 +1,5 @@
-import type { ColumnDef } from "@tanstack/react-table"
-import {
-  ArrowUpDown,
-  Edit,
-  MoreHorizontal,
-  Trash2,
-  AlertTriangle,
-} from "lucide-react"
-import { Button } from "@/shadcn-ui/components/button"
 import { Badge } from "@/shadcn-ui/components/badge"
+import { Button } from "@/shadcn-ui/components/button"
 import { Checkbox } from "@/shadcn-ui/components/checkbox"
 import {
   DropdownMenu,
@@ -17,6 +9,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shadcn-ui/components/dropdown-menu"
+import type { ColumnDef } from "@tanstack/react-table"
+import {
+  AlertTriangle,
+  ArrowUpDown,
+  Edit,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react"
 import type { Product } from "../-lib/product"
 
 type ProductColumnsProps = {
@@ -175,7 +175,7 @@ export const createProductColumns = ({
         </div>
       )
     },
-    filterFn: (row, id, value) => {
+    filterFn: (row, _id, value) => {
       const stock = row.getValue("stock") as number
       if (value === "在庫切れ") return stock === 0
       if (value === "残りわずか") return stock > 0 && stock <= 5

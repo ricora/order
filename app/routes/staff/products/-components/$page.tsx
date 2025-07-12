@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Button } from "@/shadcn-ui/components/button"
 import {
   Card,
@@ -6,13 +5,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shadcn-ui/components/card"
-import { Plus, Package, AlertTriangle, TrendingUp } from "lucide-react"
-import type { Product, ProductFormData } from "../-lib/product"
+import { AlertTriangle, Package, Plus, TrendingUp } from "lucide-react"
+import { useState } from "react"
+import { ProductCardView } from "../-components/$product-card-view"
+import { createProductColumns } from "../-components/$product-columns"
 import { ProductForm } from "../-components/$product-form"
 import { ProductTableView } from "../-components/$product-table-view"
-import { createProductColumns } from "../-components/$product-columns"
-import { ProductCardView } from "../-components/$product-card-view"
 import { ViewModeToggle } from "../-components/$view-mode-toggle"
+import type { Product, ProductFormData } from "../-lib/product"
 
 // サンプルデータ
 const initialProducts: Product[] = [

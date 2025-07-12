@@ -1,7 +1,7 @@
-import { Button } from "@/shadcn-ui/components/button"
 import { Badge } from "@/shadcn-ui/components/badge"
+import { Button } from "@/shadcn-ui/components/button"
 import { Card, CardContent } from "@/shadcn-ui/components/card"
-import { Edit, Trash2, AlertTriangle } from "lucide-react"
+import { AlertTriangle, Edit, Trash2 } from "lucide-react"
 import type { Product } from "../-lib/product"
 
 type ProductCardViewProps = {
