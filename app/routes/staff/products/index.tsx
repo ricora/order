@@ -1,6 +1,6 @@
 import { createRoute } from "honox/factory"
-import { ProductManagement } from "./-components/$page"
+import { Page } from "./-components/$page"
 
 export default createRoute((c) => {
-  return c.render(<ProductManagement />)
+  return c.render(<Page pathname={c.req.path} />)
 })

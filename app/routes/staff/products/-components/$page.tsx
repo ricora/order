@@ -13,6 +13,7 @@ import { ProductForm } from "../-components/$product-form"
 import { ProductTableView } from "../-components/$product-table-view"
 import { ViewModeToggle } from "../-components/$view-mode-toggle"
 import type { Product, ProductFormData } from "../-lib/product"
+import { StaffLayout, type StaffLayoutProps } from "../../-components/$layout"
 
 // サンプルデータ
 const initialProducts: Product[] = [
@@ -246,5 +247,13 @@ export const ProductManagement = () => {
         )}
       </div>
     </div>
+  )
+}
+
+export const Page = (props: StaffLayoutProps) => {
+  return (
+    <StaffLayout {...props}>
+      <ProductManagement />
+    </StaffLayout>
   )
 }
