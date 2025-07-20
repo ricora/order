@@ -211,7 +211,7 @@ const StaffHeader: FC<StaffHeaderProps> = ({ pathname }) => {
   )
 }
 
-type StaffLayoutProps = {
+export type StaffLayoutProps = {
   pathname: string
   children?: ReactNode
 }
