@@ -13,11 +13,7 @@
     "lib": ["ESNext", "DOM"],
     "types": ["vite/client"],
     "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./app/*"]
-    }
+    "jsxImportSource": "hono/jsx"
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }
