@@ -131,10 +131,10 @@ const productFormDataToProduct = (formData: FormData): Omit<Product, "id"> => {
     .filter(Boolean)
   return {
     name,
-    image: String(formData.get("image") ?? ""),
+    image,
     tags,
     price,
-    stock: Number(formData.get("stock") ?? 0),
+    stock,
   }
 }
 
