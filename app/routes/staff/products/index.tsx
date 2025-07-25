@@ -141,6 +141,7 @@ const productFormDataToProduct = (formData: FormData): Omit<Product, "id"> => {
 export const POST = createRoute(async (c) => {
   try {
     const formData = await c.req.formData()
+    // @ts-expect-error
     const product = productFormDataToProduct(formData)
     // TODO: Implement product registration logic
 
