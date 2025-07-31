@@ -71,6 +71,7 @@ const ProductTableView: FC<ProductTableViewProps> = ({ products }) => {
                         }
                         alt={product.name}
                         className="w-12 h-12 min-w-12 min-h-12 object-cover rounded-md border"
+                        loading="lazy"
                       />
                     </td>
                     <td className="px-4 py-2 align-middle font-medium">
