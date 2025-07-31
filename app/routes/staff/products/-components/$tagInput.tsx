@@ -69,10 +69,9 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
           aria-expanded={suggestions.length > 0}
           aria-controls="tag-suggestions"
           onInput={(e) => {
-            // @ts-expect-error
-            setInput(e.currentTarget.value)
-            // @ts-expect-error
-            updateSuggestions(e.currentTarget.value)
+            const value = (e.target as HTMLInputElement).value
+            setInput(value)
+            updateSuggestions(value)
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
