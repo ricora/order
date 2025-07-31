@@ -179,9 +179,9 @@ export default createRoute((c) => {
           />
           <ProductRegister tags={tags} />
           <div className="bg-white rounded-lg border p-4">
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-              <span className="text-lg font-bold flex-1">商品一覧</span>
-              <div className="flex-1 flex justify-end">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+              <span className="text-lg font-bold">商品一覧</span>
+              <div className="flex justify-end">
                 <ViewModeToggle viewMode={viewMode} search={search} />
               </div>
             </div>
