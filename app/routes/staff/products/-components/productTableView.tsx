@@ -30,8 +30,8 @@ const getStockStatus = (stock: number) => {
 
 const ProductTableView: FC<ProductTableViewProps> = ({ products }) => {
   return (
-    <div className="w-full">
-      <div className="rounded-md border">
+    <div className="w-full overflow-x-auto">
+      <div className="rounded-md border min-w-3xl">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -81,7 +81,7 @@ const ProductTableView: FC<ProductTableViewProps> = ({ products }) => {
                         {product.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="border rounded px-2 py-0.5 text-xs text-gray-600 bg-gray-50"
+                            className="border rounded px-2 py-0.5 text-xs text-gray-600 bg-gray-50 whitespace-nowrap"
                           >
                             {tag}
                           </span>
