@@ -50,7 +50,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
             type="button"
             className="px-2 py-1 rounded border text-xs bg-gray-100 text-gray-700 hover:bg-blue-100 transition"
             onClick={() => addTag(tag)}
-            aria-label={`${tag} を追加`}
+            aria-label={`${tag}を追加`}
           >
             {tag}
           </button>
@@ -60,7 +60,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
         <input
           id="tag-input"
           type="text"
-          className="flex-1 border rounded px-3 py-2 placeholder:text-gray-400"
+          className="w-full border rounded px-3 py-2 text-sm placeholder:text-gray-400 mt-1"
           placeholder="新しいタグを入力"
           value={input}
           autoComplete="off"
@@ -82,7 +82,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
         />
         <button
           type="button"
-          className="px-3 py-2 rounded bg-blue-600 text-white text-sm font-medium"
+          className="px-3 py-2 rounded bg-blue-600 text-white text-sm font-medium mt-1 whitespace-nowrap"
           onClick={() => addTag()}
         >
           追加
@@ -104,14 +104,14 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") addTag(tag)
               }}
-              aria-label={`${tag} を追加`}
+              aria-label={`${tag}を追加`}
             >
               {tag}
             </div>
           ))}
         </div>
       )}
-      <div className="flex flex-wrap gap-2" aria-live="polite">
+      <div className="flex flex-wrap gap-2 mb-2" aria-live="polite">
         {tags.map((tag) => (
           <span
             key={tag}
@@ -122,7 +122,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
               type="button"
               className="ml-1 text-gray-400 hover:text-red-500"
               onClick={() => removeTag(tag)}
-              aria-label={`${tag} を削除`}
+              aria-label={`${tag}を削除`}
             >
               ×
             </button>
