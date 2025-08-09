@@ -1,27 +1,29 @@
 import { type FC, useState } from "hono/jsx"
+import type ProductTag from "../../../../domain/product/entities/productTag"
 
 type TagInputProps = {
-  existingTags: string[]
+  existingTags: ProductTag[]
 }
 
 const TagInput: FC<TagInputProps> = ({ existingTags }) => {
   const [tags, setTags] = useState<string[]>([])
   const [input, setInput] = useState("")
-  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [suggestions, setSuggestions] = useState<ProductTag[]>([])
 
   function updateSuggestions(value: string) {
     const v = value.trim().toLowerCase()
     setSuggestions(
       v
         ? existingTags.filter(
-            (tag) => tag.toLowerCase().includes(v) && !tags.includes(tag),
+            (tag) =>
+              tag.name.toLowerCase().includes(v) && !tags.includes(tag.name),
           )
         : [],
     )
   }
 
-  function addTag(tag?: string) {
-    const value = (tag ?? input).trim()
+  function addTag(tagName?: string) {
+    const value = (tagName ?? input).trim()
     if (value && !tags.includes(value)) {
       setTags([...tags, value])
       setInput("")
@@ -33,7 +35,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
     setTags(tags.filter((t) => t !== tag))
   }
 
-  const unselectedTags = existingTags.filter((tag) => !tags.includes(tag))
+  const unselectedTags = existingTags.filter((tag) => !tags.includes(tag.name))
 
   return (
     <div>
@@ -46,13 +48,13 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
       <div className="flex flex-wrap gap-2 mb-2">
         {unselectedTags.map((tag) => (
           <button
-            key={tag}
+            key={tag.id}
             type="button"
             className="px-2 py-1 rounded border text-xs bg-gray-100 text-gray-700 hover:bg-blue-100 transition"
-            onClick={() => addTag(tag)}
-            aria-label={`${tag}を追加`}
+            onClick={() => addTag(tag.name)}
+            aria-label={`${tag.name}を追加`}
           >
-            {tag}
+            {tag.name}
           </button>
         ))}
       </div>
@@ -98,15 +100,15 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
         >
           {suggestions.map((tag) => (
             <div
-              key={tag}
+              key={tag.id}
               className="cursor-pointer px-2 py-1 hover:bg-blue-100 rounded"
-              onClick={() => addTag(tag)}
+              onClick={() => addTag(tag.name)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") addTag(tag)
+                if (e.key === "Enter" || e.key === " ") addTag(tag.name)
               }}
-              aria-label={`${tag}を追加`}
+              aria-label={`${tag.name}を追加`}
             >
-              {tag}
+              {tag.name}
             </div>
           ))}
         </div>
