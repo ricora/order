@@ -61,6 +61,46 @@ describe("createProduct", () => {
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
   })
 
+  it("画像URLが空ならエラーを返す", async () => {
+    await expect(
+      createProduct({
+        ...validProduct,
+        image: "",
+        repositoryImpl: async () => null,
+      }),
+    ).rejects.toThrow(
+      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
+    )
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
+
+  it("画像URLが500文字を超える場合はエラーを返す", async () => {
+    const longUrl = `https://example.com/${"a".repeat(490)}`
+    await expect(
+      createProduct({
+        ...validProduct,
+        image: longUrl,
+        repositoryImpl: async () => null,
+      }),
+    ).rejects.toThrow(
+      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
+    )
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
+
+  it("画像URLがhttp/httpsで始まらない場合はエラーを返す", async () => {
+    await expect(
+      createProduct({
+        ...validProduct,
+        image: "ftp://example.com/image.png",
+        repositoryImpl: async () => null,
+      }),
+    ).rejects.toThrow(
+      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
+    )
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
+
   it("タグIDが存在しない場合はエラーを返す", async () => {
     await expect(
       createProduct({
