@@ -12,6 +12,7 @@ import {
   type RegisterProductParams,
   registerProduct,
 } from "../../../usecases/registerProduct"
+import { countStringLength } from "../../../utils/text"
 import ProductCardView from "./-components/productCardView"
 import ProductInfo from "./-components/productInfo"
 import ProductRegister from "./-components/productRegister"
@@ -23,12 +24,12 @@ const productFormDataToRegisterProductParams = (
 ): RegisterProductParams => {
   const name = String(formData.get("name") ?? "").trim()
   if (!name) throw new Error("商品名は必須です")
-  if (name.length > 50)
+  if (countStringLength(name) > 50)
     throw new Error("商品名は1文字以上50文字以内で入力してください")
 
   const image = String(formData.get("image") ?? "").trim()
   if (image) {
-    if (!/^https?:\/\/.+/i.test(image) || image.length > 500) {
+    if (!/^https?:\/\/.+/i.test(image) || countStringLength(image) > 500) {
       throw new Error("画像URLは500文字以内かつhttp(s)で始まる必要があります")
     }
   }
