@@ -8,8 +8,7 @@
  * const findById: WithRepository<FindById> = async ({ id, repositoryImpl }) => repositoryImpl({ id })
  */
 // biome-ignore lint/suspicious/noExplicitAny: For flexible generic types.
-export type WithRepository<T extends (...args: any) => any> = (
-  params: (Parameters<T> extends [infer P] ? P : Record<string, never>) & {
-    repositoryImpl?: T
-  },
-) => ReturnType<T>
+export type WithRepository<T extends (...args: any) => any> =
+  Parameters<T> extends [infer P]
+    ? (params: P & { repositoryImpl?: T }) => ReturnType<T>
+    : (params: { repositoryImpl?: T }) => ReturnType<T>
