@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import type ProductTag from "../entities/productTag"
-import { createProductTag } from "./productTagCommandRespository"
+import { createProductTag } from "./productTagCommandRepository"
 
 const validTag: Omit<ProductTag, "id"> = {
   name: "新しいタグ",

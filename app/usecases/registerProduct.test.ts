@@ -10,7 +10,7 @@ import {
 import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
-import * as productTagCommandRepository from "../domain/product/repositories/productTagCommandRespository"
+import * as productTagCommandRepository from "../domain/product/repositories/productTagCommandRepository"
 import * as productTagQueryRepository from "../domain/product/repositories/productTagQueryRepository"
 import { registerProduct } from "./registerProduct"
 

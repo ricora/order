@@ -1,5 +1,5 @@
 import type ProductTag from "../../domain/product/entities/productTag"
-import type { CreateProductTag } from "../../domain/product/repositories/productTagCommandRespository"
+import type { CreateProductTag } from "../../domain/product/repositories/productTagCommandRepository"
 import * as cache from "../cache"
 
 export const createProductTagImpl: CreateProductTag = async (params) => {

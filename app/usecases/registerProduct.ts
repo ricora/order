@@ -1,6 +1,6 @@
 import type Product from "../domain/product/entities/product"
 import { createProduct } from "../domain/product/repositories/productCommandRepository"
-import { createProductTag } from "../domain/product/repositories/productTagCommandRespository"
+import { createProductTag } from "../domain/product/repositories/productTagCommandRepository"
 import { findAllProductTags } from "../domain/product/repositories/productTagQueryRepository"
 
 export type RegisterProductParams = Omit<Product, "tagIds" | "id"> & {
