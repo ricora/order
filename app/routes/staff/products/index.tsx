@@ -24,7 +24,7 @@ const productFormDataToRegisterProductParams = (
 ): RegisterProductParams => {
   const name = String(formData.get("name") ?? "").trim()
   if (!name) throw new Error("商品名は必須です")
-  if (countStringLength(name) > 50)
+  if (countStringLength(name) < 1 || countStringLength(name) > 50)
     throw new Error("商品名は1文字以上50文字以内で入力してください")
 
   const image = String(formData.get("image") ?? "").trim()
