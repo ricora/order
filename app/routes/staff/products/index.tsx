@@ -1,6 +1,4 @@
 import { createRoute } from "honox/factory"
-import Layout from "../-components/layout"
-
 import Toast from "../../../components/ui/toast"
 import {
   deleteToastCookie,
@@ -13,6 +11,7 @@ import {
   registerProduct,
 } from "../../../usecases/registerProduct"
 import { countStringLength } from "../../../utils/text"
+import Layout from "../-components/layout"
 import ProductCardView from "./-components/productCardView"
 import ProductInfo from "./-components/productInfo"
 import ProductRegister from "./-components/productRegister"

@@ -1,6 +1,7 @@
 import PackageIcon from "../../../../components/icons/lucide/packageIcon"
 import TrendingUpIcon from "../../../../components/icons/lucide/trendingUpIcon"
 import TriangleAlertIcon from "../../../../components/icons/lucide/triangleAlertIcon"
+
 type ProductInfoProps = {
   totalProducts: number
   outOfStockCount: number

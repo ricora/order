@@ -12,7 +12,6 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
       <summary
         className="flex items-center justify-between cursor-pointer select-none outline-none focus:ring-2 focus:ring-blue-500"
         aria-controls="product-register-form"
-        aria-expanded="false"
         tabIndex={0}
       >
         <span className="flex items-baseline gap-2">
