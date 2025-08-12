@@ -1,11 +1,11 @@
 import type { FC } from "hono/jsx"
-import type { Product } from "../-types/product"
 import SquarePenIcon from "../../../../components/icons/lucide/squarePenIcon"
 import Trash2Icon from "../../../../components/icons/lucide/trash2Icon"
 import TriangleAlertIcon from "../../../../components/icons/lucide/triangleAlertIcon"
+import type { ProductsManagementPageData } from "../../../../usecases/getProductsManagementPageData"
 
 type ProductTableViewProps = {
-  products: Product[]
+  products: ProductsManagementPageData["products"]
 }
 
 const getStockStatus = (stock: number) => {
