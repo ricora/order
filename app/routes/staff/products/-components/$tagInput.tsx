@@ -105,6 +105,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") addTag(tag.name)
               }}
+              aria-label={`${tag.name}を追加`}
             >
               {tag.name}
             </button>
