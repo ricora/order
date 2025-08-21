@@ -14,7 +14,7 @@ export const createProductTagImpl: CreateProductTag = async (params) => {
     }
     cache.productTags.push(newTag)
     return Promise.resolve(newTag)
-  } catch (e) {
+  } catch {
     return Promise.reject(new Error("商品タグの作成に失敗しました"))
   }
 }

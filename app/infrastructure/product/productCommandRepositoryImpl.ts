@@ -16,7 +16,7 @@ export const createProductImpl: CreateProduct = async (params) => {
     }
     cache.product.push(newProduct)
     return Promise.resolve(newProduct)
-  } catch (e) {
+  } catch {
     return Promise.reject(new Error("商品の作成に失敗しました"))
   }
 }
@@ -27,7 +27,7 @@ export const updateProductImpl: UpdateProduct = async (params) => {
     if (idx === -1) return Promise.resolve(null)
     cache.product[idx] = { ...params }
     return Promise.resolve(cache.product[idx])
-  } catch (e) {
+  } catch {
     return Promise.reject(new Error("商品の更新に失敗しました"))
   }
 }
@@ -40,7 +40,7 @@ export const deleteProductImpl: DeleteProduct = async (params) => {
       return Promise.resolve()
     }
     return Promise.resolve()
-  } catch (e) {
+  } catch {
     return Promise.reject(new Error("商品の削除に失敗しました"))
   }
 }

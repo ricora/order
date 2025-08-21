@@ -68,7 +68,6 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
           autoComplete="off"
           aria-autocomplete="list"
           aria-haspopup="listbox"
-          aria-expanded={suggestions.length > 0}
           aria-controls="tag-suggestions"
           onInput={(e) => {
             const value = (e.target as HTMLInputElement).value
@@ -95,12 +94,12 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
           id="tag-suggestions"
           tabIndex={-1}
           className="border rounded bg-white shadow p-2 mb-2 max-h-40 overflow-auto"
-          aria-label="タグ候補"
           aria-live="polite"
         >
           {suggestions.map((tag) => (
-            <div
+            <button
               key={tag.id}
+              type="button"
               className="cursor-pointer px-2 py-1 hover:bg-blue-100 rounded"
               onClick={() => addTag(tag.name)}
               onKeyDown={(e) => {
@@ -109,7 +108,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
               aria-label={`${tag.name}を追加`}
             >
               {tag.name}
-            </div>
+            </button>
           ))}
         </div>
       )}
