@@ -15,8 +15,10 @@
   },
   "private": true,
   "dependencies": {
+    "drizzle-orm": "^0.44.4",
     "hono": "^4.7.10",
-    "honox": "^0.1.41"
+    "honox": "^0.1.41",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.4",
@@ -25,6 +27,8 @@
     "@tailwindcss/vite": "4.1.12",
     "@types/bun": "1.2.20",
     "@types/node": "22.17.2",
+    "@types/pg": "^8.15.5",
+    "drizzle-kit": "^0.31.4",
     "prettier": "3.6.2",
     "prettier-plugin-toml": "2.0.6",
     "tailwindcss": "4.1.12",
