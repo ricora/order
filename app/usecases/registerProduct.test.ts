@@ -7,11 +7,13 @@ import {
   mock,
   spyOn,
 } from "bun:test"
+import { TransactionRollbackError } from "drizzle-orm/errors"
 import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
 import * as productTagCommandRepository from "../domain/product/repositories/productTagCommandRepository"
 import * as productTagQueryRepository from "../domain/product/repositories/productTagQueryRepository"
+import { dbClient, type TransactionDbClient } from "../infrastructure/db/client"
 import { registerProduct } from "./registerProduct"
 
 const mockTags: ProductTag[] = [
@@ -23,8 +25,18 @@ describe("registerProduct", () => {
   let createProductSpy: ReturnType<typeof spyOn>
   let createProductTagSpy: ReturnType<typeof spyOn>
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  let transactionSpy: ReturnType<typeof spyOn>
+  let rollbackSpy: ReturnType<typeof spyOn>
+  let txMock: TransactionDbClient
 
   beforeEach(() => {
+    txMock = {} as TransactionDbClient
+    rollbackSpy = spyOn(txMock, "rollback").mockImplementation(() => {
+      throw new TransactionRollbackError()
+    })
+    transactionSpy = spyOn(dbClient, "transaction").mockImplementation((cb) => {
+      return cb(txMock)
+    })
     findAllProductTagsSpy = spyOn(
       productTagQueryRepository,
       "findAllProductTags",
@@ -56,10 +68,12 @@ describe("registerProduct", () => {
       price: 500,
       stock: 20,
     })
+    expect(transactionSpy).toHaveBeenCalledTimes(1)
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(createProductTagSpy).not.toHaveBeenCalled()
     expect(createProductSpy).toHaveBeenCalledTimes(1)
     expect(createProductSpy.mock.calls[0][0].tagIds).toEqual([1, 2])
+    expect(rollbackSpy).not.toHaveBeenCalled()
   })
 
   it("新規タグを含めて商品を登録できる", async () => {
@@ -71,9 +85,12 @@ describe("registerProduct", () => {
       stock: 5,
     })
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
-    expect(createProductTagSpy).toHaveBeenCalledWith({ name: "新規タグ" })
+    expect(createProductTagSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "新規タグ" }),
+    )
     expect(createProductSpy).toHaveBeenCalledTimes(1)
     expect(createProductSpy.mock.calls[0][0].tagIds).toEqual([1, 3])
+    expect(rollbackSpy).not.toHaveBeenCalled()
   })
 
   it("タグが空や空白のみの場合は無視される", async () => {
@@ -88,11 +105,12 @@ describe("registerProduct", () => {
     expect(createProductTagSpy).toHaveBeenCalledTimes(0)
     expect(createProductSpy).toHaveBeenCalledTimes(1)
     expect(createProductSpy.mock.calls[0][0].tagIds).toEqual([])
+    expect(rollbackSpy).not.toHaveBeenCalled()
   })
 
-  it("商品作成で例外が発生した場合はエラーを投げる", async () => {
+  it("商品作成で例外が発生した場合はrollbackが呼ばれエラーを投げる", async () => {
     createProductSpy.mockImplementationOnce(async () => {
-      throw new Error("DB error")
+      throw new Error()
     })
     await expect(
       registerProduct({
@@ -103,5 +121,6 @@ describe("registerProduct", () => {
         stock: 1,
       }),
     ).rejects.toThrow("商品の作成に失敗しました")
+    expect(rollbackSpy).toHaveBeenCalledTimes(1)
   })
 })

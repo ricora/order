@@ -7,6 +7,7 @@ import {
   mock,
   spyOn,
 } from "bun:test"
+import type { DbClient } from "../../../infrastructure/db/client"
 import type Product from "../entities/product"
 import { findAllProducts, findProductById } from "./productQueryRepository"
 import * as productTagQueryRepository from "./productTagQueryRepository"
@@ -37,6 +38,7 @@ const mockProducts: Product[] = [
 
 describe("findProductById", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  const mockDbClient = {} as DbClient
 
   beforeEach(() => {
     findAllProductTagsSpy = spyOn(
@@ -56,6 +58,7 @@ describe("findProductById", () => {
     const result = await findProductById({
       id: 1,
       repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
     })
     expect(result).not.toBeNull()
     expect(result?.id).toBe(1)
@@ -68,6 +71,7 @@ describe("findProductById", () => {
     const result = await findProductById({
       id: 999,
       repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
     })
     expect(result).toBeNull()
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
@@ -76,6 +80,7 @@ describe("findProductById", () => {
 
 describe("findAllProducts", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  const mockDbClient = {} as DbClient
 
   beforeEach(() => {
     findAllProductTagsSpy = spyOn(
@@ -92,6 +97,7 @@ describe("findAllProducts", () => {
     const mockImpl = async () => mockProducts
     const results = await findAllProducts({
       repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
     })
     expect(results.length).toBe(2)
     expect(results.map((p) => p.tagIds)).toEqual([[1, 2], [2]])

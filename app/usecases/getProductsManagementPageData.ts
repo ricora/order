@@ -2,6 +2,7 @@ import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import { findAllProducts } from "../domain/product/repositories/productQueryRepository"
 import { findAllProductTags } from "../domain/product/repositories/productTagQueryRepository"
+import { dbClient } from "../infrastructure/db/client"
 
 export type ProductsManagementPageData = {
   products: (Omit<Product, "tagIds"> & { tags: string[] })[]
@@ -14,8 +15,8 @@ export type ProductsManagementPageData = {
 
 export const getProductsManagementPageData =
   async (): Promise<ProductsManagementPageData> => {
-    const products = await findAllProducts({})
-    const tags = await findAllProductTags({})
+    const products = await findAllProducts({ dbClient })
+    const tags = await findAllProductTags({ dbClient })
     const tagMap = new Map<number, string>(
       tags.map((tag) => [tag.id, tag.name]),
     )

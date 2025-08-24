@@ -7,6 +7,7 @@ import {
   mock,
   spyOn,
 } from "bun:test"
+import type { TransactionDbClient } from "../../../infrastructure/db/client"
 import type Product from "../entities/product"
 import { createProduct, updateProduct } from "./productCommandRepository"
 import * as productTagQueryRepository from "./productTagQueryRepository"
@@ -26,6 +27,7 @@ const validProduct: Omit<Product, "id"> = {
 
 describe("createProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  const mockDbClient = {} as TransactionDbClient
 
   beforeEach(() => {
     findAllProductTagsSpy = spyOn(
@@ -44,6 +46,7 @@ describe("createProduct", () => {
     const result = await createProduct({
       ...validProduct,
       repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
     })
     expect(result).not.toBeNull()
     expect(result?.name).toBe(validProduct.name)
@@ -56,6 +59,7 @@ describe("createProduct", () => {
         ...validProduct,
         name: "",
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow("商品名は1文字以上50文字以内である必要があります")
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
@@ -67,6 +71,7 @@ describe("createProduct", () => {
         ...validProduct,
         image: "",
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow(
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
@@ -81,6 +86,7 @@ describe("createProduct", () => {
         ...validProduct,
         image: longUrl,
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow(
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
@@ -94,6 +100,7 @@ describe("createProduct", () => {
         ...validProduct,
         image: "ftp://example.com/image.png",
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow(
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
@@ -107,6 +114,7 @@ describe("createProduct", () => {
         ...validProduct,
         tagIds: [999],
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow("タグIDは存在するタグのIDを参照する必要があります")
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
@@ -115,6 +123,7 @@ describe("createProduct", () => {
 
 describe("updateProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  const mockDbClient = {} as TransactionDbClient
 
   beforeEach(() => {
     findAllProductTagsSpy = spyOn(
@@ -133,6 +142,7 @@ describe("updateProduct", () => {
       ...validProduct,
       id: 1,
       repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
     })
     expect(result).not.toBeNull()
     expect(result?.id).toBe(1)
