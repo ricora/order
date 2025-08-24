@@ -2,7 +2,7 @@ import {
   findAllProductsImpl,
   findProductByIdImpl,
 } from "../../../infrastructure/product/productQueryRepositoryImpl"
-import type { WithRepository } from "../../types"
+import type { WithRepositoryImpl } from "../../types"
 import type Product from "../entities/product"
 import { findAllProductTags } from "./productTagQueryRepository"
 
@@ -11,7 +11,7 @@ export type FindProductById = (
 ) => Promise<Product | null>
 export type FindAllProducts = () => Promise<Product[]>
 
-export const findProductById: WithRepository<FindProductById> = async ({
+export const findProductById: WithRepositoryImpl<FindProductById> = async ({
   id,
   repositoryImpl = findProductByIdImpl,
 }) => {
@@ -25,7 +25,7 @@ export const findProductById: WithRepository<FindProductById> = async ({
   }
 }
 
-export const findAllProducts: WithRepository<FindAllProducts> = async ({
+export const findAllProducts: WithRepositoryImpl<FindAllProducts> = async ({
   repositoryImpl = findAllProductsImpl,
 }) => {
   const products = await repositoryImpl()

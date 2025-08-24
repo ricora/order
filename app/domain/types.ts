@@ -5,10 +5,10 @@
  * @template T リポジトリ関数の型
  * @example
  * type FindById = (params: { id: number }) => Promise<Product | null>
- * const findById: WithRepository<FindById> = async ({ id, repositoryImpl }) => repositoryImpl({ id })
+ * const findById: WithRepositoryImpl<FindById> = async ({ id, repositoryImpl }) => repositoryImpl({ id })
  */
 // biome-ignore lint/suspicious/noExplicitAny: For flexible generic types.
-export type WithRepository<T extends (...args: any) => any> =
+export type WithRepositoryImpl<T extends (...args: any) => any> =
   Parameters<T> extends [infer P]
     ? (params: P & { repositoryImpl?: T }) => ReturnType<T>
     : (params: { repositoryImpl?: T }) => ReturnType<T>

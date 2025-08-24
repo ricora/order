@@ -1,6 +1,6 @@
 import { createProductTagImpl } from "../../../infrastructure/product/productTagCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
-import type { WithRepository } from "../../types"
+import type { WithRepositoryImpl } from "../../types"
 import type ProductTag from "../entities/productTag"
 
 export type CreateProductTag = (
@@ -13,7 +13,7 @@ const validateProductTag = (tag: Omit<ProductTag, "id">) => {
   }
 }
 
-export const createProductTag: WithRepository<CreateProductTag> = async ({
+export const createProductTag: WithRepositoryImpl<CreateProductTag> = async ({
   repositoryImpl = createProductTagImpl,
   ...tag
 }) => {

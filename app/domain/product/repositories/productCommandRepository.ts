@@ -4,7 +4,7 @@ import {
   updateProductImpl,
 } from "../../../infrastructure/product/productCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
-import type { WithRepository } from "../../types"
+import type { WithRepositoryImpl } from "../../types"
 import type Product from "../entities/product"
 import { findAllProductTags } from "./productTagQueryRepository"
 
@@ -50,7 +50,7 @@ export type CreateProduct = (
 export type UpdateProduct = (params: Product) => Promise<Product | null>
 export type DeleteProduct = (params: Pick<Product, "id">) => Promise<void>
 
-export const createProduct: WithRepository<CreateProduct> = async ({
+export const createProduct: WithRepositoryImpl<CreateProduct> = async ({
   repositoryImpl = createProductImpl,
   ...product
 }) => {
@@ -59,7 +59,7 @@ export const createProduct: WithRepository<CreateProduct> = async ({
   return repositoryImpl({ ...product })
 }
 
-export const updateProduct: WithRepository<UpdateProduct> = async ({
+export const updateProduct: WithRepositoryImpl<UpdateProduct> = async ({
   repositoryImpl = updateProductImpl,
   ...product
 }) => {
@@ -68,7 +68,7 @@ export const updateProduct: WithRepository<UpdateProduct> = async ({
   return repositoryImpl(product)
 }
 
-export const deleteProduct: WithRepository<DeleteProduct> = async ({
+export const deleteProduct: WithRepositoryImpl<DeleteProduct> = async ({
   repositoryImpl = deleteProductImpl,
   id,
 }) => {
