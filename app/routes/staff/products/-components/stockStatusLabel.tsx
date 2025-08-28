@@ -1,6 +1,28 @@
 import { tv } from "tailwind-variants"
 import TriangleAlertIcon from "../../../../components/icons/lucide/triangleAlertIcon"
-import { getStockStatusLabel, type StockStatus } from "../-utils/stock"
+
+const getStockStatus = (stock: number) => {
+  if (stock === 0) {
+    return "out-of-stock"
+  }
+  if (stock <= 5) {
+    return "low-stock"
+  }
+  return "in-stock"
+}
+
+type StockStatus = ReturnType<typeof getStockStatus>
+
+const getStockStatusLabel = (status: StockStatus) => {
+  switch (status) {
+    case "out-of-stock":
+      return "在庫切れ"
+    case "low-stock":
+      return "残りわずか"
+    case "in-stock":
+      return "在庫あり"
+  }
+}
 
 const stockStatusLabel = tv({
   slots: {
@@ -19,7 +41,8 @@ const stockStatusLabel = tv({
   },
 })
 
-export const StockStatusLabel = ({ status }: { status: StockStatus }) => {
+export const StockStatusLabel = ({ stock }: { stock: number }) => {
+  const status = getStockStatus(stock)
   const { base, alertIcon } = stockStatusLabel({ status })
 
   return (

@@ -2,7 +2,6 @@ import type { FC } from "hono/jsx"
 import SquarePenIcon from "../../../../components/icons/lucide/squarePenIcon"
 import Trash2Icon from "../../../../components/icons/lucide/trash2Icon"
 import type { ProductsManagementPageData } from "../../../../usecases/getProductsManagementPageData"
-import { getStockStatus } from "../-utils/stock"
 import { StockStatusLabel } from "./stockStatusLabel"
 
 type ProductTableViewProps = {
@@ -47,7 +46,7 @@ const ProductTableRow = ({
         {product.stock}
       </td>
       <td className="px-4 py-2 align-middle text-center">
-        <StockStatusLabel status={getStockStatus(product.stock)} />
+        <StockStatusLabel stock={product.stock} />
       </td>
       <td className="px-4 py-2 align-middle">
         <div className="flex flex-col gap-2 items-center">

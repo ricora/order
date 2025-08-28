@@ -1,7 +1,6 @@
 import SquarePenIcon from "../../../../components/icons/lucide/squarePenIcon"
 import Trash2Icon from "../../../../components/icons/lucide/trash2Icon"
 import type { ProductsManagementPageData } from "../../../../usecases/getProductsManagementPageData"
-import { getStockStatus } from "../-utils/stock"
 import { StockStatusLabel } from "./stockStatusLabel"
 
 const formatPrice = (price: number) =>
@@ -30,7 +29,7 @@ const ProductCard = ({
           className="w-full h-full object-cover"
         />
         <div className="absolute top-2 right-2">
-          <StockStatusLabel status={getStockStatus(product.stock)} />
+          <StockStatusLabel stock={product.stock} />
         </div>
       </div>
       <div className="p-4 flex-1 flex flex-col justify-between">
