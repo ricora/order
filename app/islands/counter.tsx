@@ -7,7 +7,7 @@ export default function Counter() {
       <p className="py-2 text-2xl">{count}</p>
       <button
         type="button"
-        className="px-4 py-2 bg-orange-400 text-white rounded cursor-pointer"
+        className="cursor-pointer rounded bg-orange-400 px-4 py-2 text-white"
         onClick={() => setCount(count + 1)}
       >
         Increment

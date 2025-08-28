@@ -41,16 +41,16 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
     <div>
       <label
         htmlFor="tag-input"
-        className="block text-sm font-medium text-gray-700 mb-1"
+        className="mb-1 block font-medium text-gray-700 text-sm"
       >
         タグ
       </label>
-      <div className="flex flex-wrap gap-2 mb-2">
+      <div className="mb-2 flex flex-wrap gap-2">
         {unselectedTags.map((tag) => (
           <button
             key={tag.id}
             type="button"
-            className="px-2 py-1 rounded border text-xs bg-gray-100 text-gray-700 hover:bg-blue-100 transition"
+            className="rounded border bg-gray-100 px-2 py-1 text-gray-700 text-xs transition hover:bg-blue-100"
             onClick={() => addTag(tag.name)}
             aria-label={`${tag.name}を追加`}
           >
@@ -58,11 +58,11 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
           </button>
         ))}
       </div>
-      <div className="flex gap-2 mb-2">
+      <div className="mb-2 flex gap-2">
         <input
           id="tag-input"
           type="text"
-          className="w-full border rounded px-3 py-2 text-sm placeholder:text-gray-400 mt-1"
+          className="mt-1 w-full rounded border px-3 py-2 text-sm placeholder:text-gray-400"
           placeholder="新しいタグを入力"
           value={input}
           autoComplete="off"
@@ -83,7 +83,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
         />
         <button
           type="button"
-          className="px-3 py-2 rounded bg-blue-600 text-white text-sm font-medium mt-1 whitespace-nowrap"
+          className="mt-1 whitespace-nowrap rounded bg-blue-600 px-3 py-2 font-medium text-sm text-white"
           onClick={() => addTag()}
         >
           追加
@@ -93,14 +93,14 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
         <div
           id="tag-suggestions"
           tabIndex={-1}
-          className="border rounded bg-white shadow p-2 mb-2 max-h-40 overflow-auto"
+          className="mb-2 max-h-40 overflow-auto rounded border bg-white p-2 shadow"
           aria-live="polite"
         >
           {suggestions.map((tag) => (
             <button
               key={tag.id}
               type="button"
-              className="cursor-pointer px-2 py-1 hover:bg-blue-100 rounded"
+              className="cursor-pointer rounded px-2 py-1 hover:bg-blue-100"
               onClick={() => addTag(tag.name)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") addTag(tag.name)
@@ -112,11 +112,11 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
           ))}
         </div>
       )}
-      <div className="flex flex-wrap gap-2 mb-2" aria-live="polite">
+      <div className="mb-2 flex flex-wrap gap-2" aria-live="polite">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="flex items-center border rounded px-2 py-1 text-xs bg-gray-50 text-gray-600"
+            className="flex items-center rounded border bg-gray-50 px-2 py-1 text-gray-600 text-xs"
           >
             {tag}
             <button
