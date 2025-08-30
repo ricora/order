@@ -18,7 +18,7 @@
     "hono": "^4.7.10",
     "honox": "^0.1.41",
     "tailwind-merge": "^3.3.1",
-    "tailwind-variants": "^2.1.0"
+    "tailwind-variants": "^3.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.4",
