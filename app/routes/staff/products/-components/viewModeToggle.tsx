@@ -7,16 +7,16 @@ import { setQueryParam } from "../../../../utils/url"
 const viewModeToggle = tv({
   slots: {
     container: "flex items-center justify-between",
-    label: "text-sm font-medium text-gray-500",
-    toggleGroup: "flex border rounded-lg p-1 bg-gray-50",
+    label: "font-medium text-gray-500 text-sm",
+    toggleGroup: "flex rounded-lg border bg-gray-50 p-1",
     button:
-      "h-8 px-3 flex items-center rounded-md text-sm font-medium transition",
-    icon: "h-4 w-4 mr-2",
+      "flex h-8 items-center rounded-md px-3 font-medium text-sm transition",
+    icon: "mr-2 h-4 w-4",
   },
   variants: {
     isActive: {
       true: {
-        button: "bg-blue-600 text-white pointer-events-none",
+        button: "pointer-events-none bg-blue-600 text-white",
       },
       false: {
         button: "bg-white text-gray-700 hover:bg-gray-100",

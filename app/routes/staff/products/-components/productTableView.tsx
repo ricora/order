@@ -19,7 +19,7 @@ const ProductTableRow = ({
         <img
           src={product.image || "/placeholder.svg?height=60&width=60"}
           alt={product.name}
-          className="w-12 h-12 min-w-12 min-h-12 object-cover rounded-md border"
+          className="h-12 min-h-12 w-12 min-w-12 rounded-md border object-cover"
           loading="lazy"
         />
       </td>
@@ -29,30 +29,30 @@ const ProductTableRow = ({
           {product.tags.map((tag) => (
             <span
               key={tag}
-              className="border rounded px-2 py-0.5 text-xs text-gray-600 bg-gray-50 whitespace-nowrap"
+              className="whitespace-nowrap rounded border bg-gray-50 px-2 py-0.5 text-gray-600 text-xs"
             >
               {tag}
             </span>
           ))}
         </div>
       </td>
-      <td className="px-4 py-2 align-middle font-mono text-right">
+      <td className="px-4 py-2 text-right align-middle font-mono">
         {new Intl.NumberFormat("ja-JP", {
           style: "currency",
           currency: "JPY",
         }).format(product.price)}
       </td>
-      <td className="px-4 py-2 align-middle text-center font-mono">
+      <td className="px-4 py-2 text-center align-middle font-mono">
         {product.stock}
       </td>
-      <td className="px-4 py-2 align-middle text-center">
+      <td className="px-4 py-2 text-center align-middle">
         <StockStatusLabel stock={product.stock} />
       </td>
       <td className="px-4 py-2 align-middle">
-        <div className="flex flex-col gap-2 items-center">
+        <div className="flex flex-col items-center gap-2">
           <a
             href={`/staff/products/${product.id}/edit`}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium transition"
+            className="flex flex-1 items-center justify-center gap-2 rounded border bg-white px-3 py-2 font-medium text-gray-700 text-sm transition hover:bg-gray-50"
           >
             <div className="h-4 w-4">
               <SquarePenIcon />
@@ -61,7 +61,7 @@ const ProductTableRow = ({
           </a>
           <a
             href={`/staff/products/${product.id}/delete`}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border bg-white hover:bg-red-50 text-red-600 text-sm font-medium transition"
+            className="flex flex-1 items-center justify-center gap-2 rounded border bg-white px-3 py-2 font-medium text-red-600 text-sm transition hover:bg-red-50"
           >
             <div className="h-4 w-4">
               <Trash2Icon />
@@ -77,34 +77,34 @@ const ProductTableRow = ({
 const ProductTableView: FC<ProductTableViewProps> = ({ products }) => {
   return (
     <div className="w-full overflow-x-auto">
-      <div className="rounded-md border min-w-3xl">
+      <div className="min-w-3xl rounded-md border">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="w-16 px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-16 px-4 py-2 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
                 画像
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
                 商品名
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
                 タグ
               </th>
-              <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-right font-medium text-gray-500 text-xs uppercase tracking-wider">
                 価格
               </th>
-              <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-center font-medium text-gray-500 text-xs uppercase tracking-wider">
                 在庫
               </th>
-              <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-center font-medium text-gray-500 text-xs uppercase tracking-wider">
                 ステータス
               </th>
-              <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-2 text-center font-medium text-gray-500 text-xs uppercase tracking-wider">
                 編集
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 bg-white">
             {products.length ? (
               products.map((product) => (
                 <ProductTableRow key={product.id} product={product} />
