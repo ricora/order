@@ -4,7 +4,7 @@ import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import type ProductTag from "../entities/productTag"
 
 export type CreateProductTag = CommandRepositoryFunction<
-  Omit<ProductTag, "id">,
+  { productTag: Omit<ProductTag, "id"> },
   ProductTag
 >
 
@@ -17,8 +17,8 @@ const validateProductTag = (tag: Omit<ProductTag, "id">) => {
 export const createProductTag: WithRepositoryImpl<CreateProductTag> = async ({
   repositoryImpl = createProductTagImpl,
   dbClient,
-  ...tag
+  productTag,
 }) => {
-  validateProductTag(tag)
-  return repositoryImpl({ ...tag, dbClient })
+  validateProductTag(productTag)
+  return repositoryImpl({ productTag, dbClient })
 }

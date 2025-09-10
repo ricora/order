@@ -1,7 +1,10 @@
 import { describe, expect, it } from "bun:test"
 import type { TransactionDbClient } from "../../../infrastructure/db/client"
 import type ProductTag from "../entities/productTag"
-import { createProductTag } from "./productTagCommandRepository"
+import {
+  type CreateProductTag,
+  createProductTag,
+} from "./productTagCommandRepository"
 
 const validTag: Omit<ProductTag, "id"> = {
   name: "新しいタグ",
@@ -10,10 +13,12 @@ const validTag: Omit<ProductTag, "id"> = {
 describe("createProductTag", () => {
   const mockDbClient = {} as TransactionDbClient
   it("バリデーションを通過したタグを作成できる", async () => {
-    const mockImpl = async (params: Omit<ProductTag, "id">) =>
-      ({ ...params, id: 123 }) as ProductTag
+    const mockImpl: CreateProductTag = async ({ productTag }) => ({
+      ...productTag,
+      id: 123,
+    })
     const result = await createProductTag({
-      ...validTag,
+      productTag: validTag,
       repositoryImpl: mockImpl,
       dbClient: mockDbClient,
     })
@@ -25,7 +30,7 @@ describe("createProductTag", () => {
   it("タグ名が空ならエラーを返す", async () => {
     await expect(
       createProductTag({
-        name: "",
+        productTag: { name: "" },
         repositoryImpl: async () => ({ id: 1, name: "" }),
         dbClient: mockDbClient,
       }),
@@ -35,7 +40,7 @@ describe("createProductTag", () => {
   it("タグ名が51文字以上ならエラーを返す", async () => {
     await expect(
       createProductTag({
-        name: "あ".repeat(51),
+        productTag: { name: "あ".repeat(51) },
         repositoryImpl: async () => ({ id: 1, name: "あ".repeat(51) }),
         dbClient: mockDbClient,
       }),

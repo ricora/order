@@ -49,36 +49,42 @@ const verifyAllTagIdsExist = async (
 }
 
 export type CreateProduct = CommandRepositoryFunction<
-  Omit<Product, "id">,
+  { product: Omit<Product, "id"> },
   Product | null
 >
-export type UpdateProduct = CommandRepositoryFunction<Product, Product | null>
-export type DeleteProduct = CommandRepositoryFunction<Pick<Product, "id">, void>
+export type UpdateProduct = CommandRepositoryFunction<
+  { product: Product },
+  Product | null
+>
+export type DeleteProduct = CommandRepositoryFunction<
+  { product: Pick<Product, "id"> },
+  void
+>
 
 export const createProduct: WithRepositoryImpl<CreateProduct> = async ({
   repositoryImpl = createProductImpl,
   dbClient,
-  ...product
+  product,
 }) => {
   validateProduct(product)
   await verifyAllTagIdsExist(dbClient, product.tagIds)
-  return repositoryImpl({ ...product, dbClient })
+  return repositoryImpl({ product, dbClient })
 }
 
 export const updateProduct: WithRepositoryImpl<UpdateProduct> = async ({
   repositoryImpl = updateProductImpl,
   dbClient,
-  ...product
+  product,
 }) => {
   validateProduct(product)
   await verifyAllTagIdsExist(dbClient, product.tagIds)
-  return repositoryImpl({ ...product, dbClient })
+  return repositoryImpl({ product, dbClient })
 }
 
 export const deleteProduct: WithRepositoryImpl<DeleteProduct> = async ({
   repositoryImpl = deleteProductImpl,
-  id,
+  product,
   dbClient,
 }) => {
-  return repositoryImpl({ id, dbClient })
+  return repositoryImpl({ product, dbClient })
 }

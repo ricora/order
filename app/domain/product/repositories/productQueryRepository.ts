@@ -7,7 +7,7 @@ import type Product from "../entities/product"
 import { findAllProductTags } from "./productTagQueryRepository"
 
 export type FindProductById = QueryRepositoryFunction<
-  Pick<Product, "id">,
+  { product: Pick<Product, "id"> },
   Product | null
 >
 export type FindAllProducts = QueryRepositoryFunction<
@@ -16,17 +16,17 @@ export type FindAllProducts = QueryRepositoryFunction<
 >
 
 export const findProductById: WithRepositoryImpl<FindProductById> = async ({
-  id,
+  product,
   repositoryImpl = findProductByIdImpl,
   dbClient,
 }) => {
-  const product = await repositoryImpl({ id, dbClient })
-  if (!product) return null
+  const found = await repositoryImpl({ product, dbClient })
+  if (!found) return null
   const tags = await findAllProductTags({ dbClient })
   const tagIdSet = new Set(tags.map((t) => t.id))
   return {
-    ...product,
-    tagIds: product.tagIds.filter((tagId) => tagIdSet.has(tagId)),
+    ...found,
+    tagIds: found.tagIds.filter((tagId) => tagIdSet.has(tagId)),
   }
 }
 

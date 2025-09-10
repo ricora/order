@@ -9,7 +9,11 @@ import {
 } from "bun:test"
 import type { DbClient } from "../../../infrastructure/db/client"
 import type Product from "../entities/product"
-import { findAllProducts, findProductById } from "./productQueryRepository"
+import {
+  type FindAllProducts,
+  findAllProducts,
+  findProductById,
+} from "./productQueryRepository"
 import * as productTagQueryRepository from "./productTagQueryRepository"
 
 const mockTags = [
@@ -52,11 +56,11 @@ describe("findProductById", () => {
   })
 
   it("存在する商品を取得し、存在しないタグIDは除外される", async () => {
-    const mockImpl = async ({ id }: { id: number }) =>
-      mockProducts.find((p) => p.id === id) ?? null
+    const mockImpl = async ({ product }: { product: { id: number } }) =>
+      mockProducts.find((p) => p.id === product.id) ?? null
 
     const result = await findProductById({
-      id: 1,
+      product: { id: 1 },
       repositoryImpl: mockImpl,
       dbClient: mockDbClient,
     })
@@ -69,7 +73,7 @@ describe("findProductById", () => {
   it("存在しない商品IDならnullを返す", async () => {
     const mockImpl = async () => null
     const result = await findProductById({
-      id: 999,
+      product: { id: 999 },
       repositoryImpl: mockImpl,
       dbClient: mockDbClient,
     })
@@ -94,7 +98,8 @@ describe("findAllProducts", () => {
   })
 
   it("全商品を取得し、各商品で存在しないタグIDは除外される", async () => {
-    const mockImpl = async () => mockProducts
+    const mockImpl: FindAllProducts = async ({ dbClient: _dbClient }) =>
+      mockProducts
     const results = await findAllProducts({
       repositoryImpl: mockImpl,
       dbClient: mockDbClient,
