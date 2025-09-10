@@ -1,4 +1,4 @@
-import { drizzle } from "drizzle-orm/node-postgres"
+import { drizzle } from "drizzle-orm/postgres-js"
 
 export const dbClient = drizzle(process.env.DATABASE_URL || "")
 
