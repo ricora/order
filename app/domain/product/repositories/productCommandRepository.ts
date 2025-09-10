@@ -18,9 +18,10 @@ const validateProduct = (product: Omit<Product, "id">) => {
   }
 
   if (
-    !/^https?:\/\/.+/i.test(product.image) ||
-    countStringLength(product.image) < 1 ||
-    countStringLength(product.image) > 500
+    product.image !== null &&
+    (!/^https?:\/\/.+/i.test(product.image) ||
+      countStringLength(product.image) < 1 ||
+      countStringLength(product.image) > 500)
   ) {
     throw new Error(
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
