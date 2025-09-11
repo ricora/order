@@ -7,16 +7,16 @@ type ProductRegisterProps = {
 }
 
 const ProductRegister = ({ tags }: ProductRegisterProps) => (
-  <div className="bg-white rounded-lg border max-w-7xl mx-auto mt-6 mb-6 p-4">
+  <div className="mx-auto mt-6 mb-6 max-w-7xl rounded-lg border bg-white p-4">
     <details className="group">
       <summary
-        className="flex items-center justify-between cursor-pointer select-none outline-none focus:ring-2 focus:ring-blue-500"
+        className="flex cursor-pointer select-none items-center justify-between outline-none focus:ring-2 focus:ring-blue-500"
         aria-controls="product-register-form"
         tabIndex={0}
       >
         <span className="flex items-baseline gap-2">
-          <span className="text-lg font-bold">商品登録</span>
-          <span className="text-xs text-gray-400 ml-2">
+          <span className="font-bold text-lg">商品登録</span>
+          <span className="ml-2 text-gray-400 text-xs">
             クリックで開閉します。
           </span>
         </span>
@@ -29,12 +29,12 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
       <div id="product-register-form" className="p-4">
         <form method="post">
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block font-medium text-gray-700 text-sm">
               商品名
               <input
                 type="text"
                 name="name"
-                className="w-full border rounded px-3 py-2 placeholder:text-gray-400 mt-1"
+                className="mt-1 w-full rounded border px-3 py-2 placeholder:text-gray-400"
                 placeholder="商品名を入力してください"
                 required
                 minLength={1}
@@ -43,24 +43,24 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
             </label>
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block font-medium text-gray-700 text-sm">
               画像URL
               <input
                 type="url"
                 name="image"
-                className="w-full border rounded px-3 py-2 placeholder:text-gray-400 mt-1"
+                className="mt-1 w-full rounded border px-3 py-2 placeholder:text-gray-400"
                 placeholder="https://example.com/image.jpg"
               />
             </label>
           </div>
           <div className="mb-4 flex gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block font-medium text-gray-700 text-sm">
                 価格（円）
                 <input
                   type="number"
                   name="price"
-                  className="w-full border rounded px-3 py-2 placeholder:text-gray-400 mt-1"
+                  className="mt-1 w-full rounded border px-3 py-2 placeholder:text-gray-400"
                   min={0}
                   step={1}
                   required
@@ -69,12 +69,12 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
               </label>
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-1 block font-medium text-gray-700 text-sm">
                 在庫数
                 <input
                   type="number"
                   name="stock"
-                  className="w-full border rounded px-3 py-2 placeholder:text-gray-400 mt-1"
+                  className="mt-1 w-full rounded border px-3 py-2 placeholder:text-gray-400"
                   min={0}
                   step={1}
                   required
@@ -85,14 +85,14 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
           </div>
           <div className="mb-4">
             <TagInput existingTags={tags} />
-            <div className="text-xs text-gray-400 mt-1">
+            <div className="mt-1 text-gray-400 text-xs">
               既存タグは一覧からクリックで追加できます。新しいタグも入力して追加できます。
             </div>
           </div>
-          <div className="flex gap-4 mt-6">
+          <div className="mt-6 flex gap-4">
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 px-3 py-2 rounded border bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition w-full"
+              className="flex w-full items-center justify-center gap-2 rounded border bg-blue-600 px-3 py-2 font-medium text-sm text-white transition hover:bg-blue-700"
             >
               登録
             </button>

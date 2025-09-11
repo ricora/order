@@ -1,29 +1,9 @@
 import { css, keyframes } from "hono/css"
 import type { FC } from "hono/jsx"
+import { tv, type VariantProps } from "tailwind-variants"
 import CircleCheckIcon from "../icons/lucide/circleCheckIcon"
 import CircleXIcon from "../icons/lucide/circleXIcon"
 import TriangleAlertIcon from "../icons/lucide/triangleAlertIcon"
-
-const COLORS = {
-  success: {
-    bg: "bg-emerald-50",
-    text: "text-emerald-600",
-    border: "border-emerald-400",
-    icon: "text-emerald-600",
-  },
-  error: {
-    bg: "bg-rose-50",
-    text: "text-rose-600",
-    border: "border-rose-400",
-    icon: "text-rose-600",
-  },
-  warning: {
-    bg: "bg-amber-50",
-    text: "text-amber-600",
-    border: "border-amber-400",
-    icon: "text-amber-600",
-  },
-}
 
 const toastIn = keyframes`
   from {
@@ -53,21 +33,47 @@ const toastAnimate = css`
   z-index: 50;
 `
 
-const Toast: FC<{
-  message: string
-  type?: "success" | "error" | "warning"
-}> = ({ message, type = "success" }) => {
-  const color = COLORS[type]
+export const toast = tv({
+  slots: {
+    container:
+      "flex min-w-[240px] max-w-[400px] items-center rounded-lg border p-4 shadow-lg",
+    icon: "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+    text: "ml-3 break-words font-normal text-sm",
+  },
+  variants: {
+    type: {
+      success: {
+        container: "border-emerald-400 bg-emerald-50",
+        icon: "text-emerald-600",
+        text: "text-emerald-600",
+      },
+      error: {
+        container: "border-rose-400 bg-rose-50",
+        icon: "text-rose-600",
+        text: "text-rose-600",
+      },
+      warning: {
+        container: "border-amber-400 bg-amber-50",
+        icon: "text-amber-600",
+        text: "text-amber-600",
+      },
+    },
+  },
+  defaultVariants: {
+    type: "success",
+  },
+})
+
+export type ToastVariants = VariantProps<typeof toast>
+
+export type ToastProps = ToastVariants & { message: string }
+
+const Toast: FC<ToastProps> = ({ message, type }) => {
+  const { container, icon, text } = toast({ type })
   return (
     <div class={toastAnimate}>
-      <div
-        class={`flex items-center min-w-[240px] max-w-[400px] p-4 rounded-lg shadow-lg border
-          ${color.bg} ${color.border}`}
-        role="alert"
-      >
-        <div
-          class={`inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-lg ${color.icon}`}
-        >
+      <div class={container()} role="alert">
+        <div class={icon()}>
           <div class="size-5">
             {type === "error" ? (
               <CircleXIcon />
@@ -78,9 +84,7 @@ const Toast: FC<{
             )}
           </div>
         </div>
-        <div class={`ml-3 text-sm font-normal ${color.text} break-words`}>
-          {message}
-        </div>
+        <div class={text()}>{message}</div>
       </div>
     </div>
   )

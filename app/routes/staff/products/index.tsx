@@ -95,7 +95,7 @@ export default createRoute(async (c) => {
         </div>
       )}
       <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-7xl mx-auto space-y-6">
+        <div className="mx-auto max-w-7xl space-y-6">
           <ProductInfo
             totalProducts={totalProducts}
             outOfStockCount={outOfStockCount}
@@ -103,9 +103,9 @@ export default createRoute(async (c) => {
             totalValue={totalValue}
           />
           <ProductRegister tags={tags} />
-          <div className="bg-white rounded-lg border p-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
-              <span className="text-lg font-bold">商品一覧</span>
+          <div className="rounded-lg border bg-white p-4">
+            <div className="mb-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
+              <span className="font-bold text-lg">商品一覧</span>
               <div className="flex justify-end">
                 <ViewModeToggle viewMode={viewMode} search={search} />
               </div>

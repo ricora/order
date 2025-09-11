@@ -1,7 +1,29 @@
 import type { FC } from "hono/jsx"
+import { tv } from "tailwind-variants"
 import Grid3X3Icon from "../../../../components/icons/lucide/grid3X3Icon"
 import TableIcon from "../../../../components/icons/lucide/tableIcon"
 import { setQueryParam } from "../../../../utils/url"
+
+const viewModeToggle = tv({
+  slots: {
+    container: "flex items-center justify-between",
+    label: "font-medium text-gray-500 text-sm",
+    toggleGroup: "flex rounded-lg border bg-gray-50 p-1",
+    button:
+      "flex h-8 items-center rounded-md px-3 font-medium text-sm transition",
+    icon: "mr-2 h-4 w-4",
+  },
+  variants: {
+    isActive: {
+      true: {
+        button: "pointer-events-none bg-blue-600 text-white",
+      },
+      false: {
+        button: "bg-white text-gray-700 hover:bg-gray-100",
+      },
+    },
+  },
+})
 
 type ViewModeToggleProps = {
   viewMode: "table" | "card"
@@ -9,35 +31,29 @@ type ViewModeToggleProps = {
 }
 
 const ViewModeToggle: FC<ViewModeToggleProps> = ({ viewMode, search }) => {
+  const { container, label, toggleGroup, button, icon } = viewModeToggle()
+
   return (
-    <div className="flex items-center justify-between">
+    <div className={container()}>
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-500">表示モード:</span>
-        <div className="flex border rounded-lg p-1 bg-gray-50">
+        <span className={label()}>表示モード:</span>
+        <div className={toggleGroup()}>
           <a
             href={setQueryParam(search, "view", "table")}
-            className={`h-8 px-3 flex items-center rounded-md text-sm font-medium transition ${
-              viewMode === "table"
-                ? "bg-blue-600 text-white pointer-events-none"
-                : "bg-white text-gray-700 hover:bg-gray-100"
-            }`}
+            className={button({ isActive: viewMode === "table" })}
             aria-current={viewMode === "table" ? "page" : undefined}
           >
-            <div className="h-4 w-4 mr-2">
+            <div className={icon()}>
               <TableIcon />
             </div>
             テーブル
           </a>
           <a
             href={setQueryParam(search, "view", "card")}
-            className={`h-8 px-3 flex items-center rounded-md text-sm font-medium transition ${
-              viewMode === "card"
-                ? "bg-blue-600 text-white pointer-events-none"
-                : "bg-white text-gray-700 hover:bg-gray-100"
-            }`}
+            className={button({ isActive: viewMode === "card" })}
             aria-current={viewMode === "card" ? "page" : undefined}
           >
-            <div className="h-4 w-4 mr-2">
+            <div className={icon()}>
               <Grid3X3Icon />
             </div>
             カード

@@ -18,20 +18,22 @@
     "drizzle-orm": "^0.44.4",
     "hono": "^4.7.10",
     "honox": "^0.1.41",
-    "postgres": "^3.4.7"
+    "postgres": "^3.4.7",
+    "tailwind-merge": "^3.3.1",
+    "tailwind-variants": "^3.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.4",
     "@hono/vite-build": "1.7.0",
     "@hono/vite-dev-server": "0.19.0",
-    "@tailwindcss/vite": "4.1.12",
-    "@types/bun": "1.2.20",
-    "@types/node": "22.17.2",
+    "@tailwindcss/vite": "4.1.13",
+    "@types/bun": "1.2.21",
+    "@types/node": "22.18.1",
     "@types/pg": "^8.15.5",
     "drizzle-kit": "^0.31.4",
     "prettier": "3.6.2",
     "prettier-plugin-toml": "2.0.6",
-    "tailwindcss": "4.1.12",
-    "vite": "6.3.5"
+    "tailwindcss": "4.1.13",
+    "vite": "6.3.6"
   }
 }
