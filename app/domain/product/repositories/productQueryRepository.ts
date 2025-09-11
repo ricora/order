@@ -1,7 +1,7 @@
 import {
   findAllProductsImpl,
   findProductByIdImpl,
-} from "../../../infrastructure/product/productQueryRepositoryImpl"
+} from "../../../infrastructure/domain/product/productQueryRepositoryImpl"
 import type { QueryRepositoryFunction, WithRepositoryImpl } from "../../types"
 import type Product from "../entities/product"
 import { findAllProductTags } from "./productTagQueryRepository"

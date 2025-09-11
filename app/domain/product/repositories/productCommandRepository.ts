@@ -3,7 +3,7 @@ import {
   createProductImpl,
   deleteProductImpl,
   updateProductImpl,
-} from "../../../infrastructure/product/productCommandRepositoryImpl"
+} from "../../../infrastructure/domain/product/productCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
 import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import type Product from "../entities/product"

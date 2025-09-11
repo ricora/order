@@ -1,4 +1,4 @@
-import { createProductTagImpl } from "../../../infrastructure/product/productTagCommandRepositoryImpl"
+import { createProductTagImpl } from "../../../infrastructure/domain/product/productTagCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
 import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import type ProductTag from "../entities/productTag"
