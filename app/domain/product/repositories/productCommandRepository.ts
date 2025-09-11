@@ -20,7 +20,6 @@ const validateProduct = (product: Omit<Product, "id">) => {
   if (
     product.image !== null &&
     (!/^https?:\/\/.+/i.test(product.image) ||
-      countStringLength(product.image) < 1 ||
       countStringLength(product.image) > 500)
   ) {
     throw new Error(
