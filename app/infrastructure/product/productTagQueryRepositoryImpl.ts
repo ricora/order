@@ -1,14 +1,29 @@
+import { eq } from "drizzle-orm"
 import type {
   FindAllProductTags,
   FindProductTagById,
 } from "../../domain/product/repositories/productTagQueryRepository"
-import * as cache from "../cache"
+import { productTagTable } from "../db/schema"
 
-export const findProductTagByIdImpl: FindProductTagById = async ({ id }) => {
-  const tag = cache.productTags.find((t) => t.id === id) ?? null
-  return Promise.resolve(tag)
+export const findProductTagByIdImpl: FindProductTagById = async ({
+  dbClient,
+  productTag,
+}) => {
+  const dbTag = (
+    await dbClient
+      .select()
+      .from(productTagTable)
+      .where(eq(productTagTable.id, productTag.id))
+  )[0]
+  if (!dbTag) return Promise.resolve(null)
+  return Promise.resolve({ id: dbTag.id, name: dbTag.name })
 }
 
-export const findAllProductTagsImpl: FindAllProductTags = async () => {
-  return Promise.resolve(cache.productTags)
+export const findAllProductTagsImpl: FindAllProductTags = async ({
+  dbClient,
+}) => {
+  const rows = await dbClient.select().from(productTagTable)
+  return Promise.resolve(
+    rows.map((r: { id: number; name: string }) => ({ id: r.id, name: r.name })),
+  )
 }

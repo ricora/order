@@ -74,4 +74,19 @@ describe("getProductsManagementPageData", () => {
     expect(result.outOfStockCount).toBe(1)
     expect(result.totalValue).toBe(100 * 10 + 200 * 0 + 300 * 3)
   })
+
+  it("imageがnullの場合はデフォルト画像が挿入される", async () => {
+    const modifiedProducts: Product[] = mockProducts.map((p, i) =>
+      i === 0 ? { ...p, image: null } : p,
+    )
+    spyOn(productQueryRepository, "findAllProducts").mockImplementationOnce(
+      async () => modifiedProducts,
+    )
+
+    const result = await getProductsManagementPageData()
+    expect(result.products.length).toBeGreaterThan(0)
+    const first = result.products[0]
+    if (!first) throw new Error("no products returned")
+    expect(first.image).toBe("https://picsum.photos/200/200")
+  })
 })

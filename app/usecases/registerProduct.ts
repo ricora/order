@@ -26,7 +26,9 @@ export const registerProduct = async (
             tagIds.push(id)
           } else {
             const newTag = await createProductTag({
-              name: trimmed,
+              productTag: {
+                name: trimmed,
+              },
               dbClient: tx,
             })
             tagIds.push(newTag.id)
@@ -35,12 +37,18 @@ export const registerProduct = async (
         }
 
         createdProduct = await createProduct({
-          name: params.name.trim(),
-          // TODO: デフォルト画像を正式なものに差し替える
-          image: params.image.trim() || "https://picsum.photos/200/200",
-          tagIds,
-          price: params.price,
-          stock: params.stock,
+          product: {
+            name: params.name.trim(),
+            image:
+              typeof params.image === "string"
+                ? params.image.trim() === ""
+                  ? null
+                  : params.image.trim()
+                : null,
+            tagIds,
+            price: params.price,
+            stock: params.stock,
+          },
           dbClient: tx,
         })
       } catch {

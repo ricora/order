@@ -8,7 +8,6 @@ import {
   spyOn,
 } from "bun:test"
 import { TransactionRollbackError } from "drizzle-orm/errors"
-import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
 import * as productTagCommandRepository from "../domain/product/repositories/productTagCommandRepository"
@@ -44,17 +43,17 @@ describe("registerProduct", () => {
     createProductTagSpy = spyOn(
       productTagCommandRepository,
       "createProductTag",
-    ).mockImplementation(async ({ name }) => ({ id: 3, name }))
+    ).mockImplementation(async ({ productTag }) => ({
+      id: 3,
+      name: productTag.name,
+    }))
     createProductSpy = spyOn(
       productCommandRepository,
       "createProduct",
-    ).mockImplementation(
-      async (params) =>
-        ({
-          ...params,
-          id: 99,
-        }) as Product,
-    )
+    ).mockImplementation(async ({ product }) => ({
+      ...product,
+      id: 99,
+    }))
   })
   afterEach(() => {
     mock.restore()
@@ -72,7 +71,7 @@ describe("registerProduct", () => {
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(createProductTagSpy).not.toHaveBeenCalled()
     expect(createProductSpy).toHaveBeenCalledTimes(1)
-    expect(createProductSpy.mock.calls[0][0].tagIds).toEqual([1, 2])
+    expect(createProductSpy.mock.calls[0][0].product.tagIds).toEqual([1, 2])
     expect(rollbackSpy).not.toHaveBeenCalled()
   })
 
@@ -86,10 +85,10 @@ describe("registerProduct", () => {
     })
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(createProductTagSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "新規タグ" }),
+      expect.objectContaining({ productTag: { name: "新規タグ" } }),
     )
     expect(createProductSpy).toHaveBeenCalledTimes(1)
-    expect(createProductSpy.mock.calls[0][0].tagIds).toEqual([1, 3])
+    expect(createProductSpy.mock.calls[0][0].product.tagIds).toEqual([1, 3])
     expect(rollbackSpy).not.toHaveBeenCalled()
   })
 
@@ -104,7 +103,7 @@ describe("registerProduct", () => {
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(createProductTagSpy).toHaveBeenCalledTimes(0)
     expect(createProductSpy).toHaveBeenCalledTimes(1)
-    expect(createProductSpy.mock.calls[0][0].tagIds).toEqual([])
+    expect(createProductSpy.mock.calls[0][0].product.tagIds).toEqual([])
     expect(rollbackSpy).not.toHaveBeenCalled()
   })
 

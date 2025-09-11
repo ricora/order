@@ -5,7 +5,10 @@ import { findAllProductTags } from "../domain/product/repositories/productTagQue
 import { dbClient } from "../infrastructure/db/client"
 
 export type ProductsManagementPageData = {
-  products: (Omit<Product, "tagIds"> & { tags: string[] })[]
+  products: (Omit<Product, "image" | "tagIds"> & {
+    image: string
+    tags: string[]
+  })[]
   tags: ProductTag[]
   totalProducts: number
   lowStockCount: number
@@ -21,8 +24,10 @@ export const getProductsManagementPageData =
       tags.map((tag) => [tag.id, tag.name]),
     )
 
-    const productsWithTags = products.map((product) => ({
+    const managementProducts = products.map((product) => ({
       ...product,
+      // TODO: デフォルト画像を正式なものに差し替える
+      image: product.image ?? "https://picsum.photos/200/200",
       tags: product.tagIds
         .map((tagId) => tagMap.get(tagId))
         .filter((name): name is string => !!name),
@@ -36,7 +41,7 @@ export const getProductsManagementPageData =
     const totalValue = products.reduce((sum, p) => sum + p.price * p.stock, 0)
 
     return {
-      products: productsWithTags,
+      products: managementProducts,
       tags,
       totalProducts,
       lowStockCount,
