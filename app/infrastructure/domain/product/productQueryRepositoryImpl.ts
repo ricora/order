@@ -19,7 +19,7 @@ export const findProductByIdImpl: FindProductById = async ({
         stock: productTable.stock,
         tagIds: sql<
           number[]
-        >`coalesce(array_agg(${productTagRelationTable.tagId}), '{}')`,
+        >`coalesce(array_agg(${productTagRelationTable.tagId}) FILTER (WHERE ${productTagRelationTable.tagId} IS NOT NULL), ARRAY[]::int[])`,
       })
       .from(productTable)
       .leftJoin(
@@ -57,7 +57,7 @@ export const findAllProductsImpl: FindAllProducts = async ({ dbClient }) => {
       stock: productTable.stock,
       tagIds: sql<
         number[]
-      >`coalesce(array_agg(${productTagRelationTable.tagId}), '{}')`,
+      >`coalesce(array_agg(${productTagRelationTable.tagId}) FILTER (WHERE ${productTagRelationTable.tagId} IS NOT NULL), ARRAY[]::int[])`,
     })
     .from(productTable)
     .leftJoin(
