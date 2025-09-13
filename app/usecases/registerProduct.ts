@@ -12,51 +12,43 @@ export const registerProduct = async (
   params: RegisterProductParams,
 ): Promise<Product | null> => {
   let createdProduct: Product | null = null
-  try {
-    await dbClient.transaction(async (tx) => {
-      try {
-        const tags = await findAllProductTags({ dbClient: tx })
-        const tagNameToId = new Map(tags.map((tag) => [tag.name, tag.id]))
-        const tagIds: number[] = []
-        for (const tagName of params.tags) {
-          const trimmed = tagName.trim()
-          if (!trimmed) continue
-          const id = tagNameToId.get(trimmed)
-          if (id !== undefined) {
-            tagIds.push(id)
-          } else {
-            const newTag = await createProductTag({
-              productTag: {
-                name: trimmed,
-              },
-              dbClient: tx,
-            })
-            tagIds.push(newTag.id)
-            tagNameToId.set(trimmed, newTag.id)
-          }
-        }
-
-        createdProduct = await createProduct({
-          product: {
-            name: params.name.trim(),
-            image:
-              typeof params.image === "string"
-                ? params.image.trim() === ""
-                  ? null
-                  : params.image.trim()
-                : null,
-            tagIds,
-            price: params.price,
-            stock: params.stock,
+  await dbClient.transaction(async (tx) => {
+    const tags = await findAllProductTags({ dbClient: tx })
+    const tagNameToId = new Map(tags.map((tag) => [tag.name, tag.id]))
+    const tagIds: number[] = []
+    for (const tagName of params.tags) {
+      const trimmed = tagName.trim()
+      if (!trimmed) continue
+      const id = tagNameToId.get(trimmed)
+      if (id !== undefined) {
+        tagIds.push(id)
+      } else {
+        const newTag = await createProductTag({
+          productTag: {
+            name: trimmed,
           },
           dbClient: tx,
         })
-      } catch {
-        tx.rollback()
+        tagIds.push(newTag.id)
+        tagNameToId.set(trimmed, newTag.id)
       }
+    }
+
+    createdProduct = await createProduct({
+      product: {
+        name: params.name.trim(),
+        image:
+          typeof params.image === "string"
+            ? params.image.trim() === ""
+              ? null
+              : params.image.trim()
+            : null,
+        tagIds,
+        price: params.price,
+        stock: params.stock,
+      },
+      dbClient: tx,
     })
-  } catch {
-    throw new Error("商品の作成に失敗しました")
-  }
+  })
   return createdProduct
 }
