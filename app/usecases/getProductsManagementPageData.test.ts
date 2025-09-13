@@ -11,7 +11,14 @@ import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productQueryRepository from "../domain/product/repositories/productQueryRepository"
 import * as productTagQueryRepository from "../domain/product/repositories/productTagQueryRepository"
-import { getProductsManagementPageData } from "./getProductsManagementPageData"
+
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "postgres://localhost:5432/test"
+}
+
+const { getProductsManagementPageData } = await import(
+  "./getProductsManagementPageData"
+)
 
 const mockTags: ProductTag[] = [
   { id: 1, name: "人気" },
@@ -73,5 +80,20 @@ describe("getProductsManagementPageData", () => {
     expect(result.lowStockCount).toBe(1)
     expect(result.outOfStockCount).toBe(1)
     expect(result.totalValue).toBe(100 * 10 + 200 * 0 + 300 * 3)
+  })
+
+  it("imageがnullの場合はデフォルト画像が挿入される", async () => {
+    const modifiedProducts: Product[] = mockProducts.map((p, i) =>
+      i === 0 ? { ...p, image: null } : p,
+    )
+    spyOn(productQueryRepository, "findAllProducts").mockImplementationOnce(
+      async () => modifiedProducts,
+    )
+
+    const result = await getProductsManagementPageData()
+    expect(result.products.length).toBeGreaterThan(0)
+    const first = result.products[0]
+    if (!first) throw new Error("no products returned")
+    expect(first.image).toBe("https://picsum.photos/200/200")
   })
 })

@@ -1,11 +1,12 @@
-import { createProductTagImpl } from "../../../infrastructure/product/productTagCommandRepositoryImpl"
+import { createProductTagImpl } from "../../../infrastructure/domain/product/productTagCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
-import type { WithRepository } from "../../types"
+import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import type ProductTag from "../entities/productTag"
 
-export type CreateProductTag = (
-  params: Omit<ProductTag, "id">,
-) => Promise<ProductTag>
+export type CreateProductTag = CommandRepositoryFunction<
+  { productTag: Omit<ProductTag, "id"> },
+  ProductTag
+>
 
 const validateProductTag = (tag: Omit<ProductTag, "id">) => {
   if (countStringLength(tag.name) < 1 || countStringLength(tag.name) > 50) {
@@ -13,10 +14,11 @@ const validateProductTag = (tag: Omit<ProductTag, "id">) => {
   }
 }
 
-export const createProductTag: WithRepository<CreateProductTag> = async ({
+export const createProductTag: WithRepositoryImpl<CreateProductTag> = async ({
   repositoryImpl = createProductTagImpl,
-  ...tag
+  dbClient,
+  productTag,
 }) => {
-  validateProductTag(tag)
-  return repositoryImpl({ ...tag })
+  validateProductTag(productTag)
+  return repositoryImpl({ productTag, dbClient })
 }

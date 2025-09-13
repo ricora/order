@@ -1,10 +1,11 @@
+import type { TransactionDbClient } from "../../../infrastructure/db/client"
 import {
   createProductImpl,
   deleteProductImpl,
   updateProductImpl,
-} from "../../../infrastructure/product/productCommandRepositoryImpl"
+} from "../../../infrastructure/domain/product/productCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
-import type { WithRepository } from "../../types"
+import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import type Product from "../entities/product"
 import { findAllProductTags } from "./productTagQueryRepository"
 
@@ -17,9 +18,9 @@ const validateProduct = (product: Omit<Product, "id">) => {
   }
 
   if (
-    !/^https?:\/\/.+/i.test(product.image) ||
-    countStringLength(product.image) < 1 ||
-    countStringLength(product.image) > 500
+    product.image !== null &&
+    (!/^https?:\/\/.+/i.test(product.image) ||
+      countStringLength(product.image) > 500)
   ) {
     throw new Error(
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
@@ -36,41 +37,54 @@ const validateProduct = (product: Omit<Product, "id">) => {
   }
 }
 
-const verifyAllTagIdsExist = async (tagIds: number[]) => {
-  const tags = await findAllProductTags({})
+const verifyAllTagIdsExist = async (
+  dbClient: TransactionDbClient,
+  tagIds: number[],
+) => {
+  const tags = await findAllProductTags({ dbClient })
   const tagIdSet = new Set(tags.map((tag) => tag.id))
   if (tagIds.some((tagId) => !tagIdSet.has(tagId))) {
     throw new Error("タグIDは存在するタグのIDを参照する必要があります")
   }
 }
 
-export type CreateProduct = (
-  params: Omit<Product, "id">,
-) => Promise<Product | null>
-export type UpdateProduct = (params: Product) => Promise<Product | null>
-export type DeleteProduct = (params: Pick<Product, "id">) => Promise<void>
+export type CreateProduct = CommandRepositoryFunction<
+  { product: Omit<Product, "id"> },
+  Product | null
+>
+export type UpdateProduct = CommandRepositoryFunction<
+  { product: Product },
+  Product | null
+>
+export type DeleteProduct = CommandRepositoryFunction<
+  { product: Pick<Product, "id"> },
+  void
+>
 
-export const createProduct: WithRepository<CreateProduct> = async ({
+export const createProduct: WithRepositoryImpl<CreateProduct> = async ({
   repositoryImpl = createProductImpl,
-  ...product
+  dbClient,
+  product,
 }) => {
   validateProduct(product)
-  await verifyAllTagIdsExist(product.tagIds)
-  return repositoryImpl({ ...product })
+  await verifyAllTagIdsExist(dbClient, product.tagIds)
+  return repositoryImpl({ product, dbClient })
 }
 
-export const updateProduct: WithRepository<UpdateProduct> = async ({
+export const updateProduct: WithRepositoryImpl<UpdateProduct> = async ({
   repositoryImpl = updateProductImpl,
-  ...product
+  dbClient,
+  product,
 }) => {
   validateProduct(product)
-  await verifyAllTagIdsExist(product.tagIds)
-  return repositoryImpl(product)
+  await verifyAllTagIdsExist(dbClient, product.tagIds)
+  return repositoryImpl({ product, dbClient })
 }
 
-export const deleteProduct: WithRepository<DeleteProduct> = async ({
+export const deleteProduct: WithRepositoryImpl<DeleteProduct> = async ({
   repositoryImpl = deleteProductImpl,
-  id,
+  product,
+  dbClient,
 }) => {
-  return repositoryImpl({ id })
+  return repositoryImpl({ product, dbClient })
 }

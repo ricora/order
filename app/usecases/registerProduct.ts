@@ -2,6 +2,7 @@ import type Product from "../domain/product/entities/product"
 import { createProduct } from "../domain/product/repositories/productCommandRepository"
 import { createProductTag } from "../domain/product/repositories/productTagCommandRepository"
 import { findAllProductTags } from "../domain/product/repositories/productTagQueryRepository"
+import { dbClient } from "../infrastructure/db/client"
 
 export type RegisterProductParams = Omit<Product, "tagIds" | "id"> & {
   tags: string[]
@@ -10,9 +11,9 @@ export type RegisterProductParams = Omit<Product, "tagIds" | "id"> & {
 export const registerProduct = async (
   params: RegisterProductParams,
 ): Promise<Product | null> => {
-  // TODO: トランザクション管理を実装し、一連の処理をアトミックにする
-  try {
-    const tags = await findAllProductTags({})
+  let createdProduct: Product | null = null
+  await dbClient.transaction(async (tx) => {
+    const tags = await findAllProductTags({ dbClient: tx })
     const tagNameToId = new Map(tags.map((tag) => [tag.name, tag.id]))
     const tagIds: number[] = []
     for (const tagName of params.tags) {
@@ -22,21 +23,32 @@ export const registerProduct = async (
       if (id !== undefined) {
         tagIds.push(id)
       } else {
-        const newTag = await createProductTag({ name: trimmed })
+        const newTag = await createProductTag({
+          productTag: {
+            name: trimmed,
+          },
+          dbClient: tx,
+        })
         tagIds.push(newTag.id)
         tagNameToId.set(trimmed, newTag.id)
       }
     }
 
-    return await createProduct({
-      name: params.name.trim(),
-      // TODO: デフォルト画像を正式なものに差し替える
-      image: params.image.trim() || "https://picsum.photos/200/200",
-      tagIds,
-      price: params.price,
-      stock: params.stock,
+    createdProduct = await createProduct({
+      product: {
+        name: params.name.trim(),
+        image:
+          typeof params.image === "string"
+            ? params.image.trim() === ""
+              ? null
+              : params.image.trim()
+            : null,
+        tagIds,
+        price: params.price,
+        stock: params.stock,
+      },
+      dbClient: tx,
     })
-  } catch {
-    throw new Error("商品の作成に失敗しました")
-  }
+  })
+  return createdProduct
 }
