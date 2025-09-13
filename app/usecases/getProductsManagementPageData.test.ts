@@ -11,7 +11,14 @@ import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productQueryRepository from "../domain/product/repositories/productQueryRepository"
 import * as productTagQueryRepository from "../domain/product/repositories/productTagQueryRepository"
-import { getProductsManagementPageData } from "./getProductsManagementPageData"
+
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "postgres://localhost:5432/test"
+}
+
+const { getProductsManagementPageData } = await import(
+  "./getProductsManagementPageData"
+)
 
 const mockTags: ProductTag[] = [
   { id: 1, name: "人気" },

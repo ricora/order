@@ -11,8 +11,14 @@ import type ProductTag from "../domain/product/entities/productTag"
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
 import * as productTagCommandRepository from "../domain/product/repositories/productTagCommandRepository"
 import * as productTagQueryRepository from "../domain/product/repositories/productTagQueryRepository"
-import { dbClient, type TransactionDbClient } from "../infrastructure/db/client"
-import { registerProduct } from "./registerProduct"
+import type { TransactionDbClient } from "../infrastructure/db/client"
+
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "postgres://localhost:5432/test"
+}
+
+const { dbClient } = await import("../infrastructure/db/client")
+const { registerProduct } = await import("./registerProduct")
 
 const mockTags: ProductTag[] = [
   { id: 1, name: "人気" },
