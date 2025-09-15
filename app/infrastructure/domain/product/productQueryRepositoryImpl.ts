@@ -36,15 +36,15 @@ export const findProductByIdImpl: FindProductById = async ({
       )
   )[0]
 
-  if (!dbProduct) return Promise.resolve(null)
-  return Promise.resolve({
+  if (!dbProduct) return null
+  return {
     id: dbProduct.id,
     name: dbProduct.name,
     image: dbProduct.image,
     tagIds: dbProduct.tagIds,
     price: dbProduct.price,
     stock: dbProduct.stock,
-  })
+  }
 }
 
 export const findAllProductsImpl: FindAllProducts = async ({ dbClient }) => {
@@ -80,5 +80,5 @@ export const findAllProductsImpl: FindAllProducts = async ({ dbClient }) => {
     price: r.price,
     stock: r.stock,
   }))
-  return Promise.resolve(products)
+  return products
 }

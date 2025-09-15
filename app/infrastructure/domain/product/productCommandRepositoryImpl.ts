@@ -41,9 +41,9 @@ export const createProductImpl: CreateProduct = async ({
       price: dbProduct.price,
       stock: dbProduct.stock,
     }
-    return Promise.resolve(newProduct)
+    return newProduct
   } catch {
-    return Promise.reject(new Error("商品の作成に失敗しました"))
+    throw new Error("商品の作成に失敗しました")
   }
 }
 
@@ -90,9 +90,9 @@ export const updateProductImpl: UpdateProduct = async ({
       price: dbProduct.price,
       stock: dbProduct.stock,
     }
-    return Promise.resolve(updatedProduct)
+    return updatedProduct
   } catch {
-    return Promise.reject(new Error("商品の更新に失敗しました"))
+    throw new Error("商品の更新に失敗しました")
   }
 }
 
@@ -102,8 +102,7 @@ export const deleteProductImpl: DeleteProduct = async ({
 }) => {
   try {
     await dbClient.delete(productTable).where(eq(productTable.id, product.id))
-    return Promise.resolve()
   } catch {
-    return Promise.reject(new Error("商品の削除に失敗しました"))
+    throw new Error("商品の削除に失敗しました")
   }
 }

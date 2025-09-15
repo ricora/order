@@ -18,8 +18,8 @@ export const createProductTagImpl: CreateProductTag = async ({
       id: dbProductTag.id,
       name: dbProductTag.name,
     }
-    return Promise.resolve(newTag)
+    return newTag
   } catch {
-    return Promise.reject(new Error("商品タグの作成に失敗しました"))
+    throw new Error("商品タグの作成に失敗しました")
   }
 }
