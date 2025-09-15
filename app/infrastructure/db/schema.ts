@@ -5,7 +5,6 @@ import {
   integer,
   pgTable,
   primaryKey,
-  serial,
   text,
 } from "drizzle-orm/pg-core"
 
@@ -13,7 +12,7 @@ import {
 export const productTable = pgTable(
   "product",
   {
-    id: serial("id").primaryKey(),
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     name: text("name").notNull().unique(),
     image: text("image"),
     price: integer("price").notNull(),
@@ -38,7 +37,7 @@ export const productTable = pgTable(
 export const productTagTable = pgTable(
   "product_tag",
   {
-    id: serial("id").primaryKey(),
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     name: text("name").notNull().unique(),
   },
   (table) => [
