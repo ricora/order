@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm"
+import { relations, sql } from "drizzle-orm"
 import {
   check,
   index,
@@ -65,4 +65,26 @@ export const productTagRelationTable = pgTable(
     index("product_tag_relation_product_idx").on(table.productId),
     index("product_tag_relation_tag_idx").on(table.tagId),
   ],
+)
+
+export const productRelations = relations(productTable, ({ many }) => ({
+  productTags: many(productTagRelationTable),
+}))
+
+export const productTagRelations = relations(productTagTable, ({ many }) => ({
+  productTags: many(productTagRelationTable),
+}))
+
+export const productToProductTagRelations = relations(
+  productTagRelationTable,
+  ({ one }) => ({
+    product: one(productTable, {
+      fields: [productTagRelationTable.productId],
+      references: [productTable.id],
+    }),
+    productTag: one(productTagTable, {
+      fields: [productTagRelationTable.tagId],
+      references: [productTagTable.id],
+    }),
+  }),
 )
