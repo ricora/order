@@ -208,15 +208,13 @@
 
 @layer base {
   * {
-    text-rendering: optimizeLegibility;
-
     /*
      * Scrollbar
      */
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
 
-    border-color: var(--color-border);
+    border-color: var(--border);
   }
 
   body {
