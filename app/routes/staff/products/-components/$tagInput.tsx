@@ -1,5 +1,6 @@
 import { type FC, useState } from "hono/jsx"
 import type ProductTag from "../../../../domain/product/entities/productTag"
+import { stripString } from "../../../../utils/text"
 
 type TagInputProps = {
   existingTags: ProductTag[]
@@ -70,7 +71,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
           aria-haspopup="listbox"
           aria-controls="tag-suggestions"
           onInput={(e) => {
-            const value = (e.target as HTMLInputElement).value
+            const value = stripString((e.target as HTMLInputElement).value, 50)
             setInput(value)
             updateSuggestions(value)
           }}
