@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/*
+Intent UI Themes
+https://intentui.com/themes
+
+- Gray Color: Neutral
+- Accent Color: Neutral
+- Primary Color: Orange
+- Radius: 0.5
+*/
 @variant dark (&:is(.dark *));
 
 @theme inline {
