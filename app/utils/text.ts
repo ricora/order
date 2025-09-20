@@ -21,7 +21,7 @@ export const countStringLength = (input: string): number => {
  * @param maxLength - 最大文字数
  * @returns 指定文字数で切り詰めた文字列
  * @example
- * stripString("👩‍👩‍👧‍👦家", 2) // => "👩‍👩‍👧‍👦家"
+ * stripString("👩‍👩‍👧‍👦家族", 2) // => "👩‍👩‍👧‍👦家"
  */
 export const stripString = (input: string, maxLength: number): string => {
   const segmenter = new Intl.Segmenter("ja", { granularity: "grapheme" })
