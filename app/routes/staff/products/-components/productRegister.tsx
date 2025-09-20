@@ -31,6 +31,7 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
           <div className="mb-4">
             <label className="mb-1 block font-medium text-gray-700 text-sm">
               商品名
+              {/* TODO: サロゲートペアを考慮したクライアントバリデーションを実装する */}
               <input
                 type="text"
                 name="name"
@@ -38,7 +39,6 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
                 placeholder="商品名を入力してください"
                 required
                 minLength={1}
-                maxLength={100}
               />
             </label>
           </div>
