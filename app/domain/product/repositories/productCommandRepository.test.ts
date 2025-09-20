@@ -7,8 +7,14 @@ import {
   mock,
   spyOn,
 } from "bun:test"
+import type { TransactionDbClient } from "../../../infrastructure/db/client"
 import type Product from "../entities/product"
-import { createProduct, updateProduct } from "./productCommandRepository"
+import {
+  type CreateProduct,
+  createProduct,
+  type UpdateProduct,
+  updateProduct,
+} from "./productCommandRepository"
 import * as productTagQueryRepository from "./productTagQueryRepository"
 
 const mockTags = [
@@ -26,6 +32,7 @@ const validProduct: Omit<Product, "id"> = {
 
 describe("createProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  const mockDbClient = {} as TransactionDbClient
 
   beforeEach(() => {
     findAllProductTagsSpy = spyOn(
@@ -39,11 +46,14 @@ describe("createProduct", () => {
   })
 
   it("バリデーションを通過した商品を作成できる", async () => {
-    const mockImpl = async (params: Omit<Product, "id">) =>
-      ({ ...params, id: 99 }) as Product
+    const mockImpl: CreateProduct = async ({ product }) => ({
+      ...product,
+      id: 99,
+    })
     const result = await createProduct({
-      ...validProduct,
+      product: validProduct,
       repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
     })
     expect(result).not.toBeNull()
     expect(result?.name).toBe(validProduct.name)
@@ -53,9 +63,9 @@ describe("createProduct", () => {
   it("商品名が空ならエラーを返す", async () => {
     await expect(
       createProduct({
-        ...validProduct,
-        name: "",
+        product: { ...validProduct, name: "" },
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow("商品名は1文字以上50文字以内である必要があります")
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
@@ -64,9 +74,9 @@ describe("createProduct", () => {
   it("画像URLが空ならエラーを返す", async () => {
     await expect(
       createProduct({
-        ...validProduct,
-        image: "",
+        product: { ...validProduct, image: "" },
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow(
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
@@ -78,9 +88,9 @@ describe("createProduct", () => {
     const longUrl = `https://example.com/${"a".repeat(490)}`
     await expect(
       createProduct({
-        ...validProduct,
-        image: longUrl,
+        product: { ...validProduct, image: longUrl },
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow(
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
@@ -91,9 +101,9 @@ describe("createProduct", () => {
   it("画像URLがhttp/httpsで始まらない場合はエラーを返す", async () => {
     await expect(
       createProduct({
-        ...validProduct,
-        image: "ftp://example.com/image.png",
+        product: { ...validProduct, image: "ftp://example.com/image.png" },
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow(
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
@@ -104,9 +114,9 @@ describe("createProduct", () => {
   it("タグIDが存在しない場合はエラーを返す", async () => {
     await expect(
       createProduct({
-        ...validProduct,
-        tagIds: [999],
+        product: { ...validProduct, tagIds: [999] },
         repositoryImpl: async () => null,
+        dbClient: mockDbClient,
       }),
     ).rejects.toThrow("タグIDは存在するタグのIDを参照する必要があります")
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
@@ -115,6 +125,7 @@ describe("createProduct", () => {
 
 describe("updateProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  const mockDbClient = {} as TransactionDbClient
 
   beforeEach(() => {
     findAllProductTagsSpy = spyOn(
@@ -128,11 +139,11 @@ describe("updateProduct", () => {
   })
 
   it("バリデーションを通過した商品を更新できる", async () => {
-    const mockImpl = async (params: Product) => params
+    const mockImpl: UpdateProduct = async ({ product }) => product
     const result = await updateProduct({
-      ...validProduct,
-      id: 1,
+      product: { ...validProduct, id: 1 },
       repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
     })
     expect(result).not.toBeNull()
     expect(result?.id).toBe(1)

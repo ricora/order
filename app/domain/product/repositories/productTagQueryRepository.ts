@@ -1,24 +1,31 @@
 import {
   findAllProductTagsImpl,
   findProductTagByIdImpl,
-} from "../../../infrastructure/product/productTagQueryRepositoryImpl"
-import type { WithRepository } from "../../types"
+} from "../../../infrastructure/domain/product/productTagQueryRepositoryImpl"
+import type { QueryRepositoryFunction, WithRepositoryImpl } from "../../types"
 import type ProductTag from "../entities/productTag"
 
-export type FindProductTagById = (
-  params: Pick<ProductTag, "id">,
-) => Promise<ProductTag | null>
-export type FindAllProductTags = () => Promise<ProductTag[]>
+export type FindProductTagById = QueryRepositoryFunction<
+  { productTag: Pick<ProductTag, "id"> },
+  ProductTag | null
+>
+export type FindAllProductTags = QueryRepositoryFunction<
+  Record<string, never>,
+  ProductTag[]
+>
 
-export const findProductTagById: WithRepository<FindProductTagById> = async ({
-  id,
+export const findProductTagById: WithRepositoryImpl<
+  FindProductTagById
+> = async ({
+  productTag,
   repositoryImpl = findProductTagByIdImpl,
+  dbClient,
 }) => {
-  return repositoryImpl({ id })
+  return repositoryImpl({ productTag, dbClient })
 }
 
-export const findAllProductTags: WithRepository<FindAllProductTags> = async ({
-  repositoryImpl = findAllProductTagsImpl,
-}) => {
-  return repositoryImpl()
+export const findAllProductTags: WithRepositoryImpl<
+  FindAllProductTags
+> = async ({ repositoryImpl = findAllProductTagsImpl, dbClient }) => {
+  return repositoryImpl({ dbClient })
 }
