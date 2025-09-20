@@ -5,6 +5,10 @@ import honox from "honox/vite"
 import { defineConfig } from "vite"
 
 export default defineConfig({
+  define: {
+    // https://github.com/honojs/honox/issues/307
+    "process.env": "process.env",
+  },
   plugins: [
     honox({
       devServer: { adapter },
