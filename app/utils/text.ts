@@ -13,3 +13,20 @@ export const countStringLength = (input: string): number => {
   const segments = segmenter.segment(input)
   return [...segments].length
 }
+
+/**
+ * サロゲートペアや結合文字を考慮して、指定した文字数で安全に切り出す
+ *
+ * @param input - 切り出す文字列
+ * @param maxLength - 最大文字数
+ * @returns 指定文字数で切り詰めた文字列
+ * @example
+ * stripString("👩‍👩‍👧‍👦家", 2) // => "👩‍👩‍👧‍👦家"
+ */
+export const stripString = (input: string, maxLength: number): string => {
+  const segmenter = new Intl.Segmenter("ja", { granularity: "grapheme" })
+  const segments = segmenter.segment(input)
+  return Array.from(segments, (s) => s.segment)
+    .slice(0, maxLength)
+    .join("")
+}
