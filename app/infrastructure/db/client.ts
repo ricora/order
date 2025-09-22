@@ -1,10 +1,16 @@
-import { drizzle } from "drizzle-orm/postgres-js"
 import * as schema from "./schema"
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is not set.")
-}
-export const dbClient = drizzle(process.env.DATABASE_URL, { schema })
+export const dbClient = await (async () => {
+  if (!process.env.DATABASE_URL) {
+    console.warn(`DATABASE_URL environment variable is not set.
+Using native filesystem Postgres database via PGLite for testing purposes.`)
+
+    const { drizzle } = await import("drizzle-orm/pglite")
+    return drizzle("./pgdata", { schema })
+  }
+  const { drizzle } = await import("drizzle-orm/postgres-js")
+  return drizzle(process.env.DATABASE_URL, { schema })
+})()
 
 /** Query系で利用するDBクライアント */
 export type DbClient = typeof dbClient
