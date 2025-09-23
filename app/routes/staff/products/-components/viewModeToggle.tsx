@@ -7,8 +7,8 @@ import { setQueryParam } from "../../../../utils/url"
 const viewModeToggle = tv({
   slots: {
     container: "flex items-center justify-between",
-    label: "font-medium text-gray-500 text-sm",
-    toggleGroup: "flex rounded-lg border bg-gray-50 p-1",
+    label: "font-medium text-muted-fg text-sm",
+    toggleGroup: "flex rounded-lg border border-border bg-muted p-1",
     button:
       "flex h-8 items-center rounded-md px-3 font-medium text-sm transition",
     icon: "mr-2 h-4 w-4",
@@ -16,10 +16,10 @@ const viewModeToggle = tv({
   variants: {
     isActive: {
       true: {
-        button: "pointer-events-none bg-blue-600 text-white",
+        button: "pointer-events-none bg-primary text-primary-fg",
       },
       false: {
-        button: "bg-white text-gray-700 hover:bg-gray-100",
+        button: "bg-bg text-muted-fg hover:bg-muted",
       },
     },
   },
