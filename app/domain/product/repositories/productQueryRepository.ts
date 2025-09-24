@@ -40,14 +40,7 @@ export const findProductByName: WithRepositoryImpl<FindProductByName> = async ({
   repositoryImpl = findProductByNameImpl,
   dbClient,
 }) => {
-  const found = await repositoryImpl({ product, dbClient })
-  if (!found) return null
-  const tags = await findAllProductTags({ dbClient })
-  const tagIdSet = new Set(tags.map((t) => t.id))
-  return {
-    ...found,
-    tagIds: found.tagIds.filter((tagId) => tagIdSet.has(tagId)),
-  }
+  return repositoryImpl({ product, dbClient })
 }
 
 export const findAllProducts: WithRepositoryImpl<FindAllProducts> = async ({

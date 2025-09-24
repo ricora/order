@@ -85,15 +85,7 @@ describe("findProductById", () => {
 })
 
 describe("findProductByName", () => {
-  let findAllProductTagsSpy: ReturnType<typeof spyOn>
   const mockDbClient = {} as DbClient
-
-  beforeEach(() => {
-    findAllProductTagsSpy = spyOn(
-      productTagQueryRepository,
-      "findAllProductTags",
-    ).mockImplementation(async () => mockTags)
-  })
 
   afterEach(() => {
     mock.restore()
@@ -111,8 +103,7 @@ describe("findProductByName", () => {
     expect(result).not.toBeNull()
     expect(result?.id).toBe(1)
     expect(result?.name).toBe("テスト商品A")
-    expect(result?.tagIds).toEqual([1, 2])
-    expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+    expect(result?.tagIds).toEqual([1, 2, 999])
   })
 
   it("存在しない商品名ならnullを返す", async () => {
@@ -125,7 +116,6 @@ describe("findProductByName", () => {
       dbClient: mockDbClient,
     })
     expect(result).toBeNull()
-    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
   })
 
   it("商品名で正しい商品が取得される", async () => {
@@ -143,7 +133,6 @@ describe("findProductByName", () => {
     expect(result?.price).toBe(200)
     expect(result?.stock).toBe(5)
     expect(result?.tagIds).toEqual([2])
-    expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
   })
 
   it("大文字小文字を区別して検索される", async () => {
@@ -193,7 +182,6 @@ describe("findProductByName", () => {
       dbClient: mockDbClient,
     })
     expect(result).toBeNull()
-    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
   })
 
   it("特殊文字を含む商品名でも正しく検索される", async () => {
