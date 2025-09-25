@@ -30,12 +30,12 @@ const SidebarNavItem: FC<
 > = ({ href, icon: Icon, currentPath, children }) => {
   const isActive = currentPath === href
   return (
-    <li>
+    <li class="px-3 py-0.5">
       <a
         href={href}
-        className={`flex items-center gap-2 rounded-md px-6 py-2 font-medium text-sm transition ${
+        className={`flex items-center gap-2 rounded-md px-3 py-1.5 font-medium text-sm transition ${
           isActive
-            ? "bg-primary-subtle font-semibold text-primary-subtle-fg"
+            ? "bg-primary-subtle font-bold text-primary-subtle-fg"
             : "text-sidebar-fg hover:bg-sidebar-accent/60"
         }`}
         aria-current={isActive ? "page" : undefined}
