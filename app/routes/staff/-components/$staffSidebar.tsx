@@ -58,12 +58,12 @@ const StaffSidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
   const MobileToggleButton = () => (
     <button
       type="button"
-      className="fixed top-4 right-4 z-50 rounded-full border border-border bg-overlay p-2 text-overlay-fg shadow transition md:hidden"
+      className="fixed top-4 right-4 z-50 rounded-full border p-2 text-muted-fg transition hover:bg-muted md:hidden"
       aria-label={open ? "サイドバーを閉じる" : "サイドバーを開く"}
       onClick={() => setOpen(!open)}
     >
       <div
-        className={`h-6 w-6 transform text-muted-fg transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        className={`h-6 w-6 transform transition-transform duration-200 ${open ? "rotate-180" : ""}`}
       >
         <PanelLeftIcon />
       </div>
