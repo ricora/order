@@ -8,7 +8,7 @@ const viewModeToggle = tv({
   slots: {
     container: "flex items-center justify-between",
     label: "font-medium text-muted-fg text-sm",
-    toggleGroup: "flex rounded-lg border border-border bg-muted p-1",
+    toggleGroup: "flex rounded-lg bg-muted p-1",
     button:
       "flex h-8 items-center rounded-md px-3 font-medium text-sm transition",
     icon: "mr-2 h-4 w-4",
@@ -16,10 +16,10 @@ const viewModeToggle = tv({
   variants: {
     isActive: {
       true: {
-        button: "pointer-events-none bg-primary text-primary-fg",
+        button: "pointer-events-none bg-bg text-fg shadow-sm",
       },
       false: {
-        button: "bg-bg text-muted-fg hover:bg-muted",
+        button: "",
       },
     },
   },

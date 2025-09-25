@@ -103,7 +103,7 @@ export default createRoute(async (c) => {
             totalValue={totalValue}
           />
           <ProductRegister tags={tags} />
-          <div className="rounded-lg border border-border bg-bg p-4">
+          <div className="rounded-lg border bg-bg p-4">
             <div className="mb-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
               <span className="font-bold text-lg">商品一覧</span>
               <div className="flex justify-end">

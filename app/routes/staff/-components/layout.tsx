@@ -67,12 +67,12 @@ export const Layout: FC<
     <div className="flex min-h-screen bg-muted">
       <StaffSidebar currentPath={c.req.path} />
       <div className="flex min-w-0 flex-1 flex-col md:ml-64">
-        <header className="fixed top-0 right-0 left-0 z-30 flex h-16 items-center border-border border-b bg-navbar px-6 text-navbar-fg md:left-64">
+        <header className="fixed top-0 right-0 left-0 z-30 flex h-16 items-center border-b bg-navbar px-6 text-navbar-fg md:left-64">
           <Breadcrumbs currentPath={c.req.path} />
         </header>
         <main className="min-w-0 flex-1 pt-16">
           <div className="p-4">
-            <div className="mx-auto mt-2 mb-6 max-w-7xl rounded-lg border border-border bg-bg p-6">
+            <div className="mx-auto mt-2 mb-6 max-w-7xl rounded-lg border bg-bg p-6">
               <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                   <h1 className="font-bold text-2xl text-fg">{title}</h1>

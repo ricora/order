@@ -94,7 +94,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
         <div
           id="tag-suggestions"
           tabIndex={-1}
-          className="mb-2 max-h-40 overflow-auto rounded border border-border bg-bg p-2 shadow"
+          className="mb-2 max-h-40 overflow-auto rounded border bg-bg p-2 shadow"
           aria-live="polite"
         >
           {suggestions.map((tag) => (
@@ -117,7 +117,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
         {tags.map((tag) => (
           <span
             key={tag}
-            className="flex items-center rounded border border-border bg-muted px-2 py-1 text-muted-fg text-xs"
+            className="flex items-center rounded border bg-muted px-2 py-1 text-muted-fg text-xs"
           >
             {tag}
             <button

@@ -7,7 +7,7 @@ type ProductRegisterProps = {
 }
 
 const ProductRegister = ({ tags }: ProductRegisterProps) => (
-  <div className="mx-auto mt-6 mb-6 max-w-7xl rounded-lg border border-border bg-bg p-4">
+  <div className="mx-auto mt-6 mb-6 max-w-7xl rounded-lg border bg-bg p-4">
     <details className="group">
       <summary
         className="flex cursor-pointer select-none items-center justify-between outline-none focus:ring-2 focus:ring-primary"
@@ -16,7 +16,7 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
       >
         <span className="flex items-baseline gap-2">
           <span className="font-bold text-lg">商品登録</span>
-          <span className="ml-2 text-muted-fg/80 text-xs">
+          <span className="ml-2 text-muted-fg text-xs">
             クリックで開閉します。
           </span>
         </span>
@@ -35,7 +35,7 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
               <input
                 type="text"
                 name="name"
-                className="mt-1 w-full rounded border border-border px-3 py-2 text-fg placeholder:text-muted-fg/80"
+                className="mt-1 w-full rounded border px-3 py-2 text-fg placeholder:text-muted-fg/80"
                 placeholder="商品名を入力してください"
                 required
                 minLength={1}
@@ -48,7 +48,7 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
               <input
                 type="url"
                 name="image"
-                className="mt-1 w-full rounded border border-border px-3 py-2 text-fg placeholder:text-muted-fg/80"
+                className="mt-1 w-full rounded border px-3 py-2 text-fg placeholder:text-muted-fg/80"
                 placeholder="https://example.com/image.jpg"
               />
             </label>
@@ -60,7 +60,7 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
                 <input
                   type="number"
                   name="price"
-                  className="mt-1 w-full rounded border border-border px-3 py-2 text-fg placeholder:text-muted-fg/80"
+                  className="mt-1 w-full rounded border px-3 py-2 text-fg placeholder:text-muted-fg/80"
                   min={0}
                   step={1}
                   required
@@ -74,7 +74,7 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => (
                 <input
                   type="number"
                   name="stock"
-                  className="mt-1 w-full rounded border border-border px-3 py-2 text-fg placeholder:text-muted-fg/80"
+                  className="mt-1 w-full rounded border px-3 py-2 text-fg placeholder:text-muted-fg/80"
                   min={0}
                   step={1}
                   required

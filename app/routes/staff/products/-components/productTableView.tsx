@@ -19,7 +19,7 @@ const ProductTableRow = ({
         <img
           src={product.image || "/placeholder.svg?height=60&width=60"}
           alt={product.name}
-          className="h-12 min-h-12 w-12 min-w-12 rounded-md border border-border object-cover"
+          className="h-12 min-h-12 w-12 min-w-12 rounded-md border object-cover"
           loading="lazy"
         />
       </td>
@@ -29,7 +29,7 @@ const ProductTableRow = ({
           {product.tags.map((tag) => (
             <span
               key={tag}
-              className="whitespace-nowrap rounded border border-border bg-muted px-2 py-0.5 text-muted-fg text-xs"
+              className="whitespace-nowrap rounded border bg-muted px-2 py-0.5 text-muted-fg text-xs"
             >
               {tag}
             </span>
@@ -52,7 +52,7 @@ const ProductTableRow = ({
         <div className="flex flex-col items-center gap-2">
           <a
             href={`/staff/products/${product.id}/edit`}
-            className="flex flex-1 items-center justify-center gap-2 rounded border border-border bg-bg px-3 py-2 font-medium text-fg text-sm transition hover:bg-muted"
+            className="flex flex-1 items-center justify-center gap-2 rounded border bg-bg px-3 py-2 font-medium text-fg text-sm transition hover:bg-muted"
           >
             <div className="h-4 w-4">
               <SquarePenIcon />
@@ -61,7 +61,7 @@ const ProductTableRow = ({
           </a>
           <a
             href={`/staff/products/${product.id}/delete`}
-            className="flex flex-1 items-center justify-center gap-2 rounded border border-border bg-bg px-3 py-2 font-medium text-danger text-sm transition hover:bg-danger-subtle"
+            className="flex flex-1 items-center justify-center gap-2 rounded border bg-bg px-3 py-2 font-medium text-danger-subtle-fg text-sm transition hover:border-danger-subtle hover:bg-danger-subtle"
           >
             <div className="h-4 w-4">
               <Trash2Icon />
@@ -77,7 +77,7 @@ const ProductTableRow = ({
 const ProductTableView: FC<ProductTableViewProps> = ({ products }) => {
   return (
     <div className="w-full overflow-x-auto">
-      <div className="min-w-3xl rounded-md border border-border bg-bg">
+      <div className="min-w-3xl rounded-md border bg-bg">
         <table className="min-w-full divide-y divide-border">
           <thead className="bg-muted">
             <tr>
