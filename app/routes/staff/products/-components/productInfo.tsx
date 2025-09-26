@@ -27,7 +27,7 @@ const ProductInfo = ({
       <div className="font-bold text-2xl">{totalProducts}</div>
       <p className="mt-1 text-muted-fg text-xs">登録済み商品</p>
     </div>
-    <div className="flex flex-col rounded-lg border bg-bg p-4">
+    <div className="flex flex-col rounded-lg border border-danger bg-danger-subtle p-4">
       <div className="flex flex-row items-center justify-between pb-2">
         <span className="font-medium text-sm">在庫切れ</span>
         <div className="h-4 w-4 text-danger">
