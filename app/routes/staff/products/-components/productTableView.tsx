@@ -61,7 +61,7 @@ const ProductTableRow = ({
           </a>
           <a
             href={`/staff/products/${product.id}/delete`}
-            className="flex flex-1 items-center justify-center gap-2 rounded border bg-bg px-3 py-2 font-medium text-danger-subtle-fg text-sm transition hover:border-danger-subtle hover:bg-danger-subtle"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-danger-subtle-fg text-sm transition hover:border-danger-subtle hover:bg-danger-subtle"
           >
             <div className="h-4 w-4">
               <Trash2Icon />
