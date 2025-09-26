@@ -46,12 +46,12 @@ const Breadcrumbs: FC<{ currentPath: string }> = ({ currentPath }) => {
         <span key={item.href} className="flex items-center gap-2">
           <a
             href={item.href}
-            className="font-medium text-gray-600 text-sm hover:text-blue-600"
+            className="font-medium text-muted-fg text-sm hover:text-primary"
           >
             {item.label}
           </a>
           {idx < breadcrumbs.length - 1 && (
-            <span className="text-gray-300">/</span>
+            <span className="text-muted-fg/40">/</span>
           )}
         </span>
       ))}
@@ -64,19 +64,19 @@ export const Layout: FC<
 > = ({ children, title, description }) => {
   const c = useRequestContext()
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-muted">
       <StaffSidebar currentPath={c.req.path} />
       <div className="flex min-w-0 flex-1 flex-col md:ml-64">
-        <header className="fixed top-0 right-0 left-0 z-30 flex h-16 items-center border-b bg-white px-6 md:left-64">
+        <header className="fixed top-0 right-0 left-0 z-30 flex h-16 items-center border-b bg-navbar px-6 text-navbar-fg md:left-64">
           <Breadcrumbs currentPath={c.req.path} />
         </header>
         <main className="min-w-0 flex-1 pt-16">
           <div className="p-4">
-            <div className="mx-auto mt-2 mb-6 max-w-7xl rounded-lg border bg-white p-6">
+            <div className="mx-auto mt-2 mb-6 max-w-7xl rounded-lg border bg-bg p-6">
               <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
-                  <h1 className="font-bold text-2xl text-gray-900">{title}</h1>
-                  <p className="mt-1 text-gray-600">{description}</p>
+                  <h1 className="font-bold text-2xl text-fg">{title}</h1>
+                  <p className="mt-1 text-muted-fg">{description}</p>
                 </div>
               </div>
             </div>
