@@ -7,6 +7,7 @@ import {
 import { countStringLength } from "../../../utils/text"
 import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import type Product from "../entities/product"
+import { findProductByName } from "./productQueryRepository"
 import { findAllProductTags } from "./productTagQueryRepository"
 
 const validateProduct = (product: Omit<Product, "id">) => {
@@ -48,6 +49,20 @@ const verifyAllTagIdsExist = async (
   }
 }
 
+const verifyProductNameUnique = async (
+  dbClient: TransactionDbClient,
+  name: string,
+  excludeId?: number,
+) => {
+  const existingProduct = await findProductByName({
+    product: { name },
+    dbClient,
+  })
+  if (existingProduct && existingProduct.id !== excludeId) {
+    throw new Error("同じ名前の商品が既に存在します")
+  }
+}
+
 export type CreateProduct = CommandRepositoryFunction<
   { product: Omit<Product, "id"> },
   Product | null
@@ -67,6 +82,7 @@ export const createProduct: WithRepositoryImpl<CreateProduct> = async ({
   product,
 }) => {
   validateProduct(product)
+  await verifyProductNameUnique(dbClient, product.name)
   await verifyAllTagIdsExist(dbClient, product.tagIds)
   return repositoryImpl({ product, dbClient })
 }
@@ -77,6 +93,7 @@ export const updateProduct: WithRepositoryImpl<UpdateProduct> = async ({
   product,
 }) => {
   validateProduct(product)
+  await verifyProductNameUnique(dbClient, product.name, product.id)
   await verifyAllTagIdsExist(dbClient, product.tagIds)
   return repositoryImpl({ product, dbClient })
 }
