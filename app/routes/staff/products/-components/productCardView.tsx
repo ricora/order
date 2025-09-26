@@ -11,7 +11,7 @@ const formatPrice = (price: number) =>
 
 const ProductsNotRegistered = () => (
   <div className="py-12 text-center">
-    <div className="text-gray-400 text-lg">商品が登録されていません</div>
+    <div className="text-lg text-muted-fg">商品が登録されていません</div>
   </div>
 )
 
@@ -21,8 +21,8 @@ const ProductCard = ({
   product: ProductsManagementPageData["products"][number]
 }) => {
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg bg-white shadow transition-shadow hover:shadow-lg">
-      <div className="relative aspect-square overflow-hidden bg-gray-100">
+    <div className="flex flex-col overflow-hidden rounded-lg border bg-bg">
+      <div className="relative aspect-square overflow-hidden bg-muted">
         <img
           src={product.image || "/placeholder.svg?height=300&width=300"}
           alt={product.name}
@@ -42,7 +42,7 @@ const ProductCard = ({
               {product.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded border bg-gray-50 px-2 py-0.5 text-gray-600 text-xs"
+                  className="rounded border bg-muted px-2 py-0.5 text-muted-fg text-xs"
                 >
                   {tag}
                 </span>
@@ -50,11 +50,11 @@ const ProductCard = ({
             </div>
           </div>
           <div className="mt-2 flex items-center justify-between">
-            <div className="font-bold text-2xl text-blue-600">
+            <div className="font-bold text-2xl">
               {formatPrice(product.price)}
             </div>
             <div className="text-right">
-              <div className="text-gray-400 text-sm">在庫</div>
+              <div className="text-muted-fg text-sm">在庫</div>
               <div className="font-mono font-semibold">{product.stock}個</div>
             </div>
           </div>
@@ -62,7 +62,7 @@ const ProductCard = ({
         <div className="flex gap-2 pt-4">
           <a
             href={`/staff/products/${product.id}/edit`}
-            className="flex flex-1 items-center justify-center gap-2 rounded border bg-white px-3 py-2 font-medium text-gray-700 text-sm transition hover:bg-gray-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-fg text-sm transition hover:bg-muted"
           >
             <div className="h-4 w-4">
               <SquarePenIcon />
@@ -71,7 +71,7 @@ const ProductCard = ({
           </a>
           <a
             href={`/staff/products/${product.id}/delete`}
-            className="flex flex-1 items-center justify-center gap-2 rounded border bg-white px-3 py-2 font-medium text-red-600 text-sm transition hover:bg-red-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-danger-subtle-fg text-sm transition hover:border-danger-subtle hover:bg-danger-subtle"
           >
             <div className="h-4 w-4">
               <Trash2Icon />

@@ -94,7 +94,7 @@ export default createRoute(async (c) => {
           <Toast message={toastMessage} type={toastType} />
         </div>
       )}
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div className="min-h-screen bg-muted p-4">
         <div className="mx-auto max-w-7xl space-y-6">
           <ProductInfo
             totalProducts={totalProducts}
@@ -103,7 +103,7 @@ export default createRoute(async (c) => {
             totalValue={totalValue}
           />
           <ProductRegister tags={tags} />
-          <div className="rounded-lg border bg-white p-4">
+          <div className="rounded-lg border bg-bg p-4">
             <div className="mb-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
               <span className="font-bold text-lg">商品一覧</span>
               <div className="flex justify-end">

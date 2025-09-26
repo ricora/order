@@ -31,12 +31,15 @@ const stockStatusLabel = tv({
   },
   variants: {
     status: {
-      "out-of-stock": { base: "bg-red-100 text-red-700" },
+      "out-of-stock": { base: "bg-danger text-danger-fg" },
       "low-stock": {
-        base: "bg-yellow-100 text-yellow-700",
+        base: "bg-warning text-warning-fg",
         alertIcon: "hidden",
       },
-      "in-stock": { base: "bg-gray-100 text-gray-700", alertIcon: "hidden" },
+      "in-stock": {
+        base: "bg-success text-success-fg",
+        alertIcon: "hidden",
+      },
     } satisfies Record<StockStatus, unknown>,
   },
 })

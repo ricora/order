@@ -29,7 +29,7 @@ const ProductTableRow = ({
           {product.tags.map((tag) => (
             <span
               key={tag}
-              className="whitespace-nowrap rounded border bg-gray-50 px-2 py-0.5 text-gray-600 text-xs"
+              className="whitespace-nowrap rounded border bg-muted px-2 py-0.5 text-muted-fg text-xs"
             >
               {tag}
             </span>
@@ -52,7 +52,7 @@ const ProductTableRow = ({
         <div className="flex flex-col items-center gap-2">
           <a
             href={`/staff/products/${product.id}/edit`}
-            className="flex flex-1 items-center justify-center gap-2 rounded border bg-white px-3 py-2 font-medium text-gray-700 text-sm transition hover:bg-gray-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-fg text-sm transition hover:bg-muted"
           >
             <div className="h-4 w-4">
               <SquarePenIcon />
@@ -61,7 +61,7 @@ const ProductTableRow = ({
           </a>
           <a
             href={`/staff/products/${product.id}/delete`}
-            className="flex flex-1 items-center justify-center gap-2 rounded border bg-white px-3 py-2 font-medium text-red-600 text-sm transition hover:bg-red-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-danger-subtle-fg text-sm transition hover:border-danger-subtle hover:bg-danger-subtle"
           >
             <div className="h-4 w-4">
               <Trash2Icon />
@@ -77,34 +77,34 @@ const ProductTableRow = ({
 const ProductTableView: FC<ProductTableViewProps> = ({ products }) => {
   return (
     <div className="w-full overflow-x-auto">
-      <div className="min-w-3xl rounded-md border">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="min-w-3xl rounded-md border bg-bg">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
-              <th className="w-16 px-4 py-2 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
+              <th className="w-16 px-4 py-2 text-left font-medium text-muted-fg text-xs uppercase tracking-wider">
                 画像
               </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
+              <th className="px-4 py-2 text-left font-medium text-muted-fg text-xs uppercase tracking-wider">
                 商品名
               </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">
+              <th className="px-4 py-2 text-left font-medium text-muted-fg text-xs uppercase tracking-wider">
                 タグ
               </th>
-              <th className="px-4 py-2 text-right font-medium text-gray-500 text-xs uppercase tracking-wider">
+              <th className="px-4 py-2 text-right font-medium text-muted-fg text-xs uppercase tracking-wider">
                 価格
               </th>
-              <th className="px-4 py-2 text-center font-medium text-gray-500 text-xs uppercase tracking-wider">
+              <th className="px-4 py-2 text-center font-medium text-muted-fg text-xs uppercase tracking-wider">
                 在庫
               </th>
-              <th className="px-4 py-2 text-center font-medium text-gray-500 text-xs uppercase tracking-wider">
+              <th className="px-4 py-2 text-center font-medium text-muted-fg text-xs uppercase tracking-wider">
                 ステータス
               </th>
-              <th className="px-4 py-2 text-center font-medium text-gray-500 text-xs uppercase tracking-wider">
+              <th className="px-4 py-2 text-center font-medium text-muted-fg text-xs uppercase tracking-wider">
                 編集
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
+          <tbody className="divide-y divide-border/60 bg-bg">
             {products.length ? (
               products.map((product) => (
                 <ProductTableRow key={product.id} product={product} />

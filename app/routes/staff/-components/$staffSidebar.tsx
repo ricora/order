@@ -14,7 +14,9 @@ const SidebarNavSection: FC<PropsWithChildren<{ label: string }>> = ({
   children,
 }) => (
   <div>
-    <div className="px-6 py-1 font-semibold text-gray-500 text-xs">{label}</div>
+    <div className="px-6 py-1 font-semibold text-sidebar-accent-fg/80 text-xs">
+      {label}
+    </div>
     <ul>{children}</ul>
   </div>
 )
@@ -28,15 +30,14 @@ const SidebarNavItem: FC<
 > = ({ href, icon: Icon, currentPath, children }) => {
   const isActive = currentPath === href
   return (
-    <li>
+    <li class="px-3 py-0.5">
       <a
         href={href}
-        className={`flex items-center gap-2 rounded-md px-6 py-2 font-medium text-sm transition ${
+        className={`flex items-center gap-2 rounded-md px-3 py-1.5 font-medium text-sm transition ${
           isActive
-            ? "bg-blue-50 font-bold text-blue-700"
-            : "text-gray-700 hover:bg-gray-100"
-        }
-        `}
+            ? "bg-primary-subtle font-bold text-primary-subtle-fg"
+            : "text-sidebar-fg hover:bg-sidebar-accent/60"
+        }`}
         aria-current={isActive ? "page" : undefined}
       >
         <div className="h-5 w-5 flex-shrink-0">
@@ -52,15 +53,17 @@ const SidebarNavItem: FC<
 const StaffSidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
   const [open, setOpen] = useState(false)
 
+  const translateClass = open ? "translate-x-0" : "-translate-x-full"
+
   const MobileToggleButton = () => (
     <button
       type="button"
-      className="fixed top-4 right-4 z-50 rounded-full border bg-white p-2 shadow transition md:hidden"
+      className="fixed top-4 right-4 z-50 rounded-full border p-2 text-muted-fg transition hover:bg-muted md:hidden"
       aria-label={open ? "サイドバーを閉じる" : "サイドバーを開く"}
       onClick={() => setOpen(!open)}
     >
       <div
-        className={`h-6 w-6 transform text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        className={`h-6 w-6 transform transition-transform duration-200 ${open ? "rotate-180" : ""}`}
       >
         <PanelLeftIcon />
       </div>
@@ -71,17 +74,17 @@ const StaffSidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
     <>
       <MobileToggleButton />
       <aside
-        className={`fixed top-0 left-0 z-40 flex h-screen w-64 flex-col border-r bg-white transition-all duration-200 ${open ? "translate-x-0" : "-translate-x-full"}md:translate-x-0 md:fixed md:top-0 md:left-0 md:z-40 md:h-screen md:w-64`}
+        className={`fixed top-0 left-0 z-40 flex h-screen w-64 flex-col border-sidebar-border border-r bg-sidebar text-sidebar-fg transition-all duration-200 ${translateClass} md:fixed md:top-0 md:left-0 md:z-40 md:h-screen md:w-64 md:translate-x-0`}
       >
-        <div className="relative flex items-center border-b px-0 py-5">
-          <div className="ml-4 grid aspect-square size-8 place-items-center rounded-md bg-gray-100">
+        <div className="relative flex items-center border-sidebar-border border-b px-0 py-5">
+          <div className="ml-4 grid aspect-square size-8 place-items-center rounded-md bg-sidebar-accent">
             <div className="size-6">
               <ChefHatIcon />
             </div>
           </div>
           <div className="ml-2 flex flex-col gap-0.5 leading-none">
             <span className="font-semibold text-lg">Order</span>
-            <span className="whitespace-nowrap text-gray-400 text-xs">
+            <span className="whitespace-nowrap text-sidebar-accent-fg/80 text-xs">
               View and manage orders
             </span>
           </div>
