@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm"
 import type {
   FindAllProducts,
   FindProductById,
+  FindProductByName,
 } from "../../../domain/product/repositories/productQueryRepository"
 import { productTable } from "../../db/schema"
 
@@ -21,6 +22,31 @@ export const findProductByIdImpl: FindProductById = async ({
   })
   if (!dbProduct) return null
 
+  return {
+    id: dbProduct.id,
+    name: dbProduct.name,
+    image: dbProduct.image,
+    tagIds: dbProduct.productTags.map((tag) => tag.tagId),
+    price: dbProduct.price,
+    stock: dbProduct.stock,
+  }
+}
+
+export const findProductByNameImpl: FindProductByName = async ({
+  dbClient,
+  product,
+}) => {
+  const dbProduct = await dbClient.query.productTable.findFirst({
+    where: eq(productTable.name, product.name),
+    with: {
+      productTags: {
+        columns: {
+          tagId: true,
+        },
+      },
+    },
+  })
+  if (!dbProduct) return null
   return {
     id: dbProduct.id,
     name: dbProduct.name,

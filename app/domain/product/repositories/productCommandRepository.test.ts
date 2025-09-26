@@ -15,6 +15,7 @@ import {
   type UpdateProduct,
   updateProduct,
 } from "./productCommandRepository"
+import * as productQueryRepository from "./productQueryRepository"
 import * as productTagQueryRepository from "./productTagQueryRepository"
 
 const mockTags = [
@@ -32,6 +33,7 @@ const validProduct: Omit<Product, "id"> = {
 
 describe("createProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  let findProductByNameSpy: ReturnType<typeof spyOn>
   const mockDbClient = {} as TransactionDbClient
 
   beforeEach(() => {
@@ -39,6 +41,11 @@ describe("createProduct", () => {
       productTagQueryRepository,
       "findAllProductTags",
     ).mockImplementation(async () => mockTags)
+
+    findProductByNameSpy = spyOn(
+      productQueryRepository,
+      "findProductByName",
+    ).mockImplementation(async () => null)
   })
 
   afterEach(() => {
@@ -58,6 +65,28 @@ describe("createProduct", () => {
     expect(result).not.toBeNull()
     expect(result?.name).toBe(validProduct.name)
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+    expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("商品名が既に存在する場合はエラーを返す", async () => {
+    findProductByNameSpy.mockImplementation(async () => ({
+      id: 1,
+      name: validProduct.name,
+      image: "https://example.com/existing.png",
+      tagIds: [1],
+      price: 500,
+      stock: 10,
+    }))
+
+    await expect(
+      createProduct({
+        product: validProduct,
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow("同じ名前の商品が既に存在します")
+    expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
   })
 
   it("商品名が空ならエラーを返す", async () => {
@@ -69,6 +98,7 @@ describe("createProduct", () => {
       }),
     ).rejects.toThrow("商品名は1文字以上50文字以内である必要があります")
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
   })
 
   it("画像URLが空ならエラーを返す", async () => {
@@ -82,6 +112,7 @@ describe("createProduct", () => {
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
     )
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
   })
 
   it("画像URLが500文字を超える場合はエラーを返す", async () => {
@@ -96,6 +127,7 @@ describe("createProduct", () => {
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
     )
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
   })
 
   it("画像URLがhttp/httpsで始まらない場合はエラーを返す", async () => {
@@ -109,6 +141,7 @@ describe("createProduct", () => {
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
     )
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
   })
 
   it("タグIDが存在しない場合はエラーを返す", async () => {
@@ -120,11 +153,13 @@ describe("createProduct", () => {
       }),
     ).rejects.toThrow("タグIDは存在するタグのIDを参照する必要があります")
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+    expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
   })
 })
 
 describe("updateProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
+  let findProductByNameSpy: ReturnType<typeof spyOn>
   const mockDbClient = {} as TransactionDbClient
 
   beforeEach(() => {
@@ -132,6 +167,11 @@ describe("updateProduct", () => {
       productTagQueryRepository,
       "findAllProductTags",
     ).mockImplementation(async () => mockTags)
+
+    findProductByNameSpy = spyOn(
+      productQueryRepository,
+      "findProductByName",
+    ).mockImplementation(async () => null)
   })
 
   afterEach(() => {
@@ -147,6 +187,50 @@ describe("updateProduct", () => {
     })
     expect(result).not.toBeNull()
     expect(result?.id).toBe(1)
+    expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+    expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("他の商品と名前が重複している場合はエラーを返す", async () => {
+    findProductByNameSpy.mockImplementation(async () => ({
+      id: 2,
+      name: validProduct.name,
+      image: "https://example.com/existing.png",
+      tagIds: [1],
+      price: 500,
+      stock: 10,
+    }))
+
+    await expect(
+      updateProduct({
+        product: { ...validProduct, id: 1 },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow("同じ名前の商品が既に存在します")
+    expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
+
+  it("自身と同じ名前での更新は許可される", async () => {
+    findProductByNameSpy.mockImplementation(async () => ({
+      id: 1,
+      name: validProduct.name,
+      image: "https://example.com/existing.png",
+      tagIds: [1],
+      price: 500,
+      stock: 10,
+    }))
+
+    const mockImpl: UpdateProduct = async ({ product }) => product
+    const result = await updateProduct({
+      product: { ...validProduct, id: 1 },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.id).toBe(1)
+    expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
   })
 })
