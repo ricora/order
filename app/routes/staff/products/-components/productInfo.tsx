@@ -44,7 +44,7 @@ const ProductInfo = ({
           <TrendingUpIcon />
         </div>
       </div>
-      <div className="font-bold text-2xl text-warning">{lowStockCount}</div>
+      <div className="font-bold text-2xl text-warning-subtle-fg">{lowStockCount}</div>
       <p className="mt-1 text-muted-fg text-xs">在庫5個以下</p>
     </div>
     <div className="flex flex-col rounded-lg border bg-bg p-4">
