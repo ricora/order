@@ -62,7 +62,7 @@ const ProductCard = ({
         <div className="flex gap-2 pt-4">
           <a
             href={`/staff/products/${product.id}/edit`}
-            className="flex flex-1 items-center justify-center gap-2 rounded border bg-bg px-3 py-2 font-medium text-fg text-sm transition hover:bg-muted"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-fg text-sm transition hover:bg-muted"
           >
             <div className="h-4 w-4">
               <SquarePenIcon />
