@@ -34,7 +34,7 @@ const ProductInfo = ({
           <TriangleAlertIcon />
         </div>
       </div>
-      <div className="font-bold text-2xl text-danger">{outOfStockCount}</div>
+      <div className="font-bold text-2xl text-danger-subtle-fg">{outOfStockCount}</div>
       <p className="mt-1 text-muted-fg text-xs">要補充商品</p>
     </div>
     <div className="flex flex-col rounded-lg border bg-bg p-4">
