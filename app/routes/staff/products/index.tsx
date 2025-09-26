@@ -20,7 +20,7 @@ import ViewModeToggle from "./-components/viewModeToggle"
 
 const productFormDataToRegisterProductParams = (
   formData: FormData,
-): RegisterProductParams => {
+): RegisterProductParams["product"] => {
   const name = String(formData.get("name") ?? "").trim()
   if (!name) throw new Error("商品名は必須です")
   if (countStringLength(name) < 1 || countStringLength(name) > 50)
@@ -59,7 +59,7 @@ export const POST = createRoute(async (c) => {
   try {
     const formData = await c.req.formData()
     const product = productFormDataToRegisterProductParams(formData)
-    await registerProduct(product)
+    await registerProduct({ dbClient: c.get("dbClient"), product })
 
     setToastCookie(c, "success", "商品を登録しました")
   } catch (e) {
@@ -85,7 +85,7 @@ export default createRoute(async (c) => {
     outOfStockCount,
     lowStockCount,
     totalValue,
-  } = await getProductsManagementPageData()
+  } = await getProductsManagementPageData({ dbClient: c.get("dbClient") })
 
   return c.render(
     <Layout title={"商品管理"} description={"商品情報の登録や編集を行います。"}>

@@ -11,13 +11,12 @@ import type ProductTag from "../domain/product/entities/productTag"
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
 import * as productTagCommandRepository from "../domain/product/repositories/productTagCommandRepository"
 import * as productTagQueryRepository from "../domain/product/repositories/productTagQueryRepository"
-import type { TransactionDbClient } from "../infrastructure/db/client"
+import type { DbClient, TransactionDbClient } from "../infrastructure/db/client"
 
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = "postgres://localhost:5432/test"
 }
 
-const { dbClient } = await import("../infrastructure/db/client")
 const { registerProduct } = await import("./registerProduct")
 
 const mockTags: ProductTag[] = [
@@ -31,12 +30,22 @@ describe("registerProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
   let transactionSpy: ReturnType<typeof spyOn>
   let txMock: TransactionDbClient
+  let dbClient: DbClient
 
   beforeEach(() => {
     txMock = {} as TransactionDbClient
-    transactionSpy = spyOn(dbClient, "transaction").mockImplementation((cb) => {
-      return cb(txMock)
-    })
+    const transactionHolder = {
+      async transaction<T>(
+        callback: (tx: TransactionDbClient) => Promise<T>,
+      ): Promise<T> {
+        return callback(txMock)
+      },
+    }
+    dbClient = transactionHolder as unknown as DbClient
+    transactionSpy = spyOn(transactionHolder, "transaction").mockImplementation(
+      async <T>(callback: (tx: TransactionDbClient) => Promise<T>) =>
+        callback(txMock),
+    )
     findAllProductTagsSpy = spyOn(
       productTagQueryRepository,
       "findAllProductTags",
@@ -62,11 +71,14 @@ describe("registerProduct", () => {
 
   it("既存タグのみで商品を登録できる", async () => {
     await registerProduct({
-      name: "新商品",
-      image: "https://example.com/new.png",
-      tags: ["人気", "メイン"],
-      price: 500,
-      stock: 20,
+      dbClient,
+      product: {
+        name: "新商品",
+        image: "https://example.com/new.png",
+        tags: ["人気", "メイン"],
+        price: 500,
+        stock: 20,
+      },
     })
     expect(transactionSpy).toHaveBeenCalledTimes(1)
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
@@ -77,11 +89,14 @@ describe("registerProduct", () => {
 
   it("新規タグを含めて商品を登録できる", async () => {
     await registerProduct({
-      name: "新商品2",
-      image: "https://example.com/new2.png",
-      tags: ["人気", "新規タグ"],
-      price: 800,
-      stock: 5,
+      dbClient,
+      product: {
+        name: "新商品2",
+        image: "https://example.com/new2.png",
+        tags: ["人気", "新規タグ"],
+        price: 800,
+        stock: 5,
+      },
     })
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(createProductTagSpy).toHaveBeenCalledWith(
@@ -93,11 +108,14 @@ describe("registerProduct", () => {
 
   it("タグが空や空白のみの場合は無視される", async () => {
     await registerProduct({
-      name: "空タグ商品",
-      image: "https://example.com/empty.png",
-      tags: ["", "   "],
-      price: 100,
-      stock: 1,
+      dbClient,
+      product: {
+        name: "空タグ商品",
+        image: "https://example.com/empty.png",
+        tags: ["", "   "],
+        price: 100,
+        stock: 1,
+      },
     })
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(createProductTagSpy).toHaveBeenCalledTimes(0)
@@ -111,11 +129,14 @@ describe("registerProduct", () => {
     })
     await expect(
       registerProduct({
-        name: "失敗商品",
-        image: "https://example.com/fail.png",
-        tags: ["人気"],
-        price: 100,
-        stock: 1,
+        dbClient,
+        product: {
+          name: "失敗商品",
+          image: "https://example.com/fail.png",
+          tags: ["人気"],
+          price: 100,
+          stock: 1,
+        },
       }),
     ).rejects.toThrow("DBで商品の作成に失敗しました")
   })

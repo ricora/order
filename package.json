@@ -11,7 +11,8 @@
     "format": "biome format . && bun run prettier:format",
     "format:write": "biome format --write . && bun run prettier:format:write",
     "prettier:format": "prettier --ignore-path .prettierignore --ignore-path .gitignore --check .",
-    "prettier:format:write": "prettier --ignore-path .prettierignore --ignore-path .gitignore --write ."
+    "prettier:format:write": "prettier --ignore-path .prettierignore --ignore-path .gitignore --write .",
+    "setup-test-db": "drizzle-kit push --config drizzle-test.config.ts"
   },
   "private": true,
   "dependencies": {
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.4",
+    "@electric-sql/pglite": "^0.3.9",
     "@hono/vite-build": "1.7.0",
     "@hono/vite-dev-server": "0.19.0",
     "@tailwindcss/vite": "4.1.13",
