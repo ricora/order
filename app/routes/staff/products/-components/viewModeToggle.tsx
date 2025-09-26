@@ -19,7 +19,7 @@ const viewModeToggle = tv({
         button: "pointer-events-none bg-primary-subtle text-primary-subtle-fg",
       },
       false: {
-        button: "",
+        button: "hover:bg-secondary",
       },
     },
   },
