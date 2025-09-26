@@ -37,7 +37,7 @@ const stockStatusLabel = tv({
         alertIcon: "hidden",
       },
       "in-stock": {
-        base: "bg-success-subtle text-success-subtle-fg",
+        base: "bg-success text-success-fg",
         alertIcon: "hidden",
       },
     } satisfies Record<StockStatus, unknown>,
