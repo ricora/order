@@ -29,22 +29,30 @@ const ProductInfo = ({
     </div>
     <div className="flex flex-col rounded-lg border border-danger-subtle bg-danger-subtle p-4">
       <div className="flex flex-row items-center justify-between pb-2">
-        <span className="font-medium text-danger-subtle-fg text-sm">在庫切れ</span>
+        <span className="font-medium text-danger-subtle-fg text-sm">
+          在庫切れ
+        </span>
         <div className="h-4 w-4 text-danger-subtle-fg">
           <TriangleAlertIcon />
         </div>
       </div>
-      <div className="font-bold text-2xl text-danger-subtle-fg">{outOfStockCount}</div>
+      <div className="font-bold text-2xl text-danger-subtle-fg">
+        {outOfStockCount}
+      </div>
       <p className="mt-1 text-muted-fg text-xs">要補充商品</p>
     </div>
     <div className="flex flex-col rounded-lg border border-warning-subtle bg-warning-subtle p-4">
       <div className="flex flex-row items-center justify-between pb-2">
-        <span className="font-medium text-sm text-warning-subtle-fg">残りわずか</span>
+        <span className="font-medium text-sm text-warning-subtle-fg">
+          残りわずか
+        </span>
         <div className="h-4 w-4 text-warning-subtle-fg">
           <TrendingUpIcon />
         </div>
       </div>
-      <div className="font-bold text-2xl text-warning-subtle-fg">{lowStockCount}</div>
+      <div className="font-bold text-2xl text-warning-subtle-fg">
+        {lowStockCount}
+      </div>
       <p className="mt-1 text-muted-fg text-xs">在庫5個以下</p>
     </div>
     <div className="flex flex-col rounded-lg border bg-bg p-4">
