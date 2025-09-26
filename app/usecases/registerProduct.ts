@@ -2,21 +2,25 @@ import type Product from "../domain/product/entities/product"
 import { createProduct } from "../domain/product/repositories/productCommandRepository"
 import { createProductTag } from "../domain/product/repositories/productTagCommandRepository"
 import { findAllProductTags } from "../domain/product/repositories/productTagQueryRepository"
-import { dbClient } from "../infrastructure/db/client"
+import type { DbClient } from "../infrastructure/db/client"
 
-export type RegisterProductParams = Omit<Product, "tagIds" | "id"> & {
-  tags: string[]
+export type RegisterProductParams = {
+  dbClient: DbClient
+  product: Omit<Product, "tagIds" | "id"> & {
+    tags: string[]
+  }
 }
 
-export const registerProduct = async (
-  params: RegisterProductParams,
-): Promise<Product | null> => {
+export const registerProduct = async ({
+  dbClient,
+  product,
+}: RegisterProductParams): Promise<Product | null> => {
   let createdProduct: Product | null = null
   await dbClient.transaction(async (tx) => {
     const tags = await findAllProductTags({ dbClient: tx })
     const tagNameToId = new Map(tags.map((tag) => [tag.name, tag.id]))
     const tagIds: number[] = []
-    for (const tagName of params.tags) {
+    for (const tagName of product.tags) {
       const trimmed = tagName.trim()
       if (!trimmed) continue
       const id = tagNameToId.get(trimmed)
@@ -36,16 +40,16 @@ export const registerProduct = async (
 
     createdProduct = await createProduct({
       product: {
-        name: params.name.trim(),
+        name: product.name.trim(),
         image:
-          typeof params.image === "string"
-            ? params.image.trim() === ""
+          typeof product.image === "string"
+            ? product.image.trim() === ""
               ? null
-              : params.image.trim()
+              : product.image.trim()
             : null,
         tagIds,
-        price: params.price,
-        stock: params.stock,
+        price: product.price,
+        stock: product.stock,
       },
       dbClient: tx,
     })

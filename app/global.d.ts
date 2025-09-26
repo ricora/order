@@ -1,5 +1,9 @@
 import type {} from "hono"
 
 declare module "hono" {
-  interface Env {}
+  interface Env {
+    Variables: {
+      dbClient: import("./infrastructure/db/client").DbClient
+    }
+  }
 }
