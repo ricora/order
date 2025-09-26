@@ -8,7 +8,7 @@ const viewModeToggle = tv({
   slots: {
     container: "flex items-center justify-between",
     label: "font-medium text-muted-fg text-sm",
-    toggleGroup: "flex rounded-lg bg-muted p-1",
+    toggleGroup: "flex gap-x-1 rounded-lg bg-muted p-1",
     button:
       "flex h-8 items-center rounded-md px-3 font-medium text-sm transition",
     icon: "mr-2 h-4 w-4",
