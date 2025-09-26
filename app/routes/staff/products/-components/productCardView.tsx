@@ -21,7 +21,7 @@ const ProductCard = ({
   product: ProductsManagementPageData["products"][number]
 }) => {
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg bg-bg shadow transition-shadow hover:shadow-lg">
+    <div className="flex flex-col overflow-hidden rounded-lg border bg-bg">
       <div className="relative aspect-square overflow-hidden bg-muted">
         <img
           src={product.image || "/placeholder.svg?height=300&width=300"}
