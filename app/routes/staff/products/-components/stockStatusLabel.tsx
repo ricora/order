@@ -31,7 +31,7 @@ const stockStatusLabel = tv({
   },
   variants: {
     status: {
-      "out-of-stock": { base: "bg-danger-subtle text-danger-subtle-fg" },
+      "out-of-stock": { base: "bg-danger text-danger-fg" },
       "low-stock": {
         base: "bg-warning-subtle text-warning-subtle-fg",
         alertIcon: "hidden",
