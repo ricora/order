@@ -16,7 +16,7 @@ const viewModeToggle = tv({
   variants: {
     isActive: {
       true: {
-        button: "pointer-events-none bg-bg text-fg shadow-sm",
+        button: "pointer-events-none bg-primary-subtle text-primary-subtle-fg",
       },
       false: {
         button: "",
