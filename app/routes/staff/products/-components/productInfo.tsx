@@ -40,7 +40,7 @@ const ProductInfo = ({
     <div className="flex flex-col rounded-lg border border-warning bg-warning-subtle p-4">
       <div className="flex flex-row items-center justify-between pb-2">
         <span className="font-medium text-sm text-warning-subtle-fg">残りわずか</span>
-        <div className="h-4 w-4 text-warning">
+        <div className="h-4 w-4 text-warning-subtle-fg">
           <TrendingUpIcon />
         </div>
       </div>
