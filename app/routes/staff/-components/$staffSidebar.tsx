@@ -98,35 +98,37 @@ const StaffSidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
             >
               ダッシュボード
             </SidebarNavItem>
+          </SidebarNavSection>
+          <SidebarNavSection label="注文">
             <SidebarNavItem
-              href="/staff/register"
+              href="/staff/orders"
+              icon={ClipboardListIcon}
+              currentPath={currentPath}
+            >
+              注文一覧
+            </SidebarNavItem>
+            <SidebarNavItem
+              href="/staff/orders/new"
               icon={ShoppingCartIcon}
               currentPath={currentPath}
             >
-              レジ
+              注文登録
             </SidebarNavItem>
             <SidebarNavItem
-              href="/staff/kitchen"
+              href="/staff/orders/progress"
               icon={ChefHatIcon}
               currentPath={currentPath}
             >
-              厨房管理
+              注文進捗管理
             </SidebarNavItem>
           </SidebarNavSection>
-          <SidebarNavSection label="管理">
+          <SidebarNavSection label="商品">
             <SidebarNavItem
               href="/staff/products"
               icon={PackageIcon}
               currentPath={currentPath}
             >
               商品管理
-            </SidebarNavItem>
-            <SidebarNavItem
-              href="/staff/orders"
-              icon={ClipboardListIcon}
-              currentPath={currentPath}
-            >
-              注文履歴
             </SidebarNavItem>
           </SidebarNavSection>
           <SidebarNavSection label="分析・設定">
