@@ -1,10 +1,5 @@
 import { createRoute } from "honox/factory"
-import Toast from "../../../components/ui/toast"
-import {
-  deleteToastCookie,
-  getToastCookie,
-  setToastCookie,
-} from "../../../helpers/ui/toast"
+import { setToastCookie } from "../../../helpers/ui/toast"
 import { getProductsManagementPageData } from "../../../usecases/getProductsManagementPageData"
 import {
   type RegisterProductParams,
@@ -72,11 +67,6 @@ export default createRoute(async (c) => {
   const url = new URL(c.req.url)
   const viewMode = c.req.query("view") === "card" ? "card" : "table"
   const search = url.search
-  const { toastType, toastMessage } = getToastCookie(c)
-
-  if (toastType || toastMessage) {
-    deleteToastCookie(c)
-  }
 
   const {
     products,
@@ -89,34 +79,25 @@ export default createRoute(async (c) => {
 
   return c.render(
     <Layout title={"商品管理"} description={"商品情報の登録や編集を行います。"}>
-      {toastMessage && (
-        <div className="fixed top-4 right-4 z-50">
-          <Toast message={toastMessage} type={toastType} />
-        </div>
-      )}
-      <div className="min-h-screen bg-muted p-4">
-        <div className="mx-auto max-w-7xl space-y-6">
-          <ProductInfo
-            totalProducts={totalProducts}
-            outOfStockCount={outOfStockCount}
-            lowStockCount={lowStockCount}
-            totalValue={totalValue}
-          />
-          <ProductRegister tags={tags} />
-          <div className="rounded-lg border bg-bg p-4">
-            <div className="mb-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
-              <span className="font-bold text-lg">商品一覧</span>
-              <div className="flex justify-end">
-                <ViewModeToggle viewMode={viewMode} search={search} />
-              </div>
-            </div>
-            {viewMode === "table" ? (
-              <ProductTableView products={products} />
-            ) : (
-              <ProductCardView products={products} />
-            )}
+      <ProductInfo
+        totalProducts={totalProducts}
+        outOfStockCount={outOfStockCount}
+        lowStockCount={lowStockCount}
+        totalValue={totalValue}
+      />
+      <ProductRegister tags={tags} />
+      <div className="rounded-lg border bg-bg p-4">
+        <div className="mb-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <span className="font-bold text-lg">商品一覧</span>
+          <div className="flex justify-end">
+            <ViewModeToggle viewMode={viewMode} search={search} />
           </div>
         </div>
+        {viewMode === "table" ? (
+          <ProductTableView products={products} />
+        ) : (
+          <ProductCardView products={products} />
+        )}
       </div>
     </Layout>,
   )
