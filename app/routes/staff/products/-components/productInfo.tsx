@@ -1,6 +1,7 @@
 import PackageIcon from "../../../../components/icons/lucide/packageIcon"
 import TrendingUpIcon from "../../../../components/icons/lucide/trendingUpIcon"
 import TriangleAlertIcon from "../../../../components/icons/lucide/triangleAlertIcon"
+import { formatCurrencyJPY } from "../../../../utils/money"
 
 type ProductInfoProps = {
   totalProducts: number
@@ -62,12 +63,7 @@ const ProductInfo = ({
           <PackageIcon />
         </div>
       </div>
-      <div className="font-bold text-2xl">
-        {new Intl.NumberFormat("ja-JP", {
-          style: "currency",
-          currency: "JPY",
-        }).format(totalValue)}
-      </div>
+      <div className="font-bold text-2xl">{formatCurrencyJPY(totalValue)}</div>
       <p className="mt-1 text-muted-fg text-xs">現在の在庫価値</p>
     </div>
   </div>

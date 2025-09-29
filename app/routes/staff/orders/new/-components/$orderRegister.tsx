@@ -1,6 +1,7 @@
 import type { FC } from "hono/jsx"
 import { useMemo, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
+import { formatCurrencyJPY } from "../../../../../utils/money"
 import type { ProductForUI } from "../"
 
 type OrderItem = {
@@ -92,10 +93,7 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
   })
 
   const total = items.reduce((s, it) => s + it.price * (it.quantity || 0), 0)
-  const formattedTotal = new Intl.NumberFormat("ja-JP", {
-    style: "currency",
-    currency: "JPY",
-  }).format(total)
+  const formattedTotal = formatCurrencyJPY(total)
 
   const allTags = useMemo(() => {
     const set = new Set<string>()
@@ -190,10 +188,7 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
                       </div>
 
                       <div className="font-mono">
-                        {new Intl.NumberFormat("ja-JP", {
-                          style: "currency",
-                          currency: "JPY",
-                        }).format(p.price)}
+                        {formatCurrencyJPY(p.price)}
                       </div>
                     </div>
                   </button>
@@ -265,7 +260,7 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
                         />
                         <div className="min-w-0">
                           <div className="truncate font-medium">{it.name}</div>
-                          <div className="mt-1 truncate font-mono text-muted-fg text-sm">{`${new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY" }).format(it.price)} × ${it.quantity} = ${new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY" }).format(it.price * it.quantity)}`}</div>
+                          <div className="mt-1 truncate font-mono text-muted-fg text-sm">{`${formatCurrencyJPY(it.price)} × ${it.quantity} = ${formatCurrencyJPY(it.price * it.quantity)}`}</div>
                         </div>
                       </div>
 
