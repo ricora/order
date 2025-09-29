@@ -11,6 +11,7 @@ import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productQueryRepository from "../domain/product/repositories/productQueryRepository"
 import * as productTagQueryRepository from "../domain/product/repositories/productTagQueryRepository"
+import type { DbClient } from "../infrastructure/db/client"
 
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = "postgres://localhost:5432/test"
@@ -52,6 +53,8 @@ const mockProducts: Product[] = [
   },
 ]
 
+const dbClient = {} as DbClient
+
 describe("getProductsManagementPageData", () => {
   beforeAll(() => {
     spyOn(productQueryRepository, "findAllProducts").mockImplementation(
@@ -66,7 +69,7 @@ describe("getProductsManagementPageData", () => {
   })
 
   it("商品・タグ・集計値を正しく取得できる", async () => {
-    const result = await getProductsManagementPageData()
+    const result = await getProductsManagementPageData({ dbClient })
     expect(result.tags).toEqual(mockTags)
     expect(result.products.length).toBe(3)
 
@@ -90,7 +93,7 @@ describe("getProductsManagementPageData", () => {
       async () => modifiedProducts,
     )
 
-    const result = await getProductsManagementPageData()
+    const result = await getProductsManagementPageData({ dbClient })
     expect(result.products.length).toBeGreaterThan(0)
     const first = result.products[0]
     if (!first) throw new Error("no products returned")
