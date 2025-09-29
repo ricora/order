@@ -4,7 +4,7 @@ import { tv } from "tailwind-variants"
 import type { ProductForUI } from "../"
 
 type OrderItem = {
-  productId: number | string
+  productId: number
   name: string
   price: number
   quantity: number
