@@ -1,8 +1,16 @@
 import { Style } from "hono/css"
-import { jsxRenderer } from "hono/jsx-renderer"
+import { jsxRenderer, useRequestContext } from "hono/jsx-renderer"
 import { Link, Script } from "honox/server"
+import Toast from "../components/ui/toast"
+import { deleteToastCookie, getToastCookie } from "../helpers/ui/toast"
 
 export default jsxRenderer(({ children }) => {
+  const c = useRequestContext()
+  const { toastType, toastMessage } = getToastCookie(c)
+
+  if (toastType || toastMessage) {
+    deleteToastCookie(c)
+  }
   return (
     <html lang="en">
       <head>
@@ -13,7 +21,14 @@ export default jsxRenderer(({ children }) => {
         <Script src="/app/client.ts" async />
         <Style />
       </head>
-      <body>{children}</body>
+      <body>
+        {toastMessage && (
+          <div className="fixed top-4 right-4 z-50">
+            <Toast message={toastMessage} type={toastType} />
+          </div>
+        )}
+        {children}
+      </body>
     </html>
   )
 })

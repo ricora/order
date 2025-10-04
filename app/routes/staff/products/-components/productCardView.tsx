@@ -1,13 +1,8 @@
 import SquarePenIcon from "../../../../components/icons/lucide/squarePenIcon"
 import Trash2Icon from "../../../../components/icons/lucide/trash2Icon"
 import type { ProductsManagementPageData } from "../../../../usecases/getProductsManagementPageData"
+import { formatCurrencyJPY } from "../../../../utils/money"
 import { StockStatusLabel } from "./stockStatusLabel"
-
-const formatPrice = (price: number) =>
-  new Intl.NumberFormat("ja-JP", {
-    style: "currency",
-    currency: "JPY",
-  }).format(price)
 
 const ProductsNotRegistered = () => (
   <div className="py-12 text-center">
@@ -51,7 +46,7 @@ const ProductCard = ({
           </div>
           <div className="mt-2 flex items-center justify-between">
             <div className="font-bold text-2xl">
-              {formatPrice(product.price)}
+              {formatCurrencyJPY(product.price)}
             </div>
             <div className="text-right">
               <div className="text-muted-fg text-sm">在庫</div>

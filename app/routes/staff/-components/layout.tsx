@@ -81,7 +81,9 @@ export const Layout: FC<
               </div>
             </div>
           </div>
-          {children}
+          <div className="mx-auto max-w-7xl space-y-6">
+            <div className="min-h-screen bg-muted p-4">{children}</div>
+          </div>
         </main>
       </div>
     </div>

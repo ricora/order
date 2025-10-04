@@ -2,6 +2,7 @@ import type { FC } from "hono/jsx"
 import SquarePenIcon from "../../../../components/icons/lucide/squarePenIcon"
 import Trash2Icon from "../../../../components/icons/lucide/trash2Icon"
 import type { ProductsManagementPageData } from "../../../../usecases/getProductsManagementPageData"
+import { formatCurrencyJPY } from "../../../../utils/money"
 import { StockStatusLabel } from "./stockStatusLabel"
 
 type ProductTableViewProps = {
@@ -37,10 +38,7 @@ const ProductTableRow = ({
         </div>
       </td>
       <td className="px-4 py-2 text-right align-middle font-mono">
-        {new Intl.NumberFormat("ja-JP", {
-          style: "currency",
-          currency: "JPY",
-        }).format(product.price)}
+        {formatCurrencyJPY(product.price)}
       </td>
       <td className="px-4 py-2 text-center align-middle font-mono">
         {product.stock}
