@@ -27,6 +27,9 @@ const validateProduct = (product: Omit<Product, "id">) => {
       "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
     )
   }
+  if (product.tagIds.length > 20) {
+    throw new Error("商品タグは20個以内である必要があります")
+  }
   if (product.tagIds.some((tagId) => !Number.isInteger(tagId) || tagId < 1)) {
     throw new Error("タグIDは1以上の整数の配列である必要があります")
   }
