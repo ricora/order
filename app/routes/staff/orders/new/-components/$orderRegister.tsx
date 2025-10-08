@@ -37,6 +37,20 @@ const submitOrderButton = tv({
   },
 })
 
+const productButton = tv({
+  base: "w-full rounded border px-3 py-3 text-left transition",
+  variants: {
+    disabled: {
+      true: "cursor-not-allowed bg-white opacity-50",
+      false:
+        "cursor-pointer bg-white hover:border-primary-subtle hover:bg-primary-subtle",
+    },
+  },
+  defaultVariants: {
+    disabled: false,
+  },
+})
+
 const OrderRegister: FC<{
   products: OrderRegistrationPageData["products"]
   tags: OrderRegistrationPageData["tags"]
@@ -52,6 +66,16 @@ const OrderRegister: FC<{
 
   function addProduct(product: OrderRegistrationPageData["products"][number]) {
     setItems((prevItems) => {
+      // calculate reserved count for this product in the current cart
+      const reservedForThis = prevItems.reduce((sum, it) => {
+        return (
+          sum +
+          (String(it.productId) === String(product.id) ? it.quantity || 0 : 0)
+        )
+      }, 0)
+      const remainingForThis = product.stock - reservedForThis
+      // do not add if there's no remaining stock
+      if (remainingForThis <= 0) return prevItems
       const productIdStr = String(product.id)
       const existingItem = prevItems.find(
         (item) => String(item.productId) === productIdStr,
@@ -173,7 +197,8 @@ const OrderRegister: FC<{
                     key={product.id}
                     type="button"
                     onClick={() => addProduct(product)}
-                    className="w-full cursor-pointer rounded border bg-white px-3 py-3 text-left transition hover:border-primary-subtle hover:bg-primary-subtle"
+                    disabled={remaining <= 0}
+                    className={productButton({ disabled: remaining <= 0 })}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex min-w-0 items-center gap-3">
