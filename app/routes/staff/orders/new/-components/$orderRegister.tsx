@@ -1,14 +1,13 @@
 import type { FC } from "hono/jsx"
 import { useMemo, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
+import type { OrderRegistrationPageData } from "../../../../../usecases/getOrderRegistrationPageData"
+import type { RegisterOrderParams } from "../../../../../usecases/registerOrder"
 import { formatCurrencyJPY } from "../../../../../utils/money"
-import type { ProductForUI } from "../"
 
-type OrderItem = {
-  productId: number
-  name: string
-  price: number
-  quantity: number
+type OrderItem = RegisterOrderParams["order"]["orderItems"][number] & {
+  productName: string
+  unitAmount: number
 }
 
 const tagFilterButton = tv({
@@ -38,7 +37,10 @@ const submitOrderButton = tv({
   },
 })
 
-const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
+const OrderRegister: FC<{
+  products: OrderRegistrationPageData["products"]
+  tags: OrderRegistrationPageData["tags"]
+}> = ({ products, tags }) => {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [items, setItems] = useState<OrderItem[]>([])
 
@@ -48,37 +50,49 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
     )
   }
 
-  function addProduct(p: ProductForUI) {
-    setItems((prev) => {
-      const id = String(p.id)
-      const existing = prev.find((it) => String(it.productId) === id)
-      if (existing) {
-        return prev.map((it) =>
-          String(it.productId) === id
-            ? { ...it, quantity: Math.min((it.quantity || 0) + 1, p.stock) }
-            : it,
+  function addProduct(product: OrderRegistrationPageData["products"][number]) {
+    setItems((prevItems) => {
+      const productIdStr = String(product.id)
+      const existingItem = prevItems.find(
+        (item) => String(item.productId) === productIdStr,
+      )
+      if (existingItem) {
+        return prevItems.map((item) =>
+          String(item.productId) === productIdStr
+            ? {
+                ...item,
+                quantity: Math.min((item.quantity || 0) + 1, product.stock),
+              }
+            : item,
         )
       }
       return [
-        ...prev,
-        { productId: p.id, name: p.name, price: p.price, quantity: 1 },
+        ...prevItems,
+        {
+          productId: product.id,
+          productName: product.name,
+          unitAmount: product.price,
+          quantity: 1,
+        },
       ]
     })
   }
 
-  function setQuantity(productId: number | string, quantity: number) {
-    setItems((prev) =>
-      prev
-        .map((it) =>
-          String(it.productId) === String(productId) ? { ...it, quantity } : it,
+  function setQuantity(productId: number | string | null, quantity: number) {
+    setItems((prevItems) =>
+      prevItems
+        .map((item) =>
+          String(item.productId) === String(productId)
+            ? { ...item, quantity }
+            : item,
         )
-        .filter((it) => it.quantity > 0),
+        .filter((item) => item.quantity > 0),
     )
   }
 
-  function removeItem(productId: number | string) {
-    setItems((prev) =>
-      prev.filter((it) => String(it.productId) !== String(productId)),
+  function removeItem(productId: number | string | null) {
+    setItems((prevItems) =>
+      prevItems.filter((item) => String(item.productId) !== String(productId)),
     )
   }
 
@@ -87,23 +101,24 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
   }
 
   const reservedMap: Record<string, number> = {}
-  items.forEach((it) => {
-    reservedMap[String(it.productId)] =
-      (reservedMap[String(it.productId)] || 0) + (it.quantity || 0)
+  items.forEach((item) => {
+    reservedMap[String(item.productId)] =
+      (reservedMap[String(item.productId)] || 0) + (item.quantity || 0)
   })
 
-  const total = items.reduce((s, it) => s + it.price * (it.quantity || 0), 0)
+  const total = items.reduce(
+    (s, item) => s + item.unitAmount * (item.quantity || 0),
+    0,
+  )
   const formattedTotal = formatCurrencyJPY(total)
 
-  const allTags = useMemo(() => {
-    const set = new Set<string>()
-    products.forEach((p) => p.tags.forEach((t) => set.add(t)))
-    return Array.from(set)
-  }, [products])
+  const allTags = useMemo(() => tags.map((t) => t.name), [tags])
 
   const slice = useMemo(() => {
     if (selectedTags.length === 0) return products
-    return products.filter((p) => selectedTags.every((t) => p.tags.includes(t)))
+    return products.filter((product) =>
+      selectedTags.every((t) => product.tags.includes(t)),
+    )
   }, [products, selectedTags])
 
   const isCartEmpty = items.length === 0
@@ -148,30 +163,35 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
             className="max-h-[60vh] overflow-auto rounded border border-border/50 bg-muted p-2 md:max-h-[70vh]"
           >
             <div id="product-list" className="space-y-2 p-1">
-              {slice.map((p) => {
+              {slice.map((product) => {
                 const remaining = Math.max(
                   0,
-                  p.stock - (reservedMap[String(p.id)] || 0),
+                  product.stock - (reservedMap[String(product.id)] || 0),
                 )
                 return (
                   <button
-                    key={p.id}
+                    key={product.id}
                     type="button"
-                    onClick={() => addProduct(p)}
+                    onClick={() => addProduct(product)}
                     className="w-full cursor-pointer rounded border bg-white px-3 py-3 text-left transition hover:border-primary-subtle hover:bg-primary-subtle"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex min-w-0 items-center gap-3">
                         <img
-                          src={p.image || "/placeholder.svg?height=60&width=60"}
-                          alt={p.name}
+                          src={
+                            product.image ||
+                            "/placeholder.svg?height=60&width=60"
+                          }
+                          alt={product.name}
                           className="h-10 w-10 flex-shrink-0 rounded object-cover"
                           loading="lazy"
                         />
                         <div className="min-w-0">
-                          <div className="truncate font-medium">{p.name}</div>
+                          <div className="truncate font-medium">
+                            {product.name}
+                          </div>
                           <div className="mt-1 flex flex-wrap gap-1">
-                            {p.tags.map((tag) => (
+                            {product.tags.map((tag) => (
                               <span
                                 key={tag}
                                 className="whitespace-nowrap rounded border bg-muted px-2 py-0.5 text-muted-fg text-xs"
@@ -182,13 +202,15 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
                           </div>
                           <div className="mt-1 text-muted-fg text-xs">
                             残り:{" "}
-                            <span data-remaining-for={p.id}>{remaining}</span>
+                            <span data-remaining-for={product.id}>
+                              {remaining}
+                            </span>
                           </div>
                         </div>
                       </div>
 
                       <div className="font-mono">
-                        {formatCurrencyJPY(p.price)}
+                        {formatCurrencyJPY(product.price)}
                       </div>
                     </div>
                   </button>
@@ -231,42 +253,45 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
                 </div>
               )}
 
-              {items.map((it) => {
-                const prod = products.find(
-                  (p) => String(p.id) === String(it.productId),
+              {items.map((item) => {
+                const productInList = products.find(
+                  (product) => String(product.id) === String(item.productId),
                 )
-                const maxStock = prod ? prod.stock : undefined
+                const maxStock = productInList ? productInList.stock : undefined
                 return (
                   <div
-                    key={String(it.productId)}
+                    key={String(item.productId)}
                     className="rounded border bg-white p-3"
-                    data-product-id={String(it.productId)}
-                    data-price={String(it.price)}
+                    data-product-id={String(item.productId)}
+                    data-price={String(item.unitAmount)}
                   >
                     <input
                       type="hidden"
                       name="items[][productId]"
-                      value={String(it.productId)}
+                      value={String(item.productId)}
                     />
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                       <div className="flex min-w-0 items-center gap-4">
                         <img
                           src={
-                            prod?.image || "/placeholder.svg?height=60&width=60"
+                            productInList?.image ||
+                            "/placeholder.svg?height=60&width=60"
                           }
-                          alt={it.name}
+                          alt={item.productName}
                           className="h-10 w-10 flex-shrink-0 rounded object-cover"
                           loading="lazy"
                         />
                         <div className="min-w-0">
-                          <div className="truncate font-medium">{it.name}</div>
-                          <div className="mt-1 truncate font-mono text-muted-fg text-sm">{`${formatCurrencyJPY(it.price)} × ${it.quantity} = ${formatCurrencyJPY(it.price * it.quantity)}`}</div>
+                          <div className="truncate font-medium">
+                            {item.productName}
+                          </div>
+                          <div className="mt-1 truncate font-mono text-muted-fg text-sm">{`${formatCurrencyJPY(item.unitAmount)} × ${item.quantity} = ${formatCurrencyJPY(item.unitAmount * item.quantity)}`}</div>
                         </div>
                       </div>
 
                       <div className="mt-2 flex items-center gap-2 md:mt-0 md:gap-4">
                         <label
-                          htmlFor={`quantity-${String(it.productId)}`}
+                          htmlFor={`quantity-${String(item.productId)}`}
                           className="block text-sm"
                         >
                           数量
@@ -274,13 +299,13 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
                         <input
                           type="hidden"
                           name="items[][quantity]"
-                          value={String(it.quantity)}
+                          value={String(item.quantity)}
                         />
                         <input
                           type="number"
-                          id={`quantity-${String(it.productId)}`}
+                          id={`quantity-${String(item.productId)}`}
                           className="w-20 rounded border px-2 py-1 text-right text-fg text-sm md:w-24"
-                          value={String(it.quantity)}
+                          value={String(item.quantity)}
                           min={1}
                           max={maxStock}
                           onChange={(e: Event) => {
@@ -290,13 +315,13 @@ const OrderRegister: FC<{ products: ProductForUI[] }> = ({ products }) => {
                               maxStock !== undefined
                                 ? Math.min(Math.max(1, v), maxStock)
                                 : Math.max(1, v)
-                            setQuantity(it.productId, clamped)
+                            setQuantity(item.productId, clamped)
                           }}
                         />
 
                         <button
                           type="button"
-                          onClick={() => removeItem(it.productId)}
+                          onClick={() => removeItem(item.productId)}
                           className="flex cursor-pointer items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-danger-subtle-fg text-sm transition hover:border-danger-subtle hover:bg-danger-subtle"
                         >
                           削除

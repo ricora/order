@@ -31,6 +31,19 @@ const validProduct: Omit<Product, "id"> = {
   stock: 5,
 }
 
+const defaultProduct: Product = {
+  id: 1,
+  name: "テスト商品",
+  image: "https://example.com/image.png",
+  tagIds: [1, 2],
+  price: 1000,
+  stock: 5,
+}
+
+const applyPartialToDefaultProduct = (
+  partialProduct: Pick<Product, "id"> & Partial<Omit<Product, "id">>,
+): Product => Object.assign({}, defaultProduct, partialProduct) as Product
+
 describe("createProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
   let findProductByNameSpy: ReturnType<typeof spyOn>
@@ -179,7 +192,8 @@ describe("updateProduct", () => {
   })
 
   it("バリデーションを通過した商品を更新できる", async () => {
-    const mockImpl: UpdateProduct = async ({ product }) => product
+    const mockImpl: UpdateProduct = async ({ product }) =>
+      applyPartialToDefaultProduct(product)
     const result = await updateProduct({
       product: { ...validProduct, id: 1 },
       repositoryImpl: mockImpl,
@@ -222,7 +236,8 @@ describe("updateProduct", () => {
       stock: 10,
     }))
 
-    const mockImpl: UpdateProduct = async ({ product }) => product
+    const mockImpl: UpdateProduct = async ({ product }) =>
+      applyPartialToDefaultProduct(product)
     const result = await updateProduct({
       product: { ...validProduct, id: 1 },
       repositoryImpl: mockImpl,

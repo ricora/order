@@ -19,6 +19,10 @@ export type FindAllProducts = QueryRepositoryFunction<
   Record<string, never>,
   Product[]
 >
+export type findAllProductsByIds = QueryRepositoryFunction<
+  { product: { ids: Product["id"][] } },
+  Product[]
+>
 
 export const findProductById: WithRepositoryImpl<FindProductById> = async ({
   product,
@@ -54,4 +58,10 @@ export const findAllProducts: WithRepositoryImpl<FindAllProducts> = async ({
     ...product,
     tagIds: product.tagIds.filter((tagId) => tagIdSet.has(tagId)),
   }))
+}
+
+export const findAllProductsByIds: WithRepositoryImpl<
+  findAllProductsByIds
+> = async ({ product, repositoryImpl = findAllProductsImpl, dbClient }) => {
+  return repositoryImpl({ dbClient, product })
 }

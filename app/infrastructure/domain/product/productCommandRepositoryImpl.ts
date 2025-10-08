@@ -71,7 +71,7 @@ export const updateProductImpl: UpdateProduct = async ({
       .where(eq(productTagRelationTable.productId, product.id))
     let dbProductTagRelations: (typeof productTagRelationTable.$inferSelect)[] =
       []
-    if (product.tagIds.length > 0) {
+    if (product.tagIds && product.tagIds.length > 0) {
       const rows = product.tagIds.map((tagId) => ({
         productId: product.id,
         tagId,

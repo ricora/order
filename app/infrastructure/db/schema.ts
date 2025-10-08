@@ -6,8 +6,10 @@ import {
   pgTable,
   primaryKey,
   text,
+  timestamp,
 } from "drizzle-orm/pg-core"
 
+// product
 /** 商品 */
 export const productTable = pgTable(
   "product",
@@ -88,3 +90,58 @@ export const productToProductTagRelations = relations(
     }),
   }),
 )
+
+// order
+/** 注文 */
+export const orderTable = pgTable(
+  "order",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    customerName: text("customer_name"),
+    totalAmount: integer("total_amount").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("order_created_at_idx").on(table.createdAt),
+    check("order_total_amount_positive", sql`${table.totalAmount} >= 0`),
+    check(
+      "order_customer_name_length",
+      sql`${table.customerName} IS NULL OR (char_length(${table.customerName}) >= 1 AND char_length(${table.customerName}) <= 50)`,
+    ),
+  ],
+)
+
+/** 注文項目 */
+export const orderItemTable = pgTable(
+  "order_item",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    orderId: integer("order_id")
+      .notNull()
+      .references(() => orderTable.id, { onDelete: "cascade" }),
+    productId: integer("product_id").references(() => productTable.id, {
+      onDelete: "set null",
+    }),
+    quantity: integer("quantity").notNull(),
+    unitAmount: integer("unit_amount").notNull(),
+    productName: text("product_name").notNull(),
+  },
+  (table) => [
+    index("order_item_order_idx").on(table.orderId),
+    check("order_item_quantity_positive", sql`${table.quantity} >= 1`),
+    check("order_item_unit_amount_positive", sql`${table.unitAmount} >= 0`),
+  ],
+)
+
+export const orderRelations = relations(orderTable, ({ many }) => ({
+  orderItems: many(orderItemTable),
+}))
+
+export const orderItemRelations = relations(orderItemTable, ({ one }) => ({
+  order: one(orderTable, {
+    fields: [orderItemTable.orderId],
+    references: [orderTable.id],
+  }),
+}))
