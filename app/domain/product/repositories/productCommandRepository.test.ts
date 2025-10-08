@@ -168,6 +168,40 @@ describe("createProduct", () => {
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
   })
+  it("タグが20個を超える場合はエラーを返す", async () => {
+    const tagIds = Array.from({ length: 21 }, (_, i) => i + 1)
+    await expect(
+      createProduct({
+        product: { ...validProduct, tagIds },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow("商品タグは20個以内である必要があります")
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
+  })
+  it("タグがちょうど20個の場合は正常に作成できる", async () => {
+    const tagIds = Array.from({ length: 20 }, (_, i) => i + 1)
+    const extendedMockTags = Array.from({ length: 20 }, (_, i) => ({
+      id: i + 1,
+      name: `タグ${i + 1}`,
+    }))
+    findAllProductTagsSpy.mockImplementation(async () => extendedMockTags)
+
+    const mockImpl: CreateProduct = async ({ product }) => ({
+      ...product,
+      id: 99,
+    })
+    const result = await createProduct({
+      product: { ...validProduct, tagIds },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.tagIds.length).toBe(20)
+    expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+    expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe("updateProduct", () => {

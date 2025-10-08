@@ -31,6 +31,9 @@ const validateProduct = (product: Partial<Omit<Product, "id">>) => {
     }
   }
   if (product.tagIds !== undefined) {
+    if (product.tagIds.length > 20) {
+      throw new Error("商品タグは20個以内である必要があります")
+    }
     if (product.tagIds.some((tagId) => !Number.isInteger(tagId) || tagId < 1)) {
       throw new Error("タグIDは1以上の整数の配列である必要があります")
     }
