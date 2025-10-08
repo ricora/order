@@ -1,4 +1,5 @@
 import {
+  findAllProductsByIdsImpl,
   findAllProductsImpl,
   findProductByIdImpl,
   findProductByNameImpl,
@@ -48,6 +49,10 @@ export const findAllProducts: WithRepositoryImpl<FindAllProducts> = async ({
 
 export const findAllProductsByIds: WithRepositoryImpl<
   findAllProductsByIds
-> = async ({ product, repositoryImpl = findAllProductsImpl, dbClient }) => {
+> = async ({
+  product,
+  repositoryImpl = findAllProductsByIdsImpl,
+  dbClient,
+}) => {
   return repositoryImpl({ dbClient, product })
 }
