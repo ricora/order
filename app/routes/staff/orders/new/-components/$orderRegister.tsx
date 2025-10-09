@@ -199,26 +199,20 @@ const OrderRegister: FC<{
                   0,
                   product.stock - (reservedMap[String(product.id)] || 0),
                 )
+                const disabledForProduct =
+                  remaining <= 0 ||
+                  (items.length >= MAX_DISTINCT_ORDER_ITEMS &&
+                    !items.some(
+                      (it) => String(it.productId) === String(product.id),
+                    ))
+
                 return (
                   <button
                     key={product.id}
                     type="button"
                     onClick={() => addProduct(product)}
-                    disabled={
-                      remaining <= 0 ||
-                      (items.length >= MAX_DISTINCT_ORDER_ITEMS &&
-                        !items.some(
-                          (it) => String(it.productId) === String(product.id),
-                        ))
-                    }
-                    className={productButton({
-                      disabled:
-                        remaining <= 0 ||
-                        (items.length >= MAX_DISTINCT_ORDER_ITEMS &&
-                          !items.some(
-                            (it) => String(it.productId) === String(product.id),
-                          )),
-                    })}
+                    disabled={disabledForProduct}
+                    className={productButton({ disabled: disabledForProduct })}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex min-w-0 items-center gap-3">
