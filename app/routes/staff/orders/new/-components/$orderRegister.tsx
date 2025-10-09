@@ -57,6 +57,7 @@ const OrderRegister: FC<{
 }> = ({ products, tags }) => {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [items, setItems] = useState<OrderItem[]>([])
+  const MAX_DISTINCT_ORDER_ITEMS = 20
 
   function toggleTag(tag: string) {
     setSelectedTags((prev) =>
@@ -66,20 +67,26 @@ const OrderRegister: FC<{
 
   function addProduct(product: OrderRegistrationPageData["products"][number]) {
     setItems((prevItems) => {
-      // calculate reserved count for this product in the current cart
-      const reservedForThis = prevItems.reduce((sum, it) => {
-        return (
-          sum +
-          (String(it.productId) === String(product.id) ? it.quantity || 0 : 0)
-        )
-      }, 0)
-      const remainingForThis = product.stock - reservedForThis
-      // do not add if there's no remaining stock
-      if (remainingForThis <= 0) return prevItems
       const productIdStr = String(product.id)
       const existingItem = prevItems.find(
         (item) => String(item.productId) === productIdStr,
       )
+
+      if (!existingItem && prevItems.length >= MAX_DISTINCT_ORDER_ITEMS) {
+        return prevItems
+      }
+
+      const reservedForThis = prevItems.reduce((sum, currentItem) => {
+        return (
+          sum +
+          (String(currentItem.productId) === productIdStr
+            ? currentItem.quantity || 0
+            : 0)
+        )
+      }, 0)
+      const remainingForThis = product.stock - reservedForThis
+      if (remainingForThis <= 0) return prevItems
+
       if (existingItem) {
         return prevItems.map((item) =>
           String(item.productId) === productIdStr
@@ -197,8 +204,21 @@ const OrderRegister: FC<{
                     key={product.id}
                     type="button"
                     onClick={() => addProduct(product)}
-                    disabled={remaining <= 0}
-                    className={productButton({ disabled: remaining <= 0 })}
+                    disabled={
+                      remaining <= 0 ||
+                      (items.length >= MAX_DISTINCT_ORDER_ITEMS &&
+                        !items.some(
+                          (it) => String(it.productId) === String(product.id),
+                        ))
+                    }
+                    className={productButton({
+                      disabled:
+                        remaining <= 0 ||
+                        (items.length >= MAX_DISTINCT_ORDER_ITEMS &&
+                          !items.some(
+                            (it) => String(it.productId) === String(product.id),
+                          )),
+                    })}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex min-w-0 items-center gap-3">
