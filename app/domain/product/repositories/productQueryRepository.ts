@@ -1,4 +1,5 @@
 import {
+  findAllProductsByIdsImpl,
   findAllProductsImpl,
   findProductByIdImpl,
   findProductByNameImpl,
@@ -16,6 +17,10 @@ export type FindProductByName = QueryRepositoryFunction<
 >
 export type FindAllProducts = QueryRepositoryFunction<
   Record<string, never>,
+  Product[]
+>
+export type findAllProductsByIds = QueryRepositoryFunction<
+  { product: { ids: Product["id"][] } },
   Product[]
 >
 
@@ -40,4 +45,14 @@ export const findAllProducts: WithRepositoryImpl<FindAllProducts> = async ({
   dbClient,
 }) => {
   return repositoryImpl({ dbClient })
+}
+
+export const findAllProductsByIds: WithRepositoryImpl<
+  findAllProductsByIds
+> = async ({
+  product,
+  repositoryImpl = findAllProductsByIdsImpl,
+  dbClient,
+}) => {
+  return repositoryImpl({ dbClient, product })
 }

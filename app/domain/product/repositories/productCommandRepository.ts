@@ -10,40 +10,49 @@ import type Product from "../entities/product"
 import { findProductByName } from "./productQueryRepository"
 import { findAllProductTags } from "./productTagQueryRepository"
 
-const validateProduct = (product: Omit<Product, "id">) => {
-  if (
-    countStringLength(product.name) < 1 ||
-    countStringLength(product.name) > 50
-  ) {
-    throw new Error("商品名は1文字以上50文字以内である必要があります")
+const validateProduct = (product: Partial<Omit<Product, "id">>) => {
+  if (product.name !== undefined) {
+    if (
+      countStringLength(product.name) < 1 ||
+      countStringLength(product.name) > 50
+    ) {
+      throw new Error("商品名は1文字以上50文字以内である必要があります")
+    }
   }
-
-  if (
-    product.image !== null &&
-    (!/^https?:\/\/.+/i.test(product.image) ||
-      countStringLength(product.image) > 500)
-  ) {
-    throw new Error(
-      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-    )
+  if (product.image !== undefined) {
+    if (
+      product.image !== null &&
+      (!/^https?:\/\/.+/i.test(product.image) ||
+        countStringLength(product.image) > 500)
+    ) {
+      throw new Error(
+        "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
+      )
+    }
   }
-  if (product.tagIds.length > 20) {
-    throw new Error("商品タグは20個以内である必要があります")
+  if (product.tagIds !== undefined) {
+    if (product.tagIds.length > 20) {
+      throw new Error("商品タグは20個以内である必要があります")
+    }
+    if (product.tagIds.some((tagId) => !Number.isInteger(tagId) || tagId < 1)) {
+      throw new Error("タグIDは1以上の整数の配列である必要があります")
+    }
   }
-  if (product.tagIds.some((tagId) => !Number.isInteger(tagId) || tagId < 1)) {
-    throw new Error("タグIDは1以上の整数の配列である必要があります")
+  if (product.price !== undefined) {
+    if (product.price < 0 || !Number.isInteger(product.price)) {
+      throw new Error("価格は0以上の整数である必要があります")
+    }
   }
-  if (product.price < 0 || !Number.isInteger(product.price)) {
-    throw new Error("価格は0以上の整数である必要があります")
-  }
-  if (product.stock < 0 || !Number.isInteger(product.stock)) {
-    throw new Error("在庫数は0以上の整数である必要があります")
+  if (product.stock !== undefined) {
+    if (product.stock < 0 || !Number.isInteger(product.stock)) {
+      throw new Error("在庫数は0以上の整数である必要があります")
+    }
   }
 }
 
 const verifyAllTagIdsExist = async (
   dbClient: TransactionDbClient,
-  tagIds: number[],
+  tagIds: Product["tagIds"],
 ) => {
   const tags = await findAllProductTags({ dbClient })
   const tagIdSet = new Set(tags.map((tag) => tag.id))
@@ -54,8 +63,8 @@ const verifyAllTagIdsExist = async (
 
 const verifyProductNameUnique = async (
   dbClient: TransactionDbClient,
-  name: string,
-  excludeId?: number,
+  name: Product["name"],
+  excludeId?: Product["id"],
 ) => {
   const existingProduct = await findProductByName({
     product: { name },
@@ -71,7 +80,7 @@ export type CreateProduct = CommandRepositoryFunction<
   Product | null
 >
 export type UpdateProduct = CommandRepositoryFunction<
-  { product: Product },
+  { product: Pick<Product, "id"> & Partial<Omit<Product, "id">> },
   Product | null
 >
 export type DeleteProduct = CommandRepositoryFunction<
@@ -96,8 +105,12 @@ export const updateProduct: WithRepositoryImpl<UpdateProduct> = async ({
   product,
 }) => {
   validateProduct(product)
-  await verifyProductNameUnique(dbClient, product.name, product.id)
-  await verifyAllTagIdsExist(dbClient, product.tagIds)
+  if (product.name) {
+    await verifyProductNameUnique(dbClient, product.name, product.id)
+  }
+  if (product.tagIds) {
+    await verifyAllTagIdsExist(dbClient, product.tagIds)
+  }
   return repositoryImpl({ product, dbClient })
 }
 

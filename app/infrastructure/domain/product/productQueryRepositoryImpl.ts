@@ -1,8 +1,9 @@
-import { eq } from "drizzle-orm"
+import { eq, inArray } from "drizzle-orm"
 import type {
   FindAllProducts,
   FindProductById,
   FindProductByName,
+  findAllProductsByIds,
 } from "../../../domain/product/repositories/productQueryRepository"
 import { productTable } from "../../db/schema"
 
@@ -59,6 +60,31 @@ export const findProductByNameImpl: FindProductByName = async ({
 
 export const findAllProductsImpl: FindAllProducts = async ({ dbClient }) => {
   const dbProducts = await dbClient.query.productTable.findMany({
+    with: {
+      productTags: {
+        columns: {
+          tagId: true,
+        },
+      },
+    },
+  })
+  const products = dbProducts.map((dbProduct) => ({
+    id: dbProduct.id,
+    name: dbProduct.name,
+    image: dbProduct.image,
+    tagIds: dbProduct.productTags.map((tag) => tag.tagId),
+    price: dbProduct.price,
+    stock: dbProduct.stock,
+  }))
+  return products
+}
+
+export const findAllProductsByIdsImpl: findAllProductsByIds = async ({
+  dbClient,
+  product,
+}) => {
+  const dbProducts = await dbClient.query.productTable.findMany({
+    where: inArray(productTable.id, product.ids),
     with: {
       productTags: {
         columns: {
