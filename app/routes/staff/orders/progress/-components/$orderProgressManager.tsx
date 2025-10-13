@@ -23,10 +23,10 @@ const bandTv = tv({
   base: "-mx-4 -mt-4 h-2 rounded-t",
   variants: {
     status: {
-      pending: "bg-danger-subtle text-danger-fg",
-      processing: "bg-warning-subtle text-warning-fg",
-      completed: "bg-success-subtle text-success-fg",
-      cancelled: "bg-info-subtle text-info-subtle-fg",
+      pending: "bg-danger-subtle",
+      processing: "bg-warning-subtle",
+      completed: "bg-success-subtle",
+      cancelled: "bg-info-subtle",
     },
   },
   defaultVariants: { status: "pending" },
