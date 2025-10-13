@@ -1,0 +1,62 @@
+import { createRoute } from "honox/factory"
+import type Order from "../../../../domain/order/entities/order"
+import { setToastCookie } from "../../../../helpers/ui/toast"
+import { getOrderProgressPageData } from "../../../../usecases/getOrderProgressPageData"
+import {
+  type SetOrderStatusParams,
+  setOrderStatus,
+} from "../../../../usecases/setOrderStatus"
+import Layout from "../../-components/layout"
+import OrderProgressManager from "./-components/$orderProgressManager"
+
+const createInvalidFormDataError = () => {
+  return new Error("不正なフォームデータです")
+}
+
+const orderFormDataToSetOrderStatusParams = (
+  formData: FormData,
+): Omit<SetOrderStatusParams, "dbClient"> => {
+  const orderId = Number(formData.get("orderId"))
+  const status = String(
+    formData.get("status") ?? "",
+  ) as unknown as Order["status"]
+  if (!Number.isInteger(orderId) || orderId <= 0)
+    throw createInvalidFormDataError()
+  const allowed = ["pending", "processing", "completed", "cancelled"]
+  if (!allowed.includes(status)) throw createInvalidFormDataError()
+
+  return {
+    order: { id: orderId, status },
+  }
+}
+
+export const POST = createRoute(async (c) => {
+  try {
+    const formData = await c.req.formData()
+    const { order } = orderFormDataToSetOrderStatusParams(formData)
+
+    await setOrderStatus({
+      dbClient: c.get("dbClient"),
+      order,
+    })
+    setToastCookie(c, "success", "注文の状態を更新しました")
+  } catch (e) {
+    setToastCookie(c, "error", String(e))
+  }
+  return c.redirect(c.req.url)
+})
+
+export default createRoute(async (c) => {
+  const { orders } = await getOrderProgressPageData({
+    dbClient: c.get("dbClient"),
+  })
+
+  return c.render(
+    <Layout title={"注文進捗管理"} description={"注文の進捗を管理します。"}>
+      <div className="rounded-lg border bg-bg p-6">
+        <h2 className="mb-4 font-bold text-lg">注文進捗管理</h2>
+        <OrderProgressManager orders={orders} />
+      </div>
+    </Layout>,
+  )
+})
