@@ -12,6 +12,9 @@
     "format:write": "biome format --write . && bun run prettier:format:write",
     "prettier:format": "prettier --ignore-path .prettierignore --ignore-path .gitignore --check .",
     "prettier:format:write": "prettier --ignore-path .prettierignore --ignore-path .gitignore --write .",
+    "test": "bun run test:unit && bun run test:integration",
+    "test:unit": "bun test app/",
+    "test:integration": "rm -rf pgdata && bun --bun drizzle-kit push --config drizzle-test.config.ts && DATABASE_URL='' bun tests/setup-db.ts && vitest tests/integration/",
     "setup-test-db": "drizzle-kit push --config drizzle-test.config.ts"
   },
   "private": true,
