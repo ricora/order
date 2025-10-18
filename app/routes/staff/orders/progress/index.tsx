@@ -10,7 +10,7 @@ import Layout from "../../-components/layout"
 import OrderProgressManager from "./-components/$orderProgressManager"
 
 const createInvalidFormDataError = () => {
-  return new Error("不正なフォームデータです")
+  return new Error("不正なリクエストです")
 }
 
 const orderFormDataToSetOrderStatusParams = (
@@ -22,7 +22,12 @@ const orderFormDataToSetOrderStatusParams = (
   ) as unknown as Order["status"]
   if (!Number.isInteger(orderId) || orderId <= 0)
     throw createInvalidFormDataError()
-  const allowed = ["pending", "processing", "completed", "cancelled"]
+  const allowed = [
+    "pending",
+    "processing",
+    "completed",
+    "cancelled",
+  ] satisfies Order["status"][]
   if (!allowed.includes(status)) throw createInvalidFormDataError()
 
   return {
