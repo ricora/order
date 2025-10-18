@@ -11,8 +11,7 @@ import * as orderCommandRepository from "../domain/order/repositories/orderComma
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
 import * as productQueryRepository from "../domain/product/repositories/productQueryRepository"
 import type { DbClient, TransactionDbClient } from "../infrastructure/db/client"
-
-const { registerOrder } = await import("./registerOrder")
+import { registerOrder } from "./registerOrder"
 
 const mockProducts = [
   { id: 1, name: "A", image: null, tagIds: [], price: 100, stock: 5 },

@@ -18,6 +18,7 @@ export const findOrderByIdImpl: FindOrderById = async ({ dbClient, order }) => {
     id: dbOrder.id,
     customerName: dbOrder.customerName,
     createdAt: dbOrder.createdAt,
+    status: dbOrder.status,
     orderItems: dbOrder.orderItems.map((item) => ({
       productId: item.productId,
       productName: item.productName,
@@ -38,6 +39,7 @@ export const findAllOrdersImpl: FindAllOrders = async ({ dbClient }) => {
     id: dbOrder.id,
     customerName: dbOrder.customerName,
     createdAt: dbOrder.createdAt,
+    status: dbOrder.status,
     orderItems: dbOrder.orderItems.map((item) => ({
       productId: item.productId,
       productName: item.productName,
