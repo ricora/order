@@ -10,7 +10,7 @@ import Layout from "../../-components/layout"
 import OrderRegister from "./-components/$orderRegister"
 
 const createInvalidFormDataError = () => {
-  return new Error("不正なフォームデータです")
+  return new Error("不正なリクエストです")
 }
 
 const orderFormDataToRegisterOrderParams = (
@@ -22,19 +22,17 @@ const orderFormDataToRegisterOrderParams = (
   if (productIdEntries.length !== quantityEntries.length) {
     throw createInvalidFormDataError()
   }
-  const orderItems = productIdEntries
-    .map((productId, index) => {
-      const quantity = Number(quantityEntries[index])
-      const parsedProductId = Number(productId)
-      if (!Number.isInteger(parsedProductId) || !Number.isInteger(quantity)) {
-        throw createInvalidFormDataError()
-      }
-      return {
-        productId: parsedProductId,
-        quantity,
-      }
-    })
-    .filter((item) => item.quantity > 0)
+  const orderItems = productIdEntries.map((productId, index) => {
+    const quantity = Number(quantityEntries[index])
+    const parsedProductId = Number(productId)
+    if (!Number.isInteger(parsedProductId) || !Number.isInteger(quantity)) {
+      throw createInvalidFormDataError()
+    }
+    return {
+      productId: parsedProductId,
+      quantity,
+    }
+  })
 
   return {
     order: {

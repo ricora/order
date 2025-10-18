@@ -11,7 +11,7 @@ await registerProduct({
   product: {
     name: "テスト商品1",
     price: 1000,
-    stock: 10,
+    stock: 100,
     image: null,
     tags: ["タグA", "タグB"],
   },
@@ -21,7 +21,7 @@ await registerProduct({
   product: {
     name: "テスト商品2",
     price: 2000,
-    stock: 20,
+    stock: 200,
     image: null,
     tags: ["タグC", "タグD"],
   },
@@ -31,7 +31,7 @@ await registerProduct({
   product: {
     name: "テスト商品3",
     price: 3000,
-    stock: 30,
+    stock: 300,
     image: null,
     tags: ["タグA", "タグC"],
   },
@@ -41,7 +41,7 @@ await registerProduct({
   product: {
     name: "テスト商品4",
     price: 4000,
-    stock: 40,
+    stock: 400,
     image: null,
     tags: [],
   },
