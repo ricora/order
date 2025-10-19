@@ -28,13 +28,13 @@ const productFormDataToRegisterProductParams = (
     }
   }
 
-  const price = Number(formData.get("price"))
-  if (Number.isNaN(price) || price < 0 || !Number.isInteger(price)) {
+  const price = parseInt(formData.get("price")?.toString() ?? "", 10)
+  if (!Number.isInteger(price) || price < 0) {
     throw new Error("価格は0以上の整数で入力してください")
   }
 
-  const stock = Number(formData.get("stock"))
-  if (Number.isNaN(stock) || stock < 0 || !Number.isInteger(stock)) {
+  const stock = parseInt(formData.get("stock")?.toString() ?? "", 10)
+  if (!Number.isInteger(stock) || stock < 0) {
     throw new Error("在庫数は0以上の整数で入力してください")
   }
 
