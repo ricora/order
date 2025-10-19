@@ -111,7 +111,7 @@ describe("Integration tests", () => {
             )
           })
 
-          test("価格が空の場合にエラーを返す", async () => {
+          test("価格が空の場合は0が設定され正常に登録される", async () => {
             const form = new URLSearchParams()
             form.append("name", generateUniqueName("価格空"))
             form.append("stock", "10")
@@ -121,9 +121,9 @@ describe("Integration tests", () => {
               headers: { "content-type": "application/x-www-form-urlencoded" },
             })
             expect(res.status).toBe(302)
-            expect(res.headers.get("set-cookie")).toMatch(/error/)
+            expect(res.headers.get("set-cookie")).toMatch(/success/)
             expect(res.headers.get("set-cookie")).toMatch(
-              encodeURIComponent("価格は0以上の整数で入力してください"),
+              encodeURIComponent("商品を登録しました"),
             )
           })
           test("価格が負数の場合にエラーを返す", async () => {
@@ -142,7 +142,7 @@ describe("Integration tests", () => {
               encodeURIComponent("価格は0以上の整数で入力してください"),
             )
           })
-          test("価格が小数の場合小数が切り捨てされ正常に登録される", async () => {
+          test("価格が小数の場合にエラーを返す", async () => {
             const form = new URLSearchParams()
             form.append("name", generateUniqueName("価格小数"))
             form.append("price", "1000.5")
@@ -153,9 +153,9 @@ describe("Integration tests", () => {
               headers: { "content-type": "application/x-www-form-urlencoded" },
             })
             expect(res.status).toBe(302)
-            expect(res.headers.get("set-cookie")).toMatch(/success/)
+            expect(res.headers.get("set-cookie")).toMatch(/error/)
             expect(res.headers.get("set-cookie")).toMatch(
-              encodeURIComponent("商品を登録しました"),
+              encodeURIComponent("価格は0以上の整数で入力してください"),
             )
           })
           test("価格が文字列の場合にエラーを返す", async () => {
@@ -174,7 +174,7 @@ describe("Integration tests", () => {
               encodeURIComponent("価格は0以上の整数で入力してください"),
             )
           })
-          test("在庫数が空の場合にエラーを返す", async () => {
+          test("在庫数が空の場合は0が設定され正常に登録される", async () => {
             const form = new URLSearchParams()
             form.append("name", generateUniqueName("在庫空"))
             form.append("price", "1000")
@@ -184,9 +184,9 @@ describe("Integration tests", () => {
               headers: { "content-type": "application/x-www-form-urlencoded" },
             })
             expect(res.status).toBe(302)
-            expect(res.headers.get("set-cookie")).toMatch(/error/)
+            expect(res.headers.get("set-cookie")).toMatch(/success/)
             expect(res.headers.get("set-cookie")).toMatch(
-              encodeURIComponent("在庫数は0以上の整数で入力してください"),
+              encodeURIComponent("商品を登録しました"),
             )
           })
           test("在庫数が負数の場合にエラーを返す", async () => {
@@ -205,7 +205,7 @@ describe("Integration tests", () => {
               encodeURIComponent("在庫数は0以上の整数で入力してください"),
             )
           })
-          test("在庫数が小数の場合に小数が切り捨てされ正常に登録される", async () => {
+          test("在庫数が小数の場合にエラーを返す", async () => {
             const form = new URLSearchParams()
             form.append("name", generateUniqueName("在庫小数"))
             form.append("price", "1000")
@@ -216,9 +216,9 @@ describe("Integration tests", () => {
               headers: { "content-type": "application/x-www-form-urlencoded" },
             })
             expect(res.status).toBe(302)
-            expect(res.headers.get("set-cookie")).toMatch(/success/)
+            expect(res.headers.get("set-cookie")).toMatch(/error/)
             expect(res.headers.get("set-cookie")).toMatch(
-              encodeURIComponent("商品を登録しました"),
+              encodeURIComponent("在庫数は0以上の整数で入力してください"),
             )
           })
           test("在庫数が文字列の場合にエラーを返す", async () => {
