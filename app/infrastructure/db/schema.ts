@@ -3,6 +3,7 @@ import {
   check,
   index,
   integer,
+  pgEnum,
   pgTable,
   primaryKey,
   text,
@@ -92,6 +93,13 @@ export const productToProductTagRelations = relations(
 )
 
 // order
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending",
+  "processing",
+  "completed",
+  "cancelled",
+])
+
 /** 注文 */
 export const orderTable = pgTable(
   "order",
@@ -99,6 +107,7 @@ export const orderTable = pgTable(
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     customerName: text("customer_name"),
     totalAmount: integer("total_amount").notNull(),
+    status: orderStatusEnum().notNull().default("pending"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
