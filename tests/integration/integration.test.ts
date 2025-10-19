@@ -545,7 +545,7 @@ describe("Integration tests", () => {
         })
       })
       describe("注文進捗管理", () => {
-        describe("GET", async () => {
+        describe("GET", () => {
           test("注文進捗管理ページが表示される", async () => {
             const res = await app.request("/staff/orders/progress")
             const html = await res.text()
@@ -558,7 +558,7 @@ describe("Integration tests", () => {
             expect(html).toContain("顧客D")
           })
         })
-        describe("POST", async () => {
+        describe("POST", () => {
           test("注文の状態を正常に更新できる", async () => {
             const form = new URLSearchParams()
             form.append("orderId", "1")
