@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        task: [type-check, biome, build, prettier, tests]
+        task: [type-check, biome, build, prettier, test:unit, test:integration]
       fail-fast: false
     steps:
       - name: Checkout the repository
