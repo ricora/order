@@ -25,15 +25,18 @@ test.describe("注文登録", () => {
   test("タグフィルターが正しく動作する", async ({ page }) => {
     await waitForHydration(page, "/staff/orders/new")
 
-    // タグボタンが表示されることを確認
-    const tagButtons = page
-      .locator("button")
-      .filter({ hasText: /^(?!注文を登録|クリア)/ })
+    // タグ一覧セクションのボタンを取得
+    const tagSection = page
+      .getByRole("heading", { name: "タグ一覧" })
+      .locator("..")
+    const tagButtons = tagSection.locator("button")
+
     const tagCount = await tagButtons.count()
 
     if (tagCount > 0) {
       // 最初のタグをクリック
       const firstTag = tagButtons.first()
+      await expect(firstTag).toBeVisible()
       await firstTag.click()
 
       // タグがアクティブになることを確認（スタイルの変化）
