@@ -1,20 +1,13 @@
 import { expect, test } from "@playwright/test"
 
-test("has title", async ({ page }) => {
-  await page.goto("https://playwright.dev/")
+test("トップページが表示される", async ({ page }) => {
+  await page.goto("/")
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/)
-})
+  // タイトルが "Hono" であることを確認
+  await expect(page).toHaveTitle("Hono")
 
-test("get started link", async ({ page }) => {
-  await page.goto("https://playwright.dev/")
-
-  // Click the get started link.
-  await page.getByRole("link", { name: "Get started" }).click()
-
-  // Expects page to have a heading with the name of Installation.
+  // "Hello, Hono!" という見出しが表示されることを確認
   await expect(
-    page.getByRole("heading", { name: "Installation" }),
+    page.getByRole("heading", { name: "Hello, Hono!" }),
   ).toBeVisible()
 })
