@@ -28,7 +28,7 @@ test.describe("注文登録", () => {
     // タグボタンが表示されることを確認
     const tagButtons = page
       .locator("button")
-      .filter({ hasText: /^[^注文を登録|クリア]/ })
+      .filter({ hasText: /^(?!注文を登録|クリア)/ })
     const tagCount = await tagButtons.count()
 
     if (tagCount > 0) {
