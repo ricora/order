@@ -15,6 +15,7 @@
     "test": "bun run test:unit && bun run test:integration",
     "test:unit": "bun test app/",
     "test:integration": "rm -rf pgdata && bun --bun drizzle-kit push --config drizzle-test.config.ts && DATABASE_URL='' bun tests/setup-db.ts && vitest tests/integration/",
+    "test:e2e": "rm -rf pgdata && bun --bun drizzle-kit push --config drizzle-test.config.ts && DATABASE_URL='' bun tests/setup-db.ts && playwright test",
     "setup-test-db": "drizzle-kit push --config drizzle-test.config.ts"
   },
   "private": true,
