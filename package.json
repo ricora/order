@@ -14,9 +14,9 @@
     "prettier:format:write": "prettier --ignore-path .prettierignore --ignore-path .gitignore --write .",
     "test": "bun run test:unit && bun run test:integration",
     "test:unit": "bun test app/",
-    "test:integration": "rm -rf pgdata && bun --bun drizzle-kit push --config drizzle-test.config.ts && DATABASE_URL='' bun tests/setup-db.ts && vitest tests/integration/",
-    "test:e2e": "rm -rf pgdata && bun --bun drizzle-kit push --config drizzle-test.config.ts && DATABASE_URL='' bun tests/setup-db.ts && playwright test",
-    "setup-test-db": "drizzle-kit push --config drizzle-test.config.ts"
+    "test:integration": "bun run setup-test-db && vitest tests/integration/",
+    "test:e2e": "bun run setup-test-db && playwright test",
+    "setup-test-db": "rm -rf pgdata && bun --bun drizzle-kit push --config drizzle-test.config.ts && DATABASE_URL='' bun tests/setup-db.ts"
   },
   "private": true,
   "dependencies": {

@@ -1,18 +1,16 @@
 import { expect, test } from "@playwright/test"
+import { waitForHydration } from "./utils"
 
 test.describe("注文登録", () => {
   test("商品をカートに追加できる", async ({ page }) => {
-    await page.goto("/staff/orders/new")
+    await waitForHydration(page, "/staff/orders/new")
 
     // 商品リストが表示されることを確認
     await expect(page.locator("#product-list")).toBeVisible()
 
     // 商品ボタンが存在するか確認してクリック
     const productButtons = page.locator("#product-list button")
-    await expect(productButtons.first()).toBeVisible({ timeout: 10000 })
-
-    // 少し待ってからクリック（ハイドレーション待ち）
-    await page.waitForTimeout(500)
+    await expect(productButtons.first()).toBeEnabled({ timeout: 10000 })
     await productButtons.first().click()
 
     // カートに商品が追加されることを確認
@@ -25,7 +23,7 @@ test.describe("注文登録", () => {
   })
 
   test("タグフィルターが正しく動作する", async ({ page }) => {
-    await page.goto("/staff/orders/new")
+    await waitForHydration(page, "/staff/orders/new")
 
     // タグボタンが表示されることを確認
     const tagButtons = page
@@ -44,14 +42,11 @@ test.describe("注文登録", () => {
   })
 
   test("数量を変更できる", async ({ page }) => {
-    await page.goto("/staff/orders/new")
+    await waitForHydration(page, "/staff/orders/new")
 
     // 商品ボタンが存在するか確認
     const productButtons = page.locator("#product-list button")
-    await expect(productButtons.first()).toBeVisible({ timeout: 10000 })
-
-    // 少し待ってから商品をカートに追加
-    await page.waitForTimeout(500)
+    await expect(productButtons.first()).toBeEnabled({ timeout: 10000 })
     await productButtons.first().click()
 
     // カートに商品が追加されるまで待機
@@ -76,14 +71,11 @@ test.describe("注文登録", () => {
   })
 
   test("カートから商品を削除できる", async ({ page }) => {
-    await page.goto("/staff/orders/new")
+    await waitForHydration(page, "/staff/orders/new")
 
     // 商品ボタンが存在するか確認
     const productButtons = page.locator("#product-list button")
-    await expect(productButtons.first()).toBeVisible({ timeout: 10000 })
-
-    // 少し待ってから商品をカートに追加
-    await page.waitForTimeout(500)
+    await expect(productButtons.first()).toBeEnabled({ timeout: 10000 })
     await productButtons.first().click()
 
     // カートに商品が追加されるまで待機
@@ -102,14 +94,11 @@ test.describe("注文登録", () => {
   })
 
   test("クリアボタンでカートを空にできる", async ({ page }) => {
-    await page.goto("/staff/orders/new")
+    await waitForHydration(page, "/staff/orders/new")
 
     // 商品ボタンが存在するか確認
     const productButtons = page.locator("#product-list button")
-    await expect(productButtons.first()).toBeVisible({ timeout: 10000 })
-
-    // 少し待ってから商品をカートに追加
-    await page.waitForTimeout(500)
+    await expect(productButtons.first()).toBeEnabled({ timeout: 10000 })
     await productButtons.first().click()
 
     // カートに商品が追加されるまで待機

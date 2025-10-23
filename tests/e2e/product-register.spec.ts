@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test"
+import { waitForHydration } from "./utils"
 
 test.describe("商品登録", () => {
   test("商品登録フォームが正しく送信される", async ({ page }) => {
-    await page.goto("/staff/products")
+    await waitForHydration(page, "/staff/products")
 
     // 商品登録のdetailsを開く（summaryをクリック）
     await page.locator("summary:has-text('商品登録')").click()
