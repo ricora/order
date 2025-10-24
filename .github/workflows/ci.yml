@@ -35,7 +35,7 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Install Playwright browsers
         if: matrix.task == 'test:e2e'
-        run: bunx playwright install --with-deps
+        run: bun playwright install --with-deps
       - name: Run TypeScript type check
         if: matrix.task == 'type-check'
         run: bun run tsc --noEmit --pretty
