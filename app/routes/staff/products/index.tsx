@@ -1,17 +1,17 @@
 import { createRoute } from "honox/factory"
+import ItemCollectionViewer from "../../../components/ui/itemCollectionViewer"
 import { setToastCookie } from "../../../helpers/ui/toast"
 import { getProductsManagementPageData } from "../../../usecases/getProductsManagementPageData"
 import {
   type RegisterProductParams,
   registerProduct,
 } from "../../../usecases/registerProduct"
+import { formatCurrencyJPY } from "../../../utils/money"
 import { countStringLength } from "../../../utils/text"
 import Layout from "../-components/layout"
-import ProductCardView from "./-components/productCardView"
 import ProductInfo from "./-components/productInfo"
 import ProductRegister from "./-components/productRegister"
-import ProductTableView from "./-components/productTableView"
-import ViewModeToggle from "./-components/viewModeToggle"
+import StockStatusLabel from "./-components/stockStatusLabel"
 
 const productFormDataToRegisterProductParams = (
   formData: FormData,
@@ -66,7 +66,7 @@ export const POST = createRoute(async (c) => {
 export default createRoute(async (c) => {
   const url = new URL(c.req.url)
   const viewMode = c.req.query("view") === "card" ? "card" : "table"
-  const search = url.search
+  const urlSearch = url.search
 
   const {
     products,
@@ -86,19 +86,54 @@ export default createRoute(async (c) => {
         totalValue={totalValue}
       />
       <ProductRegister tags={tags} />
-      <div className="rounded-lg border bg-bg p-4">
-        <div className="mb-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <span className="font-bold text-lg">商品一覧</span>
-          <div className="flex justify-end">
-            <ViewModeToggle viewMode={viewMode} search={search} />
-          </div>
-        </div>
-        {viewMode === "table" ? (
-          <ProductTableView products={products} />
-        ) : (
-          <ProductCardView products={products} />
-        )}
-      </div>
+      <ItemCollectionViewer
+        title="商品一覧"
+        columns={[
+          { header: "画像", align: "left" },
+          { header: "商品名", align: "left" },
+          { header: "タグ", align: "left" },
+          { header: "価格", align: "right" },
+          { header: "在庫", align: "center" },
+          { header: "ステータス", align: "center" },
+        ]}
+        items={products.map((product) => ({
+          id: product.id,
+          fields: [
+            { type: "image", src: product.image, alt: product.name },
+            { type: "text", value: product.name },
+            {
+              type: "custom",
+              content: (
+                <div className="flex flex-wrap gap-1">
+                  {product.tags.map((tag) => (
+                    <span className="whitespace-nowrap rounded border bg-muted px-2 py-0.5 text-muted-fg text-xs">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ),
+            },
+            {
+              type: "custom",
+              content: (
+                <span className="font-mono">
+                  {formatCurrencyJPY(product.price)}
+                </span>
+              ),
+            },
+            { type: "number", value: product.stock },
+            {
+              type: "custom",
+              content: <StockStatusLabel stock={product.stock} />,
+            },
+          ],
+          editUrl: `/staff/products/${product.id}/edit`,
+          deleteUrl: `/staff/products/${product.id}/delete`,
+        }))}
+        viewMode={viewMode}
+        urlSearch={urlSearch}
+        emptyMessage="商品が登録されていません"
+      />
     </Layout>,
   )
 })
