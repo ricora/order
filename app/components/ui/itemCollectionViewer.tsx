@@ -143,11 +143,7 @@ const ItemCard = ({ item, columns }: { item: Item; columns: Column[] }) => {
             const isImage = field.type === "image"
 
             if (isImage) {
-              return (
-                <div>
-                  <FieldValueCell field={field} isCard={true} />
-                </div>
-              )
+              return <FieldValueCell field={field} isCard={true} />
             }
 
             return (
@@ -238,9 +234,7 @@ const ItemCollectionViewer = ({
       ) : viewMode === "card" ? (
         <div className={styles.cardGrid()}>
           {items.map((item) => (
-            <div>
-              <ItemCard item={item} columns={columns} />
-            </div>
+            <ItemCard item={item} columns={columns} />
           ))}
         </div>
       ) : (
