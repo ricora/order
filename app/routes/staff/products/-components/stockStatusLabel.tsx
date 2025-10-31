@@ -44,7 +44,7 @@ const stockStatusLabel = tv({
   },
 })
 
-export const StockStatusLabel = ({ stock }: { stock: number }) => {
+const StockStatusLabel = ({ stock }: { stock: number }) => {
   const status = getStockStatus(stock)
   const { base, alertIcon } = stockStatusLabel({ status })
 
@@ -57,3 +57,5 @@ export const StockStatusLabel = ({ stock }: { stock: number }) => {
     </span>
   )
 }
+
+export default StockStatusLabel
