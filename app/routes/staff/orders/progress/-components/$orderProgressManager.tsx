@@ -2,6 +2,8 @@ import { type FC, type PropsWithChildren, useEffect, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
 import type Order from "../../../../../domain/order/entities/order"
+import { formatDateTimeJP } from "../../../../../utils/date"
+import OrderStatusBadge from "../../-components/orderStatusBadge"
 
 const sectionTv = tv({
   base: "flex flex-col rounded border p-4",
@@ -146,13 +148,7 @@ const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
 const Card: FC<{ order: Order }> = ({ order }) => {
   const created = new Date(order.createdAt)
   const createdIso = created.toISOString()
-  const createdLabel = created.toLocaleString("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  const createdLabel = formatDateTimeJP(created)
 
   const nextStatus = (s: Order["status"]) =>
     s === "pending"
@@ -197,8 +193,11 @@ const Card: FC<{ order: Order }> = ({ order }) => {
   return (
     <div className={cardTv()} data-order-id={String(order.id)}>
       <div className={cardHeaderTv()}>
-        <div className="text-base">
-          <span className="font-semibold text-overlay-fg">#{order.id}</span>
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-lg text-overlay-fg">
+            #{order.id}
+          </span>
+          <OrderStatusBadge status={order.status} />
         </div>
         <div className="flex items-center">
           <ElapsedTime iso={createdIso} />

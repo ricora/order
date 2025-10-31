@@ -55,6 +55,12 @@
 - コンポーネントのファイル名は、サーバーサイドの場合は`camelCase.tsx`、アイランドの場合は`$camelCase.tsx`とし、`export`する名前は`PascalCase`とする
   - [HonoXのドキュメントの例](https://github.com/honojs/honox#interactions)に従う
   - `$`から始まる名前は、HonoXがコンポーネントをアイランドとして認識するための特別な接頭辞
+- Hono JSXを使用してUIを構築する
+  - Reactと異なり、ループ処理に`key`属性は不要
+- 条件分岐を含むスタイルは`tailwind-variants`で管理する
+  - コンポーネントが`class`を受け取ってスタイルを合成することは認めない
+  - 単一の静的なスタイルの場合は、`tv`を使用せず直接`class`を指定する
+- 色は`app/style.css`に定義されたdesign tokensを参照する
 
 ### サーバー
 
