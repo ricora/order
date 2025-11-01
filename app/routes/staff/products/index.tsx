@@ -9,8 +9,8 @@ import {
 import { formatCurrencyJPY } from "../../../utils/money"
 import { countStringLength } from "../../../utils/text"
 import Layout from "../-components/layout"
+import ProductRegister from "./-components/$productRegister"
 import ProductInfo from "./-components/productInfo"
-import ProductRegister from "./-components/productRegister"
 import StockStatusLabel from "./-components/stockStatusLabel"
 
 const productFormDataToRegisterProductParams = (
