@@ -195,11 +195,11 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
   )
 }
 
-type ProductRegisterProps = {
+type ProductRegistrationFormProps = {
   tags: ProductTag[]
 }
 
-const ProductRegister = ({ tags }: ProductRegisterProps) => {
+const ProductRegistrationForm = ({ tags }: ProductRegistrationFormProps) => {
   const [productName, setProductName] = useState("")
   const [nameLength, setNameLength] = useState(0)
   const [isNameComposing, setIsNameComposing] = useState(false)
@@ -368,4 +368,4 @@ const ProductRegister = ({ tags }: ProductRegisterProps) => {
   )
 }
 
-export default ProductRegister
+export default ProductRegistrationForm

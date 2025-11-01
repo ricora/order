@@ -51,7 +51,7 @@ const productButton = tv({
   },
 })
 
-const OrderRegister: FC<{
+const OrderRegistrationForm: FC<{
   products: OrderRegistrationPageData["products"]
   tags: OrderRegistrationPageData["tags"]
 }> = ({ products, tags }) => {
@@ -402,4 +402,4 @@ const OrderRegister: FC<{
   )
 }
 
-export default OrderRegister
+export default OrderRegistrationForm

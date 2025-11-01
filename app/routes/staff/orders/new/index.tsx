@@ -7,7 +7,7 @@ import {
   registerOrder,
 } from "../../../../usecases/registerOrder"
 import Layout from "../../-components/layout"
-import OrderRegister from "./-components/$orderRegister"
+import OrderRegistrationForm from "./-components/$orderRegistrationForm"
 
 const createInvalidFormDataError = () => {
   return new Error("不正なリクエストです")
@@ -69,7 +69,7 @@ export default createRoute(async (c) => {
     <Layout title={"注文登録"} description={"注文情報の登録を行います。"}>
       <div className="rounded-lg border bg-bg p-6">
         <h2 className="mb-4 font-bold text-lg">注文登録</h2>
-        <OrderRegister products={products} tags={tags} />
+        <OrderRegistrationForm products={products} tags={tags} />
       </div>
       {JSON.stringify(orders)}
     </Layout>,

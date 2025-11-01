@@ -9,7 +9,7 @@ import {
 import { formatCurrencyJPY } from "../../../utils/money"
 import { countStringLength } from "../../../utils/text"
 import Layout from "../-components/layout"
-import ProductRegister from "./-components/$productRegister"
+import ProductRegistrationForm from "./-components/$productRegistrationForm"
 import ProductInfo from "./-components/productInfo"
 import StockStatusLabel from "./-components/stockStatusLabel"
 
@@ -85,7 +85,7 @@ export default createRoute(async (c) => {
         lowStockCount={lowStockCount}
         totalValue={totalValue}
       />
-      <ProductRegister tags={tags} />
+      <ProductRegistrationForm tags={tags} />
       <ItemCollectionViewer
         title="商品一覧"
         columns={[
