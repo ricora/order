@@ -1,4 +1,5 @@
 import { createRoute } from "honox/factory"
+import Chip from "../../../components/ui/chip"
 import ItemCollectionViewer from "../../../components/ui/itemCollectionViewer"
 import { setToastCookie } from "../../../helpers/ui/toast"
 import { getProductsManagementPageData } from "../../../usecases/getProductsManagementPageData"
@@ -9,8 +10,8 @@ import {
 import { formatCurrencyJPY } from "../../../utils/money"
 import { countStringLength } from "../../../utils/text"
 import Layout from "../-components/layout"
+import ProductRegistrationForm from "./-components/$productRegistrationForm"
 import ProductInfo from "./-components/productInfo"
-import ProductRegister from "./-components/productRegister"
 import StockStatusLabel from "./-components/stockStatusLabel"
 
 const productFormDataToRegisterProductParams = (
@@ -85,7 +86,7 @@ export default createRoute(async (c) => {
         lowStockCount={lowStockCount}
         totalValue={totalValue}
       />
-      <ProductRegister tags={tags} />
+      <ProductRegistrationForm tags={tags} />
       <ItemCollectionViewer
         title="商品一覧"
         columns={[
@@ -106,9 +107,9 @@ export default createRoute(async (c) => {
               content: (
                 <div className="flex flex-wrap gap-1">
                   {product.tags.map((tag) => (
-                    <span className="whitespace-nowrap rounded border bg-muted px-2 py-0.5 text-muted-fg text-xs">
+                    <Chip key={tag} size="xs">
                       {tag}
-                    </span>
+                    </Chip>
                   ))}
                 </div>
               ),
