@@ -160,17 +160,6 @@ const ProductRegistrationForm = ({ tags }: ProductRegistrationFormProps) => {
 
   const maxNameLength = 50
 
-  const handleNameChange = (value: string) => {
-    const stripped = stripString(value, maxNameLength)
-    setProductName(stripped)
-  }
-
-  const handleImageChange = (value: string) => {
-    const maxImageLength = 500
-    const stripped = stripString(value, maxImageLength)
-    setImageValue(stripped)
-  }
-
   return (
     <div className="mx-auto mt-6 mb-6 max-w-7xl rounded-lg border bg-bg p-6">
       <details className="group">
@@ -201,28 +190,23 @@ const ProductRegistrationForm = ({ tags }: ProductRegistrationFormProps) => {
                 id="productName"
                 name="name"
                 value={productName}
-                onChange={handleNameChange}
+                onChange={setProductName}
                 maxLength={maxNameLength}
                 placeholder="商品名"
                 required
               />
             </div>
             <div className="mb-4">
-              <label
-                htmlFor="imageUrl"
-                className="mb-1 block font-medium text-fg text-sm"
-              >
-                画像URL
-                <GraphemeInput
-                  id="imageUrl"
-                  name="image"
-                  type="url"
-                  value={imageValue}
-                  onChange={handleImageChange}
-                  maxLength={500}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </label>
+              <Label htmlFor="imageUrl">画像URL</Label>
+              <GraphemeInput
+                id="imageUrl"
+                name="image"
+                type="url"
+                value={imageValue}
+                onChange={setImageValue}
+                maxLength={500}
+                placeholder="https://example.com/image.jpg"
+              />
             </div>
             <div className="mb-4 flex gap-4">
               <div className="flex-1">
