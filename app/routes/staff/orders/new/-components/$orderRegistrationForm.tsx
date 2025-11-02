@@ -1,6 +1,14 @@
 import type { FC } from "hono/jsx"
 import { useMemo, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
+import SendIcon from "../../../../../components/icons/lucide/sendIcon"
+import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
+import GraphemeInput from "../../../../../components/ui/$graphemeInput"
+import Button from "../../../../../components/ui/button"
+import Chip from "../../../../../components/ui/chip"
+import ChipButton from "../../../../../components/ui/chipButton"
+import Input from "../../../../../components/ui/input"
+import Label from "../../../../../components/ui/label"
 import type { OrderRegistrationPageData } from "../../../../../usecases/getOrderRegistrationPageData"
 import type { RegisterOrderParams } from "../../../../../usecases/registerOrder"
 import { formatCurrencyJPY } from "../../../../../utils/money"
@@ -9,33 +17,6 @@ type OrderItem = RegisterOrderParams["order"]["orderItems"][number] & {
   productName: string
   unitAmount: number
 }
-
-const tagFilterButton = tv({
-  base: "cursor-pointer rounded border px-2 py-1 text-sm transition",
-  variants: {
-    isActive: {
-      true: "bg-primary text-primary-fg",
-      false: "bg-white hover:border-primary-subtle hover:bg-primary-subtle",
-    },
-  },
-  defaultVariants: {
-    isActive: false,
-  },
-})
-
-const submitOrderButton = tv({
-  base: "flex items-center gap-2 rounded border px-4 py-2 font-medium text-sm transition",
-  variants: {
-    isDisabled: {
-      true: "cursor-not-allowed border-border bg-muted text-muted-fg",
-      false:
-        "cursor-pointer border-primary bg-primary text-primary-fg hover:bg-primary/90",
-    },
-  },
-  defaultVariants: {
-    isDisabled: false,
-  },
-})
 
 const productButton = tv({
   base: "w-full rounded border px-3 py-3 text-left transition",
@@ -153,6 +134,7 @@ const OrderRegistrationForm: FC<{
   }, [products, selectedTags])
 
   const isCartEmpty = items.length === 0
+  const [customerName, setCustomerName] = useState("")
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -163,14 +145,13 @@ const OrderRegistrationForm: FC<{
             {allTags.map((tag) => {
               const active = selectedTags.includes(tag)
               return (
-                <button
+                <ChipButton
                   key={tag}
-                  type="button"
-                  className={tagFilterButton({ isActive: active })}
+                  isActive={active}
                   onClick={() => toggleTag(tag)}
                 >
                   {tag}
-                </button>
+                </ChipButton>
               )
             })}
           </div>
@@ -185,15 +166,15 @@ const OrderRegistrationForm: FC<{
           <h3 className="mb-1 font-semibold">商品</h3>
         </div>
         <div className="rounded border bg-bg p-3">
-          <div className="mb-2 space-y-1 text-muted-fg text-xs">
+          <div className="mb-3 h-12 space-y-1 text-muted-fg text-xs">
             <div>クリックでカートに追加します。</div>
-            <div>表示件数: {slice.length}件</div>
+            <div>表示件数 {slice.length}件</div>
           </div>
           <div
             id="product-list-wrapper"
-            className="max-h-[60vh] overflow-auto rounded border border-border/50 bg-muted p-2 md:max-h-[70vh]"
+            className="max-h-[60vh] overflow-auto rounded border border-border/50 bg-muted p-3 md:max-h-[70vh]"
           >
-            <div id="product-list" className="space-y-2 p-1">
+            <div id="product-list" className="space-y-3">
               {slice.map((product) => {
                 const remaining = Math.max(
                   0,
@@ -215,7 +196,7 @@ const OrderRegistrationForm: FC<{
                     className={productButton({ disabled: disabledForProduct })}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
                         <img
                           src={
                             product.image ||
@@ -231,19 +212,17 @@ const OrderRegistrationForm: FC<{
                           </div>
                           <div className="mt-1 flex flex-wrap gap-1">
                             {product.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="whitespace-nowrap rounded border bg-muted px-2 py-0.5 text-muted-fg text-xs"
-                              >
+                              <Chip key={tag} size="xs">
                                 {tag}
-                              </span>
+                              </Chip>
                             ))}
                           </div>
                           <div className="mt-1 text-muted-fg text-xs">
-                            残り:{" "}
+                            残り
                             <span data-remaining-for={product.id}>
                               {remaining}
                             </span>
+                            個
                           </div>
                         </div>
                       </div>
@@ -266,28 +245,32 @@ const OrderRegistrationForm: FC<{
         </div>
         <div className="rounded border bg-bg p-3">
           <form method="post" id="order-form" className="space-y-4">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex h-12 items-center justify-between">
               <div className="text-muted-fg text-xs">
-                総額:{" "}
+                総額{" "}
                 <span id="order-total" className="font-mono">
                   {formattedTotal}
                 </span>
               </div>
-              <button
+              <Button
                 type="button"
+                variant="danger"
                 onClick={clearItems}
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-danger-subtle-fg text-sm transition hover:border-danger-subtle hover:bg-danger-subtle"
+                ariaLabel="カートを空にする"
               >
-                クリア
-              </button>
+                <div className="size-4">
+                  <Trash2Icon />
+                </div>
+                <span>カートを空にする</span>
+              </Button>
             </div>
 
             <div
               id="order-items"
-              className="max-h-[50vh] space-y-3 overflow-auto rounded border border-border/50 bg-muted p-3"
+              className="h-[50vh] space-y-3 overflow-auto rounded border border-border/50 bg-muted p-3"
             >
               {items.length === 0 && (
-                <div className="py-6 text-center text-muted-fg">
+                <div className="flex h-full items-center justify-center text-center text-muted-fg">
                   カートに商品がありません
                 </div>
               )}
@@ -310,7 +293,7 @@ const OrderRegistrationForm: FC<{
                       value={String(item.productId)}
                     />
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                      <div className="flex min-w-0 items-center gap-4">
+                      <div className="flex min-w-0 flex-1 items-center gap-4">
                         <img
                           src={
                             productInList?.image ||
@@ -328,43 +311,51 @@ const OrderRegistrationForm: FC<{
                         </div>
                       </div>
 
-                      <div className="mt-2 flex items-center gap-2 md:mt-0 md:gap-4">
-                        <label
+                      <div className="mt-2 flex flex-shrink-0 items-center gap-2 md:mt-0 md:gap-4">
+                        <Label
                           htmlFor={`quantity-${String(item.productId)}`}
-                          className="block text-sm"
+                          required
                         >
                           数量
-                        </label>
+                        </Label>
                         <input
                           type="hidden"
                           name="items[][quantity]"
                           value={String(item.quantity)}
                         />
-                        <input
-                          type="number"
-                          id={`quantity-${String(item.productId)}`}
-                          className="w-20 rounded border px-2 py-1 text-right text-fg text-sm md:w-24"
-                          value={String(item.quantity)}
-                          min={1}
-                          max={maxStock}
-                          onChange={(e: Event) => {
-                            const target = e.target as HTMLInputElement
-                            const v = Number(target.value) || 0
-                            const clamped =
-                              maxStock !== undefined
-                                ? Math.min(Math.max(1, v), maxStock)
-                                : Math.max(1, v)
-                            setQuantity(item.productId, clamped)
-                          }}
-                        />
+                        <div className="w-20 md:w-24">
+                          <Input
+                            id={`quantity-${String(item.productId)}`}
+                            type="number"
+                            value={String(item.quantity)}
+                            min={1}
+                            max={maxStock}
+                            required
+                            onChange={(e: Event) => {
+                              const target = e.target as HTMLInputElement
+                              const v = Number(target.value) || 0
+                              const clamped =
+                                maxStock !== undefined
+                                  ? Math.min(Math.max(1, v), maxStock)
+                                  : Math.max(1, v)
+                              setQuantity(item.productId, clamped)
+                            }}
+                          />
+                        </div>
 
-                        <button
-                          type="button"
-                          onClick={() => removeItem(item.productId)}
-                          className="flex cursor-pointer items-center justify-center gap-2 rounded-md border bg-bg px-3 py-2 font-medium text-danger-subtle-fg text-sm transition hover:border-danger-subtle hover:bg-danger-subtle"
-                        >
-                          削除
-                        </button>
+                        <div className="flex-shrink-0">
+                          <Button
+                            type="button"
+                            variant="danger"
+                            onClick={() => removeItem(item.productId)}
+                            ariaLabel="削除"
+                          >
+                            <div className="size-4">
+                              <Trash2Icon />
+                            </div>
+                            <span>削除</span>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -373,27 +364,28 @@ const OrderRegistrationForm: FC<{
             </div>
 
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-4">
-                <label htmlFor="customerName" className="text-sm">
-                  顧客名
-                </label>
-                <input
+              <div className="flex-1">
+                <Label htmlFor="customerName">顧客名</Label>
+                <GraphemeInput
                   id="customerName"
                   name="customerName"
-                  className="rounded border px-3 py-2 text-fg text-sm"
+                  value={customerName}
+                  onChange={setCustomerName}
+                  maxLength={50}
                   placeholder="顧客名（省略可）"
                 />
               </div>
             </div>
 
             <div className="flex gap-4">
-              <button
-                type="submit"
-                disabled={isCartEmpty}
-                className={submitOrderButton({ isDisabled: isCartEmpty })}
-              >
-                注文を登録
-              </button>
+              <div className="ml-auto">
+                <Button type="submit" disabled={isCartEmpty}>
+                  <div className="size-4">
+                    <SendIcon />
+                  </div>
+                  <span>注文を登録</span>
+                </Button>
+              </div>
             </div>
           </form>
         </div>

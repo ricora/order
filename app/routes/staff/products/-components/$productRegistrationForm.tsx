@@ -1,35 +1,16 @@
 import { type FC, useState } from "hono/jsx"
-import { tv } from "tailwind-variants"
 import ChevronDownIcon from "../../../../components/icons/lucide/chevronDownIcon"
+import SendIcon from "../../../../components/icons/lucide/sendIcon"
+import TagIcon from "../../../../components/icons/lucide/tagIcon"
 import XIcon from "../../../../components/icons/lucide/xIcon"
+import GraphemeInput from "../../../../components/ui/$graphemeInput"
+import Button from "../../../../components/ui/button"
+import Chip from "../../../../components/ui/chip"
+import ChipButton from "../../../../components/ui/chipButton"
+import Input from "../../../../components/ui/input"
+import Label from "../../../../components/ui/label"
 import type ProductTag from "../../../../domain/product/entities/productTag"
-import { countStringLength, stripString } from "../../../../utils/text"
-
-const counterTv = tv({
-  base: "text-xs",
-  variants: {
-    state: {
-      normal: "text-muted-fg",
-      danger: "text-danger",
-    },
-  },
-  defaultVariants: {
-    state: "normal",
-  },
-})
-
-const RemainingCounter: FC<{ valueLength: number; maxLength: number }> = ({
-  valueLength,
-  maxLength,
-}) => {
-  const remaining = Math.max(0, maxLength - valueLength)
-  const state = remaining <= 0 ? "danger" : "normal"
-  return (
-    <div className="my-1 text-xs" aria-live="polite">
-      <span className={counterTv({ state })}>残り{remaining}文字</span>
-    </div>
-  )
-}
+import { stripString } from "../../../../utils/text"
 
 type TagInputProps = {
   existingTags: ProductTag[]
@@ -38,9 +19,7 @@ type TagInputProps = {
 const TagInput: FC<TagInputProps> = ({ existingTags }) => {
   const [tags, setTags] = useState<string[]>([])
   const [input, setInput] = useState("")
-  const [isTagComposing, setIsTagComposing] = useState(false)
   const [suggestions, setSuggestions] = useState<ProductTag[]>([])
-  const [inputLength, setInputLength] = useState(0)
 
   const maxTagLength = 50
 
@@ -63,7 +42,6 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
     if (tags.includes(value)) return
     setTags([...tags, value])
     setInput("")
-    setInputLength(0)
     setSuggestions([])
   }
 
@@ -81,116 +59,93 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
       >
         タグ
       </label>
+
+      <div className="my-1 text-muted-fg text-xs">
+        既存タグは一覧からクリックで追加できます。新しいタグも入力して追加できます。
+      </div>
       <div className="mb-1 flex max-h-35 flex-wrap gap-2 overflow-auto rounded border border-border/50 bg-muted p-2">
         {unselectedTags.map((tag) => (
-          <button
-            key={tag.id}
-            type="button"
-            className="cursor-pointer rounded border bg-white px-2 py-1 text-sm transition hover:border-primary-subtle hover:bg-primary-subtle"
-            onClick={() => addTag(tag.name)}
-            aria-label={`${tag.name}を追加`}
-          >
+          <ChipButton key={tag.id} onClick={() => addTag(tag.name)}>
             {tag.name}
-          </button>
+          </ChipButton>
         ))}
       </div>
       <div className="flex gap-2">
-        <input
-          id="tag-input"
-          type="text"
-          className="mt-1 w-full rounded border border-border px-3 py-2 text-fg text-sm placeholder:text-muted-fg/80"
-          placeholder="新しいタグを入力"
-          value={input}
-          autoComplete="off"
-          aria-autocomplete="list"
-          aria-haspopup="listbox"
-          aria-controls="tag-suggestions"
-          onCompositionStart={() => setIsTagComposing(true)}
-          onCompositionEnd={() => setIsTagComposing(false)}
-          onBeforeInput={(e: InputEvent) => {
-            if (isTagComposing) return
-            const data = e.data ?? ""
-            if (countStringLength(input + String(data)) > maxTagLength) {
-              e.preventDefault()
-            }
-          }}
-          onInput={(e) => {
-            const raw = (e.target as HTMLInputElement).value
-            const value = stripString(raw, maxTagLength)
-            setInput(value)
-            setInputLength(countStringLength(value))
-            updateSuggestions(value)
-          }}
-          onPaste={(e) => {
-            e.preventDefault()
-            const paste = e.clipboardData?.getData("text") ?? ""
-            const newVal = stripString(input + paste, maxTagLength)
-            setInput(newVal)
-            setInputLength(countStringLength(newVal))
-            updateSuggestions(newVal)
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault()
-              addTag()
-            }
-          }}
-        />
-        <button
-          type="button"
-          className="mt-1 whitespace-nowrap rounded border border-primary bg-primary px-3 py-2 font-medium text-primary-fg text-sm transition hover:bg-primary/90"
-          onClick={() => addTag()}
-        >
-          追加
-        </button>
+        <div className="flex-1">
+          <GraphemeInput
+            id="tag-input"
+            value={input}
+            onChange={(v) => {
+              setInput(v)
+              updateSuggestions(v)
+            }}
+            maxLength={maxTagLength}
+            placeholder="新しいタグを入力"
+            onKeyDown={(e: KeyboardEvent) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                addTag()
+              }
+            }}
+          />
+        </div>
+        <div className="mt-1 flex-shrink-0">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => addTag()}
+            ariaLabel="新しいタグを追加"
+          >
+            <div className="size-4">
+              <TagIcon />
+            </div>
+            <span>新しいタグを追加</span>
+          </Button>
+        </div>
       </div>
-
-      <RemainingCounter valueLength={inputLength} maxLength={maxTagLength} />
 
       {suggestions.length > 0 && (
         <div
           id="tag-suggestions"
           tabIndex={-1}
-          className="mb-2 max-h-40 overflow-auto rounded border bg-bg p-2 shadow"
+          className="mb-2 flex max-h-40 flex-wrap gap-2 overflow-auto rounded border bg-bg p-2"
           aria-live="polite"
         >
           {suggestions.map((tag) => (
-            <button
+            <ChipButton
               key={tag.id}
-              type="button"
-              className="cursor-pointer rounded border bg-white px-2 py-1 text-sm transition hover:border-primary-subtle hover:bg-primary-subtle"
               onClick={() => addTag(tag.name)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") addTag(tag.name)
               }}
-              aria-label={`${tag.name}を追加`}
+              ariaLabel={`${tag.name}を追加`}
             >
               {tag.name}
-            </button>
+            </ChipButton>
           ))}
         </div>
       )}
-      <div className="mb-2 flex flex-wrap gap-2" aria-live="polite">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="flex items-center rounded border bg-muted px-2 py-1 text-muted-fg text-xs"
-          >
-            {tag}
-            <button
-              type="button"
-              className="ml-1 text-muted-fg/80 transition hover:text-danger"
-              onClick={() => removeTag(tag)}
-              aria-label={`${tag}を削除`}
-            >
-              <div className="size-3">
-                <XIcon />
-              </div>
-            </button>
-            <input type="hidden" name="tags" value={tag} />
-          </span>
-        ))}
-      </div>
+
+      {tags.length > 0 && (
+        <div className="my-2 flex flex-wrap gap-2" aria-live="polite">
+          {tags.map((tag) => (
+            <Chip key={tag}>
+              {tag}
+              <button
+                type="button"
+                className="ml-1 cursor-pointer rounded-full p-1 text-muted-fg/80 transition hover:bg-danger-subtle hover:text-danger"
+                onClick={() => removeTag(tag)}
+                aria-label={`${tag}を削除`}
+              >
+                <div className="size-3">
+                  <XIcon />
+                </div>
+              </button>
+              <input type="hidden" name="tags" value={tag} />
+            </Chip>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -201,25 +156,19 @@ type ProductRegistrationFormProps = {
 
 const ProductRegistrationForm = ({ tags }: ProductRegistrationFormProps) => {
   const [productName, setProductName] = useState("")
-  const [nameLength, setNameLength] = useState(0)
-  const [isNameComposing, setIsNameComposing] = useState(false)
   const [imageValue, setImageValue] = useState("")
-  const [imageLength, setImageLength] = useState(0)
-  const [isImageComposing, setIsImageComposing] = useState(false)
 
   const maxNameLength = 50
 
   const handleNameChange = (value: string) => {
     const stripped = stripString(value, maxNameLength)
     setProductName(stripped)
-    setNameLength(countStringLength(stripped))
   }
 
   const handleImageChange = (value: string) => {
     const maxImageLength = 500
     const stripped = stripString(value, maxImageLength)
     setImageValue(stripped)
-    setImageLength(countStringLength(stripped))
   }
 
   return (
@@ -245,121 +194,78 @@ const ProductRegistrationForm = ({ tags }: ProductRegistrationFormProps) => {
         <div id="product-register-form" className="p-4">
           <form method="post">
             <div className="mb-4">
-              <label className="mb-1 block font-medium text-fg text-sm">
+              <Label htmlFor="productName" required>
                 商品名
-                <input
-                  type="text"
-                  name="name"
-                  className="mt-1 w-full rounded border px-3 py-2 text-fg placeholder:text-muted-fg/80"
-                  placeholder="商品名を入力してください"
-                  required
-                  minLength={1}
-                  value={productName}
-                  onCompositionStart={() => setIsNameComposing(true)}
-                  onCompositionEnd={() => setIsNameComposing(false)}
-                  onBeforeInput={(e: InputEvent) => {
-                    if (isNameComposing) return
-                    const data = e.data ?? ""
-                    if (
-                      countStringLength(productName + String(data)) >
-                      maxNameLength
-                    ) {
-                      e.preventDefault()
-                    }
-                  }}
-                  onInput={(e) =>
-                    handleNameChange((e.target as HTMLInputElement).value)
-                  }
-                  onPaste={(e) => {
-                    e.preventDefault()
-                    const paste = e.clipboardData?.getData("text") ?? ""
-                    const newVal = stripString(
-                      productName + paste,
-                      maxNameLength,
-                    )
-                    handleNameChange(newVal)
-                  }}
-                />
-                <RemainingCounter
-                  valueLength={nameLength}
-                  maxLength={maxNameLength}
-                />
-              </label>
+              </Label>
+              <GraphemeInput
+                id="productName"
+                name="name"
+                value={productName}
+                onChange={handleNameChange}
+                maxLength={maxNameLength}
+                placeholder="商品名"
+                required
+              />
             </div>
             <div className="mb-4">
-              <label className="mb-1 block font-medium text-fg text-sm">
+              <label
+                htmlFor="imageUrl"
+                className="mb-1 block font-medium text-fg text-sm"
+              >
                 画像URL
-                <input
-                  type="url"
+                <GraphemeInput
+                  id="imageUrl"
                   name="image"
+                  type="url"
                   value={imageValue}
-                  onCompositionStart={() => setIsImageComposing(true)}
-                  onCompositionEnd={() => setIsImageComposing(false)}
-                  onBeforeInput={(e: InputEvent) => {
-                    if (isImageComposing) return
-                    const data = e.data ?? ""
-                    if (countStringLength(imageValue + String(data)) > 500) {
-                      e.preventDefault()
-                    }
-                  }}
-                  onInput={(e) =>
-                    handleImageChange((e.target as HTMLInputElement).value)
-                  }
-                  onPaste={(e) => {
-                    e.preventDefault()
-                    const paste = e.clipboardData?.getData("text") ?? ""
-                    const newVal = stripString(imageValue + paste, 500)
-                    handleImageChange(newVal)
-                  }}
-                  className="mt-1 w-full rounded border px-3 py-2 text-fg placeholder:text-muted-fg/80"
+                  onChange={handleImageChange}
+                  maxLength={500}
                   placeholder="https://example.com/image.jpg"
                 />
-                <RemainingCounter valueLength={imageLength} maxLength={500} />
               </label>
             </div>
             <div className="mb-4 flex gap-4">
               <div className="flex-1">
-                <label className="mb-1 block font-medium text-fg text-sm">
+                <Label htmlFor="price" required>
                   価格（円）
-                  <input
-                    type="number"
-                    name="price"
-                    className="mt-1 w-full rounded border px-3 py-2 text-fg placeholder:text-muted-fg/80"
-                    min={0}
-                    step={1}
-                    required
-                    placeholder="0"
-                  />
-                </label>
+                </Label>
+                <Input
+                  id="price"
+                  type="number"
+                  name="price"
+                  min={0}
+                  step={1}
+                  required
+                  placeholder="0"
+                />
               </div>
               <div className="flex-1">
-                <label className="mb-1 block font-medium text-fg text-sm">
+                <Label htmlFor="stock" required>
                   在庫数
-                  <input
-                    type="number"
-                    name="stock"
-                    className="mt-1 w-full rounded border px-3 py-2 text-fg placeholder:text-muted-fg/80"
-                    min={0}
-                    step={1}
-                    required
-                    placeholder="0"
-                  />
-                </label>
+                </Label>
+                <Input
+                  id="stock"
+                  type="number"
+                  name="stock"
+                  min={0}
+                  step={1}
+                  required
+                  placeholder="0"
+                />
               </div>
             </div>
             <div className="mb-4">
               <TagInput existingTags={tags} />
-              <div className="mt-1 text-muted-fg/80 text-xs">
-                既存タグは一覧からクリックで追加できます。新しいタグも入力して追加できます。
-              </div>
             </div>
             <div className="mt-6 flex gap-4">
-              <button
-                type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded border border-primary bg-primary px-3 py-2 font-medium text-primary-fg text-sm transition hover:bg-primary/90"
-              >
-                登録
-              </button>
+              <div className="ml-auto">
+                <Button type="submit">
+                  <div className="size-4">
+                    <SendIcon />
+                  </div>
+                  <span>商品を登録</span>
+                </Button>
+              </div>
             </div>
           </form>
         </div>
