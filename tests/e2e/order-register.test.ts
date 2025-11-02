@@ -113,7 +113,7 @@ test.describe("注文登録", () => {
     )
 
     // クリアボタンをクリック
-    await page.getByRole("button", { name: "クリア" }).click()
+    await page.getByRole("button", { name: "カートを空にする" }).click()
 
     // カートが空になったことを確認
     await expect(page.getByText("カートに商品がありません")).toBeVisible()
