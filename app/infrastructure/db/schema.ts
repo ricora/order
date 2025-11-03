@@ -154,3 +154,32 @@ export const orderItemRelations = relations(orderItemTable, ({ one }) => ({
     references: [orderTable.id],
   }),
 }))
+
+export const userRoleEnum = pgEnum("user_role", ["admin", "staff", "viewer"])
+
+/** ユーザー */
+export const userTable = pgTable(
+  "user",
+  {
+    id: text("id").primaryKey(), // nanoidで生成される21文字のID
+    oidcSub: text("oidc_sub").notNull().unique(),
+    email: text("email").notNull(),
+    name: text("name"),
+    role: userRoleEnum().notNull().default("viewer"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("user_oidc_sub_idx").on(table.oidcSub),
+    index("user_email_idx").on(table.email),
+    check(
+      "user_email_format",
+      sql`${table.email} ~ '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$'`,
+    ),
+    check("user_oidc_sub_not_empty", sql`char_length(${table.oidcSub}) >= 1`),
+  ],
+)
