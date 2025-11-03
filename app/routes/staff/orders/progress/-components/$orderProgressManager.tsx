@@ -1,7 +1,9 @@
 import { type FC, type PropsWithChildren, useEffect, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
+import Button from "../../../../../components/ui/button"
 import type Order from "../../../../../domain/order/entities/order"
+import { createHonoClient } from "../../../../../helpers/hono/hono-client"
 import { formatDateTimeJP } from "../../../../../utils/date"
 import OrderStatusBadge from "../../-components/orderStatusBadge"
 
@@ -106,10 +108,6 @@ const btnTv = tv({
   },
   defaultVariants: { status: "pending", disabled: false },
 })
-
-type Props = {
-  orders: Order[]
-}
 
 const statusLabel: Record<Order["status"], string> = {
   pending: "処理待ち",
@@ -290,7 +288,46 @@ const Card: FC<{ order: Order }> = ({ order }) => {
   )
 }
 
-const OrderProgressManager: FC<Props> = ({ orders }) => {
+const OrderProgressManager: FC = () => {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [secondsUntilRefresh, setSecondsUntilRefresh] = useState(30)
+  const REFRESH_INTERVAL = 30
+
+  const fetchData = async () => {
+    try {
+      const honoClient = createHonoClient()
+      const response = await honoClient["order-progress-manager"].$get()
+      const { orders: fetchedOrders } = await response.json()
+      const orders = fetchedOrders.map((order) => ({
+        ...order,
+        createdAt: new Date(order.createdAt),
+      }))
+      setOrders(orders)
+    } finally {
+      setSecondsUntilRefresh(REFRESH_INTERVAL)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const refreshTimer = setInterval(() => {
+      fetchData()
+    }, REFRESH_INTERVAL * 1000)
+
+    return () => clearInterval(refreshTimer)
+  }, [])
+
+  useEffect(() => {
+    const countdownTimer = setInterval(() => {
+      setSecondsUntilRefresh((prev) => Math.max(0, prev - 1))
+    }, 1000)
+
+    return () => clearInterval(countdownTimer)
+  }, [])
+
   const pending = orders.filter((o) => o.status === "pending")
   const processing = orders.filter((o) => o.status === "processing")
   const completed = orders.filter((o) => o.status === "completed")
@@ -317,6 +354,25 @@ const OrderProgressManager: FC<Props> = ({ orders }) => {
 
   return (
     <div>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-end gap-2">
+          <h2 className="font-semibold text-lg">注文進捗</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="text-muted-fg text-xs">
+            自動更新まであと
+            <span className="font-mono">{secondsUntilRefresh}</span>秒
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={fetchData}
+            ariaLabel="注文一覧を更新する"
+          >
+            <span>注文一覧を更新する</span>
+          </Button>{" "}
+        </div>
+      </div>
       <div className="-mx-2 overflow-auto rounded border border-border/50 bg-muted p-2">
         <div className="flex w-max gap-4">
           <Column status="pending" items={pending} />

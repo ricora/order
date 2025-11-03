@@ -63,7 +63,6 @@ describe("getProductsManagementPageData", () => {
 
   it("商品・タグ・集計値を正しく取得できる", async () => {
     const result = await getProductsManagementPageData({ dbClient })
-    expect(result.tags).toEqual(mockTags)
     expect(result.products.length).toBe(3)
 
     expect(result.products.map((p) => p.tags)).toEqual([

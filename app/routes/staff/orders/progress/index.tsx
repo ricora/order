@@ -1,7 +1,6 @@
 import { createRoute } from "honox/factory"
 import type Order from "../../../../domain/order/entities/order"
 import { setToastCookie } from "../../../../helpers/ui/toast"
-import { getOrderProgressPageData } from "../../../../usecases/getOrderProgressPageData"
 import {
   type SetOrderStatusParams,
   setOrderStatus,
@@ -52,15 +51,11 @@ export const POST = createRoute(async (c) => {
 })
 
 export default createRoute(async (c) => {
-  const { orders } = await getOrderProgressPageData({
-    dbClient: c.get("dbClient"),
-  })
-
   return c.render(
     <Layout title={"注文進捗管理"} description={"注文の進捗を管理します。"}>
       <div className="rounded-lg border bg-bg p-6">
         <h2 className="mb-4 font-bold text-lg">注文進捗管理</h2>
-        <OrderProgressManager orders={orders} />
+        <OrderProgressManager />
       </div>
     </Layout>,
   )

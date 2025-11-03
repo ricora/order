@@ -1,4 +1,4 @@
-import { type FC, useState } from "hono/jsx"
+import { type FC, useEffect, useState } from "hono/jsx"
 import ChevronDownIcon from "../../../../components/icons/lucide/chevronDownIcon"
 import SendIcon from "../../../../components/icons/lucide/sendIcon"
 import TagIcon from "../../../../components/icons/lucide/tagIcon"
@@ -10,6 +10,7 @@ import ChipButton from "../../../../components/ui/chipButton"
 import Input from "../../../../components/ui/input"
 import Label from "../../../../components/ui/label"
 import type ProductTag from "../../../../domain/product/entities/productTag"
+import { createHonoClient } from "../../../../helpers/hono/hono-client"
 import { stripString } from "../../../../utils/text"
 
 type TagInputProps = {
@@ -150,13 +151,21 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
   )
 }
 
-type ProductRegistrationFormProps = {
-  tags: ProductTag[]
-}
-
-const ProductRegistrationForm = ({ tags }: ProductRegistrationFormProps) => {
+const ProductRegistrationForm = () => {
   const [productName, setProductName] = useState("")
   const [imageValue, setImageValue] = useState("")
+  const [tags, setTags] = useState<ProductTag[]>([])
+
+  const fetchTags = async () => {
+    const honoClient = createHonoClient()
+    const response = await honoClient["product-registration-form"].$get()
+    const { tags: fetchedTags } = await response.json()
+    setTags(fetchedTags)
+  }
+
+  useEffect(() => {
+    fetchTags()
+  }, [])
 
   const maxNameLength = 50
 
