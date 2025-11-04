@@ -10,7 +10,7 @@ import ChipButton from "../../../../components/ui/chipButton"
 import Input from "../../../../components/ui/input"
 import Label from "../../../../components/ui/label"
 import type ProductTag from "../../../../domain/product/entities/productTag"
-import { createHonoClient } from "../../../../helpers/hono/hono-client"
+import { createHonoClient } from "../../../../helpers/api/hono-client"
 import { stripString } from "../../../../utils/text"
 
 type TagInputProps = {

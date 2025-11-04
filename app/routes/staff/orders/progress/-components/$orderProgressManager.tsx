@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
 import Button from "../../../../../components/ui/button"
 import type Order from "../../../../../domain/order/entities/order"
-import { createHonoClient } from "../../../../../helpers/hono/hono-client"
+import { createHonoClient } from "../../../../../helpers/api/hono-client"
 import { formatDateTimeJP } from "../../../../../utils/date"
 import OrderStatusBadge from "../../-components/orderStatusBadge"
 
