@@ -1,4 +1,4 @@
-import { type FC, type PropsWithChildren, useEffect, useState } from "hono/jsx"
+import { type FC, type PropsWithChildren, useCallback, useEffect, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
 import Button from "../../../../../components/ui/button"
@@ -293,7 +293,7 @@ const OrderProgressManager: FC = () => {
   const [secondsUntilRefresh, setSecondsUntilRefresh] = useState(30)
   const REFRESH_INTERVAL = 30
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const honoClient = createHonoClient()
       const response = await honoClient["order-progress-manager"].$get()
@@ -306,11 +306,11 @@ const OrderProgressManager: FC = () => {
     } finally {
       setSecondsUntilRefresh(REFRESH_INTERVAL)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [fetchData])
 
   useEffect(() => {
     const refreshTimer = setInterval(() => {
@@ -318,7 +318,7 @@ const OrderProgressManager: FC = () => {
     }, REFRESH_INTERVAL * 1000)
 
     return () => clearInterval(refreshTimer)
-  }, [])
+  }, [fetchData])
 
   useEffect(() => {
     const countdownTimer = setInterval(() => {
