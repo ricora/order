@@ -1,4 +1,10 @@
-import { type FC, type PropsWithChildren, useCallback, useEffect, useState } from "hono/jsx"
+import {
+  type FC,
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useState,
+} from "hono/jsx"
 import { tv } from "tailwind-variants"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
 import Button from "../../../../../components/ui/button"
@@ -291,18 +297,28 @@ const Card: FC<{ order: Order }> = ({ order }) => {
 const OrderProgressManager: FC = () => {
   const [orders, setOrders] = useState<Order[]>([])
   const [secondsUntilRefresh, setSecondsUntilRefresh] = useState(30)
+  const [error, setError] = useState<string | null>(null)
   const REFRESH_INTERVAL = 30
 
   const fetchData = useCallback(async () => {
     try {
+      setError(null)
       const honoClient = createHonoClient()
       const response = await honoClient["order-progress-manager"].$get()
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch orders: ${response.status} ${response.statusText}`,
+        )
+      }
       const { orders: fetchedOrders } = await response.json()
       const orders = fetchedOrders.map((order) => ({
         ...order,
         createdAt: new Date(order.createdAt),
       }))
       setOrders(orders)
+    } catch (err) {
+      console.error(err)
+      setError(err instanceof Error ? err.message : String(err))
     } finally {
       setSecondsUntilRefresh(REFRESH_INTERVAL)
     }
@@ -374,12 +390,18 @@ const OrderProgressManager: FC = () => {
         </div>
       </div>
       <div className="-mx-2 overflow-auto rounded border border-border/50 bg-muted p-2">
-        <div className="flex w-max gap-4">
-          <Column status="pending" items={pending} />
-          <Column status="processing" items={processing} />
-          <Column status="completed" items={completed} />
-          <Column status="cancelled" items={cancelled} />
-        </div>
+        {error ? (
+          <div className="items-center justify-center text-center text-muted-fg">
+            注文一覧の取得に失敗しました。しばらくしてから再試行してください。
+          </div>
+        ) : (
+          <div className="flex w-max gap-4">
+            <Column status="pending" items={pending} />
+            <Column status="processing" items={processing} />
+            <Column status="completed" items={completed} />
+            <Column status="cancelled" items={cancelled} />
+          </div>
+        )}
       </div>
     </div>
   )
