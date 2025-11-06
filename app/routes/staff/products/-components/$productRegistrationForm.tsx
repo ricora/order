@@ -1,4 +1,4 @@
-import { type FC, useEffect, useState } from "hono/jsx"
+import { type FC, useCallback, useEffect, useState } from "hono/jsx"
 import ChevronDownIcon from "../../../../components/icons/lucide/chevronDownIcon"
 import SendIcon from "../../../../components/icons/lucide/sendIcon"
 import TagIcon from "../../../../components/icons/lucide/tagIcon"
@@ -15,9 +15,11 @@ import { stripString } from "../../../../utils/text"
 
 type TagInputProps = {
   existingTags: ProductTag[]
+  error?: string | null
+  isLoading?: boolean
 }
 
-const TagInput: FC<TagInputProps> = ({ existingTags }) => {
+const TagInput: FC<TagInputProps> = ({ existingTags, error, isLoading }) => {
   const [tags, setTags] = useState<string[]>([])
   const [input, setInput] = useState("")
   const [suggestions, setSuggestions] = useState<ProductTag[]>([])
@@ -64,12 +66,26 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
       <div className="my-1 text-muted-fg text-xs">
         既存タグは一覧からクリックで追加できます。新しいタグも入力して追加できます。
       </div>
-      <div className="mb-1 flex max-h-35 flex-wrap gap-2 overflow-auto rounded border border-border/50 bg-muted p-2">
-        {unselectedTags.map((tag) => (
-          <ChipButton key={tag.id} onClick={() => addTag(tag.name)}>
-            {tag.name}
-          </ChipButton>
-        ))}
+      <div className="mb-1">
+        {isLoading ? (
+          <div className="mb-3 flex items-center justify-center rounded border border-border/50 bg-muted p-6">
+            <div className="text-muted-fg text-sm">読み込み中...</div>
+          </div>
+        ) : error ? (
+          <div className="mb-3 flex items-center justify-center rounded border border-border/50 bg-muted p-6">
+            <div className="text-muted-fg text-sm">
+              タグ一覧の取得に失敗しました。しばらくしてから再試行してください。
+            </div>
+          </div>
+        ) : (
+          <div className="flex max-h-35 flex-wrap gap-2 overflow-auto rounded border border-border/50 bg-muted p-2">
+            {unselectedTags.map((tag) => (
+              <ChipButton key={tag.id} onClick={() => addTag(tag.name)}>
+                {tag.name}
+              </ChipButton>
+            ))}
+          </div>
+        )}
       </div>
       <div className="flex gap-2">
         <div className="flex-1">
@@ -90,7 +106,7 @@ const TagInput: FC<TagInputProps> = ({ existingTags }) => {
             }}
           />
         </div>
-        <div className="mt-1 flex-shrink-0">
+        <div className="mt-1 shrink-0">
           <Button
             type="button"
             variant="secondary"
@@ -155,17 +171,32 @@ const ProductRegistrationForm = () => {
   const [productName, setProductName] = useState("")
   const [imageValue, setImageValue] = useState("")
   const [tags, setTags] = useState<ProductTag[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const fetchTags = async () => {
-    const honoClient = createHonoClient()
-    const response = await honoClient["product-registration-form"].$get()
-    const { tags: fetchedTags } = await response.json()
-    setTags(fetchedTags)
-  }
+  const fetchTags = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const honoClient = createHonoClient()
+      const response = await honoClient["product-registration-form"].$get()
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch tags: ${response.status} ${response.statusText}`,
+        )
+      }
+      const { tags: fetchedTags } = await response.json()
+      setTags(fetchedTags)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     fetchTags()
-  }, [])
+  }, [fetchTags])
 
   const maxNameLength = 50
 
@@ -248,7 +279,11 @@ const ProductRegistrationForm = () => {
               </div>
             </div>
             <div className="mb-4">
-              <TagInput existingTags={tags} />
+              <TagInput
+                existingTags={tags}
+                error={error}
+                isLoading={isLoading}
+              />
             </div>
             <div className="mt-6 flex gap-4">
               <div className="ml-auto">
