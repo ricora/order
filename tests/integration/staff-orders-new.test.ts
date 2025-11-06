@@ -1,5 +1,16 @@
 import { describe, expect, test } from "vitest"
+import type { createHonoClient } from "../../app/helpers/api/hono-client"
 import { app, assertBasicHtmlResponse } from "./utils"
+
+type ApiJson = Awaited<
+  ReturnType<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof createHonoClient>["order-registration-form"]["$get"]
+      >
+    >["json"]
+  >
+>
 
 describe("注文登録", () => {
   describe("GET", () => {
@@ -7,21 +18,25 @@ describe("注文登録", () => {
       const res = await app.request("/staff/orders/new")
       const html = await res.text()
       assertBasicHtmlResponse(res, html)
-
       expect(html).toMatch(/<h1[^>]*>\s*注文登録\s*<\/h1>/)
+      expect(html).toContain("読み込み中...")
+    })
 
-      expect(html).toContain("テスト商品1")
-      expect(html).toContain("テスト商品2")
-      expect(html).toContain("テスト商品3")
-      expect(html).toContain("テスト商品4")
+    test("クライアント用のAPIが利用できる", async () => {
+      const res = await app.request("/api/order-registration-form")
+      expect(res.status).toBe(200)
+      const apiJson = (await res.json()) as ApiJson
+      const productNames = apiJson.products.map((p) => p.name)
+      expect(productNames).toContain("テスト商品1")
+      expect(productNames).toContain("テスト商品2")
+      expect(productNames).toContain("テスト商品3")
+      expect(productNames).toContain("テスト商品4")
 
-      expect(html).toContain("タグA")
-      expect(html).toContain("タグB")
-      expect(html).toContain("タグC")
-      expect(html).toContain("タグD")
-
-      expect(html).toMatch(/<form[^>]*id="order-form"/)
-      expect(html).toContain("注文を登録")
+      const tagNames = apiJson.tags.map((t) => t.name)
+      expect(tagNames).toContain("タグA")
+      expect(tagNames).toContain("タグB")
+      expect(tagNames).toContain("タグC")
+      expect(tagNames).toContain("タグD")
     })
   })
   describe("POST", () => {

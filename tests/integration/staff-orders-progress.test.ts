@@ -1,5 +1,16 @@
 import { describe, expect, test } from "vitest"
+import type { createHonoClient } from "../../app/helpers/api/hono-client"
 import { app, assertBasicHtmlResponse } from "./utils"
+
+type ApiJson = Awaited<
+  ReturnType<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof createHonoClient>["order-progress-manager"]["$get"]
+      >
+    >["json"]
+  >
+>
 
 describe("注文進捗管理", () => {
   describe("GET", () => {
@@ -8,11 +19,18 @@ describe("注文進捗管理", () => {
       const html = await res.text()
       assertBasicHtmlResponse(res, html)
       expect(html).toMatch(/注文進捗管理/)
-      expect(html).toMatch(/<form[^>]*method="post"/)
-      expect(html).toContain("顧客A")
-      expect(html).toContain("顧客B")
-      expect(html).toContain("顧客C")
-      expect(html).toContain("顧客D")
+      expect(html).toContain("自動更新まであと")
+    })
+
+    test("クライアント用のAPIが利用できる", async () => {
+      const res = await app.request("/api/order-progress-manager")
+      expect(res.status).toBe(200)
+      const apiJson = (await res.json()) as ApiJson
+      const customerNames = apiJson.orders.map((o) => o.customerName)
+      expect(customerNames).toContain("顧客A")
+      expect(customerNames).toContain("顧客B")
+      expect(customerNames).toContain("顧客C")
+      expect(customerNames).toContain("顧客D")
     })
   })
   describe("POST", () => {
