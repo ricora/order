@@ -134,9 +134,9 @@ const OrderRegistrationForm: FC = () => {
     )
   }
 
-  const clearItems = useCallback(() => {
+  const clearItems = () => {
     setItems([])
-  }, [])
+  }
 
   const reservedMap: Record<string, number> = {}
   items.forEach((item) => {
@@ -163,9 +163,8 @@ const OrderRegistrationForm: FC = () => {
   const [customerName, setCustomerName] = useState("")
 
   useEffect(() => {
-    clearItems()
     fetchData()
-  }, [fetchData, clearItems])
+  }, [fetchData])
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
