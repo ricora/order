@@ -66,13 +66,15 @@ const OrderRegistrationForm: FC = () => {
     }
   }, [])
 
-  function toggleTag(tag: string) {
+  const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
     )
   }
 
-  function addProduct(product: OrderRegistrationPageData["products"][number]) {
+  const addProduct = (
+    product: OrderRegistrationPageData["products"][number],
+  ) => {
     setItems((prevItems) => {
       const productIdStr = String(product.id)
       const existingItem = prevItems.find(
@@ -116,7 +118,7 @@ const OrderRegistrationForm: FC = () => {
     })
   }
 
-  function setQuantity(productId: number | string | null, quantity: number) {
+  const setQuantity = (productId: number | string | null, quantity: number) => {
     setItems((prevItems) =>
       prevItems
         .map((item) =>
@@ -128,7 +130,7 @@ const OrderRegistrationForm: FC = () => {
     )
   }
 
-  function removeItem(productId: number | string | null) {
+  const removeItem = (productId: number | string | null) => {
     setItems((prevItems) =>
       prevItems.filter((item) => String(item.productId) !== String(productId)),
     )
