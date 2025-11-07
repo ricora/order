@@ -1,16 +1,8 @@
 import { describe, expect, test } from "vitest"
-import type { createHonoClient } from "../../app/helpers/api/hono-client"
+import type { ApiResponse } from "./utils"
 import { app, assertBasicHtmlResponse } from "./utils"
 
-type ApiJson = Awaited<
-  ReturnType<
-    Awaited<
-      ReturnType<
-        ReturnType<typeof createHonoClient>["order-progress-manager"]["$get"]
-      >
-    >["json"]
-  >
->
+type ApiJson = ApiResponse<"order-progress-manager">
 
 describe("注文進捗管理", () => {
   describe("GET", () => {
