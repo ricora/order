@@ -297,9 +297,10 @@ const Card: FC<{ order: Order }> = ({ order }) => {
 
 const OrderProgressManager: FC = () => {
   const [orders, setOrders] = useState<Order[]>([])
-  const [secondsUntilRefresh, setSecondsUntilRefresh] = useState(30)
-  const [error, setError] = useState<string | null>(null)
   const REFRESH_INTERVAL = 30
+  const [secondsUntilRefresh, setSecondsUntilRefresh] =
+    useState(REFRESH_INTERVAL)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
     try {
@@ -337,20 +338,18 @@ const OrderProgressManager: FC = () => {
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   useEffect(() => {
     refreshTimerRef.current = setInterval(() => {
-      if (fetchDataRef.current) fetchDataRef.current()
-    }, REFRESH_INTERVAL * 1000)
+      setSecondsUntilRefresh((prev) => {
+        if (prev <= 1) {
+          if (fetchDataRef.current) fetchDataRef.current()
+          return REFRESH_INTERVAL
+        }
+        return prev - 1
+      })
+    }, 1000)
 
     return () => {
       if (refreshTimerRef.current) clearInterval(refreshTimerRef.current)
     }
-  }, [])
-
-  useEffect(() => {
-    const countdownTimer = setInterval(() => {
-      setSecondsUntilRefresh((prev) => Math.max(0, prev - 1))
-    }, 1000)
-
-    return () => clearInterval(countdownTimer)
   }, [])
 
   const pending = orders.filter((o) => o.status === "pending")
