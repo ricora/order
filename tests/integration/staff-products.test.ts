@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest"
+import type { ApiResponse } from "./utils"
 import { app, assertBasicHtmlResponse, generateUniqueName } from "./utils"
+
+type ApiJson = ApiResponse<"product-registration-form">
 
 describe("商品管理", () => {
   describe("GET", () => {
@@ -10,6 +13,18 @@ describe("商品管理", () => {
       expect(text).toMatch(/商品管理/)
       expect(text).toMatch(/商品登録/)
       expect(text).toMatch(/商品一覧/)
+      expect(text).toContain("読み込み中...")
+    })
+
+    test("クライアント用のAPIが利用できる", async () => {
+      const res = await app.request("/api/product-registration-form")
+      expect(res.status).toBe(200)
+      const apiJson = (await res.json()) as ApiJson
+      const tagNames = apiJson.tags.map((t) => t.name)
+      expect(tagNames).toContain("タグA")
+      expect(tagNames).toContain("タグB")
+      expect(tagNames).toContain("タグC")
+      expect(tagNames).toContain("タグD")
     })
   })
   describe("POST", () => {

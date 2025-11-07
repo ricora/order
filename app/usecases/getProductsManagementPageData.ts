@@ -1,5 +1,4 @@
 import type Product from "../domain/product/entities/product"
-import type ProductTag from "../domain/product/entities/productTag"
 import { findAllProducts } from "../domain/product/repositories/productQueryRepository"
 import { findAllProductTags } from "../domain/product/repositories/productTagQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
@@ -13,7 +12,6 @@ export type ProductsManagementPageData = {
     image: string
     tags: string[]
   })[]
-  tags: ProductTag[]
   totalProducts: number
   lowStockCount: number
   outOfStockCount: number
@@ -45,7 +43,6 @@ export const getProductsManagementPageData = async ({
 
   return {
     products: managementProducts,
-    tags,
     totalProducts,
     lowStockCount,
     outOfStockCount,

@@ -1,7 +1,16 @@
-import { type FC, type PropsWithChildren, useEffect, useState } from "hono/jsx"
+import {
+  type FC,
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "hono/jsx"
 import { tv } from "tailwind-variants"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
+import Button from "../../../../../components/ui/button"
 import type Order from "../../../../../domain/order/entities/order"
+import { createHonoClient } from "../../../../../helpers/api/hono-client"
 import { formatDateTimeJP } from "../../../../../utils/date"
 import OrderStatusBadge from "../../-components/orderStatusBadge"
 
@@ -107,10 +116,6 @@ const btnTv = tv({
   defaultVariants: { status: "pending", disabled: false },
 })
 
-type Props = {
-  orders: Order[]
-}
-
 const statusLabel: Record<Order["status"], string> = {
   pending: "処理待ち",
   processing: "処理中",
@@ -122,7 +127,7 @@ const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
   const [text, setText] = useState("--:--")
   useEffect(() => {
     let mounted = true
-    function update() {
+    const update = () => {
       const now = Date.now()
       const diff = Math.max(0, now - Date.parse(iso))
       const totalSec = Math.floor(diff / 1000)
@@ -130,9 +135,10 @@ const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
       const mins = Math.floor((totalSec % 3600) / 60)
       const secs = totalSec % 60
       const pad = (n: number) => String(n).padStart(2, "0")
-      let s: string = ""
-      if (hours > 0) s = `${hours}:${pad(mins)}:${pad(secs)}`
-      else s = `${pad(mins)}:${pad(secs)}`
+      const s =
+        hours > 0
+          ? `${hours}:${pad(mins)}:${pad(secs)}`
+          : `${pad(mins)}:${pad(secs)}`
       if (mounted) setText(s)
     }
     update()
@@ -150,18 +156,10 @@ const Card: FC<{ order: Order }> = ({ order }) => {
   const createdIso = created.toISOString()
   const createdLabel = formatDateTimeJP(created)
 
-  const nextStatus = (s: Order["status"]) =>
-    s === "pending"
-      ? "processing"
-      : s === "processing"
-        ? "completed"
-        : "completed"
-  const prevStatus = (s: Order["status"]) =>
-    s === "completed"
-      ? "processing"
-      : s === "processing"
-        ? "pending"
-        : "pending"
+  const nextStatus = (s: Order["status"]): Order["status"] =>
+    s === "processing" ? "completed" : "processing"
+  const prevStatus = (s: Order["status"]): Order["status"] =>
+    s === "completed" ? "processing" : "pending"
 
   const isPrevDisabled = order.status === "pending"
   const isNextDisabled = order.status === "completed"
@@ -290,40 +288,134 @@ const Card: FC<{ order: Order }> = ({ order }) => {
   )
 }
 
-const OrderProgressManager: FC<Props> = ({ orders }) => {
+type ColumnStatus = "pending" | "processing" | "completed" | "cancelled"
+
+const Countdown: FC<{
+  refreshInterval: number
+  fetchRef: { current: (() => Promise<void>) | null | undefined }
+  resetSignal: number
+}> = ({ refreshInterval, fetchRef, resetSignal }) => {
+  const [seconds, setSeconds] = useState(refreshInterval)
+
+  useEffect(() => {
+    setSeconds(refreshInterval)
+  }, [resetSignal, refreshInterval])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setSeconds((prev) => {
+        if (prev <= 1) {
+          fetchRef?.current?.()
+          return refreshInterval
+        }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(id)
+  }, [refreshInterval, fetchRef])
+
+  return <span className="font-mono">{seconds}</span>
+}
+
+const Column: FC<{
+  status: ColumnStatus
+  items: Order[]
+}> = ({ status, items }) => (
+  <section className={sectionTv({ status })}>
+    <div className={bandTv({ status })} />
+    <div className={headerRowTv()}>
+      <div className={statusTextTv({ status })}>{statusLabel[status]}</div>
+      <div className={headerBadgeTv({ status })}>{items.length}</div>
+    </div>
+
+    <div className={innerScrollTv()}>
+      {items.map((o) => (
+        <Card key={String(o.id)} order={o} />
+      ))}
+    </div>
+  </section>
+)
+
+const OrderProgressManager: FC = () => {
+  const [orders, setOrders] = useState<Order[]>([])
+  const REFRESH_INTERVAL = 30
+  const [fetchSignal, setFetchSignal] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchData = useCallback(async () => {
+    try {
+      setError(null)
+      const honoClient = createHonoClient()
+      const response = await honoClient["order-progress-manager"].$get()
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch orders: ${response.status} ${response.statusText}`,
+        )
+      }
+      const { orders: fetchedOrders } = await response.json()
+      const orders = fetchedOrders.map((order) => ({
+        ...order,
+        createdAt: new Date(order.createdAt),
+      }))
+      setOrders(orders)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setFetchSignal((s) => s + 1)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  const fetchDataRef = useRef(fetchData)
+  useEffect(() => {
+    fetchDataRef.current = fetchData
+  }, [fetchData])
+
   const pending = orders.filter((o) => o.status === "pending")
   const processing = orders.filter((o) => o.status === "processing")
   const completed = orders.filter((o) => o.status === "completed")
   const cancelled = orders.filter((o) => o.status === "cancelled")
-  type ColumnStatus = "pending" | "processing" | "completed" | "cancelled"
-  const Column: FC<{
-    status: ColumnStatus
-    items: Order[]
-  }> = ({ status, items }) => (
-    <section className={sectionTv({ status })}>
-      <div className={bandTv({ status })} />
-      <div className={headerRowTv()}>
-        <div className={statusTextTv({ status })}>{statusLabel[status]}</div>
-        <div className={headerBadgeTv({ status })}>{items.length}</div>
-      </div>
-
-      <div className={innerScrollTv()}>
-        {items.map((o) => (
-          <Card key={String(o.id)} order={o} />
-        ))}
-      </div>
-    </section>
-  )
 
   return (
     <div>
-      <div className="-mx-2 overflow-auto rounded border border-border/50 bg-muted p-2">
-        <div className="flex w-max gap-4">
-          <Column status="pending" items={pending} />
-          <Column status="processing" items={processing} />
-          <Column status="completed" items={completed} />
-          <Column status="cancelled" items={cancelled} />
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="font-semibold text-lg">注文進捗</h2>
+        <div className="flex items-center gap-2">
+          <div className="text-muted-fg text-xs">
+            自動更新まであと
+            <Countdown
+              refreshInterval={REFRESH_INTERVAL}
+              fetchRef={fetchDataRef}
+              resetSignal={fetchSignal}
+            />
+            秒
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={fetchData}
+            ariaLabel="注文一覧を更新する"
+          >
+            <span>注文一覧を更新する</span>
+          </Button>
         </div>
+      </div>
+      <div className="-mx-2 overflow-auto rounded border border-border/50 bg-muted p-2">
+        {error ? (
+          <div className="items-center justify-center text-center text-muted-fg">
+            注文一覧の取得に失敗しました。しばらくしてから再試行してください。
+          </div>
+        ) : (
+          <div className="flex w-max gap-4">
+            <Column status="pending" items={pending} />
+            <Column status="processing" items={processing} />
+            <Column status="completed" items={completed} />
+            <Column status="cancelled" items={cancelled} />
+          </div>
+        )}
       </div>
     </div>
   )

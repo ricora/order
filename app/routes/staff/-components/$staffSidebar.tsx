@@ -40,7 +40,7 @@ const SidebarNavItem: FC<
         }`}
         aria-current={isActive ? "page" : undefined}
       >
-        <div className="h-5 w-5 flex-shrink-0">
+        <div className="h-5 w-5 shrink-0">
           <Icon />
         </div>
 

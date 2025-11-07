@@ -1,6 +1,5 @@
 import { createRoute } from "honox/factory"
 import { setToastCookie } from "../../../../helpers/ui/toast"
-import { getOrderRegistrationPageData } from "../../../../usecases/getOrderRegistrationPageData"
 import {
   type RegisterOrderParams,
   registerOrder,
@@ -55,15 +54,11 @@ export const POST = createRoute(async (c) => {
 })
 
 export default createRoute(async (c) => {
-  const { products, tags } = await getOrderRegistrationPageData({
-    dbClient: c.get("dbClient"),
-  })
-
   return c.render(
     <Layout title={"注文登録"} description={"注文情報の登録を行います。"}>
       <div className="rounded-lg border bg-bg p-6">
         <h2 className="mb-4 font-bold text-lg">注文登録</h2>
-        <OrderRegistrationForm products={products} tags={tags} />
+        <OrderRegistrationForm />
       </div>
     </Layout>,
   )

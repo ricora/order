@@ -71,7 +71,6 @@ export default createRoute(async (c) => {
 
   const {
     products,
-    tags,
     totalProducts,
     outOfStockCount,
     lowStockCount,
@@ -86,7 +85,7 @@ export default createRoute(async (c) => {
         lowStockCount={lowStockCount}
         totalValue={totalValue}
       />
-      <ProductRegistrationForm tags={tags} />
+      <ProductRegistrationForm />
       <ItemCollectionViewer
         title="商品一覧"
         columns={[

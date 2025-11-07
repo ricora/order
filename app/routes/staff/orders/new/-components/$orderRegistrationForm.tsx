@@ -1,5 +1,5 @@
 import type { FC } from "hono/jsx"
-import { useMemo, useState } from "hono/jsx"
+import { useCallback, useEffect, useMemo, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
 import SendIcon from "../../../../../components/icons/lucide/sendIcon"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
@@ -9,6 +9,7 @@ import Chip from "../../../../../components/ui/chip"
 import ChipButton from "../../../../../components/ui/chipButton"
 import Input from "../../../../../components/ui/input"
 import Label from "../../../../../components/ui/label"
+import { createHonoClient } from "../../../../../helpers/api/hono-client"
 import type { OrderRegistrationPageData } from "../../../../../usecases/getOrderRegistrationPageData"
 import type { RegisterOrderParams } from "../../../../../usecases/registerOrder"
 import { formatCurrencyJPY } from "../../../../../utils/money"
@@ -32,21 +33,48 @@ const productButton = tv({
   },
 })
 
-const OrderRegistrationForm: FC<{
-  products: OrderRegistrationPageData["products"]
-  tags: OrderRegistrationPageData["tags"]
-}> = ({ products, tags }) => {
+const OrderRegistrationForm: FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [items, setItems] = useState<OrderItem[]>([])
+  const [products, setProducts] = useState<
+    OrderRegistrationPageData["products"]
+  >([])
+  const [tags, setTags] = useState<OrderRegistrationPageData["tags"]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const MAX_DISTINCT_ORDER_ITEMS = 20
 
-  function toggleTag(tag: string) {
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const honoClient = createHonoClient()
+      const response = await honoClient["order-registration-form"].$get()
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch products: ${response.status} ${response.statusText}`,
+        )
+      }
+      const { products: fetchedProducts, tags: fetchedTags } =
+        await response.json()
+      setProducts(fetchedProducts)
+      setTags(fetchedTags)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
     )
   }
 
-  function addProduct(product: OrderRegistrationPageData["products"][number]) {
+  const addProduct = (
+    product: OrderRegistrationPageData["products"][number],
+  ) => {
     setItems((prevItems) => {
       const productIdStr = String(product.id)
       const existingItem = prevItems.find(
@@ -90,7 +118,7 @@ const OrderRegistrationForm: FC<{
     })
   }
 
-  function setQuantity(productId: number | string | null, quantity: number) {
+  const setQuantity = (productId: number | string | null, quantity: number) => {
     setItems((prevItems) =>
       prevItems
         .map((item) =>
@@ -102,13 +130,13 @@ const OrderRegistrationForm: FC<{
     )
   }
 
-  function removeItem(productId: number | string | null) {
+  const removeItem = (productId: number | string | null) => {
     setItems((prevItems) =>
       prevItems.filter((item) => String(item.productId) !== String(productId)),
     )
   }
 
-  function clearItems() {
+  const clearItems = () => {
     setItems([])
   }
 
@@ -136,25 +164,52 @@ const OrderRegistrationForm: FC<{
   const isCartEmpty = items.length === 0
   const [customerName, setCustomerName] = useState("")
 
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
       <div className="md:col-span-3">
         <div className="mb-3">
-          <h3 className="mb-2 font-semibold">タグ一覧</h3>
-          <div className="mb-3 flex max-h-35 flex-wrap gap-2 overflow-auto rounded border border-border/50 bg-muted p-2">
-            {allTags.map((tag) => {
-              const active = selectedTags.includes(tag)
-              return (
-                <ChipButton
-                  key={tag}
-                  isActive={active}
-                  onClick={() => toggleTag(tag)}
-                >
-                  {tag}
-                </ChipButton>
-              )
-            })}
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="font-semibold">タグ一覧</h3>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={fetchData}
+              disabled={isLoading}
+              ariaLabel="商品一覧を更新する"
+            >
+              <span>{isLoading ? "読み込み中..." : "商品一覧を更新する"}</span>
+            </Button>
           </div>
+          {isLoading ? (
+            <div className="mb-3 flex items-center justify-center rounded border border-border/50 bg-muted p-6">
+              <div className="text-muted-fg text-sm">読み込み中...</div>
+            </div>
+          ) : (
+            <div className="mb-3 flex max-h-35 flex-wrap gap-2 overflow-auto rounded border border-border/50 bg-muted p-2">
+              {error ? (
+                <div className="items-center justify-center text-center text-muted-fg text-sm">
+                  タグ一覧の取得に失敗しました。しばらくしてから再試行してください。
+                </div>
+              ) : (
+                allTags.map((tag) => {
+                  const active = selectedTags.includes(tag)
+                  return (
+                    <ChipButton
+                      key={tag}
+                      isActive={active}
+                      onClick={() => toggleTag(tag)}
+                    >
+                      {tag}
+                    </ChipButton>
+                  )
+                })
+              )}
+            </div>
+          )}
           <div className="mb-1 text-muted-fg text-xs">
             タグをクリックして商品を絞り込めます。複数選択はAND絞り込みになります。
           </div>
@@ -170,72 +225,86 @@ const OrderRegistrationForm: FC<{
             <div>クリックでカートに追加します。</div>
             <div>表示件数 {slice.length}件</div>
           </div>
-          <div
-            id="product-list-wrapper"
-            className="max-h-[60vh] overflow-auto rounded border border-border/50 bg-muted p-3 md:max-h-[70vh]"
-          >
-            <div id="product-list" className="space-y-3">
-              {slice.map((product) => {
-                const remaining = Math.max(
-                  0,
-                  product.stock - (reservedMap[String(product.id)] || 0),
-                )
-                const disabledForProduct =
-                  remaining <= 0 ||
-                  (items.length >= MAX_DISTINCT_ORDER_ITEMS &&
-                    !items.some(
-                      (it) => String(it.productId) === String(product.id),
-                    ))
+          {isLoading ? (
+            <div className="flex items-center justify-center rounded border border-border/50 bg-muted p-12">
+              <div className="text-muted-fg text-sm">読み込み中...</div>
+            </div>
+          ) : (
+            <div
+              id="product-list-wrapper"
+              className="max-h-[60vh] overflow-auto rounded border border-border/50 bg-muted p-3 md:max-h-[70vh]"
+            >
+              {error ? (
+                <div className="items-center justify-center text-center text-muted-fg text-sm">
+                  商品一覧の取得に失敗しました。しばらくしてから再試行してください。
+                </div>
+              ) : (
+                <div id="product-list" className="space-y-3">
+                  {slice.map((product) => {
+                    const remaining = Math.max(
+                      0,
+                      product.stock - (reservedMap[String(product.id)] || 0),
+                    )
+                    const disabledForProduct =
+                      remaining <= 0 ||
+                      (items.length >= MAX_DISTINCT_ORDER_ITEMS &&
+                        !items.some(
+                          (it) => String(it.productId) === String(product.id),
+                        ))
 
-                return (
-                  <button
-                    key={product.id}
-                    type="button"
-                    onClick={() => addProduct(product)}
-                    disabled={disabledForProduct}
-                    className={productButton({ disabled: disabledForProduct })}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex min-w-0 flex-1 items-center gap-3">
-                        <img
-                          src={
-                            product.image ||
-                            "/placeholder.svg?height=60&width=60"
-                          }
-                          alt={product.name}
-                          className="h-10 w-10 flex-shrink-0 rounded object-cover"
-                          loading="lazy"
-                        />
-                        <div className="min-w-0">
-                          <div className="truncate font-medium">
-                            {product.name}
+                    return (
+                      <button
+                        key={product.id}
+                        type="button"
+                        onClick={() => addProduct(product)}
+                        disabled={disabledForProduct}
+                        className={productButton({
+                          disabled: disabledForProduct,
+                        })}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex min-w-0 flex-1 items-center gap-3">
+                            <img
+                              src={
+                                product.image ||
+                                "/placeholder.svg?height=60&width=60"
+                              }
+                              alt={product.name}
+                              className="h-10 w-10 shrink-0 rounded object-cover"
+                              loading="lazy"
+                            />
+                            <div className="min-w-0">
+                              <div className="truncate font-medium">
+                                {product.name}
+                              </div>
+                              <div className="mt-1 flex flex-wrap gap-1">
+                                {product.tags.map((tag) => (
+                                  <Chip key={tag} size="xs">
+                                    {tag}
+                                  </Chip>
+                                ))}
+                              </div>
+                              <div className="mt-1 text-muted-fg text-xs">
+                                残り
+                                <span data-remaining-for={product.id}>
+                                  {remaining}
+                                </span>
+                                個
+                              </div>
+                            </div>
                           </div>
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {product.tags.map((tag) => (
-                              <Chip key={tag} size="xs">
-                                {tag}
-                              </Chip>
-                            ))}
-                          </div>
-                          <div className="mt-1 text-muted-fg text-xs">
-                            残り
-                            <span data-remaining-for={product.id}>
-                              {remaining}
-                            </span>
-                            個
+
+                          <div className="font-mono">
+                            {formatCurrencyJPY(product.price)}
                           </div>
                         </div>
-                      </div>
-
-                      <div className="font-mono">
-                        {formatCurrencyJPY(product.price)}
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -300,7 +369,7 @@ const OrderRegistrationForm: FC<{
                             "/placeholder.svg?height=60&width=60"
                           }
                           alt={item.productName}
-                          className="h-10 w-10 flex-shrink-0 rounded object-cover"
+                          className="h-10 w-10 shrink-0 rounded object-cover"
                           loading="lazy"
                         />
                         <div className="min-w-0">
@@ -311,7 +380,7 @@ const OrderRegistrationForm: FC<{
                         </div>
                       </div>
 
-                      <div className="mt-2 flex flex-shrink-0 items-center gap-2 md:mt-0 md:gap-4">
+                      <div className="mt-2 flex shrink-0 items-center gap-2 md:mt-0 md:gap-4">
                         <Label
                           htmlFor={`quantity-${String(item.productId)}`}
                           required
@@ -343,7 +412,7 @@ const OrderRegistrationForm: FC<{
                           />
                         </div>
 
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           <Button
                             type="button"
                             variant="danger"
