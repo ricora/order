@@ -3,6 +3,7 @@ import {
   type PropsWithChildren,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "hono/jsx"
 import { tv } from "tailwind-variants"
@@ -328,13 +329,21 @@ const OrderProgressManager: FC = () => {
     fetchData()
   }, [fetchData])
 
+  const fetchDataRef = useRef(fetchData)
   useEffect(() => {
-    const refreshTimer = setInterval(() => {
-      fetchData()
+    fetchDataRef.current = fetchData
+  }, [fetchData])
+
+  const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  useEffect(() => {
+    refreshTimerRef.current = setInterval(() => {
+      if (fetchDataRef.current) fetchDataRef.current()
     }, REFRESH_INTERVAL * 1000)
 
-    return () => clearInterval(refreshTimer)
-  }, [fetchData])
+    return () => {
+      if (refreshTimerRef.current) clearInterval(refreshTimerRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     const countdownTimer = setInterval(() => {
