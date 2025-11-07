@@ -386,7 +386,7 @@ const OrderProgressManager: FC = () => {
             ariaLabel="注文一覧を更新する"
           >
             <span>注文一覧を更新する</span>
-          </Button>{" "}
+          </Button>
         </div>
       </div>
       <div className="-mx-2 overflow-auto rounded border border-border/50 bg-muted p-2">
