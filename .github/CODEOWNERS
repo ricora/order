@@ -1,1 +1,8 @@
 * @sou1118 @3w36zj6 @r4ai
+
+# Exclude dependency management files for Renovate
+/mise.toml
+/package.json
+/bun.lock
+/.github/workflows/*
+/biome.jsonc
