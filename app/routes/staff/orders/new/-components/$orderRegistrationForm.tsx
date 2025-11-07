@@ -193,20 +193,18 @@ const OrderRegistrationForm: FC = () => {
                   タグ一覧の取得に失敗しました。しばらくしてから再試行してください。
                 </div>
               ) : (
-                <div>
-                  {allTags.map((tag) => {
-                    const active = selectedTags.includes(tag)
-                    return (
-                      <ChipButton
-                        key={tag}
-                        isActive={active}
-                        onClick={() => toggleTag(tag)}
-                      >
-                        {tag}
-                      </ChipButton>
-                    )
-                  })}
-                </div>
+                allTags.map((tag) => {
+                  const active = selectedTags.includes(tag)
+                  return (
+                    <ChipButton
+                      key={tag}
+                      isActive={active}
+                      onClick={() => toggleTag(tag)}
+                    >
+                      {tag}
+                    </ChipButton>
+                  )
+                })
               )}
             </div>
           )}
