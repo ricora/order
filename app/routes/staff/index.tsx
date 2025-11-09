@@ -72,12 +72,8 @@ const DashboardCard: FC<DashboardCard> = ({
           </div>
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-lg text-secondary-fg">
-            {title}
-          </h3>
-          <p className="mt-1 text-muted-fg text-sm">
-            {description}
-          </p>
+          <h3 className="font-semibold text-lg text-secondary-fg">{title}</h3>
+          <p className="mt-1 text-muted-fg text-sm">{description}</p>
         </div>
       </div>
     </a>
