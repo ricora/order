@@ -12,7 +12,7 @@ export default jsxRenderer(({ children }) => {
     deleteToastCookie(c)
   }
   return (
-    <html lang="en">
+    <html lang="en" class="h-full">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,7 +21,7 @@ export default jsxRenderer(({ children }) => {
         <Script src="/app/client.ts" async />
         <Style />
       </head>
-      <body>
+      <body class="h-full">
         {toastMessage && (
           <div className="fixed top-4 right-4 z-50">
             <Toast message={toastMessage} type={toastType} />

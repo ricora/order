@@ -64,7 +64,7 @@ export const Layout: FC<
 > = ({ children, title, description }) => {
   const c = useRequestContext()
   return (
-    <div className="flex min-h-screen bg-muted">
+    <div className="flex min-h-full bg-muted">
       <StaffSidebar currentPath={c.req.path} />
       <div className="flex min-w-0 flex-1 flex-col md:ml-64">
         <header className="fixed top-0 right-0 left-0 z-30 flex h-16 items-center border-b bg-navbar px-6 text-navbar-fg md:left-64">
@@ -81,8 +81,8 @@ export const Layout: FC<
               </div>
             </div>
           </div>
-          <div className="mx-auto max-w-7xl space-y-6">
-            <div className="min-h-screen bg-muted p-4">{children}</div>
+          <div className="mx-auto max-w-7xl flex-1 space-y-6">
+            <div className="bg-muted p-4">{children}</div>
           </div>
         </main>
       </div>

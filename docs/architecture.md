@@ -49,7 +49,8 @@
 
 - `/app/routes/`以下に`createRoute()`を`export`した`index.tsx`を配置してルーティングを定義する
   - [File-based routing](https://github.com/honojs/honox#routes)を利用する
-- コロケーションに基づき、再利用箇所が限られているコンポーネントや関数は`-`から始まるディレクトリに配置する
+- コンポーネントは共通化が必要になるまでは分割せずにルーティング定義に直接記述する
+- コロケーションに基づき、再利用箇所が限られているコンポーネントは`-components/`、関数は`-helpers/`のディレクトリに配置する
   - `-`から始まるディレクトリはルーティングから除外される
 - コンポーネントのファイル名は、サーバーサイドの場合は`camelCase.tsx`、アイランドの場合は`$camelCase.tsx`とし、`export`する名前は`PascalCase`とする
   - [HonoXのドキュメントの例](https://github.com/honojs/honox#interactions)に従う
