@@ -29,8 +29,10 @@ const TagInput: FC<TagInputProps> = ({
   const [tags, setTags] = useState<string[]>([])
   const [input, setInput] = useState("")
   const [suggestions, setSuggestions] = useState<ProductTag[]>([])
+  const [tagError, setTagError] = useState<string | null>(null)
 
   const maxTagLength = 50
+  const maxTagCount = 20
 
   function updateSuggestions(value: string) {
     const v = value.trim().toLowerCase()
@@ -48,10 +50,21 @@ const TagInput: FC<TagInputProps> = ({
     const raw = (tagName ?? input).trim()
     const value = stripString(raw, maxTagLength)
     if (!value) return
-    if (tags.includes(value)) return
+
+    if (tags.length >= maxTagCount) {
+      setTagError(`設定できるタグの個数の上限は${maxTagCount}個です。`)
+      return
+    }
+
+    if (tags.includes(value)) {
+      setTagError("このタグは既に追加されています。")
+      return
+    }
+
     setTags([...tags, value])
     setInput("")
     setSuggestions([])
+    setTagError(null)
   }
 
   useEffect(() => {
@@ -62,6 +75,7 @@ const TagInput: FC<TagInputProps> = ({
 
   function removeTag(tag: string) {
     setTags(tags.filter((t) => t !== tag))
+    setTagError(null)
   }
 
   const unselectedTags = existingTags.filter((tag) => !tags.includes(tag.name))
@@ -124,6 +138,7 @@ const TagInput: FC<TagInputProps> = ({
             variant="secondary"
             onClick={() => addTag()}
             ariaLabel="新しいタグを追加"
+            disabled={tags.length >= maxTagCount || !input.trim()}
           >
             <div className="size-4">
               <TagIcon />
@@ -132,6 +147,12 @@ const TagInput: FC<TagInputProps> = ({
           </Button>
         </div>
       </div>
+
+      {tagError && (
+        <div className="mt-1 text-danger text-sm" role="alert">
+          {tagError}
+        </div>
+      )}
 
       {suggestions.length > 0 && (
         <div
