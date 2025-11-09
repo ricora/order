@@ -108,6 +108,44 @@ describe("商品編集", () => {
       expect(res.headers.get("set-cookie")).toMatch(/error/)
     })
 
+    test("商品タグが21個以上の場合にエラーを返す", async () => {
+      const form = new URLSearchParams()
+      form.append("name", generateUniqueName("タグ多"))
+      form.append("price", "1000")
+      form.append("stock", "10")
+      Array.from({ length: 21 }, (_, i) => `タグ${i}`).forEach((tag) =>
+        form.append("tags", tag),
+      )
+      const res = await app.request(endpoint, {
+        method: "POST",
+        body: form,
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      })
+      expect(res.status).toBe(302)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("商品タグは20個以内である必要があります"),
+      )
+    })
+
+    test("タグ名が51文字以上の場合にエラーを返す", async () => {
+      const form = new URLSearchParams()
+      form.append("name", generateUniqueName("タグ長大"))
+      form.append("price", "1000")
+      form.append("stock", "10")
+      form.append("tags", "あ".repeat(51))
+      const res = await app.request(endpoint, {
+        method: "POST",
+        body: form,
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      })
+      expect(res.status).toBe(302)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("タグ名は1文字以上50文字以内である必要があります"),
+      )
+    })
+
     test("Content-Typeが不正なときにエラーを返す", async () => {
       const res = await app.request(endpoint, {
         method: "POST",

@@ -60,7 +60,7 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("商品名は必須です"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("商品名が51文字以上の場合にエラーを返す", async () => {
@@ -76,7 +76,7 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("商品名は1文字以上50文字以内で入力してください"),
+        encodeURIComponent("商品名は1文字以上50文字以内である必要があります"),
       )
     })
     test("同じ名前の商品が既に存在する場合にエラーを返す", async () => {
@@ -96,7 +96,7 @@ describe("商品管理", () => {
       )
     })
 
-    test("価格が空の場合は0が設定され正常に登録される", async () => {
+    test("価格が空の場合はエラーを返す", async () => {
       const form = new URLSearchParams()
       form.append("name", generateUniqueName("価格空"))
       form.append("stock", "10")
@@ -106,9 +106,9 @@ describe("商品管理", () => {
         headers: { "content-type": "application/x-www-form-urlencoded" },
       })
       expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/success/)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("商品を登録しました"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("価格が負数の場合にエラーを返す", async () => {
@@ -124,7 +124,7 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("価格は0以上の整数で入力してください"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("価格が小数の場合にエラーを返す", async () => {
@@ -140,7 +140,7 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("価格は0以上の整数で入力してください"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("価格が文字列の場合にエラーを返す", async () => {
@@ -156,10 +156,10 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("価格は0以上の整数で入力してください"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
-    test("在庫数が空の場合は0が設定され正常に登録される", async () => {
+    test("在庫数が空の場合はエラーを返す", async () => {
       const form = new URLSearchParams()
       form.append("name", generateUniqueName("在庫空"))
       form.append("price", "1000")
@@ -169,9 +169,9 @@ describe("商品管理", () => {
         headers: { "content-type": "application/x-www-form-urlencoded" },
       })
       expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/success/)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("商品を登録しました"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("在庫数が負数の場合にエラーを返す", async () => {
@@ -187,7 +187,7 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("在庫数は0以上の整数で入力してください"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("在庫数が小数の場合にエラーを返す", async () => {
@@ -203,7 +203,7 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("在庫数は0以上の整数で入力してください"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("在庫数が文字列の場合にエラーを返す", async () => {
@@ -219,7 +219,7 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("在庫数は0以上の整数で入力してください"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("画像URLが501文字以上の場合にエラーを返す", async () => {
@@ -237,7 +237,7 @@ describe("商品管理", () => {
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
         encodeURIComponent(
-          "画像URLは500文字以内かつhttp(s)で始まる必要があります",
+          "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
         ),
       )
     })
@@ -256,8 +256,44 @@ describe("商品管理", () => {
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
         encodeURIComponent(
-          "画像URLは500文字以内かつhttp(s)で始まる必要があります",
+          "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
         ),
+      )
+    })
+    test("商品タグが21個以上の場合にエラーを返す", async () => {
+      const form = new URLSearchParams()
+      form.append("name", generateUniqueName("タグ多"))
+      form.append("price", "1000")
+      form.append("stock", "10")
+      Array.from({ length: 21 }, (_, i) => `タグ${i}`).forEach((tag) =>
+        form.append("tags", tag),
+      )
+      const res = await app.request(endpoint, {
+        method: "POST",
+        body: form,
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      })
+      expect(res.status).toBe(302)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("商品タグは20個以内である必要があります"),
+      )
+    })
+    test("タグ名が51文字以上の場合にエラーを返す", async () => {
+      const form = new URLSearchParams()
+      form.append("name", generateUniqueName("タグ長大"))
+      form.append("price", "1000")
+      form.append("stock", "10")
+      form.append("tags", "あ".repeat(51))
+      const res = await app.request(endpoint, {
+        method: "POST",
+        body: form,
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      })
+      expect(res.status).toBe(302)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("タグ名は1文字以上50文字以内である必要があります"),
       )
     })
     test("Content-Typeが不正なときにエラーを返す", async () => {
