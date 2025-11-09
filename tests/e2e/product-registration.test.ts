@@ -15,10 +15,62 @@ test.describe("商品登録", () => {
     await page.getByLabel("在庫数").fill("10")
 
     // 登録ボタンをクリック
-    await page.getByRole("button", { name: "登録" }).click()
+    await page.getByRole("button", { name: "商品を登録" }).click()
 
     // ページがリロードされたことを確認（同じURLに戻る）
     await page.waitForURL("/staff/products", { timeout: 10000 })
+  })
+
+  test("タグの追加と削除が正しく動作する", async ({ page }) => {
+    await waitForHydration(page, "/staff/products")
+
+    const newTag = `e2e-tag-${Date.now()}`
+
+    // タグ入力に値を入れて追加ボタンを押す
+    await page.locator("#tag-input").fill(newTag)
+    await page.getByRole("button", { name: "新しいタグを追加" }).click()
+
+    // 追加されたタグが表示される
+    await expect(page.getByText(newTag)).toBeVisible()
+
+    // タグを削除する
+    await page.getByRole("button", { name: `${newTag}を削除` }).click()
+
+    // 削除されていることを確認
+    await expect(page.getByText(newTag)).not.toBeVisible()
+  })
+
+  test("タグのバリデーションが正しく動作する", async ({ page }) => {
+    await waitForHydration(page, "/staff/products")
+
+    // 重複タグの検証
+    const dupTag = `dup-tag-${Date.now()}`
+    await page.locator("#tag-input").fill(dupTag)
+    await page.getByRole("button", { name: "新しいタグを追加" }).click()
+
+    // 同じタグをもう一度追加して重複エラーを確認
+    await page.locator("#tag-input").fill(dupTag)
+    await page.getByRole("button", { name: "新しいタグを追加" }).click()
+    await expect(page.getByRole("alert")).toHaveText(
+      "このタグは既に追加されています。",
+    )
+
+    // タグ個数上限の検証（20個）
+    // 既に1つ追加しているので19個追加して上限を超える動作を確認する
+    for (let i = 0; i < 19; i++) {
+      const t = `t-${i}-${Date.now()}`
+      await page.locator("#tag-input").fill(t)
+      await page.getByRole("button", { name: "新しいタグを追加" }).click()
+    }
+
+    // 21個目（上限を超える）を追加しようとするとエラーが出る
+    const overTag = `over-tag-${Date.now()}`
+    await page.locator("#tag-input").fill(overTag)
+    // ボタンが無効化されている可能性があるため Enter キーで追加処理をトリガーする
+    await page.locator("#tag-input").press("Enter")
+    await expect(page.getByRole("alert")).toHaveText(
+      `設定できるタグの個数の上限は20個です。`,
+    )
   })
 })
 
