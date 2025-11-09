@@ -1,7 +1,6 @@
 import { defineConfig } from "vitest/config"
 import viteConfig from "./vite.config"
 
-// @ts-expect-error
 export default defineConfig({
   ...viteConfig,
   test: {
