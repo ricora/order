@@ -4,46 +4,19 @@ import { getProductEditPageData } from "../../../../../usecases/getProductEditPa
 import { registerProduct } from "../../../../../usecases/registerProduct"
 import Layout from "../../../../staff/-components/layout"
 import ProductRegistrationForm from "../../-components/$productRegistrationForm"
-
-const createInvalidRequestError = () => {
-  return new Error("不正なリクエストです")
-}
+import { parseProductRequestBody } from "../../-helpers/parseRequestBody"
 
 export const POST = createRoute(async (c) => {
   try {
     const id = Number(c.req.param("id"))
-    if (!Number.isInteger(id) || id <= 0) throw createInvalidRequestError()
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.notFound()
+    }
 
     const body = await c.req.parseBody({ all: true })
-
-    const name = body.name
-    if (typeof name !== "string") throw createInvalidRequestError()
-
-    const image = body.image
-    if (typeof image !== "string") throw createInvalidRequestError()
-
-    const price = Number(body.price)
-    if (typeof price !== "number" || !Number.isInteger(price) || price < 0) {
-      throw createInvalidRequestError()
-    }
-
-    const stock = Number(body.stock)
-    if (typeof stock !== "number" || !Number.isInteger(stock) || stock < 0) {
-      throw createInvalidRequestError()
-    }
-
-    const rawTags = body.tags
-    const tags =
-      rawTags === undefined
-        ? undefined
-        : typeof rawTags === "string"
-          ? [rawTags]
-          : Array.isArray(rawTags) &&
-              rawTags.every((t) => typeof t === "string")
-            ? rawTags
-            : (() => {
-                throw createInvalidRequestError()
-              })()
+    const { name, image, price, stock, tags } = parseProductRequestBody(body, {
+      allowUndefinedTags: true,
+    })
 
     await registerProduct({
       dbClient: c.get("dbClient"),
