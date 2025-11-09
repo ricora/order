@@ -228,23 +228,8 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
     fetchTags()
   }, [fetchTags])
 
-  useEffect(() => {
-    setProductName(initialValues?.name ?? "")
-    setImageValue(initialValues?.image ?? "")
-    setPriceValue(
-      initialValues?.price !== undefined
-        ? String(initialValues.price)
-        : undefined,
-    )
-    setStockValue(
-      initialValues?.stock !== undefined
-        ? String(initialValues.stock)
-        : undefined,
-    )
-  }, [initialValues])
-
   const maxNameLength = 50
-  const heading = initialValues?.id ? "商品編集" : "商品登録"
+  const heading = mode === "edit" ? "商品編集" : "商品登録"
   const submitLabel = mode === "edit" ? "商品を更新" : "商品を登録"
 
   return (
