@@ -87,7 +87,7 @@ export default createRoute((c) => {
         <h2 className="mb-4 font-bold text-lg">クイックアクセス</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {dashboardCards.map((card) => (
-            <DashboardCard key={card.href} {...card} />
+            <DashboardCard {...card} />
           ))}
         </div>
       </div>
