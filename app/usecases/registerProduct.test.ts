@@ -191,7 +191,6 @@ describe("registerProduct", () => {
     expect(result).not.toBeNull()
     expect(result?.id).toBe(12)
     expect(result?.name).toBe("部分更新商品")
-    expect(result?.price).toBe(750)
     expect(result?.image).toBe("https://example.com/image.png")
     expect(result?.tagIds).toEqual([1, 2])
     expect(result?.price).toBe(750)
