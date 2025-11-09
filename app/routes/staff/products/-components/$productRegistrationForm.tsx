@@ -1,5 +1,4 @@
 import { type FC, useCallback, useEffect, useState } from "hono/jsx"
-import ChevronDownIcon from "../../../../components/icons/lucide/chevronDownIcon"
 import SendIcon from "../../../../components/icons/lucide/sendIcon"
 import TagIcon from "../../../../components/icons/lucide/tagIcon"
 import XIcon from "../../../../components/icons/lucide/xIcon"
@@ -9,6 +8,7 @@ import Chip from "../../../../components/ui/chip"
 import ChipButton from "../../../../components/ui/chipButton"
 import Input from "../../../../components/ui/input"
 import Label from "../../../../components/ui/label"
+import type Product from "../../../../domain/product/entities/product"
 import type ProductTag from "../../../../domain/product/entities/productTag"
 import { createHonoClient } from "../../../../helpers/api/hono-client"
 import { stripString } from "../../../../utils/text"
@@ -17,9 +17,15 @@ type TagInputProps = {
   existingTags: ProductTag[]
   error?: string | null
   isLoading?: boolean
+  initialSelected?: string[]
 }
 
-const TagInput: FC<TagInputProps> = ({ existingTags, error, isLoading }) => {
+const TagInput: FC<TagInputProps> = ({
+  existingTags,
+  error,
+  isLoading,
+  initialSelected,
+}) => {
   const [tags, setTags] = useState<string[]>([])
   const [input, setInput] = useState("")
   const [suggestions, setSuggestions] = useState<ProductTag[]>([])
@@ -47,6 +53,12 @@ const TagInput: FC<TagInputProps> = ({ existingTags, error, isLoading }) => {
     setInput("")
     setSuggestions([])
   }
+
+  useEffect(() => {
+    if (initialSelected && initialSelected.length > 0) {
+      setTags(initialSelected.filter(Boolean))
+    }
+  }, [initialSelected])
 
   function removeTag(tag: string) {
     setTags(tags.filter((t) => t !== tag))
@@ -167,9 +179,27 @@ const TagInput: FC<TagInputProps> = ({ existingTags, error, isLoading }) => {
   )
 }
 
-const ProductRegistrationForm = () => {
-  const [productName, setProductName] = useState("")
-  const [imageValue, setImageValue] = useState("")
+type ProductFormProps = {
+  initialValues?: Partial<Product>
+  mode?: "create" | "edit"
+}
+
+const ProductRegistrationForm: FC<ProductFormProps> = ({
+  initialValues,
+  mode = "create",
+}) => {
+  const [productName, setProductName] = useState(initialValues?.name ?? "")
+  const [imageValue, setImageValue] = useState(initialValues?.image ?? "")
+  const [priceValue, setPriceValue] = useState<string | undefined>(
+    initialValues?.price !== undefined
+      ? String(initialValues.price)
+      : undefined,
+  )
+  const [stockValue, setStockValue] = useState<string | undefined>(
+    initialValues?.stock !== undefined
+      ? String(initialValues.stock)
+      : undefined,
+  )
   const [tags, setTags] = useState<ProductTag[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -198,28 +228,31 @@ const ProductRegistrationForm = () => {
     fetchTags()
   }, [fetchTags])
 
+  useEffect(() => {
+    setProductName(initialValues?.name ?? "")
+    setImageValue(initialValues?.image ?? "")
+    setPriceValue(
+      initialValues?.price !== undefined
+        ? String(initialValues.price)
+        : undefined,
+    )
+    setStockValue(
+      initialValues?.stock !== undefined
+        ? String(initialValues.stock)
+        : undefined,
+    )
+  }, [initialValues])
+
   const maxNameLength = 50
+  const heading = initialValues?.id ? "商品編集" : "商品登録"
+  const submitLabel = mode === "edit" ? "商品を更新" : "商品を登録"
 
   return (
     <div className="mx-auto mt-6 mb-6 max-w-7xl rounded-lg border bg-bg p-6">
-      <details className="group">
-        <summary
-          className="flex cursor-pointer select-none items-center justify-between outline-none"
-          aria-controls="product-register-form"
-          tabIndex={0}
-        >
-          <span className="flex items-baseline gap-2">
-            <span className="font-bold text-lg">商品登録</span>
-            <span className="ml-2 text-muted-fg text-xs">
-              クリックで開閉します。
-            </span>
-          </span>
-          <span className="ml-2 transition-transform group-open:rotate-180">
-            <div className="h-4 w-4 text-muted-fg">
-              <ChevronDownIcon />
-            </div>
-          </span>
-        </summary>
+      <div>
+        <div className="mb-2 flex items-baseline justify-between">
+          <span className="font-bold text-lg">{heading}</span>
+        </div>
         <div id="product-register-form" className="p-4">
           <form method="post">
             <div className="mb-4">
@@ -261,6 +294,10 @@ const ProductRegistrationForm = () => {
                   step={1}
                   required
                   placeholder="0"
+                  value={priceValue}
+                  onChange={(e: Event) =>
+                    setPriceValue((e.target as HTMLInputElement).value)
+                  }
                 />
               </div>
               <div className="flex-1">
@@ -275,6 +312,10 @@ const ProductRegistrationForm = () => {
                   step={1}
                   required
                   placeholder="0"
+                  value={stockValue}
+                  onChange={(e: Event) =>
+                    setStockValue((e.target as HTMLInputElement).value)
+                  }
                 />
               </div>
             </div>
@@ -283,6 +324,15 @@ const ProductRegistrationForm = () => {
                 existingTags={tags}
                 error={error}
                 isLoading={isLoading}
+                initialSelected={
+                  initialValues?.tagIds && tags.length > 0
+                    ? tags
+                        .filter((t) =>
+                          initialValues.tagIds?.some((id) => id === t.id),
+                        )
+                        .map((t) => t.name)
+                    : undefined
+                }
               />
             </div>
             <div className="mt-6 flex gap-4">
@@ -291,13 +341,13 @@ const ProductRegistrationForm = () => {
                   <div className="size-4">
                     <SendIcon />
                   </div>
-                  <span>商品を登録</span>
+                  <span>{submitLabel}</span>
                 </Button>
               </div>
             </div>
           </form>
         </div>
-      </details>
+      </div>
     </div>
   )
 }
