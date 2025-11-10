@@ -71,7 +71,7 @@ const TagInput: FC<TagInputProps> = ({
     if (initialSelected && initialSelected.length > 0) {
       setTags(initialSelected.filter(Boolean))
     }
-  }, [])
+  }, [initialSelected])
 
   function removeTag(tag: string) {
     setTags(tags.filter((t) => t !== tag))
