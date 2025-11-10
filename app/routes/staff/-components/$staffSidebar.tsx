@@ -33,8 +33,8 @@ export const sidebarToggleButtonStyles = tv({
         icon: "size-6",
       },
       desktop: {
-        base: "mr-4 hidden md:block",
-        icon: "size-6",
+        base: "mr-4 hidden rounded-lg hover:bg-muted md:block",
+        icon: "size-4",
       },
     },
     open: {
@@ -190,7 +190,7 @@ const MobileSidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
     <DrawerRoot side="left">
       <MobileSidebarToggleButton />
       <DrawerOverlay />
-      <DrawerContent>
+      <DrawerContent className="w-64">
         <SidebarInternal currentPath={currentPath} />
       </DrawerContent>
     </DrawerRoot>

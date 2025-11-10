@@ -1,6 +1,6 @@
 import { useEffect, useState } from "hono/jsx"
 
-const usePresence = (open: boolean, duration: number) => {
+export const usePresence = (open: boolean, duration: number) => {
   const [shouldRender, setShouldRender] = useState(open)
 
   useEffect(() => {
@@ -18,5 +18,3 @@ const usePresence = (open: boolean, duration: number) => {
 
   return shouldRender
 }
-
-export default usePresence

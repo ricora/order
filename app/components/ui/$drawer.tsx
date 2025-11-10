@@ -13,8 +13,8 @@ import {
   useState,
 } from "hono/jsx"
 import { tv } from "tailwind-variants"
-import usePrefersReducedMotion from "../../hooks/usePrefersReducedMotion"
-import usePresence from "../../hooks/usePresence"
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion"
+import { usePresence } from "../../hooks/usePresence"
 import {
   getFocusableElements,
   lockBodyScroll,
@@ -85,7 +85,7 @@ const drawerStyles = tv({
     overlay:
       "fixed inset-0 z-40 bg-overlay/30 backdrop-blur-xs transition-opacity duration-300 ease-out data-[state=closed]:pointer-events-none data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
     content:
-      "fixed z-50 flex max-h-screen w-fit flex-col border border-border bg-overlay text-overlay-fg shadow-2xl outline-none transition-[transform,opacity] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-primary/60 data-[state=closed]:pointer-events-none data-[state=closed]:opacity-0",
+      "fixed z-50 flex max-h-screen w-fit flex-col border border-border bg-overlay text-overlay-fg shadow-2xl outline-none transition-all duration-300 ease-out focus-visible:ring-2 focus-visible:ring-primary/60 data-[state=closed]:pointer-events-none",
   },
   variants: {
     side: {
@@ -397,7 +397,6 @@ const DrawerContent = ({
   } = useDrawerContext("Drawer.Content")
   const side = sideProp ?? rootSide
   const { content } = drawerStyles({ side })
-  const shouldRender = usePresence(open, animationDuration)
   const generatedId = useId()
   const resolvedId = id ?? `drawer-${generatedId}`
 
@@ -405,8 +404,6 @@ const DrawerContent = ({
     registerContent(resolvedId)
     return () => registerContent(null)
   }, [registerContent, resolvedId])
-
-  if (!shouldRender) return null
 
   return (
     <div
@@ -418,9 +415,7 @@ const DrawerContent = ({
       data-state={open ? "open" : "closed"}
       tabIndex={-1}
       className={content({ class: className })}
-      ref={(node: HTMLDivElement | null) => {
-        contentRef.current = node
-      }}
+      ref={contentRef.current}
       style={{
         ...style,
         transitionDuration: `${animationDuration}ms`,

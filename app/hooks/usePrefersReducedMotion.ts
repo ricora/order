@@ -2,7 +2,7 @@ import { useEffect, useState } from "hono/jsx"
 
 const MEDIA_QUERY = "(prefers-reduced-motion: reduce)"
 
-const usePrefersReducedMotion = () => {
+export const usePrefersReducedMotion = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
@@ -24,5 +24,3 @@ const usePrefersReducedMotion = () => {
 
   return prefersReducedMotion
 }
-
-export default usePrefersReducedMotion
