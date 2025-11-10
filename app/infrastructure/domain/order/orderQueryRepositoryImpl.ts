@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm"
+import { asc, eq } from "drizzle-orm"
 import type {
   FindAllOrders,
   FindOrderById,
@@ -37,6 +37,7 @@ export const findAllOrdersImpl: FindAllOrders = async ({
     with: {
       orderItems: true,
     },
+    orderBy: [asc(orderTable.id)],
     offset: pagination.offset,
     limit: pagination.limit,
   })

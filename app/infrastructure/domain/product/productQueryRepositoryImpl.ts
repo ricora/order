@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm"
+import { asc, eq, inArray } from "drizzle-orm"
 import type {
   FindAllProductStocks,
   FindAllProducts,
@@ -71,6 +71,7 @@ export const findAllProductsImpl: FindAllProducts = async ({
         },
       },
     },
+    orderBy: [asc(productTable.id)],
     offset: pagination.offset,
     limit: pagination.limit,
   })
@@ -93,6 +94,7 @@ export const findAllProductStocksImpl: FindAllProductStocks = async ({
     columns: {
       stock: true,
     },
+    orderBy: [asc(productTable.id)],
     offset: pagination.offset,
     limit: pagination.limit,
   })

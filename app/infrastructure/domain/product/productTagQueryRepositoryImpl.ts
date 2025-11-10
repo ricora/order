@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm"
+import { asc, eq, inArray } from "drizzle-orm"
 import type {
   FindAllProductTags,
   FindAllProductTagsByIds,
@@ -23,6 +23,7 @@ export const findAllProductTagsImpl: FindAllProductTags = async ({
   pagination,
 }) => {
   const dbProductTags = await dbClient.query.productTagTable.findMany({
+    orderBy: [asc(productTagTable.id)],
     offset: pagination.offset,
     limit: pagination.limit,
   })
@@ -39,6 +40,7 @@ export const findAllProductTagsByIdsImpl: FindAllProductTagsByIds = async ({
 }) => {
   const dbProductTags = await dbClient.query.productTagTable.findMany({
     where: inArray(productTagTable.id, productTag.ids),
+    orderBy: [asc(productTagTable.id)],
     offset: pagination.offset,
     limit: pagination.limit,
   })
