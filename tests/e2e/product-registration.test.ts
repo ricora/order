@@ -112,18 +112,18 @@ test.describe("商品編集", () => {
     const tagInputs = page.locator('input[name="tags"]')
     await expect(tagInputs).toHaveCount(2)
 
-    await expect(page.locator('input[name="tags"][value="タグA"]')).toHaveCount(
+    await expect(page.locator('input[name="tags"][value="タグC"]')).toHaveCount(
       1,
     )
-    await expect(page.locator('input[name="tags"][value="タグB"]')).toHaveCount(
+    await expect(page.locator('input[name="tags"][value="タグD"]')).toHaveCount(
       1,
     )
 
     await expect(
-      page.getByRole("button", { name: "タグAを削除" }),
+      page.getByRole("button", { name: "タグCを削除" }),
     ).toBeVisible()
     await expect(
-      page.getByRole("button", { name: "タグBを削除" }),
+      page.getByRole("button", { name: "タグDを削除" }),
     ).toBeVisible()
   })
 })
