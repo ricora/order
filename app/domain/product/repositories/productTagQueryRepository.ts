@@ -1,4 +1,5 @@
 import {
+  findAllProductTagsByIdsImpl,
   findAllProductTagsImpl,
   findProductTagByIdImpl,
 } from "../../../infrastructure/domain/product/productTagQueryRepositoryImpl"
@@ -46,7 +47,7 @@ export const findAllProductTags: WithRepositoryImpl<
 export const findAllProductTagsByIds: WithRepositoryImpl<
   FindAllProductTagsByIds
 > = async ({
-  repositoryImpl = findAllProductTagsImpl,
+  repositoryImpl = findAllProductTagsByIdsImpl,
   dbClient,
   pagination,
   productTag,
