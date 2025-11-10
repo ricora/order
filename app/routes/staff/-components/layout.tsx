@@ -8,7 +8,7 @@ export const Layout: FC<
 > = ({ children, title, description }) => {
   const c = useRequestContext()
   return (
-    <div class="min-h-full bg-muted">
+    <div className="min-h-full bg-muted">
       <Sidebar currentPath={c.req.path} />
       <div class="ml-0 md:ml-64" id={MAIN_CONTENT_ID}>
         <Header currentPath={c.req.path} />
