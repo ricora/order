@@ -259,7 +259,7 @@ const useSidebar = () => {
   const context = useContext(SidebarContext)
   if (!context) {
     throw new Error(
-      "useDesktopSidebar must be used within a DesktopSidebarProvider",
+      "useSidebar must be used within a SidebarProvider",
     )
   }
   return context
