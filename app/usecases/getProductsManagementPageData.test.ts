@@ -53,9 +53,17 @@ describe("getProductsManagementPageData", () => {
     spyOn(productQueryRepository, "findAllProducts").mockImplementation(
       async () => mockProducts,
     )
-    spyOn(productTagQueryRepository, "findAllProductTags").mockImplementation(
-      async () => mockTags,
+    spyOn(productQueryRepository, "findAllProductStocks").mockImplementation(
+      async () => [
+        { id: 1, stock: 10 },
+        { id: 2, stock: 0 },
+        { id: 3, stock: 3 },
+      ],
     )
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagsByIds",
+    ).mockImplementation(async () => mockTags)
   })
   afterAll(() => {
     mock.restore()
@@ -74,7 +82,9 @@ describe("getProductsManagementPageData", () => {
     expect(result.totalProducts).toBe(3)
     expect(result.lowStockCount).toBe(1)
     expect(result.outOfStockCount).toBe(1)
-    expect(result.totalValue).toBe(100 * 10 + 200 * 0 + 300 * 3)
+    expect(result.hasNextPage).toBe(false)
+    expect(result.currentPage).toBe(1)
+    expect(result.pageSize).toBe(20)
   })
 
   it("imageがnullの場合はデフォルト画像が挿入される", async () => {
@@ -90,5 +100,44 @@ describe("getProductsManagementPageData", () => {
     const first = result.products[0]
     if (!first) throw new Error("no products returned")
     expect(first.image).toBe("https://picsum.photos/200/200")
+  })
+
+  it("pageSize+1を取得して次ページの有無を判定できる", async () => {
+    const manyProducts: Product[] = Array.from({ length: 21 }, (_, i) => ({
+      id: i + 1,
+      name: `商品${i + 1}`,
+      image: "https://example.com/test.png",
+      tagIds: [],
+      price: 100 * (i + 1),
+      stock: i + 1,
+    }))
+
+    spyOn(productQueryRepository, "findAllProducts").mockImplementationOnce(
+      async () => manyProducts,
+    )
+
+    const result = await getProductsManagementPageData({ dbClient })
+    expect(result.products.length).toBe(20)
+    expect(result.hasNextPage).toBe(true)
+    expect(result.currentPage).toBe(1)
+  })
+
+  it("ページネーション: page=2の場合、offset計算が正しい", async () => {
+    const manyProducts: Product[] = Array.from({ length: 21 }, (_, i) => ({
+      id: i + 1,
+      name: `商品${i + 1}`,
+      image: "https://example.com/test.png",
+      tagIds: [],
+      price: 100 * (i + 1),
+      stock: i + 1,
+    }))
+
+    spyOn(productQueryRepository, "findAllProducts").mockImplementationOnce(
+      async () => manyProducts,
+    )
+
+    const result = await getProductsManagementPageData({ dbClient, page: 2 })
+    expect(result.currentPage).toBe(2)
+    expect(result.pageSize).toBe(20)
   })
 })

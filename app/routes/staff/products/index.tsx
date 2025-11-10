@@ -39,13 +39,20 @@ export default createRoute(async (c) => {
   const viewMode = c.req.query("view") === "card" ? "card" : "table"
   const urlSearch = url.search
 
+  const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10))
+
   const {
     products,
     totalProducts,
     outOfStockCount,
     lowStockCount,
     totalValue,
-  } = await getProductsManagementPageData({ dbClient: c.get("dbClient") })
+    hasNextPage,
+    currentPage,
+  } = await getProductsManagementPageData({
+    dbClient: c.get("dbClient"),
+    page,
+  })
 
   return c.render(
     <Layout title={"商品管理"} description={"商品情報の登録や編集を行います。"}>
@@ -103,6 +110,8 @@ export default createRoute(async (c) => {
         viewMode={viewMode}
         urlSearch={urlSearch}
         emptyMessage="商品が登録されていません"
+        currentPage={currentPage}
+        hasNextPage={hasNextPage}
       />
     </Layout>,
   )

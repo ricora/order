@@ -23,6 +23,7 @@ export const productTable = pgTable(
   },
   (table) => [
     index("product_name_idx").on(table.name),
+    index("product_stock_idx").on(table.stock),
     check("product_price_positive", sql`${table.price} >= 0`),
     check("product_stock_positive", sql`${table.stock} >= 0`),
     check(
