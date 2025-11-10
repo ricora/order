@@ -7,6 +7,7 @@ import {
   mock,
   spyOn,
 } from "bun:test"
+import { MAX_STORE_PRODUCT_TAG_COUNT } from "../domain/product/constants"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
 import * as productTagCommandRepository from "../domain/product/repositories/productTagCommandRepository"
@@ -304,7 +305,7 @@ describe("registerProduct", () => {
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(findAllProductTagsSpy.mock.calls[0][0].pagination).toEqual({
       offset: 0,
-      limit: 1000,
+      limit: MAX_STORE_PRODUCT_TAG_COUNT,
     })
   })
 
@@ -321,7 +322,7 @@ describe("registerProduct", () => {
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(findAllProductTagsSpy.mock.calls[0][0].pagination).toEqual({
       offset: 0,
-      limit: 1000,
+      limit: MAX_STORE_PRODUCT_TAG_COUNT,
     })
   })
 })

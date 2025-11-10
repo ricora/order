@@ -13,6 +13,7 @@ export type OrderProgressManagerComponentData = {
 export const getOrderProgressManagerComponentData = async ({
   dbClient,
 }: GetOrderProgressManagerComponentDataParams): Promise<OrderProgressManagerComponentData> => {
+  // TODO: 取得条件を調整する
   const orders = await findAllOrders({
     dbClient,
     pagination: { offset: 0, limit: 1000 },

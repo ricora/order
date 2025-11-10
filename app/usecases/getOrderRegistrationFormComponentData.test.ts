@@ -7,6 +7,7 @@ import {
   mock,
   spyOn,
 } from "bun:test"
+import { MAX_STORE_PRODUCT_COUNT } from "../domain/product/constants"
 import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productQueryRepository from "../domain/product/repositories/productQueryRepository"
@@ -75,7 +76,7 @@ describe("getOrderRegistrationFormComponentData", () => {
       productQueryRepository,
       "findAllProducts",
     ).mockImplementation(async (params) => {
-      expect(params.pagination.limit).toBe(1000)
+      expect(params.pagination.limit).toBe(MAX_STORE_PRODUCT_COUNT)
       expect(params.pagination.offset).toBe(0)
       return mockProducts
     })

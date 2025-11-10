@@ -1,3 +1,7 @@
+import {
+  MAX_STORE_PRODUCT_COUNT,
+  MAX_STORE_PRODUCT_TAG_COUNT,
+} from "../domain/product/constants"
 import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
 import { findAllProducts } from "../domain/product/repositories/productQueryRepository"
@@ -21,11 +25,11 @@ export const getOrderRegistrationFormComponentData = async ({
 }: GetOrderRegistrationFormComponentDataParams): Promise<OrderRegistrationFormComponentData> => {
   const products = await findAllProducts({
     dbClient,
-    pagination: { offset: 0, limit: 1000 },
+    pagination: { offset: 0, limit: MAX_STORE_PRODUCT_COUNT },
   })
   const tags = await findAllProductTags({
     dbClient,
-    pagination: { offset: 0, limit: 1000 },
+    pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
   })
   const tagMap = new Map<number, string>(tags.map((tag) => [tag.id, tag.name]))
 

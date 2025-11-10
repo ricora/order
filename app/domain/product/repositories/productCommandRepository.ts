@@ -6,6 +6,7 @@ import {
 } from "../../../infrastructure/domain/product/productCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
 import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
+import { MAX_STORE_PRODUCT_TAG_COUNT } from "../constants"
 import type Product from "../entities/product"
 import { findProductByName } from "./productQueryRepository"
 import { findAllProductTags } from "./productTagQueryRepository"
@@ -56,7 +57,7 @@ const verifyAllTagIdsExist = async (
 ) => {
   const tags = await findAllProductTags({
     dbClient,
-    pagination: { offset: 0, limit: 1000 },
+    pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
   })
   const tagIdSet = new Set(tags.map((tag) => tag.id))
   if (tagIds.some((tagId) => !tagIdSet.has(tagId))) {

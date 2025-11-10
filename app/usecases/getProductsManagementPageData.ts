@@ -1,3 +1,4 @@
+import { MAX_STORE_PRODUCT_COUNT } from "../domain/product/constants"
 import type Product from "../domain/product/entities/product"
 import {
   findAllProductStocks,
@@ -43,7 +44,7 @@ export const getProductsManagementPageData = async ({
     dbClient,
     pagination: {
       offset: 0,
-      limit: 1000,
+      limit: MAX_STORE_PRODUCT_COUNT,
     },
     productTag: { ids: products.flatMap((p) => p.tagIds) },
   })
@@ -62,7 +63,7 @@ export const getProductsManagementPageData = async ({
     dbClient,
     pagination: {
       offset: 0,
-      limit: 1000,
+      limit: MAX_STORE_PRODUCT_COUNT,
     },
   })
   const totalProducts = productStocks.length

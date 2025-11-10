@@ -8,6 +8,7 @@ import {
   spyOn,
 } from "bun:test"
 import * as orderCommandRepository from "../domain/order/repositories/orderCommandRepository"
+import { MAX_STORE_PRODUCT_COUNT } from "../domain/product/constants"
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
 import * as productQueryRepository from "../domain/product/repositories/productQueryRepository"
 import type { DbClient, TransactionDbClient } from "../infrastructure/db/client"
@@ -159,7 +160,7 @@ describe("registerOrder", () => {
     expect(findAllProductsByIdsSpy).toHaveBeenCalledTimes(1)
     expect(findAllProductsByIdsSpy.mock.calls[0][0].pagination).toEqual({
       offset: 0,
-      limit: 1000,
+      limit: MAX_STORE_PRODUCT_COUNT,
     })
   })
 })
