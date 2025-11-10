@@ -10,7 +10,7 @@ import {
 import type Order from "../domain/order/entities/order"
 import * as orderQueryRepository from "../domain/order/repositories/orderQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
-import { getOrderProgressPageData } from "./getOrderProgressPageData"
+import { getOrderProgressManagerComponentData } from "./getOrderProgressManagerComponentData"
 
 const dbClient = {} as DbClient
 
@@ -37,7 +37,7 @@ const sampleOrders: Order[] = [
   },
 ]
 
-describe("getOrderProgressPageData", () => {
+describe("getOrderProgressManagerComponentData", () => {
   beforeAll(() => {
     spyOn(orderQueryRepository, "findAllOrders").mockImplementation(
       async () => sampleOrders,
@@ -49,7 +49,7 @@ describe("getOrderProgressPageData", () => {
   })
 
   it("注文を正しく取得できる", async () => {
-    const result = await getOrderProgressPageData({ dbClient })
+    const result = await getOrderProgressManagerComponentData({ dbClient })
     expect(result.orders.length).toBe(2)
     const [first, second] = result.orders
     if (!first || !second) throw new Error("unexpected empty orders")

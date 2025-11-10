@@ -4,7 +4,11 @@ import {
   findProductByIdImpl,
   findProductByNameImpl,
 } from "../../../infrastructure/domain/product/productQueryRepositoryImpl"
-import type { QueryRepositoryFunction, WithRepositoryImpl } from "../../types"
+import type {
+  PaginatedQueryRepositoryFunction,
+  QueryRepositoryFunction,
+  WithRepositoryImpl,
+} from "../../types"
 import type Product from "../entities/product"
 
 export type FindProductById = QueryRepositoryFunction<
@@ -15,13 +19,17 @@ export type FindProductByName = QueryRepositoryFunction<
   { product: Pick<Product, "name"> },
   Product | null
 >
-export type FindAllProducts = QueryRepositoryFunction<
+export type FindAllProducts = PaginatedQueryRepositoryFunction<
   Record<string, never>,
-  Product[]
+  Product
 >
-export type findAllProductsByIds = QueryRepositoryFunction<
+export type FindAllProductStocks = PaginatedQueryRepositoryFunction<
+  Record<string, never>,
+  Pick<Product, "stock">
+>
+export type FindAllProductsByIds = PaginatedQueryRepositoryFunction<
   { product: { ids: Product["id"][] } },
-  Product[]
+  Product
 >
 
 export const findProductById: WithRepositoryImpl<FindProductById> = async ({
@@ -43,16 +51,24 @@ export const findProductByName: WithRepositoryImpl<FindProductByName> = async ({
 export const findAllProducts: WithRepositoryImpl<FindAllProducts> = async ({
   repositoryImpl = findAllProductsImpl,
   dbClient,
+  pagination,
 }) => {
-  return repositoryImpl({ dbClient })
+  return repositoryImpl({ dbClient, pagination })
+}
+
+export const findAllProductStocks: WithRepositoryImpl<
+  FindAllProductStocks
+> = async ({ repositoryImpl = findAllProductsImpl, dbClient, pagination }) => {
+  return repositoryImpl({ dbClient, pagination })
 }
 
 export const findAllProductsByIds: WithRepositoryImpl<
-  findAllProductsByIds
+  FindAllProductsByIds
 > = async ({
   product,
   repositoryImpl = findAllProductsByIdsImpl,
   dbClient,
+  pagination,
 }) => {
-  return repositoryImpl({ dbClient, product })
+  return repositoryImpl({ dbClient, product, pagination })
 }

@@ -288,4 +288,40 @@ describe("registerProduct", () => {
       }),
     ).rejects.toThrow("DBで商品の更新に失敗しました")
   })
+
+  it("findAllProductTagsに正しいページネーションパラメータを渡している", async () => {
+    await registerProduct({
+      dbClient,
+      product: {
+        name: "新商品",
+        image: "https://example.com/new.png",
+        tags: ["人気"],
+        price: 500,
+        stock: 20,
+      },
+    })
+
+    expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+    expect(findAllProductTagsSpy.mock.calls[0][0].pagination).toEqual({
+      offset: 0,
+      limit: 1000,
+    })
+  })
+
+  it("商品更新時もfindAllProductTagsに正しいページネーションパラメータを渡している", async () => {
+    await registerProduct({
+      dbClient,
+      product: {
+        id: 10,
+        name: "更新商品",
+        tags: ["メイン"],
+      },
+    })
+
+    expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+    expect(findAllProductTagsSpy.mock.calls[0][0].pagination).toEqual({
+      offset: 0,
+      limit: 1000,
+    })
+  })
 })

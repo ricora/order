@@ -1,9 +1,10 @@
 import { eq, inArray } from "drizzle-orm"
 import type {
+  FindAllProductStocks,
   FindAllProducts,
+  FindAllProductsByIds,
   FindProductById,
   FindProductByName,
-  findAllProductsByIds,
 } from "../../../domain/product/repositories/productQueryRepository"
 import { productTable } from "../../db/schema"
 
@@ -58,7 +59,10 @@ export const findProductByNameImpl: FindProductByName = async ({
   }
 }
 
-export const findAllProductsImpl: FindAllProducts = async ({ dbClient }) => {
+export const findAllProductsImpl: FindAllProducts = async ({
+  dbClient,
+  pagination,
+}) => {
   const dbProducts = await dbClient.query.productTable.findMany({
     with: {
       productTags: {
@@ -67,6 +71,8 @@ export const findAllProductsImpl: FindAllProducts = async ({ dbClient }) => {
         },
       },
     },
+    offset: pagination.offset,
+    limit: pagination.limit,
   })
   const products = dbProducts.map((dbProduct) => ({
     id: dbProduct.id,
@@ -79,9 +85,27 @@ export const findAllProductsImpl: FindAllProducts = async ({ dbClient }) => {
   return products
 }
 
-export const findAllProductsByIdsImpl: findAllProductsByIds = async ({
+export const findAllProductStocksImpl: FindAllProductStocks = async ({
+  dbClient,
+  pagination,
+}) => {
+  const dbProducts = await dbClient.query.productTable.findMany({
+    columns: {
+      stock: true,
+    },
+    offset: pagination.offset,
+    limit: pagination.limit,
+  })
+  const products = dbProducts.map((dbProduct) => ({
+    stock: dbProduct.stock,
+  }))
+  return products
+}
+
+export const findAllProductsByIdsImpl: FindAllProductsByIds = async ({
   dbClient,
   product,
+  pagination,
 }) => {
   const dbProducts = await dbClient.query.productTable.findMany({
     where: inArray(productTable.id, product.ids),
@@ -92,6 +116,8 @@ export const findAllProductsByIdsImpl: findAllProductsByIds = async ({
         },
       },
     },
+    offset: pagination.offset,
+    limit: pagination.limit,
   })
   const products = dbProducts.map((dbProduct) => ({
     id: dbProduct.id,

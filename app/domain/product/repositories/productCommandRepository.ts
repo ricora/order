@@ -54,7 +54,10 @@ const verifyAllTagIdsExist = async (
   dbClient: TransactionDbClient,
   tagIds: Product["tagIds"],
 ) => {
-  const tags = await findAllProductTags({ dbClient })
+  const tags = await findAllProductTags({
+    dbClient,
+    pagination: { offset: 0, limit: 1000 },
+  })
   const tagIdSet = new Set(tags.map((tag) => tag.id))
   if (tagIds.some((tagId) => !tagIdSet.has(tagId))) {
     throw new Error("タグIDは存在するタグのIDを参照する必要があります")

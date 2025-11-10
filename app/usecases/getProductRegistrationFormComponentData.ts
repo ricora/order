@@ -13,7 +13,10 @@ export type ProductRegistrationFormComponentData = {
 export const getProductRegistrationFormComponentData = async ({
   dbClient,
 }: GetProductRegistrationFormComponentDataParams): Promise<ProductRegistrationFormComponentData> => {
-  const tags = await findAllProductTags({ dbClient })
+  const tags = await findAllProductTags({
+    dbClient,
+    pagination: { offset: 0, limit: 1000 },
+  })
   return {
     tags,
   }

@@ -39,6 +39,7 @@ export const registerOrder = async ({
           return item.productId
         }),
       },
+      pagination: { offset: 0, limit: 1000 },
     })
 
     const productById = new Map(

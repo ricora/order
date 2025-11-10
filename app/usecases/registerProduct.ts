@@ -16,7 +16,10 @@ const resolveTagNamesToIds = async ({
 }): Promise<number[]> => {
   if (!tagNames || tagNames.length === 0) return []
 
-  const tags = await findAllProductTags({ dbClient })
+  const tags = await findAllProductTags({
+    dbClient,
+    pagination: { offset: 0, limit: 1000 },
+  })
   const tagNameToId = new Map(tags.map((tag) => [tag.name, tag.id]))
   const tagIds: number[] = []
   for (const tagName of tagNames) {

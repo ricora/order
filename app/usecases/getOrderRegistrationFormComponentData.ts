@@ -4,11 +4,11 @@ import { findAllProducts } from "../domain/product/repositories/productQueryRepo
 import { findAllProductTags } from "../domain/product/repositories/productTagQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
 
-export type GetOrderRegistrationPageDataParams = {
+export type GetOrderRegistrationFormComponentDataParams = {
   dbClient: DbClient
 }
 
-export type OrderRegistrationPageData = {
+export type OrderRegistrationFormComponentData = {
   products: (Omit<Product, "image" | "tagIds"> & {
     image: string
     tags: string[]
@@ -16,11 +16,17 @@ export type OrderRegistrationPageData = {
   tags: ProductTag[]
 }
 
-export const getOrderRegistrationPageData = async ({
+export const getOrderRegistrationFormComponentData = async ({
   dbClient,
-}: GetOrderRegistrationPageDataParams): Promise<OrderRegistrationPageData> => {
-  const products = await findAllProducts({ dbClient })
-  const tags = await findAllProductTags({ dbClient })
+}: GetOrderRegistrationFormComponentDataParams): Promise<OrderRegistrationFormComponentData> => {
+  const products = await findAllProducts({
+    dbClient,
+    pagination: { offset: 0, limit: 1000 },
+  })
+  const tags = await findAllProductTags({
+    dbClient,
+    pagination: { offset: 0, limit: 1000 },
+  })
   const tagMap = new Map<number, string>(tags.map((tag) => [tag.id, tag.name]))
 
   return {

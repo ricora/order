@@ -1,7 +1,7 @@
 import { createRoute } from "honox/factory"
 import { tv } from "tailwind-variants"
 import ItemCollectionViewer from "../../../components/ui/itemCollectionViewer"
-import { getOrderProgressPageData } from "../../../usecases/getOrderProgressPageData"
+import { getOrdersManagementPageData } from "../../../usecases/getOrdersManagementPageData"
 import { formatDateTimeJP } from "../../../utils/date"
 import { formatCurrencyJPY } from "../../../utils/money"
 import Layout from "../-components/layout"
@@ -16,8 +16,11 @@ export default createRoute(async (c) => {
   const viewMode = c.req.query("view") === "card" ? "card" : "table"
   const urlSearch = url.search
 
-  const { orders } = await getOrderProgressPageData({
+  const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10))
+
+  const { orders } = await getOrdersManagementPageData({
     dbClient: c.get("dbClient"),
+    page,
   })
 
   return c.render(

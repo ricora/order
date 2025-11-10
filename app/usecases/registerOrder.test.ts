@@ -143,4 +143,23 @@ describe("registerOrder", () => {
     expect(updateProductSpy).not.toHaveBeenCalled()
     expect(createOrderSpy).not.toHaveBeenCalled()
   })
+
+  it("findAllProductsByIdsに正しいページネーションパラメータを渡している", async () => {
+    await registerOrder({
+      dbClient,
+      order: {
+        customerName: "Taro",
+        orderItems: [
+          { productId: 1, quantity: 1 },
+          { productId: 2, quantity: 1 },
+        ],
+      },
+    })
+
+    expect(findAllProductsByIdsSpy).toHaveBeenCalledTimes(1)
+    expect(findAllProductsByIdsSpy.mock.calls[0][0].pagination).toEqual({
+      offset: 0,
+      limit: 1000,
+    })
+  })
 })

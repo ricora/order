@@ -29,11 +29,16 @@ export const findOrderByIdImpl: FindOrderById = async ({ dbClient, order }) => {
   }
 }
 
-export const findAllOrdersImpl: FindAllOrders = async ({ dbClient }) => {
+export const findAllOrdersImpl: FindAllOrders = async ({
+  dbClient,
+  pagination,
+}) => {
   const dbOrders = await dbClient.query.orderTable.findMany({
     with: {
       orderItems: true,
     },
+    offset: pagination.offset,
+    limit: pagination.limit,
   })
   const orders = dbOrders.map((dbOrder) => ({
     id: dbOrder.id,

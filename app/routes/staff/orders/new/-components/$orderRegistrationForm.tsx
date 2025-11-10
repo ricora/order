@@ -10,7 +10,7 @@ import ChipButton from "../../../../../components/ui/chipButton"
 import Input from "../../../../../components/ui/input"
 import Label from "../../../../../components/ui/label"
 import { createHonoClient } from "../../../../../helpers/api/hono-client"
-import type { OrderRegistrationPageData } from "../../../../../usecases/getOrderRegistrationPageData"
+import type { OrderRegistrationFormComponentData } from "../../../../../usecases/getOrderRegistrationFormComponentData"
 import type { RegisterOrderParams } from "../../../../../usecases/registerOrder"
 import { formatCurrencyJPY } from "../../../../../utils/money"
 
@@ -37,9 +37,11 @@ const OrderRegistrationForm: FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [items, setItems] = useState<OrderItem[]>([])
   const [products, setProducts] = useState<
-    OrderRegistrationPageData["products"]
+    OrderRegistrationFormComponentData["products"]
   >([])
-  const [tags, setTags] = useState<OrderRegistrationPageData["tags"]>([])
+  const [tags, setTags] = useState<OrderRegistrationFormComponentData["tags"]>(
+    [],
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const MAX_DISTINCT_ORDER_ITEMS = 20
@@ -73,7 +75,7 @@ const OrderRegistrationForm: FC = () => {
   }
 
   const addProduct = (
-    product: OrderRegistrationPageData["products"][number],
+    product: OrderRegistrationFormComponentData["products"][number],
   ) => {
     setItems((prevItems) => {
       const productIdStr = String(product.id)
