@@ -26,6 +26,55 @@ describe("商品管理", () => {
       expect(tagNames).toContain("タグC")
       expect(tagNames).toContain("タグD")
     })
+
+    test("page=1でデフォルトの商品を取得できる", async () => {
+      const res = await app.request("/staff/products?page=1")
+      const text = await res.text()
+      assertBasicHtmlResponse(res, text)
+      expect(text).toMatch(/テスト商品1/)
+      expect(text).toMatch(/テスト商品2/)
+      // page=1では1-20番目の商品が表示される
+      expect(text).not.toMatch(/テスト商品21/)
+    })
+
+    test("page=2で次のページの商品を取得できる", async () => {
+      const res = await app.request("/staff/products?page=2")
+      const text = await res.text()
+      assertBasicHtmlResponse(res, text)
+      expect(text).toMatch(/テスト商品21/)
+      expect(text).toMatch(/テスト商品25/)
+      expect(text).not.toMatch(/テスト商品1/)
+    })
+
+    test("page=3では空になる", async () => {
+      const res = await app.request("/staff/products?page=3")
+      const text = await res.text()
+      assertBasicHtmlResponse(res, text)
+      expect(text).toMatch(/商品が登録されていません/)
+    })
+
+    test("無効なページパラメータはpage=1として処理される", async () => {
+      const res = await app.request("/staff/products?page=0")
+      const text = await res.text()
+      assertBasicHtmlResponse(res, text)
+      expect(text).toMatch(/テスト商品1/)
+      expect(text).toMatch(/テスト商品2/)
+    })
+
+    test("ページネーション情報が正しく表示される", async () => {
+      const res = await app.request("/staff/products?page=1")
+      const text = await res.text()
+      expect(text).toMatch(/ページ\s*1/)
+      expect(text).toMatch(/href="[^"]*page=2/)
+    })
+
+    test("page=2では「前へ」ボタンが有効で「次へ」ボタンが無効", async () => {
+      const res = await app.request("/staff/products?page=2")
+      const text = await res.text()
+      expect(text).toMatch(/ページ\s*2/)
+      expect(text).toMatch(/href="[^"]*page=1/)
+      expect(text).toMatch(/aria-disabled="true"/)
+    })
   })
   describe("POST", () => {
     const endpoint = "/staff/products"

@@ -6,46 +6,23 @@ import { setOrderStatus } from "../app/usecases/setOrderStatus"
 const dbClient = await createDbClient()
 
 // 商品登録
-await registerProduct({
-  dbClient,
-  product: {
-    name: "テスト商品1",
-    price: 1000,
-    stock: 100,
-    image: null,
-    tags: ["タグA", "タグB"],
-  },
-})
-await registerProduct({
-  dbClient,
-  product: {
-    name: "テスト商品2",
-    price: 2000,
-    stock: 200,
-    image: null,
-    tags: ["タグC", "タグD"],
-  },
-})
-await registerProduct({
-  dbClient,
-  product: {
-    name: "テスト商品3",
-    price: 3000,
-    stock: 300,
-    image: null,
-    tags: ["タグA", "タグC"],
-  },
-})
-await registerProduct({
-  dbClient,
-  product: {
-    name: "テスト商品4",
-    price: 4000,
-    stock: 400,
-    image: null,
-    tags: [],
-  },
-})
+for (let i = 1; i <= 25; i++) {
+  await registerProduct({
+    dbClient,
+    product: {
+      name: `テスト商品${i}`,
+      price: i * 1000,
+      stock: i * 100,
+      image: null,
+      tags:
+        i % 3 === 0
+          ? ["タグA", "タグB"]
+          : i % 3 === 1
+            ? ["タグC", "タグD"]
+            : ["タグA", "タグC"],
+    },
+  })
+}
 
 // 注文登録
 await registerOrder({
@@ -108,3 +85,38 @@ await setOrderStatus({
   dbClient: dbClient,
   order: { id: order5.id, status: "cancelled" },
 })
+
+// 追加の注文を20個登録
+for (let i = 6; i <= 25; i++) {
+  const customerNumber = ((i - 6) % 10) + 1
+  const productId = ((i - 6) % 5) + 1
+  const quantity = ((i - 6) % 5) + 1
+
+  const order = await registerOrder({
+    dbClient,
+    order: {
+      customerName: `テスト顧客${customerNumber}`,
+      orderItems: [{ productId, quantity }],
+    },
+  })
+
+  if (order == null) throw new Error(`Failed to create order ${i}`)
+
+  // 一部の注文のステータスを変更
+  if (i % 4 === 0) {
+    await setOrderStatus({
+      dbClient,
+      order: { id: order.id, status: "processing" },
+    })
+  } else if (i % 4 === 1) {
+    await setOrderStatus({
+      dbClient,
+      order: { id: order.id, status: "completed" },
+    })
+  } else if (i % 4 === 2) {
+    await setOrderStatus({
+      dbClient,
+      order: { id: order.id, status: "cancelled" },
+    })
+  }
+}
