@@ -1,5 +1,7 @@
 import type { FC, PropsWithChildren } from "hono/jsx"
 import { createContext, useContext, useEffect, useState } from "hono/jsx"
+import { twJoin } from "tailwind-merge"
+import { tv } from "tailwind-variants"
 import ChartColumnIcon from "../../../components/icons/lucide/chartColumnIcon"
 import ChefHatIcon from "../../../components/icons/lucide/chefHatIcon"
 import ClipboardListIcon from "../../../components/icons/lucide/clipboardListIcon"
@@ -14,12 +16,12 @@ import {
   DrawerRoot,
   DrawerTrigger,
 } from "../../../components/ui/$drawer"
-import { tv } from "tailwind-variants"
-import { twJoin } from "tailwind-merge"
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import { Header } from "./$header"
 
-const sidebarToggleButtonStyles = tv({
+export const DESKTOP_SIDEBAR_TOGGLE_BUTTON_ID = "desktop-sidebar-toggle-button"
+export const MAIN_CONTENT_ID = "staff-main-content"
+
+export const sidebarToggleButtonStyles = tv({
   slots: {
     base: "p-2",
     icon: "",
@@ -31,7 +33,7 @@ const sidebarToggleButtonStyles = tv({
         icon: "size-6",
       },
       desktop: {
-        base: "fixed top-5 left-6",
+        base: "mr-4 hidden md:block",
         icon: "size-6",
       },
     },
@@ -92,7 +94,7 @@ const SidebarInternal = ({
 }) => (
   <aside
     className={twJoin(
-      "sticky top-0 left-0 flex h-screen w-64 flex-col border-sidebar-border border-r bg-sidebar text-sidebar-fg",
+      "fixed top-0 left-0 flex h-screen w-64 flex-col border-sidebar-border border-r bg-sidebar text-sidebar-fg",
       className,
     )}
   >
@@ -207,6 +209,45 @@ const SidebarProvider: FC<PropsWithChildren> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(true)
   const toggle = () => setIsOpen((prev) => !prev)
 
+  useEffect(() => {
+    // トグルボタンはヘッダーにあるため、ID経由で取得してクリックイベントを登録する。
+    // いい方法ではないが、以下の理由よりやむを得ない：
+    //
+    // ヘッダー内にトグルボタンを置くには、ヘッダーをクライアントコンポーネントにする必要がある。
+    //
+    // ヘッダーをクライアントコンポーネントにするには、
+    // 次のようなレイアウトの都合上ページ全体をクライアントコンポーネントにして、
+    // コンテンツをchildrenとして渡す必要がある。
+    //
+    //   *------------*------------*
+    //   | サイドバー | ヘッダー   |
+    //   |            *------------*
+    //   |            | コンテンツ |
+    //   *------------*------------*
+    //
+    // ただしここで、クライアントコンポーネントのchildrenとしてサーバーコンポーネントを渡すことはできない。
+    // したがって、ヘッダーをクライアントコンポーネントにすることができない。
+    //
+    // 以上の理由により、やむを得ずボタンをサーバーコンポーネントとして設置し、ID経由でクリックイベントを登録している。
+    const button = document.getElementById(DESKTOP_SIDEBAR_TOGGLE_BUTTON_ID)
+    button?.addEventListener("click", () => {
+      toggle()
+    })
+  }, [])
+
+  useEffect(() => {
+    const mainContentElm = document.getElementById(MAIN_CONTENT_ID)
+    if (!mainContentElm) return
+
+    if (isOpen) {
+      mainContentElm.classList.remove("ml-0")
+      mainContentElm.classList.add("md:ml-64")
+    } else {
+      mainContentElm.classList.remove("md:ml-64")
+      mainContentElm.classList.add("ml-0")
+    }
+  }, [isOpen])
+
   return (
     <SidebarContext.Provider value={{ isOpen, toggle }}>
       {children}
@@ -224,12 +265,15 @@ const useSidebar = () => {
   return context
 }
 
-const DesktopSidebarToggleButton: FC = () => {
+export const DesktopSidebarToggleButton = () => {
   const { base, icon } = sidebarToggleButtonStyles({ device: "desktop" })
-  const { toggle } = useSidebar()
 
   return (
-    <button type="button" className={base()} onClick={toggle}>
+    <button
+      id={DESKTOP_SIDEBAR_TOGGLE_BUTTON_ID}
+      type="button"
+      className={base()}
+    >
       <div className={icon()}>
         <PanelLeftIcon />
       </div>
@@ -241,39 +285,23 @@ const DesktopSidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
   const { isOpen } = useSidebar()
 
   return (
-    <>
-      <DesktopSidebarToggleButton />
-      <SidebarInternal
-        currentPath={currentPath}
-        className={isOpen ? "flex" : "hidden"}
-      />
-    </>
+    <SidebarInternal
+      currentPath={currentPath}
+      className={twJoin("hidden", isOpen && "md:flex")}
+    />
   )
 }
 
 export const Sidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
   const isMobile = useIsMobile()
 
-  return isMobile ? (
-    <MobileSidebar currentPath={currentPath} />
-  ) : (
-    <DesktopSidebar currentPath={currentPath} />
-  )
-}
-
-export const SidebarLayout = ({
-  children,
-  currentPath,
-}: PropsWithChildren<{ currentPath: string }>) => {
   return (
     <SidebarProvider>
-      <div class="flex h-full flex-row bg-muted">
-        <Sidebar currentPath={currentPath} />
-        <div class="flex-1">
-          <Header currentPath={currentPath} />
-          {children}
-        </div>
-      </div>
+      {isMobile ? (
+        <MobileSidebar currentPath={currentPath} />
+      ) : (
+        <DesktopSidebar currentPath={currentPath} />
+      )}
     </SidebarProvider>
   )
 }

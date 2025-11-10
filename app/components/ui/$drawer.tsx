@@ -175,7 +175,6 @@ const DrawerRoot = ({
   )
 
   useEffect(() => {
-    console.log("Drawer open state changed:", currentOpen)
     if (!currentOpen) {
       if (hadMountedOpenRef.current) {
         const focusTarget = triggerRef.current ?? lastFocusedElementRef.current
@@ -302,7 +301,6 @@ const DrawerTrigger = ({
     useDrawerContext("Drawer.Trigger")
 
   const handleClick = (event: Event) => {
-    console.log("DrawerTrigger clicked")
     onClick?.(event)
     if (event.defaultPrevented || disabled) return
     openDrawer()

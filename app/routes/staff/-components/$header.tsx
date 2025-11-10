@@ -1,4 +1,5 @@
 import type { FC } from "hono/jsx"
+import { DesktopSidebarToggleButton } from "./$staffSidebar"
 
 type Breadcrumb = {
   label: string
@@ -60,6 +61,7 @@ const Breadcrumbs: FC<{ currentPath: string }> = ({ currentPath }) => {
 export const Header = ({ currentPath }: { currentPath: string }) => {
   return (
     <header className="sticky top-0 flex h-16 items-center border-b bg-navbar px-6 text-navbar-fg">
+      <DesktopSidebarToggleButton />
       <Breadcrumbs currentPath={currentPath} />
     </header>
   )
