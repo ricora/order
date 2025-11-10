@@ -66,31 +66,42 @@ export const updateProductImpl: UpdateProduct = async ({
     )[0]
     if (!dbProduct) throw new Error("DBの更新に失敗しました")
 
-    await dbClient
-      .delete(productTagRelationTable)
-      .where(eq(productTagRelationTable.productId, product.id))
-    let dbProductTagRelations: (typeof productTagRelationTable.$inferSelect)[] =
-      []
-    if (product.tagIds && product.tagIds.length > 0) {
-      const rows = product.tagIds.map((tagId) => ({
-        productId: product.id,
-        tagId,
-      }))
-      dbProductTagRelations = await dbClient
-        .insert(productTagRelationTable)
-        .values(rows)
-        .returning()
-    }
+    const updatedTagIds = await ("tagIds" in product
+      ? (async () => {
+          await dbClient
+            .delete(productTagRelationTable)
+            .where(eq(productTagRelationTable.productId, product.id))
 
-    const updatedProduct: Product = {
+          if (!product.tagIds || product.tagIds.length === 0) {
+            return []
+          }
+
+          const rows = product.tagIds.map((tagId) => ({
+            productId: product.id,
+            tagId,
+          }))
+          const relations = await dbClient
+            .insert(productTagRelationTable)
+            .values(rows)
+            .returning()
+          return relations.map((relation) => relation.tagId)
+        })()
+      : (async () => {
+          const existingRelations = await dbClient
+            .select()
+            .from(productTagRelationTable)
+            .where(eq(productTagRelationTable.productId, product.id))
+          return existingRelations.map((relation) => relation.tagId)
+        })())
+
+    return {
       id: dbProduct.id,
       name: dbProduct.name,
       image: dbProduct.image,
-      tagIds: dbProductTagRelations.map((relation) => relation.tagId),
+      tagIds: updatedTagIds,
       price: dbProduct.price,
       stock: dbProduct.stock,
     }
-    return updatedProduct
   } catch {
     throw new Error("商品の更新に失敗しました")
   }
