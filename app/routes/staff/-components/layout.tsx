@@ -10,7 +10,7 @@ export const Layout: FC<
   return (
     <div className="min-h-full bg-muted">
       <Sidebar currentPath={c.req.path} />
-      <div class="ml-0 md:ml-64" id={MAIN_CONTENT_ID}>
+      <div className="ml-0 md:ml-64" id={MAIN_CONTENT_ID}>
         <Header currentPath={c.req.path} />
         <main className="flex min-w-0 flex-1 flex-col items-center gap-6 overflow-auto px-5 py-6">
           <div className="w-full max-w-7xl rounded-lg border bg-bg p-6">
