@@ -100,4 +100,30 @@ test.describe("商品編集", () => {
     // 正常リダイレクトを確認
     await page.waitForURL("/staff/products", { timeout: 10000 })
   })
+
+  test("編集ページで初期タグが表示される", async ({ page }) => {
+    await waitForHydration(page, "/staff/products/1/edit")
+
+    // タグの初期選択が反映されるまで待機
+    await page.waitForFunction(
+      () => document.querySelectorAll('input[name="tags"]').length > 0,
+    )
+
+    const tagInputs = page.locator('input[name="tags"]')
+    await expect(tagInputs).toHaveCount(2)
+
+    await expect(page.locator('input[name="tags"][value="タグA"]')).toHaveCount(
+      1,
+    )
+    await expect(page.locator('input[name="tags"][value="タグB"]')).toHaveCount(
+      1,
+    )
+
+    await expect(
+      page.getByRole("button", { name: "タグAを削除" }),
+    ).toBeVisible()
+    await expect(
+      page.getByRole("button", { name: "タグBを削除" }),
+    ).toBeVisible()
+  })
 })
