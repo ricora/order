@@ -41,7 +41,9 @@ type CreateProductPayload = Omit<Product, "tagIds" | "id"> & {
   tags: string[]
 }
 
-type UpdateProductPayload = { id: number } & Partial<Omit<Product, "id">> & {
+type UpdateProductPayload = { id: number } & Partial<
+  Omit<Product, "tagIds" | "id">
+> & {
     tags?: string[]
   }
 
