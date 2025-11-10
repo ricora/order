@@ -415,7 +415,7 @@ const DrawerContent = ({
       data-state={open ? "open" : "closed"}
       tabIndex={-1}
       className={content({ class: className })}
-      ref={contentRef.current}
+      ref={contentRef}
       style={{
         ...style,
         transitionDuration: `${animationDuration}ms`,
