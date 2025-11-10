@@ -18,10 +18,11 @@ export default createRoute(async (c) => {
 
   const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10))
 
-  const { orders } = await getOrdersManagementPageData({
-    dbClient: c.get("dbClient"),
-    page,
-  })
+  const { orders, hasNextPage, currentPage } =
+    await getOrdersManagementPageData({
+      dbClient: c.get("dbClient"),
+      page,
+    })
 
   return c.render(
     <Layout title={"注文一覧"} description={"注文の一覧を表示します。"}>
@@ -80,6 +81,8 @@ export default createRoute(async (c) => {
         viewMode={viewMode}
         urlSearch={urlSearch}
         emptyMessage="注文が登録されていません"
+        currentPage={currentPage}
+        hasNextPage={hasNextPage}
       />
     </Layout>,
   )

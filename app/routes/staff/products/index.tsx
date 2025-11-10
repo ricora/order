@@ -47,6 +47,8 @@ export default createRoute(async (c) => {
     outOfStockCount,
     lowStockCount,
     totalValue,
+    hasNextPage,
+    currentPage,
   } = await getProductsManagementPageData({
     dbClient: c.get("dbClient"),
     page,
@@ -108,6 +110,8 @@ export default createRoute(async (c) => {
         viewMode={viewMode}
         urlSearch={urlSearch}
         emptyMessage="商品が登録されていません"
+        currentPage={currentPage}
+        hasNextPage={hasNextPage}
       />
     </Layout>,
   )
