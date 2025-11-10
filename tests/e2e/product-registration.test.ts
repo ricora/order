@@ -106,7 +106,7 @@ test.describe("商品編集", () => {
 
     // タグの初期選択が反映されるまで待機
     await page.waitForFunction(
-      () => document.querySelectorAll('input[name="tags"]').length > 0,
+      () => document.querySelectorAll('input[name="tags"]').length >= 2,
     )
 
     const tagInputs = page.locator('input[name="tags"]')
