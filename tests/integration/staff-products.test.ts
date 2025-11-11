@@ -66,7 +66,7 @@ describe("商品管理", () => {
       const text = await res.text()
       expect(text).toMatch(/総商品数/)
       expect(text).toMatch(/在庫十分/)
-      expect(text).toMatch(/残りわずか/)
+      expect(text).toMatch(/在庫わずか/)
       expect(text).toMatch(/在庫切れ/)
     })
 

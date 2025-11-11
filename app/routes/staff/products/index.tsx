@@ -131,7 +131,7 @@ const ProductStockStatusCards = ({
     <StatusCard
       variant="warning"
       icon={TriangleAlertIcon}
-      title="残りわずか"
+      title="在庫わずか"
       value={lowStockCount}
       description={`在庫${LOW_STOCK_THRESHOLD}個以下`}
     />
