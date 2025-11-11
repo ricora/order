@@ -9,6 +9,8 @@ import type { DbClient } from "../infrastructure/db/client"
 
 type ProductStatus = "inStock" | "lowStock" | "outOfStock"
 
+export const LOW_STOCK_THRESHOLD = 5
+
 export type GetProductsManagementPageDataParams = {
   dbClient: DbClient
   page?: number
@@ -30,7 +32,7 @@ export type ProductsManagementPageData = {
 }
 
 const calculateProductStatus = (stock: number): ProductStatus => {
-  if (stock > 5) {
+  if (stock > LOW_STOCK_THRESHOLD) {
     return "inStock"
   }
   if (stock > 0) {
@@ -84,9 +86,11 @@ export const getProductsManagementPageData = async ({
     },
   })
   const totalProducts = productStocks.length
-  const inStockCount = productStocks.filter((p) => p.stock > 5).length
+  const inStockCount = productStocks.filter(
+    (p) => p.stock > LOW_STOCK_THRESHOLD,
+  ).length
   const lowStockCount = productStocks.filter(
-    (p) => p.stock <= 5 && p.stock > 0,
+    (p) => p.stock <= LOW_STOCK_THRESHOLD && p.stock > 0,
   ).length
   const outOfStockCount = productStocks.filter((p) => p.stock === 0).length
 

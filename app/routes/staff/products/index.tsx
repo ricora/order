@@ -9,7 +9,10 @@ import Badge from "../../../components/ui/badge"
 import Chip from "../../../components/ui/chip"
 import ItemCollectionViewer from "../../../components/ui/itemCollectionViewer"
 import { setToastCookie } from "../../../helpers/ui/toast"
-import { getProductsManagementPageData } from "../../../usecases/getProductsManagementPageData"
+import {
+  getProductsManagementPageData,
+  LOW_STOCK_THRESHOLD,
+} from "../../../usecases/getProductsManagementPageData"
 import { registerProduct } from "../../../usecases/registerProduct"
 import { formatCurrencyJPY } from "../../../utils/money"
 import Layout from "../-components/layout"
@@ -123,14 +126,14 @@ const ProductStockStatusCards = ({
       icon={CircleCheckIcon}
       title="在庫十分"
       value={inStockCount}
-      description="在庫6個以上"
+      description={`在庫${LOW_STOCK_THRESHOLD + 1}個以上`}
     />
     <StatusCard
       variant="warning"
       icon={TriangleAlertIcon}
       title="残りわずか"
       value={lowStockCount}
-      description="在庫5個以下"
+      description={`在庫${LOW_STOCK_THRESHOLD}個以下`}
     />
     <StatusCard
       variant="danger"
