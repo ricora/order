@@ -2,6 +2,7 @@ type Order = {
   id: number
   customerName: string | null
   createdAt: Date
+  updatedAt: Date
   status: "pending" | "processing" | "completed" | "cancelled"
   orderItems: {
     productId: number | null

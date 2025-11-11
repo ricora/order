@@ -66,6 +66,17 @@ const validateOrder = (
       }
     }
   }
+  if (commandType === "create") {
+    if (
+      order.createdAt === undefined ||
+      order.updatedAt === undefined ||
+      order.createdAt.getTime() !== order.updatedAt.getTime()
+    ) {
+      throw new Error(
+        "新規に登録する注文の作成日時と更新日時は同じである必要があります",
+      )
+    }
+  }
 }
 
 export type CreateOrder = CommandRepositoryFunction<
@@ -74,8 +85,8 @@ export type CreateOrder = CommandRepositoryFunction<
 >
 export type UpdateOrder = CommandRepositoryFunction<
   {
-    order: Pick<Order, "id"> &
-      Partial<Omit<Order, "id" | "totalAmount" | "createdAt" | "orderItems">>
+    order: Pick<Order, "id" | "updatedAt"> &
+      Partial<Pick<Order, "customerName" | "status">>
   },
   Order | null
 >
