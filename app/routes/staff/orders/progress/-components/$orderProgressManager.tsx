@@ -7,8 +7,14 @@ import {
   useState,
 } from "hono/jsx"
 import { tv } from "tailwind-variants"
+import ChefHatIcon from "../../../../../components/icons/lucide/chefHatIcon"
+import ChevronLeftIcon from "../../../../../components/icons/lucide/chevronLeftIcon"
+import ChevronRightIcon from "../../../../../components/icons/lucide/chevronRightIcon"
+import CircleCheckIcon from "../../../../../components/icons/lucide/circleCheckIcon"
+import CircleXIcon from "../../../../../components/icons/lucide/circleXIcon"
 import RotateCwIcon from "../../../../../components/icons/lucide/rotateCwIcon"
-import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
+import ShoppingCartIcon from "../../../../../components/icons/lucide/shoppingCartIcon"
+import TimerIcon from "../../../../../components/icons/lucide/timerIcon"
 import Button from "../../../../../components/ui/button"
 import type Order from "../../../../../domain/order/entities/order"
 import { createHonoClient } from "../../../../../helpers/api/hono-client"
@@ -16,7 +22,7 @@ import { formatDateTimeJP } from "../../../../../utils/date"
 import OrderStatusBadge from "../../-components/orderStatusBadge"
 
 const sectionTv = tv({
-  base: "flex flex-col rounded border p-4",
+  base: "flex min-h-0 flex-col rounded border p-4",
   variants: {
     status: {
       pending: "border-danger-subtle bg-danger-subtle",
@@ -46,8 +52,8 @@ const bandTv = tv({
 
 const headerRowTv = tv({ base: "my-2 flex items-center justify-between px-2" })
 
-const statusTextTv = tv({
-  base: "font-semibold",
+const headerTitleTv = tv({
+  base: "flex items-center gap-2 font-semibold",
   variants: {
     status: {
       pending: "text-danger-subtle-fg",
@@ -60,7 +66,7 @@ const statusTextTv = tv({
 })
 
 const innerScrollTv = tv({
-  base: "max-h-[48vh] flex-1 space-y-3 overflow-y-auto bg-muted p-2",
+  base: "min-h-0 flex-1 space-y-3 overflow-y-auto bg-muted p-2",
 })
 
 const cardTv = tv({
@@ -88,6 +94,16 @@ const headerBadgeTv = tv({
   defaultVariants: { status: "pending" },
 })
 
+const headerNoticeTv = tv({
+  base: "text-xs",
+  variants: {
+    status: {
+      completed: "text-success-subtle-fg",
+      cancelled: "text-info-subtle-fg",
+    },
+  },
+})
+
 const itemRowTv = tv({
   base: "flex items-center justify-between rounded border border-border/50 bg-muted p-2 text-sm",
 })
@@ -97,8 +113,12 @@ const labelTv = tv({
 })
 
 const btnTv = tv({
-  base: "flex h-8 w-28 flex-1 items-center justify-center gap-2 rounded-md border bg-bg px-2 py-1 font-medium text-sm transition",
+  base: "flex h-8 min-w-24 items-center justify-center gap-1 whitespace-nowrap rounded-md border bg-bg px-2 py-1 font-medium text-xs transition",
   variants: {
+    fixed: {
+      true: "w-28",
+      false: "",
+    },
     status: {
       pending:
         "border-danger-subtle bg-danger-subtle text-danger-subtle-fg hover:bg-danger-subtle/80 hover:text-danger-subtle-fg/80",
@@ -107,21 +127,21 @@ const btnTv = tv({
       completed:
         "border-success-subtle bg-success-subtle text-success-subtle-fg hover:bg-success-subtle/80 hover:text-success-subtle-fg/80",
       cancelled:
-        "w-36 border-info-subtle bg-info-subtle text-info-subtle-fg hover:bg-info-subtle/80 hover:text-info-subtle-fg/80",
+        "min-w-28 border-info-subtle bg-info-subtle text-info-subtle-fg hover:bg-info-subtle/80 hover:text-info-subtle-fg/80",
     },
     disabled: {
       true: "cursor-not-allowed opacity-50",
       false: "cursor-pointer",
     },
   },
-  defaultVariants: { status: "pending", disabled: false },
+  defaultVariants: { status: "pending", disabled: false, fixed: true },
 })
 
 const statusLabel: Record<Order["status"], string> = {
   pending: "処理待ち",
   processing: "処理中",
   completed: "完了",
-  cancelled: "取り消し済",
+  cancelled: "取消済",
 }
 
 const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
@@ -149,7 +169,14 @@ const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
       clearInterval(id)
     }
   }, [iso])
-  return <span className="ml-2 text-muted-fg text-sm">{text}</span>
+  return (
+    <span className="flex items-center gap-1">
+      <div className="h-4 w-4 text-muted-fg">
+        <TimerIcon />
+      </div>
+      <span className="text-muted-fg text-sm">{text}</span>
+    </span>
+  )
 }
 
 const Card: FC<{ order: Order }> = ({ order }) => {
@@ -181,6 +208,7 @@ const Card: FC<{ order: Order }> = ({ order }) => {
         className={btnTv({
           status: btnStatus ?? toStatus,
           disabled: !!disabled,
+          fixed: btnStatus !== "cancelled" && toStatus !== "cancelled",
         })}
         disabled={!!disabled}
       >
@@ -232,14 +260,24 @@ const Card: FC<{ order: Order }> = ({ order }) => {
                 toStatus={"processing"}
                 btnStatus={"processing"}
               >
-                処理中に移動
+                <span className="flex w-full items-center justify-between">
+                  <div className="h-4 w-4">
+                    <ChevronLeftIcon />
+                  </div>
+                  <span className="flex-1 text-center">処理中に移動</span>
+                </span>
               </FormAction>
               <FormAction
                 orderId={order.id}
                 toStatus={"pending"}
                 btnStatus={"pending"}
               >
-                処理待ちに移動
+                <span className="flex w-full items-center justify-between">
+                  <div className="h-4 w-4">
+                    <ChevronLeftIcon />
+                  </div>
+                  <span className="flex-1 text-center">処理待ちに移動</span>
+                </span>
               </FormAction>
             </div>
           ) : order.status !== "pending" ? (
@@ -249,9 +287,21 @@ const Card: FC<{ order: Order }> = ({ order }) => {
               btnStatus={prevStatus(order.status)}
               disabled={isPrevDisabled}
             >
-              {prevStatus(order.status) === "processing"
-                ? "処理中に移動"
-                : "処理待ちに移動"}
+              {prevStatus(order.status) === "processing" ? (
+                <span className="flex w-full items-center justify-between">
+                  <div className="h-4 w-4">
+                    <ChevronLeftIcon />
+                  </div>
+                  <span className="flex-1 text-center">処理中に移動</span>
+                </span>
+              ) : (
+                <span className="flex w-full items-center justify-between">
+                  <div className="h-4 w-4">
+                    <ChevronLeftIcon />
+                  </div>
+                  <span className="flex-1 text-center">処理待ちに移動</span>
+                </span>
+              )}
             </FormAction>
           ) : null}
         </div>
@@ -264,9 +314,21 @@ const Card: FC<{ order: Order }> = ({ order }) => {
               btnStatus={nextStatus(order.status)}
               disabled={isNextDisabled}
             >
-              {nextStatus(order.status) === "processing"
-                ? "処理中に移動"
-                : "完了に移動"}
+              {nextStatus(order.status) === "processing" ? (
+                <span className="flex w-full items-center justify-between">
+                  <span className="flex-1 text-center">処理中に移動</span>
+                  <div className="h-4 w-4">
+                    <ChevronRightIcon />
+                  </div>
+                </span>
+              ) : (
+                <span className="flex w-full items-center justify-between">
+                  <span className="flex-1 text-center">完了に移動</span>
+                  <div className="h-4 w-4">
+                    <ChevronRightIcon />
+                  </div>
+                </span>
+              )}
             </FormAction>
           ) : null}
         </div>
@@ -279,7 +341,7 @@ const Card: FC<{ order: Order }> = ({ order }) => {
             btnStatus={"cancelled"}
           >
             <div className="h-4 w-4">
-              <Trash2Icon />
+              <CircleXIcon />
             </div>
             <span>注文を取り消す</span>
           </FormAction>
@@ -321,21 +383,42 @@ const Countdown: FC<{
 const Column: FC<{
   status: ColumnStatus
   items: Order[]
-}> = ({ status, items }) => (
-  <section className={sectionTv({ status })}>
-    <div className={bandTv({ status })} />
-    <div className={headerRowTv()}>
-      <div className={statusTextTv({ status })}>{statusLabel[status]}</div>
-      <div className={headerBadgeTv({ status })}>{items.length}</div>
-    </div>
+}> = ({ status, items }) => {
+  const statusIcons: Record<ColumnStatus, FC> = {
+    pending: ShoppingCartIcon,
+    processing: ChefHatIcon,
+    completed: CircleCheckIcon,
+    cancelled: CircleXIcon,
+  }
+  const Icon = statusIcons[status]
 
-    <div className={innerScrollTv()}>
-      {items.map((o) => (
-        <Card key={String(o.id)} order={o} />
-      ))}
-    </div>
-  </section>
-)
+  return (
+    <section className={sectionTv({ status })}>
+      <div className={bandTv({ status })} />
+      <div className={headerRowTv()}>
+        <div className={headerTitleTv({ status })}>
+          <div className="size-5">
+            <Icon />
+          </div>
+          <span>{statusLabel[status]}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {(status === "completed" || status === "cancelled") && (
+            <div className={headerNoticeTv({ status })}>
+              直近の注文のみを表示します。
+            </div>
+          )}
+          <div className={headerBadgeTv({ status })}>{items.length}</div>
+        </div>
+      </div>
+      <div className={innerScrollTv()}>
+        {items.map((o) => (
+          <Card key={String(o.id)} order={o} />
+        ))}
+      </div>
+    </section>
+  )
+}
 
 const OrderProgressManager: FC = () => {
   const [orders, setOrders] = useState<Order[]>([])
@@ -381,7 +464,7 @@ const OrderProgressManager: FC = () => {
   const cancelled = orders.filter((o) => o.status === "cancelled")
 
   return (
-    <div>
+    <div className="flex h-[calc(100vh-14rem)] flex-col">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-semibold text-lg">注文進捗</h2>
         <div className="flex items-center gap-2">
@@ -407,13 +490,13 @@ const OrderProgressManager: FC = () => {
           </Button>
         </div>
       </div>
-      <div className="-mx-2 overflow-auto rounded border border-border/50 bg-muted p-2">
+      <div className="min-h-0 flex-1 overflow-auto rounded border border-border/50 bg-muted p-2">
         {error ? (
           <div className="items-center justify-center text-center text-muted-fg">
             注文一覧の取得に失敗しました。しばらくしてから再試行してください。
           </div>
         ) : (
-          <div className="flex w-max gap-4">
+          <div className="flex h-full min-h-0 w-max gap-4">
             <Column status="pending" items={pending} />
             <Column status="processing" items={processing} />
             <Column status="completed" items={completed} />

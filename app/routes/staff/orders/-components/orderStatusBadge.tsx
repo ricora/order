@@ -4,7 +4,7 @@ const statusLabel: Record<string, string> = {
   pending: "処理待ち",
   processing: "処理中",
   completed: "完了",
-  cancelled: "取り消し済",
+  cancelled: "取消済",
 }
 
 const statusVariantMap: Record<
