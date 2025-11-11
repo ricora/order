@@ -1,5 +1,6 @@
 import type Order from "../domain/order/entities/order"
 import { createOrder } from "../domain/order/repositories/orderCommandRepository"
+import { MAX_STORE_PRODUCT_COUNT } from "../domain/product/constants"
 import { updateProduct } from "../domain/product/repositories/productCommandRepository"
 import { findAllProductsByIds } from "../domain/product/repositories/productQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
@@ -39,6 +40,7 @@ export const registerOrder = async ({
           return item.productId
         }),
       },
+      pagination: { offset: 0, limit: MAX_STORE_PRODUCT_COUNT },
     })
 
     const productById = new Map(

@@ -7,6 +7,7 @@ import {
   useState,
 } from "hono/jsx"
 import { tv } from "tailwind-variants"
+import RotateCwIcon from "../../../../../components/icons/lucide/rotateCwIcon"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
 import Button from "../../../../../components/ui/button"
 import type Order from "../../../../../domain/order/entities/order"
@@ -399,6 +400,9 @@ const OrderProgressManager: FC = () => {
             onClick={fetchData}
             ariaLabel="注文一覧を更新する"
           >
+            <div class="size-4">
+              <RotateCwIcon />
+            </div>
             <span>注文一覧を更新する</span>
           </Button>
         </div>

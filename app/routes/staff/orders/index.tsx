@@ -1,7 +1,7 @@
 import { createRoute } from "honox/factory"
 import { tv } from "tailwind-variants"
 import ItemCollectionViewer from "../../../components/ui/itemCollectionViewer"
-import { getOrderProgressPageData } from "../../../usecases/getOrderProgressPageData"
+import { getOrdersManagementPageData } from "../../../usecases/getOrdersManagementPageData"
 import { formatDateTimeJP } from "../../../utils/date"
 import { formatCurrencyJPY } from "../../../utils/money"
 import Layout from "../-components/layout"
@@ -16,9 +16,13 @@ export default createRoute(async (c) => {
   const viewMode = c.req.query("view") === "card" ? "card" : "table"
   const urlSearch = url.search
 
-  const { orders } = await getOrderProgressPageData({
-    dbClient: c.get("dbClient"),
-  })
+  const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10))
+
+  const { orders, hasNextPage, currentPage } =
+    await getOrdersManagementPageData({
+      dbClient: c.get("dbClient"),
+      page,
+    })
 
   return c.render(
     <Layout title={"注文一覧"} description={"注文の一覧を表示します。"}>
@@ -77,6 +81,8 @@ export default createRoute(async (c) => {
         viewMode={viewMode}
         urlSearch={urlSearch}
         emptyMessage="注文が登録されていません"
+        currentPage={currentPage}
+        hasNextPage={hasNextPage}
       />
     </Layout>,
   )

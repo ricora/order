@@ -5,6 +5,7 @@ import Grid3X3Icon from "../icons/lucide/grid3X3Icon"
 import SquarePenIcon from "../icons/lucide/squarePenIcon"
 import TableIcon from "../icons/lucide/tableIcon"
 import Trash2Icon from "../icons/lucide/trash2Icon"
+import Pagination from "./pagination"
 
 const itemCollectionTv = tv({
   slots: {
@@ -184,6 +185,8 @@ type ItemCollectionViewerProps = {
   viewMode: ViewMode
   urlSearch: string
   emptyMessage?: string
+  currentPage: number
+  hasNextPage: boolean
 }
 
 const ItemCollectionViewer = ({
@@ -193,6 +196,8 @@ const ItemCollectionViewer = ({
   viewMode,
   urlSearch,
   emptyMessage = "データがありません",
+  currentPage,
+  hasNextPage,
 }: ItemCollectionViewerProps) => {
   const styles = itemCollectionTv()
 
@@ -301,6 +306,11 @@ const ItemCollectionViewer = ({
           </div>
         </div>
       )}
+      <Pagination
+        currentPage={currentPage}
+        hasNextPage={hasNextPage}
+        urlSearch={urlSearch}
+      />
     </div>
   )
 }

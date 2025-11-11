@@ -16,7 +16,7 @@ export type WithRepositoryImpl<T extends (...args: any) => any> =
     : (params: { repositoryImpl?: T }) => ReturnType<T>
 
 /**
- * Query系リポジトリ関数の型定義。
+ * 単数の要素を取得するQuery系リポジトリ関数の型定義。
  * DB参照系のRepository関数はこの型を継承して定義する。
  * @template P paramsの型
  * @template R 戻り値の型
@@ -27,6 +27,29 @@ export type WithRepositoryImpl<T extends (...args: any) => any> =
 export type QueryRepositoryFunction<P, R> = [P] extends [Record<string, never>]
   ? (params: { dbClient: DbClient | TransactionDbClient }) => Promise<R>
   : (params: P & { dbClient: DbClient | TransactionDbClient }) => Promise<R>
+
+/**
+ * 複数の要素を取得するQuery系リポジトリ関数の型定義。
+ * DB参照系のRepository関数はこの型を継承して定義する。
+ * Paginationのためのパラメータが自動的に追加される。
+ * @template P paramsの型
+ * @template T 戻り値の型
+ * @example
+ * type FindAllProducts = PaginatedQueryRepositoryFunction<Record<string, never>, Product>
+ */
+export type PaginatedQueryRepositoryFunction<P, T> = [P] extends [
+  Record<string, never>,
+]
+  ? (params: {
+      pagination: PaginationParams
+      dbClient: DbClient | TransactionDbClient
+    }) => Promise<T[]>
+  : (
+      params: P & {
+        pagination: PaginationParams
+        dbClient: DbClient | TransactionDbClient
+      },
+    ) => Promise<T[]>
 
 /**
  * Command系リポジトリ関数の型定義。
@@ -42,3 +65,20 @@ export type CommandRepositoryFunction<P, R> = [P] extends [
 ]
   ? (params: { dbClient: TransactionDbClient }) => Promise<R>
   : (params: P & { dbClient: TransactionDbClient }) => Promise<R>
+
+/**
+ * ページネーション用パラメータ型。
+ * Query系リポジトリ関数で一括取得時に使用する。
+ * @example
+ * type FindAllProducts = PaginatedQueryRepositoryFunction<{ pagination: PaginationParams }, Product[]>
+ */
+type PaginationParams = {
+  /**
+   * 取得を開始するオフセット（0-indexed）。
+   */
+  offset: number
+  /**
+   * 取得する件数の上限。
+   */
+  limit: number
+}
