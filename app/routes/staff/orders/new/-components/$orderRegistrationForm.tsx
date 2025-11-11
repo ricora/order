@@ -1,6 +1,7 @@
 import type { FC } from "hono/jsx"
 import { useCallback, useEffect, useMemo, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
+import RotateCwIcon from "../../../../../components/icons/lucide/rotateCwIcon"
 import SendIcon from "../../../../../components/icons/lucide/sendIcon"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
 import GraphemeInput from "../../../../../components/ui/$graphemeInput"
@@ -183,6 +184,9 @@ const OrderRegistrationForm: FC = () => {
               disabled={isLoading}
               ariaLabel="商品一覧を更新する"
             >
+              <div class="size-4">
+                <RotateCwIcon />
+              </div>
               <span>{isLoading ? "読み込み中..." : "商品一覧を更新する"}</span>
             </Button>
           </div>
