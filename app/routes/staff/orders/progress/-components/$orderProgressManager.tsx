@@ -384,11 +384,13 @@ const Column: FC<{
   status: ColumnStatus
   items: Order[]
 }> = ({ status, items }) => {
-  let Icon: FC = () => null
-  if (status === "pending") Icon = ShoppingCartIcon
-  if (status === "processing") Icon = ChefHatIcon
-  if (status === "completed") Icon = CircleCheckIcon
-  if (status === "cancelled") Icon = CircleXIcon
+  const statusIcons: Record<ColumnStatus, FC> = {
+    pending: ShoppingCartIcon,
+    processing: ChefHatIcon,
+    completed: CircleCheckIcon,
+    cancelled: CircleXIcon,
+  }
+  const Icon = statusIcons[status]
 
   return (
     <section className={sectionTv({ status })}>
