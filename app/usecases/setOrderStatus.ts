@@ -18,6 +18,7 @@ export const setOrderStatus = async ({
       order: {
         id: order.id,
         status: order.status,
+        updatedAt: new Date(),
       },
     })
   })
