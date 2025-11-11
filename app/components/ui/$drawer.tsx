@@ -13,14 +13,106 @@ import {
   useState,
 } from "hono/jsx"
 import { tv } from "tailwind-variants"
-import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion"
-import { usePresence } from "../../hooks/usePresence"
-import {
-  getFocusableElements,
-  lockBodyScroll,
-  unlockBodyScroll,
-} from "../../utils/dom"
 import type { EventHandler } from "../../utils/events"
+
+// Internal hooks
+const MEDIA_QUERY = "(prefers-reduced-motion: reduce)"
+
+const usePrefersReducedMotion = () => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return
+    const mediaQuery = window.matchMedia(MEDIA_QUERY)
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handleChange = (event: MediaQueryListEvent) =>
+      setPrefersReducedMotion(event.matches)
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleChange)
+      return () => mediaQuery.removeEventListener("change", handleChange)
+    }
+
+    mediaQuery.addListener(handleChange)
+    return () => mediaQuery.removeListener(handleChange)
+  }, [])
+
+  return prefersReducedMotion
+}
+
+const usePresence = (open: boolean, duration: number) => {
+  const [shouldRender, setShouldRender] = useState(open)
+
+  useEffect(() => {
+    if (open) {
+      setShouldRender(true)
+      return
+    }
+    if (duration === 0) {
+      setShouldRender(false)
+      return
+    }
+    const timer = window.setTimeout(() => setShouldRender(false), duration)
+    return () => window.clearTimeout(timer)
+  }, [open, duration])
+
+  return shouldRender
+}
+
+// Internal utility functions
+const focusableSelectors = [
+  "[data-drawer-autofocus]",
+  'a[href]:not([tabindex="-1"])',
+  'area[href]:not([tabindex="-1"])',
+  'input:not([disabled]):not([tabindex="-1"])',
+  'select:not([disabled]):not([tabindex="-1"])',
+  'textarea:not([disabled]):not([tabindex="-1"])',
+  'button:not([disabled]):not([tabindex="-1"])',
+  'iframe:not([tabindex="-1"])',
+  'audio[controls]:not([tabindex="-1"])',
+  'video[controls]:not([tabindex="-1"])',
+  '[contenteditable="true"]:not([tabindex="-1"])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(",")
+
+const getFocusableElements = (container: HTMLElement) =>
+  Array.from(
+    container.querySelectorAll<HTMLElement>(focusableSelectors),
+  ).filter(
+    (element) =>
+      !element.hasAttribute("disabled") &&
+      element.tabIndex !== -1 &&
+      element.getClientRects().length > 0,
+  )
+
+let scrollLockDepth = 0
+let previousOverflow = ""
+let previousPaddingRight = ""
+let previousTouchAction = ""
+
+const lockBodyScroll = () => {
+  scrollLockDepth += 1
+  if (scrollLockDepth > 1) return
+  previousOverflow = document.body.style.overflow
+  previousPaddingRight = document.body.style.paddingRight
+  previousTouchAction = document.body.style.touchAction
+  const scrollBarGap = window.innerWidth - document.documentElement.clientWidth
+  document.body.style.overflow = "hidden"
+  document.body.style.touchAction = "none"
+  if (scrollBarGap > 0) {
+    document.body.style.paddingRight = `${scrollBarGap}px`
+  }
+}
+
+const unlockBodyScroll = () => {
+  scrollLockDepth = Math.max(0, scrollLockDepth - 1)
+  if (scrollLockDepth === 0) {
+    document.body.style.overflow = previousOverflow
+    document.body.style.paddingRight = previousPaddingRight
+    document.body.style.touchAction = previousTouchAction
+  }
+}
 
 type DrawerSide = "top" | "right" | "bottom" | "left"
 type SetOpenAction = boolean | ((prev: boolean) => boolean)
