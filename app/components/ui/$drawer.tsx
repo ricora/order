@@ -13,7 +13,9 @@ import {
   useState,
 } from "hono/jsx"
 import { tv } from "tailwind-variants"
-import type { EventHandler } from "../../utils/events"
+
+// Internal types
+type EventHandler<E extends Event = Event> = (event: E) => void
 
 // Internal hooks
 const MEDIA_QUERY = "(prefers-reduced-motion: reduce)"
