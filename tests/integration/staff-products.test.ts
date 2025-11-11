@@ -61,6 +61,15 @@ describe("商品管理", () => {
       expect(text).toMatch(/テスト商品2/)
     })
 
+    test("ステータスカードが表示される", async () => {
+      const res = await app.request("/staff/products?page=1")
+      const text = await res.text()
+      expect(text).toMatch(/総商品数/)
+      expect(text).toMatch(/在庫十分/)
+      expect(text).toMatch(/残りわずか/)
+      expect(text).toMatch(/在庫切れ/)
+    })
+
     test("ページネーション情報が正しく表示される", async () => {
       const res = await app.request("/staff/products?page=1")
       const text = await res.text()

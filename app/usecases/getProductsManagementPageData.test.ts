@@ -80,11 +80,19 @@ describe("getProductsManagementPageData", () => {
     ])
 
     expect(result.totalProducts).toBe(3)
+    expect(result.inStockCount).toBe(1)
     expect(result.lowStockCount).toBe(1)
     expect(result.outOfStockCount).toBe(1)
     expect(result.hasNextPage).toBe(false)
     expect(result.currentPage).toBe(1)
     expect(result.pageSize).toBe(20)
+  })
+
+  it("各商品のステータスが正しく計算される", async () => {
+    const result = await getProductsManagementPageData({ dbClient })
+    expect(result.products[0]?.status).toBe("inStock")
+    expect(result.products[1]?.status).toBe("outOfStock")
+    expect(result.products[2]?.status).toBe("lowStock")
   })
 
   it("imageがnullの場合はデフォルト画像が挿入される", async () => {
