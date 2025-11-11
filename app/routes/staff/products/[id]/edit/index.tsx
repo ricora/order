@@ -2,7 +2,7 @@ import { createRoute } from "honox/factory"
 import { setToastCookie } from "../../../../../helpers/ui/toast"
 import { getProductEditPageData } from "../../../../../usecases/getProductEditPageData"
 import { registerProduct } from "../../../../../usecases/registerProduct"
-import Layout from "../../../../staff/-components/layout"
+import Layout from "../../../-components/layout"
 import ProductRegistrationForm from "../../-components/$productRegistrationForm"
 import { parseProductRequestBody } from "../../-helpers/parseRequestBody"
 
