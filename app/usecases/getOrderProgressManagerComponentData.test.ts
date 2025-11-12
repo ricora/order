@@ -14,11 +14,15 @@ import { getOrderProgressManagerComponentData } from "./getOrderProgressManagerC
 
 const dbClient = {} as DbClient
 
-const sampleOrders: Order[] = [
+const now = new Date()
+const oneHourAgo = new Date(now.getTime() - 3600000)
+
+const activeOrders: Order[] = [
   {
     id: 1,
     customerName: "Taro",
-    createdAt: new Date(),
+    createdAt: oneHourAgo,
+    updatedAt: oneHourAgo,
     status: "pending",
     orderItems: [
       { productId: 1, productName: "A", unitAmount: 100, quantity: 1 },
@@ -27,11 +31,37 @@ const sampleOrders: Order[] = [
   },
   {
     id: 2,
-    customerName: null,
-    createdAt: new Date(),
+    customerName: "Hanako",
+    createdAt: new Date(now.getTime() - 1800000),
+    updatedAt: new Date(now.getTime() - 1800000),
+    status: "processing",
+    orderItems: [
+      { productId: 2, productName: "B", unitAmount: 200, quantity: 1 },
+    ],
+    totalAmount: 200,
+  },
+]
+
+const inactiveOrders: Order[] = [
+  {
+    id: 3,
+    customerName: "Jiro",
+    createdAt: new Date(now.getTime() - 7200000),
+    updatedAt: now,
     status: "completed",
     orderItems: [
-      { productId: 2, productName: "B", unitAmount: 200, quantity: 2 },
+      { productId: 3, productName: "C", unitAmount: 300, quantity: 1 },
+    ],
+    totalAmount: 300,
+  },
+  {
+    id: 4,
+    customerName: null,
+    createdAt: new Date(now.getTime() - 10800000),
+    updatedAt: now,
+    status: "cancelled",
+    orderItems: [
+      { productId: 4, productName: "D", unitAmount: 400, quantity: 1 },
     ],
     totalAmount: 400,
   },
@@ -39,22 +69,66 @@ const sampleOrders: Order[] = [
 
 describe("getOrderProgressManagerComponentData", () => {
   beforeAll(() => {
-    spyOn(orderQueryRepository, "findAllOrders").mockImplementation(
-      async () => sampleOrders,
-    )
+    spyOn(
+      orderQueryRepository,
+      "findAllOrdersByActiveStatusOrderByUpdatedAtAsc",
+    ).mockImplementation(async () => activeOrders)
+
+    spyOn(
+      orderQueryRepository,
+      "findAllOrdersByInactiveStatusOrderByUpdatedAtDesc",
+    ).mockImplementation(async () => inactiveOrders)
   })
 
   afterAll(() => {
     mock.restore()
   })
 
-  it("注文を正しく取得できる", async () => {
+  it("ステータス別に注文を正しく分類できる", async () => {
     const result = await getOrderProgressManagerComponentData({ dbClient })
-    expect(result.orders.length).toBe(2)
-    const [first, second] = result.orders
-    if (!first || !second) throw new Error("unexpected empty orders")
-    expect(first.id).toBe(1)
-    expect(second.status).toBe("completed")
-    expect(second.totalAmount).toBe(400)
+
+    expect(result.pendingOrders.length).toBe(1)
+    expect(result.pendingOrders[0]?.id).toBe(1)
+    expect(result.pendingOrders[0]?.status).toBe("pending")
+
+    expect(result.processingOrders.length).toBe(1)
+    expect(result.processingOrders[0]?.id).toBe(2)
+    expect(result.processingOrders[0]?.status).toBe("processing")
+
+    expect(result.completedOrders.length).toBe(1)
+    expect(result.completedOrders[0]?.id).toBe(3)
+    expect(result.completedOrders[0]?.status).toBe("completed")
+
+    expect(result.cancelledOrders.length).toBe(1)
+    expect(result.cancelledOrders[0]?.id).toBe(4)
+    expect(result.cancelledOrders[0]?.status).toBe("cancelled")
+  })
+
+  it("アクティブな注文を取得時にpaginationを使用する", async () => {
+    const spy = spyOn(
+      orderQueryRepository,
+      "findAllOrdersByActiveStatusOrderByUpdatedAtAsc",
+    )
+
+    await getOrderProgressManagerComponentData({ dbClient })
+
+    expect(spy).toHaveBeenCalledWith({
+      dbClient,
+      pagination: { offset: 0, limit: 100 },
+    })
+  })
+
+  it("非アクティブな注文を取得時にpaginationを使用する", async () => {
+    const spy = spyOn(
+      orderQueryRepository,
+      "findAllOrdersByInactiveStatusOrderByUpdatedAtDesc",
+    )
+
+    await getOrderProgressManagerComponentData({ dbClient })
+
+    expect(spy).toHaveBeenCalledWith({
+      dbClient,
+      pagination: { offset: 0, limit: 50 },
+    })
   })
 })

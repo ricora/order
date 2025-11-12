@@ -16,10 +16,20 @@ const routes = app
     return c.json({ products, tags })
   })
   .get("/order-progress-manager", async (c) => {
-    const { orders } = await getOrderProgressManagerComponentData({
+    const {
+      pendingOrders,
+      processingOrders,
+      completedOrders,
+      cancelledOrders,
+    } = await getOrderProgressManagerComponentData({
       dbClient: c.get("dbClient"),
     })
-    return c.json({ orders })
+    return c.json({
+      pendingOrders,
+      processingOrders,
+      completedOrders,
+      cancelledOrders,
+    })
   })
   .get("/product-registration-form", async (c) => {
     const { tags } = await getProductRegistrationFormComponentData({
