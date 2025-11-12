@@ -30,7 +30,8 @@ export default createRoute(async (c) => {
         title="注文一覧"
         columns={[
           { header: "注文ID", align: "left" },
-          { header: "注文日時", align: "left" },
+          { header: "登録日時", align: "left" },
+          { header: "更新日時", align: "left" },
           { header: "顧客名", align: "left" },
           { header: "注文内容", align: "left" },
           { header: "合計金額", align: "right" },
@@ -43,6 +44,10 @@ export default createRoute(async (c) => {
             {
               type: "text",
               value: formatDateTimeJP(order.createdAt),
+            },
+            {
+              type: "text",
+              value: formatDateTimeJP(order.updatedAt),
             },
             { type: "text", value: order.customerName ?? "-" },
             {
