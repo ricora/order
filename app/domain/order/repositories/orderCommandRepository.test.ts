@@ -5,6 +5,7 @@ import { createOrder, updateOrder } from "./orderCommandRepository"
 const baseOrder: Parameters<typeof createOrder>[0]["order"] = {
   customerName: "Taro",
   createdAt: new Date(),
+  updatedAt: new Date(),
   status: "pending",
   totalAmount: 300,
   orderItems: [
@@ -195,13 +196,14 @@ describe("updateOrder", () => {
         id: order.id,
         customerName: order.customerName ?? null,
         createdAt: new Date(),
+        updatedAt: order.updatedAt,
         status: order.status ?? "pending",
         orderItems: baseOrder.orderItems,
         totalAmount: baseOrder.totalAmount,
       })
 
     const result = await updateOrder({
-      order: { id: 42, customerName: "Jiro" },
+      order: { id: 42, customerName: "Jiro", updatedAt: new Date() },
       dbClient: mockDbClient,
       repositoryImpl: mockImpl,
     })
@@ -218,7 +220,7 @@ describe("updateOrder", () => {
     )
     await expect(
       updateOrder({
-        order: { id: 1, customerName: longName },
+        order: { id: 1, customerName: longName, updatedAt: new Date() },
         dbClient: mockDbClient,
         repositoryImpl: mockImpl,
       }),
@@ -251,13 +253,14 @@ describe("updateOrder", () => {
         id: order.id,
         customerName: "X",
         createdAt: new Date(),
+        updatedAt: order.updatedAt,
         status: order.status ?? "pending",
         orderItems: baseOrder.orderItems,
         totalAmount: baseOrder.totalAmount,
       })
 
     const result = await updateOrder({
-      order: { id: 7, status: "processing" },
+      order: { id: 7, status: "processing", updatedAt: new Date() },
       dbClient: mockDbClient,
       repositoryImpl: mockImpl,
     })

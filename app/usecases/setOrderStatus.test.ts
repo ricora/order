@@ -40,6 +40,7 @@ describe("setOrderStatus", () => {
       customerName:
         order.customerName === undefined ? "Taro" : order.customerName,
       createdAt: new Date(),
+      updatedAt: order.updatedAt,
       orderItems: [],
       totalAmount: 1000,
       status: order.status === undefined ? "pending" : order.status,

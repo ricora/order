@@ -17,6 +17,7 @@ const mockOrders: Order[] = [
     id: 1,
     customerName: "田中太郎",
     createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-01"),
     status: "pending",
     orderItems: [
       { productId: 1, productName: "商品A", unitAmount: 1000, quantity: 2 },
@@ -27,6 +28,7 @@ const mockOrders: Order[] = [
     id: 2,
     customerName: "鈴木花子",
     createdAt: new Date("2025-01-02"),
+    updatedAt: new Date("2025-01-02"),
     status: "completed",
     orderItems: [
       { productId: 2, productName: "商品B", unitAmount: 500, quantity: 3 },
@@ -37,6 +39,7 @@ const mockOrders: Order[] = [
     id: 3,
     customerName: null,
     createdAt: new Date("2025-01-03"),
+    updatedAt: new Date("2025-01-03"),
     status: "pending",
     orderItems: [
       { productId: 3, productName: "商品C", unitAmount: 2000, quantity: 1 },
@@ -73,6 +76,7 @@ describe("getOrdersManagementPageData", () => {
       id: i + 1,
       customerName: `顧客${i + 1}`,
       createdAt: new Date(),
+      updatedAt: new Date(),
       status: "pending",
       orderItems: [
         { productId: 1, productName: "商品", unitAmount: 1000, quantity: 1 },
@@ -95,6 +99,7 @@ describe("getOrdersManagementPageData", () => {
       id: i + 1,
       customerName: `顧客${i + 1}`,
       createdAt: new Date(),
+      updatedAt: new Date(),
       status: "pending",
       orderItems: [
         { productId: 1, productName: "商品", unitAmount: 1000, quantity: 1 },

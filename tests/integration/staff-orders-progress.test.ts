@@ -18,11 +18,26 @@ describe("注文進捗管理", () => {
       const res = await app.request("/api/order-progress-manager")
       expect(res.status).toBe(200)
       const apiJson = (await res.json()) as ApiJson
-      const customerNames = apiJson.orders.map((o) => o.customerName)
-      expect(customerNames).toContain("顧客A")
-      expect(customerNames).toContain("顧客B")
-      expect(customerNames).toContain("顧客C")
-      expect(customerNames).toContain("顧客D")
+
+      expect(apiJson.pendingOrders.length).toBeGreaterThanOrEqual(2)
+      const pendingNames = apiJson.pendingOrders.map((o) => o.customerName)
+      expect(pendingNames).toContain("顧客A")
+      expect(pendingNames).toContain("顧客B")
+
+      expect(apiJson.processingOrders.length).toBeGreaterThanOrEqual(1)
+      expect(
+        apiJson.processingOrders.some((o) => o.customerName === null),
+      ).toBe(true)
+
+      expect(apiJson.completedOrders.length).toBeGreaterThanOrEqual(1)
+      expect(
+        apiJson.completedOrders.some((o) => o.customerName === "顧客C"),
+      ).toBe(true)
+
+      expect(apiJson.cancelledOrders.length).toBeGreaterThanOrEqual(1)
+      expect(
+        apiJson.cancelledOrders.some((o) => o.customerName === "顧客D"),
+      ).toBe(true)
     })
   })
   describe("POST", () => {

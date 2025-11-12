@@ -16,6 +16,7 @@ export const createOrderImpl: CreateOrder = async ({ dbClient, order }) => {
           createdAt: order.createdAt,
           status: order.status,
           totalAmount: order.totalAmount,
+          updatedAt: order.createdAt,
         })
         .returning()
     )[0]
@@ -39,6 +40,7 @@ export const createOrderImpl: CreateOrder = async ({ dbClient, order }) => {
       customerName: dbOrder.customerName,
       createdAt: dbOrder.createdAt,
       status: dbOrder.status,
+      updatedAt: dbOrder.updatedAt,
       orderItems: dbOrderItems.map((item) => ({
         productId: item.productId,
         productName: item.productName,
@@ -58,7 +60,11 @@ export const updateOrderImpl: UpdateOrder = async ({ dbClient, order }) => {
     const updatedOrder = (
       await dbClient
         .update(orderTable)
-        .set({ customerName: order.customerName, status: order.status })
+        .set({
+          customerName: order.customerName,
+          status: order.status,
+          updatedAt: order.updatedAt,
+        })
         .where(eq(orderTable.id, order.id))
         .returning()
     )[0]
@@ -74,6 +80,7 @@ export const updateOrderImpl: UpdateOrder = async ({ dbClient, order }) => {
       customerName: updatedOrder.customerName,
       createdAt: updatedOrder.createdAt,
       status: updatedOrder.status,
+      updatedAt: updatedOrder.updatedAt,
       orderItems: dbOrderItems.map((item) => ({
         productId: item.productId,
         productName: item.productName,

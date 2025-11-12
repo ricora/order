@@ -112,9 +112,13 @@ export const orderTable = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     index("order_created_at_idx").on(table.createdAt),
+    index("order_updated_at_idx").on(table.updatedAt),
     check("order_total_amount_positive", sql`${table.totalAmount} >= 0`),
     check(
       "order_customer_name_length",

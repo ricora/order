@@ -184,6 +184,9 @@ const Card: FC<{ order: Order }> = ({ order }) => {
   const createdIso = created.toISOString()
   const createdLabel = formatDateTimeJP(created)
 
+  const updated = new Date(order.updatedAt)
+  const updatedLabel = formatDateTimeJP(updated)
+
   const nextStatus = (s: Order["status"]): Order["status"] =>
     s === "processing" ? "completed" : "processing"
   const prevStatus = (s: Order["status"]): Order["status"] =>
@@ -231,7 +234,8 @@ const Card: FC<{ order: Order }> = ({ order }) => {
         </div>
       </div>
       <div className="mb-2 space-y-1">
-        <div className={metaLineTv()}>注文日時 {createdLabel}</div>
+        <div className={metaLineTv()}>登録日時 {createdLabel}</div>
+        <div className={metaLineTv()}>更新日時 {updatedLabel}</div>
         <div className={metaLineTv()}>顧客名 {order.customerName ?? "-"}</div>
       </div>
 
@@ -421,7 +425,10 @@ const Column: FC<{
 }
 
 const OrderProgressManager: FC = () => {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [pendingOrders, setPendingOrders] = useState<Order[]>([])
+  const [processingOrders, setProcessingOrders] = useState<Order[]>([])
+  const [completedOrders, setCompletedOrders] = useState<Order[]>([])
+  const [cancelledOrders, setCancelledOrders] = useState<Order[]>([])
   const REFRESH_INTERVAL = 30
   const [fetchSignal, setFetchSignal] = useState(0)
   const [error, setError] = useState<string | null>(null)
@@ -436,12 +443,41 @@ const OrderProgressManager: FC = () => {
           `Failed to fetch orders: ${response.status} ${response.statusText}`,
         )
       }
-      const { orders: fetchedOrders } = await response.json()
-      const orders = fetchedOrders.map((order) => ({
-        ...order,
-        createdAt: new Date(order.createdAt),
-      }))
-      setOrders(orders)
+      const {
+        pendingOrders: fetchedPending,
+        processingOrders: fetchedProcessing,
+        completedOrders: fetchedCompleted,
+        cancelledOrders: fetchedCancelled,
+      } = await response.json()
+
+      setPendingOrders(
+        fetchedPending.map((order) => ({
+          ...order,
+          createdAt: new Date(order.createdAt),
+          updatedAt: new Date(order.updatedAt),
+        })),
+      )
+      setProcessingOrders(
+        fetchedProcessing.map((order) => ({
+          ...order,
+          createdAt: new Date(order.createdAt),
+          updatedAt: new Date(order.updatedAt),
+        })),
+      )
+      setCompletedOrders(
+        fetchedCompleted.map((order) => ({
+          ...order,
+          createdAt: new Date(order.createdAt),
+          updatedAt: new Date(order.updatedAt),
+        })),
+      )
+      setCancelledOrders(
+        fetchedCancelled.map((order) => ({
+          ...order,
+          createdAt: new Date(order.createdAt),
+          updatedAt: new Date(order.updatedAt),
+        })),
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -457,11 +493,6 @@ const OrderProgressManager: FC = () => {
   useEffect(() => {
     fetchDataRef.current = fetchData
   }, [fetchData])
-
-  const pending = orders.filter((o) => o.status === "pending")
-  const processing = orders.filter((o) => o.status === "processing")
-  const completed = orders.filter((o) => o.status === "completed")
-  const cancelled = orders.filter((o) => o.status === "cancelled")
 
   return (
     <div className="flex h-[calc(100vh-14rem)] flex-col">
@@ -497,10 +528,10 @@ const OrderProgressManager: FC = () => {
           </div>
         ) : (
           <div className="flex h-full min-h-0 w-max gap-4">
-            <Column status="pending" items={pending} />
-            <Column status="processing" items={processing} />
-            <Column status="completed" items={completed} />
-            <Column status="cancelled" items={cancelled} />
+            <Column status="pending" items={pendingOrders} />
+            <Column status="processing" items={processingOrders} />
+            <Column status="completed" items={completedOrders} />
+            <Column status="cancelled" items={cancelledOrders} />
           </div>
         )}
       </div>
