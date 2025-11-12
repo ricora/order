@@ -1,10 +1,13 @@
 type Product = {
   id: number
   name: string
-  image: string | null
   tagIds: number[]
   price: number
   stock: number
+  image: {
+    data: string
+    mimeType: string
+  } | null
 }
 
 export default Product

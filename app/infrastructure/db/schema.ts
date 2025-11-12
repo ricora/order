@@ -17,7 +17,6 @@ export const productTable = pgTable(
   {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     name: text("name").notNull().unique(),
-    image: text("image"),
     price: integer("price").notNull(),
     stock: integer("stock").notNull(),
   },
@@ -30,9 +29,37 @@ export const productTable = pgTable(
       "product_name_length",
       sql`char_length(${table.name}) >= 1 AND char_length(${table.name}) <= 50`,
     ),
+  ],
+)
+
+/** 商品画像 */
+export const productImageTable = pgTable(
+  "product_image",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    productId: integer("product_id")
+      .notNull()
+      .unique()
+      .references(() => productTable.id, { onDelete: "cascade" }),
+    data: text("data"),
+    mimeType: text("mime_type"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
     check(
-      "product_image_url",
-      sql`${table.image} IS NULL OR (char_length(${table.image}) >= 1 AND char_length(${table.image}) <= 500 AND ${table.image} ~ '^https?://')`,
+      "product_image_consistency",
+      sql`(${table.data} IS NULL AND ${table.mimeType} IS NULL) OR (${table.data} IS NOT NULL AND ${table.mimeType} IS NOT NULL)`,
+    ),
+    check(
+      "product_image_mime_type_length",
+      sql`${table.mimeType} IS NULL OR (char_length(${table.mimeType}) >= 1 AND char_length(${table.mimeType}) <= 100)`,
+    ),
+    check(
+      "product_image_data_length",
+      // Base64エンコードされたデータの最大長を10MBに設定
+      sql`${table.data} IS NULL OR (char_length(${table.data}) >= 1 AND char_length(${table.data}) <= 10485760)`,
     ),
   ],
 )
@@ -71,13 +98,24 @@ export const productTagRelationTable = pgTable(
   ],
 )
 
-export const productRelations = relations(productTable, ({ many }) => ({
+export const productRelations = relations(productTable, ({ one, many }) => ({
   productTags: many(productTagRelationTable),
+  productImage: one(productImageTable),
 }))
 
 export const productTagRelations = relations(productTagTable, ({ many }) => ({
   productTags: many(productTagRelationTable),
 }))
+
+export const productImageRelations = relations(
+  productImageTable,
+  ({ one }) => ({
+    product: one(productTable, {
+      fields: [productImageTable.productId],
+      references: [productTable.id],
+    }),
+  }),
+)
 
 export const productToProductTagRelations = relations(
   productTagRelationTable,
