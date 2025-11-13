@@ -8,7 +8,7 @@ import {
   resolveColorScheme,
   setStoredColorScheme,
   THEME_STORAGE_KEY,
-} from "../helpers/ui/color-scheme"
+} from "../helpers/ui/colorSchema"
 
 const COLOR_SCHEME_EVENT = "color-scheme:change"
 

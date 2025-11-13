@@ -7,7 +7,7 @@ import {
   resolveColorScheme,
   setStoredColorScheme,
   THEME_STORAGE_KEY,
-} from "./color-scheme"
+} from "./colorSchema"
 
 // Utility function to mock prefers-color-scheme
 const withPrefersColorScheme = (
