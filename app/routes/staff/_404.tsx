@@ -1,5 +1,5 @@
 import type { NotFoundHandler } from "hono"
-import HouseIcon from "../components/icons/lucide/house"
+import HouseIcon from "../../components/icons/lucide/house"
 
 const handler: NotFoundHandler = (c) => {
   c.status(404)
@@ -15,11 +15,11 @@ const handler: NotFoundHandler = (c) => {
         </div>
         <div class="mt-8">
           <a
-            href="/"
+            href="/staff"
             class="inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-primary bg-primary px-3 py-2 font-medium text-primary-fg text-sm transition hover:bg-primary/90"
           >
             <HouseIcon />
-            ホームに戻る
+            スタッフページに戻る
           </a>
         </div>
       </div>
