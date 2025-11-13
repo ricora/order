@@ -37,7 +37,7 @@ export const serializeDataUriScheme = ({
 /**
  * Data URIスキーム文字列を解析し、base64データとMIMEタイプを抽出する。
  * @param uri - Data URIスキーム文字列
- * @returns データとMIMEタイプのオブジェクト、または無効な場合は`null`
+ * @returns データとMIMEタイプのオブジェクト、または無効な場合は`undefined`を返す。
  */
 export const parseDataUriScheme = (
   uri: string,
