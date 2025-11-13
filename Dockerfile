@@ -1,0 +1,26 @@
+ARG BUN_VERSION
+FROM oven/bun:${BUN_VERSION} AS builder
+
+WORKDIR /app
+
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+
+COPY . .
+
+RUN bun run build
+
+FROM oven/bun:${BUN_VERSION}-slim
+
+WORKDIR /app
+
+COPY package.json bun.lock ./
+RUN bun install --production --frozen-lockfile
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 3000
+
+WORKDIR /app/dist
+
+CMD ["bun", "index.js"]
