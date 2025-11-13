@@ -4,7 +4,7 @@ import HouseIcon from "../../components/icons/lucide/house"
 const handler: NotFoundHandler = (c) => {
   c.status(404)
   return c.render(
-    <div class="flex min-h-screen items-center justify-center bg-bg px-4">
+    <div class="flex min-h-full items-center justify-center bg-bg px-4">
       <div class="text-center">
         <h1 class="font-bold text-9xl text-primary">404</h1>
         <div class="mt-4 space-y-2">
