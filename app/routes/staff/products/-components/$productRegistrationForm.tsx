@@ -210,7 +210,6 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
   mode = "create",
 }) => {
   const [productName, setProductName] = useState(initialValues?.name ?? "")
-  const [imageValue, setImageValue] = useState(initialValues?.image ?? "")
   const [priceValue, setPriceValue] = useState<string | undefined>(
     initialValues?.price !== undefined
       ? String(initialValues.price)
@@ -260,7 +259,7 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
           <span className="font-bold text-lg">{heading}</span>
         </div>
         <div id="product-register-form" className="p-4">
-          <form method="post">
+          <form method="post" encType="multipart/form-data">
             <div className="mb-4">
               <Label htmlFor="productName" required>
                 商品名
@@ -276,16 +275,8 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
               />
             </div>
             <div className="mb-4">
-              <Label htmlFor="imageUrl">画像URL</Label>
-              <GraphemeInput
-                id="imageUrl"
-                name="image"
-                type="url"
-                value={imageValue}
-                onChange={setImageValue}
-                maxLength={500}
-                placeholder="https://example.com/image.jpg"
-              />
+              <Label htmlFor="imageFile">商品画像</Label>
+              <input id="imageFile" name="image" type="file" accept="image/*" />
             </div>
             <div className="mb-4 flex gap-4">
               <div className="flex-1">

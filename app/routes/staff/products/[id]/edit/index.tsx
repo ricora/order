@@ -4,7 +4,7 @@ import { getProductEditPageData } from "../../../../../usecases/getProductEditPa
 import { registerProduct } from "../../../../../usecases/registerProduct"
 import Layout from "../../../-components/layout"
 import ProductRegistrationForm from "../../-components/$productRegistrationForm"
-import { parseProductRequestBody } from "../../-helpers/parseRequestBody"
+import { parseUpdateProductRequestBody } from "../../-helpers/parseRequestBody"
 
 export const POST = createRoute(async (c) => {
   try {
@@ -14,13 +14,12 @@ export const POST = createRoute(async (c) => {
     }
 
     const body = await c.req.parseBody({ all: true })
-    const { name, image, price, stock, tags } = parseProductRequestBody(body, {
-      allowUndefinedTags: true,
-    })
+
+    const parsedProduct = await parseUpdateProductRequestBody(body)
 
     await registerProduct({
       dbClient: c.get("dbClient"),
-      product: { id, name, image, price, stock, tags },
+      product: { id, ...parsedProduct },
     })
 
     setToastCookie(c, "success", "商品を更新しました")
