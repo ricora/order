@@ -6,6 +6,7 @@ import GraphemeInput from "../../../../components/ui/$graphemeInput"
 import Button from "../../../../components/ui/button"
 import Chip from "../../../../components/ui/chip"
 import ChipButton from "../../../../components/ui/chipButton"
+import FileInput from "../../../../components/ui/fileInput"
 import Input from "../../../../components/ui/input"
 import Label from "../../../../components/ui/label"
 import type Product from "../../../../domain/product/entities/product"
@@ -276,7 +277,7 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
             </div>
             <div className="mb-4">
               <Label htmlFor="imageFile">商品画像</Label>
-              <input id="imageFile" name="image" type="file" accept="image/*" />
+              <FileInput id="imageFile" name="image" accept="image/*" />
             </div>
             <div className="mb-4 flex gap-4">
               <div className="flex-1">
