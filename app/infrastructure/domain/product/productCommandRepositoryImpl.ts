@@ -138,21 +138,41 @@ export const updateProductImpl: UpdateProduct = async ({
         .where(eq(productImageTable.productId, product.id))
       image = null
     } else {
-      const dbImage = (
-        await dbClient
-          .update(productImageTable)
-          .set({
-            data: product.image.data,
-            mimeType: product.image.mimeType,
-          })
-          .where(eq(productImageTable.productId, product.id))
-          .returning()
-      )[0]
-      if (!dbImage) throw new Error("DBの更新に失敗しました")
-      image =
-        dbImage.data && dbImage.mimeType
-          ? { data: dbImage.data, mimeType: dbImage.mimeType }
-          : null
+      const existingImage = await dbClient.query.productImageTable.findFirst({
+        where: eq(productImageTable.productId, product.id),
+      })
+
+      if (existingImage) {
+        const dbImage = (
+          await dbClient
+            .update(productImageTable)
+            .set({
+              data: product.image.data,
+              mimeType: product.image.mimeType,
+            })
+            .where(eq(productImageTable.productId, product.id))
+            .returning()
+        )[0]
+        image =
+          dbImage?.data && dbImage.mimeType
+            ? { data: dbImage.data, mimeType: dbImage.mimeType }
+            : null
+      } else {
+        const dbImage = (
+          await dbClient
+            .insert(productImageTable)
+            .values({
+              productId: product.id,
+              data: product.image.data,
+              mimeType: product.image.mimeType,
+            })
+            .returning()
+        )[0]
+        image =
+          dbImage?.data && dbImage.mimeType
+            ? { data: dbImage.data, mimeType: dbImage.mimeType }
+            : null
+      }
     }
 
     return {
