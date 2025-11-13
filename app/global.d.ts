@@ -7,3 +7,10 @@ declare module "hono" {
     }
   }
 }
+
+declare global {
+  module "*?js" {
+    const code: string
+    export default code
+  }
+}

@@ -2,6 +2,7 @@ import { Style } from "hono/css"
 import { jsxRenderer, useRequestContext } from "hono/jsx-renderer"
 import { Link, Script } from "honox/server"
 import Toast from "../components/ui/toast"
+import themeInitScript from "../helpers/ui/theme-init.entry.ts?js"
 import { deleteToastCookie, getToastCookie } from "../helpers/ui/toast"
 
 export default jsxRenderer(({ children }) => {
@@ -11,11 +12,14 @@ export default jsxRenderer(({ children }) => {
   if (toastType || toastMessage) {
     deleteToastCookie(c)
   }
+
   return (
     <html lang="en" class="h-full">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: must inline pre-render theme script */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <link rel="icon" href="/favicon.ico" />
         <Link href="/app/style.css" rel="stylesheet" />
         <Script src="/app/client.ts" async />
