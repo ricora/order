@@ -1,4 +1,4 @@
-import HouseIcon from "./icons/lucide/house"
+import HouseIcon from "../icons/lucide/house"
 
 type NotFoundProps = {
   homeHref: string
