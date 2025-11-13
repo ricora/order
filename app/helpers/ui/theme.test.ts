@@ -3,11 +3,11 @@ import {
   applyColorScheme,
   getStoredColorScheme,
   getSystemColorScheme,
+  initColorScheme,
   resolveColorScheme,
   setStoredColorScheme,
   THEME_STORAGE_KEY,
 } from "./theme"
-import { initColorScheme } from "./theme-init"
 
 // Utility function to mock prefers-color-scheme
 const withPrefersColorScheme = (

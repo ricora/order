@@ -86,3 +86,19 @@ export const readColorSchemePreference = (
 ): ColorScheme => {
   return getStoredColorScheme(storage) ?? DEFAULT_COLOR_SCHEME
 }
+
+export const initColorScheme = (): void => {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return
+  }
+
+  const stored = getStoredColorScheme()
+  const scheme = stored ?? DEFAULT_COLOR_SCHEME
+  const resolved = resolveColorScheme(scheme)
+
+  applyColorScheme(resolved)
+
+  if (stored === null) {
+    setStoredColorScheme(DEFAULT_COLOR_SCHEME)
+  }
+}

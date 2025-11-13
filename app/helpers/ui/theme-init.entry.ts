@@ -1,3 +1,3 @@
-import { initColorScheme } from "./theme-init"
+import { initColorScheme } from "./theme"
 
 initColorScheme()
