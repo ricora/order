@@ -7,10 +7,11 @@ import { getProductImageAssetData } from "../../usecases/getProductImageAssetDat
  */
 const app = new Hono<Env>()
 app.get("/products/:id", async (c) => {
-  const id = parseInt(c.req.param("id"), 10)
-  if (!Number.isInteger(id)) {
+  const paramId = c.req.param("id")
+  if (!/^\d+$/.test(paramId)) {
     return c.text("Invalid product ID", 400)
   }
+  const id = Number.parseInt(paramId, 10)
   const { product } = await getProductImageAssetData({
     dbClient: c.get("dbClient"),
     product: { id },
