@@ -11,6 +11,16 @@ import type Product from "../entities/product"
 import { findProductByName } from "./productQueryRepository"
 import { findAllProductTags } from "./productTagQueryRepository"
 
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]
+
+// base64エンコード後のサイズは元のバイナリサイズの約133%になるため、逆算（10MB / 1.33 ≈ 7.5MB）して厳しめに設定する
+const MAX_IMAGE_SIZE = Math.floor(7.5 * 1024 * 1024)
+
 const validateProduct = (product: Partial<Omit<Product, "id">>) => {
   if (product.name !== undefined) {
     if (
@@ -21,8 +31,21 @@ const validateProduct = (product: Partial<Omit<Product, "id">>) => {
     }
   }
   if (product.image) {
+    if (!ALLOWED_MIME_TYPES.includes(product.image.mimeType)) {
+      throw new Error(
+        `画像のMIMEタイプは${ALLOWED_MIME_TYPES.join(", ")}のいずれかである必要があります`,
+      )
+    }
     if (countStringLength(product.image.mimeType) > 100) {
       throw new Error("MIMEタイプは100文字以内である必要があります")
+    }
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(product.image.data)) {
+      throw new Error("画像データの形式が不正です")
+    }
+    if (product.image.data.length > MAX_IMAGE_SIZE) {
+      throw new Error(
+        `画像データのサイズは約${MAX_IMAGE_SIZE / 1024 / 1024}MB以内である必要があります`,
+      )
     }
   }
   if (product.tagIds !== undefined) {

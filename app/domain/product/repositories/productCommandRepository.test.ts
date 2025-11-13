@@ -168,6 +168,86 @@ describe("createProduct", () => {
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
   })
+
+  it("画像のMIMEタイプが許可されていない場合はエラーを返す", async () => {
+    await expect(
+      createProduct({
+        product: {
+          ...validProduct,
+          image: {
+            data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            mimeType: "image/bmp",
+          },
+        },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow(
+      "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります",
+    )
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
+  })
+
+  it("画像データの形式が不正な場合はエラーを返す", async () => {
+    await expect(
+      createProduct({
+        product: {
+          ...validProduct,
+          image: {
+            data: "!!!invalid base64!!!",
+            mimeType: "image/png",
+          },
+        },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow("画像データの形式が不正です")
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
+  })
+
+  it("画像データのサイズが7.5MBを超える場合はエラーを返す", async () => {
+    // 7.5MBを超えるbase64文字列を生成
+    const oversizedData = "A".repeat(7.5 * 1024 * 1024 + 1)
+    await expect(
+      createProduct({
+        product: {
+          ...validProduct,
+          image: {
+            data: oversizedData,
+            mimeType: "image/png",
+          },
+        },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow("画像データのサイズは約7.5MB以内である必要があります")
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
+  })
+
+  it("画像データがnullの場合でも作成できる", async () => {
+    const mockImpl: CreateProduct = async ({ product }) => ({
+      ...product,
+      id: 99,
+    })
+    const result = await createProduct({
+      product: {
+        name: "テスト商品",
+        image: null,
+        tagIds: [1, 2],
+        price: 1000,
+        stock: 5,
+      },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.id).toBe(99)
+    expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+    expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe("updateProduct", () => {
@@ -253,5 +333,78 @@ describe("updateProduct", () => {
     expect(result?.id).toBe(1)
     expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("画像を新しいものに更新できる", async () => {
+    const mockImpl: UpdateProduct = async ({ product }) =>
+      applyPartialToDefaultProduct(product)
+    const result = await updateProduct({
+      product: {
+        id: 1,
+        image: {
+          data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          mimeType: "image/jpeg",
+        },
+      },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.image?.mimeType).toBe("image/jpeg")
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
+
+  it("更新時に画像のMIMEタイプが許可されていない場合はエラーを返す", async () => {
+    await expect(
+      updateProduct({
+        product: {
+          id: 1,
+          image: {
+            data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            mimeType: "image/tiff",
+          },
+        },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow(
+      "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります",
+    )
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
+
+  it("更新時に画像データの形式が不正な場合はエラーを返す", async () => {
+    await expect(
+      updateProduct({
+        product: {
+          id: 1,
+          image: {
+            data: "not base64 at all!!!",
+            mimeType: "image/png",
+          },
+        },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow("画像データの形式が不正です")
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
+
+  it("更新時に画像データのサイズが7.5MBを超える場合はエラーを返す", async () => {
+    const oversizedData = "A".repeat(7.5 * 1024 * 1024 + 1)
+    await expect(
+      updateProduct({
+        product: {
+          id: 1,
+          image: {
+            data: oversizedData,
+            mimeType: "image/png",
+          },
+        },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow("画像データのサイズは約7.5MB以内である必要があります")
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
   })
 })

@@ -277,7 +277,14 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
             </div>
             <div className="mb-4">
               <Label htmlFor="imageFile">商品画像</Label>
-              <FileInput id="imageFile" name="image" accept="image/*" />
+              <div className="my-1 text-muted-fg text-xs">
+                対応形式: JPEG, PNG, GIF, WebP (約7.5MB以下)
+              </div>
+              <FileInput
+                id="imageFile"
+                name="image"
+                accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+              />
             </div>
             <div className="mb-4 flex gap-4">
               <div className="flex-1">
