@@ -7,7 +7,7 @@ import {
   resolveColorScheme,
   setStoredColorScheme,
   THEME_STORAGE_KEY,
-} from "./theme"
+} from "./color-scheme"
 
 // Utility function to mock prefers-color-scheme
 const withPrefersColorScheme = (
@@ -40,7 +40,7 @@ const withPrefersColorScheme = (
   }
 }
 
-describe("theme helper functions", () => {
+describe("color scheme helper functions", () => {
   beforeEach(() => {
     window.localStorage.clear()
     document.documentElement.classList.remove("dark")
