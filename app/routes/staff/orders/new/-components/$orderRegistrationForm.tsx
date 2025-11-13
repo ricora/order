@@ -24,9 +24,9 @@ const productButton = tv({
   base: "w-full rounded border px-3 py-3 text-left transition",
   variants: {
     disabled: {
-      true: "cursor-not-allowed bg-white opacity-50",
+      true: "cursor-not-allowed bg-bg opacity-50",
       false:
-        "cursor-pointer bg-white hover:border-primary-subtle hover:bg-primary-subtle",
+        "cursor-pointer bg-bg hover:border-primary-subtle hover:bg-primary-subtle",
     },
   },
   defaultVariants: {
@@ -358,7 +358,7 @@ const OrderRegistrationForm: FC = () => {
                 return (
                   <div
                     key={String(item.productId)}
-                    className="rounded border bg-white p-3"
+                    className="rounded border bg-bg p-3"
                     data-product-id={String(item.productId)}
                     data-price={String(item.unitAmount)}
                   >
