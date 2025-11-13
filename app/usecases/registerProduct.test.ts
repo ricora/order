@@ -60,6 +60,7 @@ describe("registerProduct", () => {
     ).mockImplementation(async ({ product }) => ({
       ...product,
       id: 99,
+      image: product.image ?? null,
     }))
     updateProductSpy = spyOn(
       productCommandRepository,
@@ -68,7 +69,7 @@ describe("registerProduct", () => {
       return {
         id: product.id,
         name: product.name ?? "name",
-        image: product.image ?? "https://example.com/image.png",
+        image: product.image ?? null,
         tagIds: product.tagIds ?? [1, 2],
         price: product.price ?? 100,
         stock: product.stock ?? 1,
@@ -84,7 +85,10 @@ describe("registerProduct", () => {
       dbClient,
       product: {
         name: "新商品",
-        image: "https://example.com/new.png",
+        image: {
+          data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          mimeType: "image/png",
+        },
         tags: ["人気", "メイン"],
         price: 500,
         stock: 20,
@@ -102,7 +106,10 @@ describe("registerProduct", () => {
       dbClient,
       product: {
         name: "新商品2",
-        image: "https://example.com/new2.png",
+        image: {
+          data: "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2P4//8/AyMDIwMhwOgAAI9/Bv6zbsz/AAAAAElFTkSuQmCC",
+          mimeType: "image/jpeg",
+        },
         tags: ["人気", "新規タグ"],
         price: 800,
         stock: 5,
@@ -121,7 +128,10 @@ describe("registerProduct", () => {
       dbClient,
       product: {
         name: "空タグ商品",
-        image: "https://example.com/empty.png",
+        image: {
+          data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          mimeType: "image/png",
+        },
         tags: ["", "   "],
         price: 100,
         stock: 1,
@@ -142,7 +152,10 @@ describe("registerProduct", () => {
         dbClient,
         product: {
           name: "失敗商品",
-          image: "https://example.com/fail.png",
+          image: {
+            data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            mimeType: "image/png",
+          },
           tags: ["人気"],
           price: 100,
           stock: 1,
@@ -157,7 +170,10 @@ describe("registerProduct", () => {
       product: {
         id: 10,
         name: " 更新後商品 ",
-        image: " https://example.com/updated.png ",
+        image: {
+          data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          mimeType: "image/png",
+        },
         tags: ["人気", "メイン"],
         price: 600,
         stock: 10,
@@ -170,7 +186,10 @@ describe("registerProduct", () => {
     expect(result).not.toBeNull()
     expect(result?.id).toBe(10)
     expect(result?.name).toBe("更新後商品")
-    expect(result?.image).toBe("https://example.com/updated.png")
+    expect(result?.image).toEqual({
+      data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      mimeType: "image/png",
+    })
     expect(result?.tagIds).toEqual([1, 2])
     expect(result?.price).toBe(600)
     expect(result?.stock).toBe(10)
@@ -192,7 +211,7 @@ describe("registerProduct", () => {
     expect(result).not.toBeNull()
     expect(result?.id).toBe(12)
     expect(result?.name).toBe("部分更新商品")
-    expect(result?.image).toBe("https://example.com/image.png")
+    expect(result?.image).toBeNull()
     expect(result?.tagIds).toEqual([1, 2])
     expect(result?.price).toBe(750)
     expect(result?.stock).toBe(1)
@@ -216,7 +235,7 @@ describe("registerProduct", () => {
       dbClient,
       product: {
         id: 13,
-        image: "   ",
+        image: null,
       },
     })
     expect(updateProductSpy).toHaveBeenCalledTimes(1)
@@ -259,7 +278,10 @@ describe("registerProduct", () => {
       product: {
         id: 20,
         name: "更新商品2",
-        image: "https://example.com/updated2.png",
+        image: {
+          data: "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2P4//8/AyMDIwMhwOgAAI9/Bv6zbsz/AAAAAElFTkSuQmCC",
+          mimeType: "image/jpeg",
+        },
         tags: ["人気", "新規タグ2"],
         price: 900,
         stock: 15,
@@ -295,7 +317,10 @@ describe("registerProduct", () => {
       dbClient,
       product: {
         name: "新商品",
-        image: "https://example.com/new.png",
+        image: {
+          data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          mimeType: "image/png",
+        },
         tags: ["人気"],
         price: 500,
         stock: 20,

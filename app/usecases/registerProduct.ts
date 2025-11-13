@@ -41,24 +41,26 @@ const resolveTagNamesToIds = async ({
   return tagIds
 }
 
-type CreateProductPayload = Omit<Product, "tagIds" | "id"> & {
+export type CreateProductPayload = Omit<Product, "tagIds" | "id"> & {
   tags: string[]
 }
 
-type UpdateProductPayload = { id: number } & Partial<
+export type UpdateProductPayload = { id: number } & Partial<
   Omit<Product, "tagIds" | "id">
 > & {
     tags?: string[]
   }
 
+export type RegisterProductPayload = CreateProductPayload | UpdateProductPayload
+
 const isUpdatePayload = (
-  p: CreateProductPayload | UpdateProductPayload,
+  p: RegisterProductPayload,
 ): p is UpdateProductPayload =>
   typeof (p as UpdateProductPayload).id === "number"
 
 export type RegisterProductParams = {
   dbClient: DbClient
-  product: CreateProductPayload | UpdateProductPayload
+  product: RegisterProductPayload
 }
 
 export const registerProduct = async ({
@@ -84,14 +86,7 @@ export const registerProduct = async ({
             updatePayload.name !== undefined
               ? updatePayload.name.trim()
               : undefined,
-          image:
-            updatePayload.image !== undefined
-              ? typeof updatePayload.image === "string"
-                ? updatePayload.image.trim() === ""
-                  ? null
-                  : updatePayload.image.trim()
-                : updatePayload.image
-              : undefined,
+          image: updatePayload.image,
           tagIds: tagIds ?? undefined,
           price: updatePayload.price ?? undefined,
           stock: updatePayload.stock ?? undefined,
@@ -113,12 +108,7 @@ export const registerProduct = async ({
     createdProduct = await createProduct({
       product: {
         name: createPayload.name.trim(),
-        image:
-          typeof createPayload.image === "string"
-            ? createPayload.image.trim() === ""
-              ? null
-              : createPayload.image.trim()
-            : null,
+        image: createPayload.image,
         tagIds,
         price: createPayload.price,
         stock: createPayload.stock,
