@@ -13,9 +13,14 @@ describe("商品画像", () => {
       expect(buffer.byteLength).toBeGreaterThan(0)
     })
 
-    test("存在しない商品IDで404を返す", async () => {
+    test("存在しない商品IDではデフォルト画像を返す", async () => {
       const res = await app.request("/images/products/99999")
-      expect(res.status).toBe(404)
+      expect(res.status).toBe(200)
+      const contentType = res.headers.get("content-type")
+      expect(contentType).toBeTruthy()
+      expect(["image/jpeg", "image/png"]).toContain(contentType)
+      const buffer = await res.arrayBuffer()
+      expect(buffer.byteLength).toBeGreaterThan(0)
     })
 
     test("無効なID（NaN）で400を返す", async () => {
