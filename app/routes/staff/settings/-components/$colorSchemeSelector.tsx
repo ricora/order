@@ -20,14 +20,14 @@ export default function ColorSchemeSelector() {
   const { colorScheme, setColorScheme } = useColorScheme()
 
   return (
-    <div className="rounded-lg border bg-bg p-6">
-      <div className="mb-4">
-        <h2 className="font-semibold text-fg text-lg">カラースキーム</h2>
-        <p className="mt-1 text-muted-fg text-sm">
+    <div class="rounded-lg border bg-bg p-6">
+      <div class="mb-4">
+        <h2 class="font-semibold text-fg text-lg">カラースキーム</h2>
+        <p class="mt-1 text-muted-fg text-sm">
           アプリケーションの外観テーマを選択します。
         </p>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div class="flex flex-wrap gap-2">
         {colorSchemeOptions.map((option) => {
           const Icon = option.icon
           return (
@@ -37,8 +37,8 @@ export default function ColorSchemeSelector() {
               onClick={() => setColorScheme(option.value)}
               ariaLabel={`${option.label}モードに切り替え`}
             >
-              <div className="flex items-center gap-1.5">
-                <div className="h-4 w-4">
+              <div class="flex items-center gap-1.5">
+                <div class="h-4 w-4">
                   <Icon />
                 </div>
                 <span>{option.label}</span>
