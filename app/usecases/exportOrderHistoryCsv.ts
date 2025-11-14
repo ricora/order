@@ -5,7 +5,7 @@ import { toCsv } from "../utils/csv"
 
 export const ORDER_HISTORY_EXPORT_PAGE_SIZE = 200
 
-const ORDER_HISTORY_HEADER = [
+export const ORDER_HISTORY_HEADER = [
   "order_id",
   "order_created_at",
   "order_updated_at",

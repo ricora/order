@@ -6,7 +6,7 @@ import { toCsv } from "../utils/csv"
 
 export const PRODUCT_CATALOG_EXPORT_PAGE_SIZE = 200
 
-const PRODUCT_CATALOG_HEADER = [
+export const PRODUCT_CATALOG_HEADER = [
   "product_id",
   "product_name",
   "price",
