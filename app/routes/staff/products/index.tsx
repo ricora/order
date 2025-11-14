@@ -17,7 +17,7 @@ import { registerProduct } from "../../../usecases/registerProduct"
 import { formatCurrencyJPY } from "../../../utils/money"
 import Layout from "../-components/layout"
 import ProductRegistrationForm from "./-components/$productRegistrationForm"
-import { parseProductRequestBody } from "./-helpers/parseRequestBody"
+import { parseCreateProductRequestBody } from "./-helpers/parseRequestBody"
 
 const statusCardVariants = tv({
   slots: {
@@ -172,17 +172,12 @@ const OrderStatusBadge = ({ status }: OrderStatusBadgeProps) => {
 export const POST = createRoute(async (c) => {
   try {
     const body = await c.req.parseBody({ all: true })
-    const { name, image, price, stock, tags } = parseProductRequestBody(body)
+
+    const product = await parseCreateProductRequestBody(body)
 
     await registerProduct({
       dbClient: c.get("dbClient"),
-      product: {
-        name,
-        image,
-        price,
-        stock,
-        tags,
-      },
+      product,
     })
 
     setToastCookie(c, "success", "商品を登録しました")
@@ -234,7 +229,11 @@ export default createRoute(async (c) => {
         items={products.map((product) => ({
           id: product.id,
           fields: [
-            { type: "image", src: product.image, alt: product.name },
+            {
+              type: "image",
+              src: `/images/products/${product.id}`,
+              alt: product.name,
+            },
             { type: "text", value: product.name },
             {
               type: "custom",

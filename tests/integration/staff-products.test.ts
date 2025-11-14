@@ -280,44 +280,6 @@ describe("商品管理", () => {
         encodeURIComponent("不正なリクエストです"),
       )
     })
-    test("画像URLが501文字以上の場合にエラーを返す", async () => {
-      const form = new URLSearchParams()
-      form.append("name", generateUniqueName("画像長大"))
-      form.append("price", "1000")
-      form.append("stock", "10")
-      form.append("image", `https://${"a".repeat(495)}`)
-      const res = await app.request(endpoint, {
-        method: "POST",
-        body: form,
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-      })
-      expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/error/)
-      expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent(
-          "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-        ),
-      )
-    })
-    test("画像URLがhttp/httpsで始まらない場合にエラーを返す", async () => {
-      const form = new URLSearchParams()
-      form.append("name", generateUniqueName("画像不正"))
-      form.append("price", "1000")
-      form.append("stock", "10")
-      form.append("image", "ftp://example.com/image.jpg")
-      const res = await app.request(endpoint, {
-        method: "POST",
-        body: form,
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-      })
-      expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/error/)
-      expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent(
-          "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-        ),
-      )
-    })
     test("商品タグが21個以上の場合にエラーを返す", async () => {
       const form = new URLSearchParams()
       form.append("name", generateUniqueName("タグ多"))
@@ -376,6 +338,41 @@ describe("商品管理", () => {
       })
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
+    })
+    test("画像ファイルサイズが7.5MBを超える場合にエラーを返す", async () => {
+      const form = new FormData()
+      form.append("name", generateUniqueName("大きい画像"))
+      form.append("price", "1000")
+      form.append("stock", "10")
+      const oversizeData = "A".repeat(10 * 1024 * 1024)
+      const blob = new Blob([oversizeData], { type: "image/png" })
+      form.append("image", blob, "large-image.png")
+      const res = await app.request(endpoint, {
+        method: "POST",
+        body: form,
+      })
+      expect(res.status).toBe(302)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("画像データのサイズは"),
+      )
+    })
+    test("許可されていない画像のMIMEタイプの場合にエラーを返す", async () => {
+      const form = new FormData()
+      form.append("name", generateUniqueName("不正なMIME"))
+      form.append("price", "1000")
+      form.append("stock", "10")
+      const blob = new Blob(["fake image data"], { type: "image/svg+xml" })
+      form.append("image", blob, "image.svg")
+      const res = await app.request(endpoint, {
+        method: "POST",
+        body: form,
+      })
+      expect(res.status).toBe(302)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("画像のMIMEタイプは"),
+      )
     })
   })
 })
