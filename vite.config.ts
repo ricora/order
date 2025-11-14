@@ -3,7 +3,7 @@ import adapter from "@hono/vite-dev-server/bun"
 import tailwindcss from "@tailwindcss/vite"
 import honox from "honox/vite"
 import { defineConfig } from "vite"
-import { inlineJsPlugin } from "./plugins/vite-inline-js"
+import { inlineJsPlugin } from "./vite-plugins/inline-js"
 
 export default defineConfig({
   define: {
