@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
-import { app } from "./utils"
 import { ORDER_HISTORY_HEADER } from "../../app/usecases/exportOrderHistoryCsv"
 import { PRODUCT_CATALOG_HEADER } from "../../app/usecases/exportProductCatalogCsv"
+import { app } from "./utils"
 
 const escapeForRegex = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
