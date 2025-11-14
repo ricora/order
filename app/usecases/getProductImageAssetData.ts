@@ -1,32 +1,19 @@
-import type Product from "../domain/product/entities/product"
-import { findProductById } from "../domain/product/repositories/productQueryRepository"
+import type ProductImage from "../domain/product/entities/productImage"
+import { findProductImageByProductId } from "../domain/product/repositories/productImageQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
 
 export type GetProductImageAssetParams = {
   dbClient: DbClient
-  product: Pick<Product, "id">
+  productImage: Pick<ProductImage, "productId">
 }
-
-export type GetProductImageAssetData = {
-  product: Pick<Product, "image"> | null
-}
-
 export const getProductImageAssetData = async ({
   dbClient,
-  product,
-}: GetProductImageAssetParams): Promise<GetProductImageAssetData> => {
-  const foundProduct = await findProductById({
+  productImage,
+}: GetProductImageAssetParams) => {
+  const foundProductImage = await findProductImageByProductId({
     dbClient,
-    product: { id: product.id },
+    productImage,
   })
 
-  if (!foundProduct) {
-    return { product: null }
-  }
-  if (!foundProduct.image) {
-    return { product: { image: null } }
-  }
-  return {
-    product: { image: foundProduct.image },
-  }
+  return { productImage: foundProductImage }
 }

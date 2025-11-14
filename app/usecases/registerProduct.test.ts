@@ -10,6 +10,8 @@ import {
 import { MAX_STORE_PRODUCT_TAG_COUNT } from "../domain/product/constants"
 import type ProductTag from "../domain/product/entities/productTag"
 import * as productCommandRepository from "../domain/product/repositories/productCommandRepository"
+import * as productImageCommandRepository from "../domain/product/repositories/productImageCommandRepository"
+import * as productImageQueryRepository from "../domain/product/repositories/productImageQueryRepository"
 import * as productTagCommandRepository from "../domain/product/repositories/productTagCommandRepository"
 import * as productTagQueryRepository from "../domain/product/repositories/productTagQueryRepository"
 import type { DbClient, TransactionDbClient } from "../infrastructure/db/client"
@@ -24,6 +26,10 @@ describe("registerProduct", () => {
   let createProductSpy: ReturnType<typeof spyOn>
   let updateProductSpy: ReturnType<typeof spyOn>
   let createProductTagSpy: ReturnType<typeof spyOn>
+  let createProductImageSpy: ReturnType<typeof spyOn>
+  let updateProductImageSpy: ReturnType<typeof spyOn>
+  let deleteProductImageByProductIdSpy: ReturnType<typeof spyOn>
+  let findProductImageByProductIdSpy: ReturnType<typeof spyOn>
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
   let transactionSpy: ReturnType<typeof spyOn>
   let txMock: TransactionDbClient
@@ -54,13 +60,42 @@ describe("registerProduct", () => {
       id: 3,
       name: productTag.name,
     }))
+    findProductImageByProductIdSpy = spyOn(
+      productImageQueryRepository,
+      "findProductImageByProductId",
+    ).mockImplementation(async () => null)
+    createProductImageSpy = spyOn(
+      productImageCommandRepository,
+      "createProductImage",
+    ).mockImplementation(async ({ productImage }) => ({
+      id: 999,
+      productId: productImage.productId,
+      data: productImage.data,
+      mimeType: productImage.mimeType,
+      createdAt: productImage.createdAt,
+      updatedAt: productImage.updatedAt,
+    }))
+    updateProductImageSpy = spyOn(
+      productImageCommandRepository,
+      "updateProductImageByProductId",
+    ).mockImplementation(async ({ productImage }) => ({
+      id: productImage.productId,
+      productId: productImage.productId,
+      data: productImage.data ?? "updated-data",
+      mimeType: productImage.mimeType ?? "image/png",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }))
+    deleteProductImageByProductIdSpy = spyOn(
+      productImageCommandRepository,
+      "deleteProductImageByProductId",
+    ).mockImplementation(async () => undefined)
     createProductSpy = spyOn(
       productCommandRepository,
       "createProduct",
     ).mockImplementation(async ({ product }) => ({
       ...product,
       id: 99,
-      image: product.image ?? null,
     }))
     updateProductSpy = spyOn(
       productCommandRepository,
@@ -69,7 +104,6 @@ describe("registerProduct", () => {
       return {
         id: product.id,
         name: product.name ?? "name",
-        image: product.image ?? null,
         tagIds: product.tagIds ?? [1, 2],
         price: product.price ?? 100,
         stock: product.stock ?? 1,
@@ -99,6 +133,15 @@ describe("registerProduct", () => {
     expect(createProductTagSpy).not.toHaveBeenCalled()
     expect(createProductSpy).toHaveBeenCalledTimes(1)
     expect(createProductSpy.mock.calls[0][0].product.tagIds).toEqual([1, 2])
+    expect(createProductImageSpy).toHaveBeenCalledTimes(1)
+    expect(createProductImageSpy.mock.calls[0][0].productImage.productId).toBe(
+      99,
+    )
+    expect(createProductImageSpy.mock.calls[0][0].productImage.mimeType).toBe(
+      "image/png",
+    )
+    expect(updateProductImageSpy).not.toHaveBeenCalled()
+    expect(findProductImageByProductIdSpy).not.toHaveBeenCalled()
   })
 
   it("新規タグを含めて商品を登録できる", async () => {
@@ -162,9 +205,21 @@ describe("registerProduct", () => {
         },
       }),
     ).rejects.toThrow("DBで商品の作成に失敗しました")
+    expect(createProductImageSpy).not.toHaveBeenCalled()
   })
 
   it("既存タグのみで商品を更新できる", async () => {
+    const mockExistingImage = {
+      id: 1,
+      productId: 10,
+      data: "old",
+      mimeType: "image/png",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    findProductImageByProductIdSpy.mockImplementationOnce(
+      async () => mockExistingImage,
+    )
     const result = await registerProduct({
       dbClient,
       product: {
@@ -186,13 +241,13 @@ describe("registerProduct", () => {
     expect(result).not.toBeNull()
     expect(result?.id).toBe(10)
     expect(result?.name).toBe("更新後商品")
-    expect(result?.image).toEqual({
-      data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-      mimeType: "image/png",
-    })
     expect(result?.tagIds).toEqual([1, 2])
     expect(result?.price).toBe(600)
     expect(result?.stock).toBe(10)
+    expect(findProductImageByProductIdSpy).toHaveBeenCalledTimes(1)
+    expect(updateProductImageSpy).toHaveBeenCalledTimes(1)
+    expect(createProductImageSpy).not.toHaveBeenCalled()
+    expect(deleteProductImageByProductIdSpy).not.toHaveBeenCalled()
   })
 
   it("商品を部分更新できる", async () => {
@@ -211,10 +266,13 @@ describe("registerProduct", () => {
     expect(result).not.toBeNull()
     expect(result?.id).toBe(12)
     expect(result?.name).toBe("部分更新商品")
-    expect(result?.image).toBeNull()
     expect(result?.tagIds).toEqual([1, 2])
     expect(result?.price).toBe(750)
     expect(result?.stock).toBe(1)
+    expect(findProductImageByProductIdSpy).not.toHaveBeenCalled()
+    expect(createProductImageSpy).not.toHaveBeenCalled()
+    expect(updateProductImageSpy).not.toHaveBeenCalled()
+    expect(deleteProductImageByProductIdSpy).not.toHaveBeenCalled()
   })
 
   it("タグが未指定の場合はtagIdsを更新しない", async () => {
@@ -239,8 +297,12 @@ describe("registerProduct", () => {
       },
     })
     expect(updateProductSpy).toHaveBeenCalledTimes(1)
-    const passedImage = updateProductSpy.mock.calls[0][0].product.image
-    expect(passedImage).toBeNull()
+    expect(deleteProductImageByProductIdSpy).toHaveBeenCalledTimes(1)
+    expect(
+      deleteProductImageByProductIdSpy.mock.calls[0][0].productImage.productId,
+    ).toBe(13)
+    expect(createProductImageSpy).not.toHaveBeenCalled()
+    expect(updateProductImageSpy).not.toHaveBeenCalled()
   })
 
   it("tagsが空配列の場合はtagIdsが空配列で更新される", async () => {
@@ -294,6 +356,8 @@ describe("registerProduct", () => {
     expect(result).not.toBeNull()
     expect(result?.id).toBe(20)
     expect(result?.tagIds).toEqual([1, 3])
+    expect(createProductImageSpy).toHaveBeenCalledTimes(1)
+    expect(updateProductImageSpy).not.toHaveBeenCalled()
   })
 
   it("商品更新で例外が発生した場合はエラーを投げる", async () => {

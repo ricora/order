@@ -23,7 +23,6 @@ const mockProducts: Product[] = [
   {
     id: 1,
     name: "テスト商品A",
-    image: { data: "dummyA", mimeType: "image/png" },
     tagIds: [1, 2],
     price: 100,
     stock: 10,
@@ -31,7 +30,6 @@ const mockProducts: Product[] = [
   {
     id: 2,
     name: "テスト商品B",
-    image: { data: "dummyB", mimeType: "image/png" },
     tagIds: [2],
     price: 200,
     stock: 0,
@@ -39,7 +37,6 @@ const mockProducts: Product[] = [
   {
     id: 3,
     name: "テスト商品C",
-    image: { data: "dummyC", mimeType: "image/png" },
     tagIds: [],
     price: 300,
     stock: 3,

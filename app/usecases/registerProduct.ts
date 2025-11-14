@@ -1,9 +1,16 @@
 import { MAX_STORE_PRODUCT_TAG_COUNT } from "../domain/product/constants"
 import type Product from "../domain/product/entities/product"
+import type ProductImage from "../domain/product/entities/productImage"
 import {
   createProduct,
   updateProduct,
 } from "../domain/product/repositories/productCommandRepository"
+import {
+  createProductImage,
+  deleteProductImageByProductId,
+  updateProductImageByProductId,
+} from "../domain/product/repositories/productImageCommandRepository"
+import { findProductImageByProductId } from "../domain/product/repositories/productImageQueryRepository"
 import { createProductTag } from "../domain/product/repositories/productTagCommandRepository"
 import { findAllProductTags } from "../domain/product/repositories/productTagQueryRepository"
 import type { DbClient, TransactionDbClient } from "../infrastructure/db/client"
@@ -41,14 +48,18 @@ const resolveTagNamesToIds = async ({
   return tagIds
 }
 
+type ProductImageInput = Pick<ProductImage, "data" | "mimeType"> | null
+
 export type CreateProductPayload = Omit<Product, "tagIds" | "id"> & {
   tags: string[]
+  image?: ProductImageInput
 }
 
 export type UpdateProductPayload = { id: number } & Partial<
   Omit<Product, "tagIds" | "id">
 > & {
     tags?: string[]
+    image?: ProductImageInput
   }
 
 export type RegisterProductPayload = CreateProductPayload | UpdateProductPayload
@@ -86,13 +97,48 @@ export const registerProduct = async ({
             updatePayload.name !== undefined
               ? updatePayload.name.trim()
               : undefined,
-          image: updatePayload.image,
           tagIds: tagIds ?? undefined,
           price: updatePayload.price ?? undefined,
           stock: updatePayload.stock ?? undefined,
         },
         dbClient: tx,
       })
+
+      if (updatedProduct && updatePayload.image !== undefined) {
+        if (updatePayload.image === null) {
+          await deleteProductImageByProductId({
+            dbClient: tx,
+            productImage: { productId: updatePayload.id },
+          })
+        } else {
+          const existingImage = await findProductImageByProductId({
+            dbClient: tx,
+            productImage: { productId: updatePayload.id },
+          })
+          if (existingImage) {
+            await updateProductImageByProductId({
+              dbClient: tx,
+              productImage: {
+                productId: updatePayload.id,
+                data: updatePayload.image.data,
+                mimeType: updatePayload.image.mimeType,
+                updatedAt: new Date(),
+              },
+            })
+          } else {
+            await createProductImage({
+              dbClient: tx,
+              productImage: {
+                productId: updatePayload.id,
+                data: updatePayload.image.data,
+                mimeType: updatePayload.image.mimeType,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              },
+            })
+          }
+        }
+      }
     })
     return updatedProduct
   }
@@ -108,13 +154,25 @@ export const registerProduct = async ({
     createdProduct = await createProduct({
       product: {
         name: createPayload.name.trim(),
-        image: createPayload.image,
         tagIds,
         price: createPayload.price,
         stock: createPayload.stock,
       },
       dbClient: tx,
     })
+
+    if (createdProduct && createPayload.image) {
+      await createProductImage({
+        dbClient: tx,
+        productImage: {
+          productId: createdProduct.id,
+          data: createPayload.image.data,
+          mimeType: createPayload.image.mimeType,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      })
+    }
   })
   return createdProduct
 }
