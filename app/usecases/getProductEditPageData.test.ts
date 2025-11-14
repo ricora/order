@@ -15,7 +15,6 @@ import { getProductEditPageData } from "./getProductEditPageData"
 const mockProduct: Product = {
   id: 1,
   name: "編集テスト商品",
-  image: "https://example.com/test.png",
   tagIds: [1, 2],
   price: 500,
   stock: 50,

@@ -23,7 +23,6 @@ const mockProducts: Product[] = [
   {
     id: 1,
     name: "テスト商品A",
-    image: "https://example.com/a.png",
     tagIds: [1, 2],
     price: 100,
     stock: 10,
@@ -31,7 +30,6 @@ const mockProducts: Product[] = [
   {
     id: 2,
     name: "テスト商品B",
-    image: "https://example.com/b.png",
     tagIds: [2],
     price: 200,
     stock: 0,
@@ -39,7 +37,6 @@ const mockProducts: Product[] = [
   {
     id: 3,
     name: "テスト商品C",
-    image: "https://example.com/c.png",
     tagIds: [],
     price: 300,
     stock: 3,
@@ -95,26 +92,11 @@ describe("getProductsManagementPageData", () => {
     expect(result.products[2]?.status).toBe("lowStock")
   })
 
-  it("imageがnullの場合はデフォルト画像が挿入される", async () => {
-    const modifiedProducts: Product[] = mockProducts.map((p, i) =>
-      i === 0 ? { ...p, image: null } : p,
-    )
-    spyOn(productQueryRepository, "findAllProducts").mockImplementationOnce(
-      async () => modifiedProducts,
-    )
-
-    const result = await getProductsManagementPageData({ dbClient })
-    expect(result.products.length).toBeGreaterThan(0)
-    const first = result.products[0]
-    if (!first) throw new Error("no products returned")
-    expect(first.image).toBe("https://picsum.photos/200/200")
-  })
-
   it("pageSize+1を取得して次ページの有無を判定できる", async () => {
     const manyProducts: Product[] = Array.from({ length: 21 }, (_, i) => ({
       id: i + 1,
       name: `商品${i + 1}`,
-      image: "https://example.com/test.png",
+      image: { data: `dummy${i + 1}`, mimeType: "image/png" },
       tagIds: [],
       price: 100 * (i + 1),
       stock: i + 1,
@@ -134,7 +116,7 @@ describe("getProductsManagementPageData", () => {
     const manyProducts: Product[] = Array.from({ length: 21 }, (_, i) => ({
       id: i + 1,
       name: `商品${i + 1}`,
-      image: "https://example.com/test.png",
+      image: { data: `dummy${i + 1}`, mimeType: "image/png" },
       tagIds: [],
       price: 100 * (i + 1),
       stock: i + 1,
