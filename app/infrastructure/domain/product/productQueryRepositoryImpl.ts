@@ -134,5 +134,5 @@ export const findAllProductsByIdsImpl: FindAllProductsByIds = async ({
 }
 
 export const countProductsImpl: CountProducts = async ({ dbClient }) => {
-  return dbClient.$count(productTable)
+  return await dbClient.$count(productTable)
 }
