@@ -6,16 +6,8 @@ import type {
   FindProductById,
   FindProductByName,
 } from "../../../domain/product/repositories/productQueryRepository"
-import type { productImageTable } from "../../db/schema"
 import { productTable } from "../../db/schema"
 
-const mapImage = (
-  dbImage: typeof productImageTable.$inferSelect | null,
-): NonNullable<Awaited<ReturnType<FindProductById>>>["image"] => {
-  return dbImage?.data && dbImage.mimeType
-    ? { data: dbImage.data, mimeType: dbImage.mimeType }
-    : null
-}
 export const findProductByIdImpl: FindProductById = async ({
   dbClient,
   product,
@@ -28,7 +20,6 @@ export const findProductByIdImpl: FindProductById = async ({
           tagId: true,
         },
       },
-      productImage: true,
     },
   })
   if (!dbProduct) return null
@@ -39,7 +30,6 @@ export const findProductByIdImpl: FindProductById = async ({
     tagIds: dbProduct.productTags.map((tag) => tag.tagId),
     price: dbProduct.price,
     stock: dbProduct.stock,
-    image: mapImage(dbProduct.productImage),
   }
 }
 
@@ -55,7 +45,6 @@ export const findProductByNameImpl: FindProductByName = async ({
           tagId: true,
         },
       },
-      productImage: true,
     },
   })
   if (!dbProduct) return null
@@ -66,7 +55,6 @@ export const findProductByNameImpl: FindProductByName = async ({
     tagIds: dbProduct.productTags.map((tag) => tag.tagId),
     price: dbProduct.price,
     stock: dbProduct.stock,
-    image: mapImage(dbProduct.productImage),
   }
 }
 
@@ -81,7 +69,6 @@ export const findAllProductsImpl: FindAllProducts = async ({
           tagId: true,
         },
       },
-      productImage: true,
     },
     orderBy: [asc(productTable.id)],
     offset: pagination.offset,
@@ -93,7 +80,6 @@ export const findAllProductsImpl: FindAllProducts = async ({
     tagIds: dbProduct.productTags.map((tag) => tag.tagId),
     price: dbProduct.price,
     stock: dbProduct.stock,
-    image: mapImage(dbProduct.productImage),
   }))
 }
 
@@ -128,7 +114,6 @@ export const findAllProductsByIdsImpl: FindAllProductsByIds = async ({
           tagId: true,
         },
       },
-      productImage: true,
     },
     offset: pagination.offset,
     limit: pagination.limit,
@@ -139,6 +124,5 @@ export const findAllProductsByIdsImpl: FindAllProductsByIds = async ({
     tagIds: dbProduct.productTags.map((tag) => tag.tagId),
     price: dbProduct.price,
     stock: dbProduct.stock,
-    image: mapImage(dbProduct.productImage),
   }))
 }

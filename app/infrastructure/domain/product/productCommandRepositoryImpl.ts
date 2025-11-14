@@ -4,11 +4,7 @@ import type {
   DeleteProduct,
   UpdateProduct,
 } from "../../../domain/product/repositories/productCommandRepository"
-import {
-  productImageTable,
-  productTable,
-  productTagRelationTable,
-} from "../../db/schema"
+import { productTable, productTagRelationTable } from "../../db/schema"
 
 export const createProductImpl: CreateProduct = async ({
   dbClient,
@@ -35,42 +31,12 @@ export const createProductImpl: CreateProduct = async ({
       await dbClient.insert(productTagRelationTable).values(rows)
     }
 
-    if (!product.image) {
-      return {
-        id: dbProduct.id,
-        name: dbProduct.name,
-        tagIds: product.tagIds,
-        price: dbProduct.price,
-        stock: dbProduct.stock,
-        image: null,
-      }
-    }
-
-    const dbImage = (
-      await dbClient
-        .insert(productImageTable)
-        .values({
-          productId: dbProduct.id,
-          data: product.image.data,
-          mimeType: product.image.mimeType,
-        })
-        .returning()
-    )[0]
-    if (!dbImage) throw new Error("DBへの挿入に失敗しました")
-
     return {
       id: dbProduct.id,
       name: dbProduct.name,
       tagIds: product.tagIds,
       price: dbProduct.price,
       stock: dbProduct.stock,
-      image:
-        dbImage.data && dbImage.mimeType
-          ? {
-              data: dbImage.data,
-              mimeType: dbImage.mimeType,
-            }
-          : null,
     }
   } catch {
     throw new Error("商品の作成に失敗しました")
@@ -123,65 +89,12 @@ export const updateProductImpl: UpdateProduct = async ({
           return existingRelations.map((relation) => relation.tagId)
         })())
 
-    let image: NonNullable<Awaited<ReturnType<UpdateProduct>>>["image"] = null
-    if (product.image === undefined) {
-      const dbImage = await dbClient.query.productImageTable.findFirst({
-        where: eq(productImageTable.productId, product.id),
-      })
-      image =
-        dbImage?.data && dbImage.mimeType
-          ? { data: dbImage.data, mimeType: dbImage.mimeType }
-          : null
-    } else if (product.image === null) {
-      await dbClient
-        .delete(productImageTable)
-        .where(eq(productImageTable.productId, product.id))
-      image = null
-    } else {
-      const existingImage = await dbClient.query.productImageTable.findFirst({
-        where: eq(productImageTable.productId, product.id),
-      })
-
-      if (existingImage) {
-        const dbImage = (
-          await dbClient
-            .update(productImageTable)
-            .set({
-              data: product.image.data,
-              mimeType: product.image.mimeType,
-            })
-            .where(eq(productImageTable.productId, product.id))
-            .returning()
-        )[0]
-        image =
-          dbImage?.data && dbImage.mimeType
-            ? { data: dbImage.data, mimeType: dbImage.mimeType }
-            : null
-      } else {
-        const dbImage = (
-          await dbClient
-            .insert(productImageTable)
-            .values({
-              productId: product.id,
-              data: product.image.data,
-              mimeType: product.image.mimeType,
-            })
-            .returning()
-        )[0]
-        image =
-          dbImage?.data && dbImage.mimeType
-            ? { data: dbImage.data, mimeType: dbImage.mimeType }
-            : null
-      }
-    }
-
     return {
       id: dbProduct.id,
       name: dbProduct.name,
       tagIds: updatedTagIds,
       price: dbProduct.price,
       stock: dbProduct.stock,
-      image: image,
     }
   } catch {
     throw new Error("商品の更新に失敗しました")

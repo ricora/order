@@ -41,25 +41,25 @@ export const productImageTable = pgTable(
       .notNull()
       .unique()
       .references(() => productTable.id, { onDelete: "cascade" }),
-    data: text("data"),
-    mimeType: text("mime_type"),
+    data: text("data").notNull(),
+    mimeType: text("mime_type").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
   (table) => [
-    check(
-      "product_image_consistency",
-      sql`(${table.data} IS NULL AND ${table.mimeType} IS NULL) OR (${table.data} IS NOT NULL AND ${table.mimeType} IS NOT NULL)`,
-    ),
+    index("product_image_product_id_idx").on(table.productId),
     check(
       "product_image_mime_type_length",
-      sql`${table.mimeType} IS NULL OR (char_length(${table.mimeType}) >= 1 AND char_length(${table.mimeType}) <= 100)`,
+      sql`char_length(${table.mimeType}) >= 1 AND char_length(${table.mimeType}) <= 100`,
     ),
     check(
       "product_image_data_length",
       // Base64エンコードされたデータの最大長を10MBに設定
-      sql`${table.data} IS NULL OR (char_length(${table.data}) >= 1 AND char_length(${table.data}) <= 10485760)`,
+      sql`char_length(${table.data}) >= 1 AND char_length(${table.data}) <= 10485760`,
     ),
   ],
 )
