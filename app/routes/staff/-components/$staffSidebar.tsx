@@ -1,5 +1,11 @@
 import type { FC, PropsWithChildren } from "hono/jsx"
-import { createContext, useContext, useEffect, useState } from "hono/jsx"
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "hono/jsx"
 import { twJoin } from "tailwind-merge"
 import { tv } from "tailwind-variants"
 import ChartColumnIcon from "../../../components/icons/lucide/chartColumnIcon"
@@ -210,7 +216,7 @@ const SidebarProvider: FC<PropsWithChildren> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(true)
   const toggle = () => setIsOpen((prev) => !prev)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // 復元可能な状態があればlocalStorageから読み出す
     try {
       const stored = window.localStorage.getItem(SIDEBAR_STATE_STORAGE_KEY)
@@ -261,7 +267,7 @@ const SidebarProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [isOpen])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mainContentElm = document.getElementById(MAIN_CONTENT_ID)
     if (!mainContentElm) return
 
