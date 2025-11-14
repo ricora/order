@@ -9,7 +9,7 @@ import {
 
 const dbClient = {} as DbClient
 
-const createOrder = (id: number, overrides?: Partial<Order>): Order => ({
+const mockOrder = (id: number, overrides?: Partial<Order>): Order => ({
   id,
   customerName: `Customer ${id}`,
   createdAt: new Date("2024-01-01T00:00:00.000Z"),
@@ -32,7 +32,7 @@ describe("exportOrderHistoryCsv", () => {
     mock.restore()
   })
 
-  it("converts orders into CSV rows with line items", async () => {
+  it("注文を行アイテム付きでCSV行に変換する", async () => {
     const orders: Order[] = [
       {
         id: 1,
@@ -98,22 +98,23 @@ describe("exportOrderHistoryCsv", () => {
     )
   })
 
-  it("fetches all pages until less than page size is returned", async () => {
+  it("ページをまたいで全注文を取得する", async () => {
     const firstPage = Array.from(
-      { length: ORDER_HISTORY_EXPORT_PAGE_SIZE },
-      (_, i) => createOrder(i + 1),
+      { length: ORDER_HISTORY_EXPORT_PAGE_SIZE + 1 },
+      (_, i) => mockOrder(i + 1),
     )
-    const secondPage = [createOrder(ORDER_HISTORY_EXPORT_PAGE_SIZE + 1)]
+    const secondPage = [mockOrder(ORDER_HISTORY_EXPORT_PAGE_SIZE + 1)]
 
     const findAllSpy = spyOn(
       orderQueryRepository,
       "findAllOrders",
     ).mockImplementation(async ({ pagination }) => {
       if (pagination.offset === 0) {
-        expect(pagination.limit).toBe(ORDER_HISTORY_EXPORT_PAGE_SIZE)
+        expect(pagination.limit).toBe(ORDER_HISTORY_EXPORT_PAGE_SIZE + 1)
         return firstPage
       }
       if (pagination.offset === ORDER_HISTORY_EXPORT_PAGE_SIZE) {
+        expect(pagination.limit).toBe(ORDER_HISTORY_EXPORT_PAGE_SIZE + 1)
         return secondPage
       }
       return []
@@ -130,8 +131,8 @@ describe("exportOrderHistoryCsv", () => {
     )
   })
 
-  it("outputs a placeholder row when an order has no items", async () => {
-    const emptyOrder = createOrder(99, {
+  it("行アイテムがない注文はプレースホルダー行を出力する", async () => {
+    const emptyOrder = mockOrder(99, {
       orderItems: [],
       totalAmount: 0,
     })

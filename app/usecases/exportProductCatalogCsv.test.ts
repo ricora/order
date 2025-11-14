@@ -10,7 +10,7 @@ import {
 
 const dbClient = {} as DbClient
 
-const createProduct = (id: number, overrides?: Partial<Product>): Product => ({
+const mockProduct = (id: number, overrides?: Partial<Product>): Product => ({
   id,
   name: `Product ${id}`,
   image: `https://example.com/${id}`,
@@ -25,10 +25,10 @@ describe("exportProductCatalogCsv", () => {
     mock.restore()
   })
 
-  it("converts products with tags into CSV rows", async () => {
+  it("タグ付きの商品をCSV行に変換する", async () => {
     const products: Product[] = [
-      createProduct(1, { name: "Blend", tagIds: [2, 1], price: 450 }),
-      createProduct(2, { name: "Latte", tagIds: [2], image: null, stock: 0 }),
+      mockProduct(1, { name: "Blend", tagIds: [2, 1], price: 450 }),
+      mockProduct(2, { name: "Latte", tagIds: [2], image: null, stock: 0 }),
     ]
 
     spyOn(productQueryRepository, "findAllProducts").mockImplementation(
@@ -62,13 +62,13 @@ describe("exportProductCatalogCsv", () => {
     )
   })
 
-  it("fetches products in multiple pages", async () => {
+  it("複数ページの商品を取得する", async () => {
     const firstPage = Array.from(
-      { length: PRODUCT_CATALOG_EXPORT_PAGE_SIZE },
-      (_, i) => createProduct(i + 1, { tagIds: [1] }),
+      { length: PRODUCT_CATALOG_EXPORT_PAGE_SIZE + 1 },
+      (_, i) => mockProduct(i + 1, { tagIds: [1] }),
     )
     const secondPage = [
-      createProduct(PRODUCT_CATALOG_EXPORT_PAGE_SIZE + 1, { tagIds: [1] }),
+      mockProduct(PRODUCT_CATALOG_EXPORT_PAGE_SIZE + 1, { tagIds: [1] }),
     ]
 
     const findProductsSpy = spyOn(
@@ -76,10 +76,11 @@ describe("exportProductCatalogCsv", () => {
       "findAllProducts",
     ).mockImplementation(async ({ pagination }) => {
       if (pagination.offset === 0) {
-        expect(pagination.limit).toBe(PRODUCT_CATALOG_EXPORT_PAGE_SIZE)
+        expect(pagination.limit).toBe(PRODUCT_CATALOG_EXPORT_PAGE_SIZE + 1)
         return firstPage
       }
       if (pagination.offset === PRODUCT_CATALOG_EXPORT_PAGE_SIZE) {
+        expect(pagination.limit).toBe(PRODUCT_CATALOG_EXPORT_PAGE_SIZE + 1)
         return secondPage
       }
       return []
@@ -99,8 +100,8 @@ describe("exportProductCatalogCsv", () => {
     )
   })
 
-  it("handles products without tags without loading tag names", async () => {
-    const products: Product[] = [createProduct(1, { tagIds: [] })]
+  it("タグなしの商品ではタグ名を読み込まない", async () => {
+    const products: Product[] = [mockProduct(1, { tagIds: [] })]
 
     spyOn(productQueryRepository, "findAllProducts").mockImplementation(
       async () => products,
