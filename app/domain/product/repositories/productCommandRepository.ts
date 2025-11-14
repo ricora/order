@@ -23,17 +23,6 @@ const validateProduct = (product: Partial<Omit<Product, "id">>) => {
       throw new Error("商品名は1文字以上50文字以内である必要があります")
     }
   }
-  if (product.image !== undefined) {
-    if (
-      product.image !== null &&
-      (!/^https?:\/\/.+/i.test(product.image) ||
-        countStringLength(product.image) > 500)
-    ) {
-      throw new Error(
-        "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-      )
-    }
-  }
   if (product.tagIds !== undefined) {
     if (product.tagIds.length > 20) {
       throw new Error("商品タグは20個以内である必要があります")

@@ -24,7 +24,6 @@ const mockProducts: Product[] = [
   {
     id: 1,
     name: "テスト商品A",
-    image: "https://example.com/a.png",
     tagIds: [1, 2],
     price: 100,
     stock: 10,
@@ -32,7 +31,6 @@ const mockProducts: Product[] = [
   {
     id: 2,
     name: "テスト商品B",
-    image: null,
     tagIds: [2],
     price: 200,
     stock: 0,
@@ -61,14 +59,8 @@ describe("getOrderRegistrationFormComponentData", () => {
 
     expect(result.products[0]?.name).toBe("テスト商品A")
     expect(result.products[0]?.tags).toEqual(["人気", "メイン"])
-    expect(result.tags).toEqual(mockTags)
-  })
 
-  it("imageがnullの場合はデフォルト画像が挿入される", async () => {
-    const result = await getOrderRegistrationFormComponentData({ dbClient })
-    const secondProduct = result.products[1]
-    if (!secondProduct) throw new Error("no products returned")
-    expect(secondProduct.image).toBe("https://picsum.photos/200/200")
+    expect(result.tags).toEqual(mockTags)
   })
 
   it("ページネーションで1000件のlimitを指定している", async () => {

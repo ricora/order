@@ -26,7 +26,6 @@ const mockTags = [
 
 const validProduct: Omit<Product, "id"> = {
   name: "テスト商品",
-  image: "https://example.com/image.png",
   tagIds: [1, 2],
   price: 1000,
   stock: 5,
@@ -35,7 +34,6 @@ const validProduct: Omit<Product, "id"> = {
 const defaultProduct: Product = {
   id: 1,
   name: "テスト商品",
-  image: "https://example.com/image.png",
   tagIds: [1, 2],
   price: 1000,
   stock: 5,
@@ -91,7 +89,10 @@ describe("createProduct", () => {
     findProductByNameSpy.mockImplementation(async () => ({
       id: 1,
       name: validProduct.name,
-      image: "https://example.com/existing.png",
+      image: {
+        data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        mimeType: "image/png",
+      },
       tagIds: [1],
       price: 500,
       stock: 10,
@@ -116,49 +117,6 @@ describe("createProduct", () => {
         dbClient: mockDbClient,
       }),
     ).rejects.toThrow("商品名は1文字以上50文字以内である必要があります")
-    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
-    expect(findProductByNameSpy).not.toHaveBeenCalled()
-  })
-
-  it("画像URLが空ならエラーを返す", async () => {
-    await expect(
-      createProduct({
-        product: { ...validProduct, image: "" },
-        repositoryImpl: async () => null,
-        dbClient: mockDbClient,
-      }),
-    ).rejects.toThrow(
-      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-    )
-    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
-    expect(findProductByNameSpy).not.toHaveBeenCalled()
-  })
-
-  it("画像URLが500文字を超える場合はエラーを返す", async () => {
-    const longUrl = `https://example.com/${"a".repeat(490)}`
-    await expect(
-      createProduct({
-        product: { ...validProduct, image: longUrl },
-        repositoryImpl: async () => null,
-        dbClient: mockDbClient,
-      }),
-    ).rejects.toThrow(
-      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-    )
-    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
-    expect(findProductByNameSpy).not.toHaveBeenCalled()
-  })
-
-  it("画像URLがhttp/httpsで始まらない場合はエラーを返す", async () => {
-    await expect(
-      createProduct({
-        product: { ...validProduct, image: "ftp://example.com/image.png" },
-        repositoryImpl: async () => null,
-        dbClient: mockDbClient,
-      }),
-    ).rejects.toThrow(
-      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-    )
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
     expect(findProductByNameSpy).not.toHaveBeenCalled()
   })
@@ -267,7 +225,6 @@ describe("updateProduct", () => {
     findProductByNameSpy.mockImplementation(async () => ({
       id: 2,
       name: validProduct.name,
-      image: "https://example.com/existing.png",
       tagIds: [1],
       price: 500,
       stock: 10,
@@ -288,7 +245,6 @@ describe("updateProduct", () => {
     findProductByNameSpy.mockImplementation(async () => ({
       id: 1,
       name: validProduct.name,
-      image: "https://example.com/existing.png",
       tagIds: [1],
       price: 500,
       stock: 10,

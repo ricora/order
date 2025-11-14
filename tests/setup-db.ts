@@ -13,7 +13,13 @@ for (let i = 1; i <= 25; i++) {
       name: `テスト商品${i}`,
       price: i * 1000,
       stock: i * 100,
-      image: null,
+      image:
+        i % 3 === 0
+          ? {
+              data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/w8AAgMBAp6n2ZcAAAAASUVORK5CYII=",
+              mimeType: "image/png",
+            }
+          : null,
       tags:
         i % 3 === 0
           ? ["タグA", "タグB"]
