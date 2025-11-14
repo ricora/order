@@ -18,7 +18,6 @@ export type GetProductsManagementPageDataParams = {
 
 export type ProductsManagementPageData = {
   products: (Omit<Product, "image" | "tagIds"> & {
-    image: string
     tags: string[]
     status: ProductStatus
   })[]
@@ -69,8 +68,6 @@ export const getProductsManagementPageData = async ({
     const status = calculateProductStatus(product.stock)
     return {
       ...product,
-      // TODO: デフォルト画像を正式なものに差し替える
-      image: product.image ?? "https://picsum.photos/200/200",
       tags: product.tagIds
         .map((tagId) => tagMap.get(tagId))
         .filter((name): name is string => !!name),

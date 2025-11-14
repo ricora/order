@@ -271,10 +271,7 @@ const OrderRegistrationForm: FC = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex min-w-0 flex-1 items-center gap-3">
                             <img
-                              src={
-                                product.image ||
-                                "/placeholder.svg?height=60&width=60"
-                              }
+                              src={`/images/products/${product.id}`}
                               alt={product.name}
                               className="h-10 w-10 shrink-0 rounded object-cover"
                               loading="lazy"
@@ -370,10 +367,7 @@ const OrderRegistrationForm: FC = () => {
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                       <div className="flex min-w-0 flex-1 items-center gap-4">
                         <img
-                          src={
-                            productInList?.image ||
-                            "/placeholder.svg?height=60&width=60"
-                          }
+                          src={`/images/products/${item.productId}`}
                           alt={item.productName}
                           className="h-10 w-10 shrink-0 rounded object-cover"
                           loading="lazy"

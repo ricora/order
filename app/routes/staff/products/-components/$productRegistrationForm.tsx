@@ -6,6 +6,7 @@ import GraphemeInput from "../../../../components/ui/$graphemeInput"
 import Button from "../../../../components/ui/button"
 import Chip from "../../../../components/ui/chip"
 import ChipButton from "../../../../components/ui/chipButton"
+import FileInput from "../../../../components/ui/fileInput"
 import Input from "../../../../components/ui/input"
 import Label from "../../../../components/ui/label"
 import type Product from "../../../../domain/product/entities/product"
@@ -210,7 +211,6 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
   mode = "create",
 }) => {
   const [productName, setProductName] = useState(initialValues?.name ?? "")
-  const [imageValue, setImageValue] = useState(initialValues?.image ?? "")
   const [priceValue, setPriceValue] = useState<string | undefined>(
     initialValues?.price !== undefined
       ? String(initialValues.price)
@@ -260,7 +260,7 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
           <span className="font-bold text-lg">{heading}</span>
         </div>
         <div id="product-register-form" className="p-4">
-          <form method="post">
+          <form method="post" encType="multipart/form-data">
             <div className="mb-4">
               <Label htmlFor="productName" required>
                 商品名
@@ -276,15 +276,14 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
               />
             </div>
             <div className="mb-4">
-              <Label htmlFor="imageUrl">画像URL</Label>
-              <GraphemeInput
-                id="imageUrl"
+              <Label htmlFor="imageFile">商品画像</Label>
+              <div className="my-1 text-muted-fg text-xs">
+                対応形式: JPEG, PNG, GIF, WebP (約7.5MB以下)
+              </div>
+              <FileInput
+                id="imageFile"
                 name="image"
-                type="url"
-                value={imageValue}
-                onChange={setImageValue}
-                maxLength={500}
-                placeholder="https://example.com/image.jpg"
+                accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
               />
             </div>
             <div className="mb-4 flex gap-4">
