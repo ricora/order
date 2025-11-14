@@ -1,53 +1,109 @@
-const createInvalidRequestError = () => {
-  return new Error("不正なリクエストです")
-}
+import type {
+  CreateProductPayload,
+  UpdateProductPayload,
+} from "../../../../usecases/registerProduct"
 
-type ParsedProductBody = {
-  name: string
-  image: string | null
-  price: number
-  stock: number
-  tags: string[]
-}
+const createInvalidRequestError = () => new Error("不正なリクエストです")
 
-export const parseProductRequestBody = (
-  body: unknown,
-  opts?: { allowUndefinedTags?: boolean },
-): ParsedProductBody => {
-  const allowUndefinedTags = opts?.allowUndefinedTags ?? false
+const ensureRecord = (body: unknown): Record<string, unknown> => {
   if (typeof body !== "object" || body === null) {
     throw createInvalidRequestError()
   }
-  const b = body as Record<string, unknown>
+  return body as Record<string, unknown>
+}
 
-  const name = b.name
-  if (typeof name !== "string") throw createInvalidRequestError()
-
-  const image = b.image
-
-  if (image !== undefined && typeof image !== "string") {
+const parseName = (value: unknown): CreateProductPayload["name"] => {
+  if (typeof value !== "string") {
     throw createInvalidRequestError()
   }
+  return value
+}
 
-  const price = Number(b.price as unknown)
-  if (!Number.isFinite(price) || !Number.isInteger(price) || price < 0)
-    throw createInvalidRequestError()
-
-  const stock = Number(b.stock as unknown)
-  if (!Number.isFinite(stock) || !Number.isInteger(stock) || stock < 0)
-    throw createInvalidRequestError()
-
-  const rawTags = b.tags
-
-  const normalizeTags = (value: unknown, allowUndefined: boolean) => {
-    if (value === undefined) return allowUndefined ? undefined : []
-    if (typeof value === "string") return [value]
-    if (Array.isArray(value) && value.every((t) => typeof t === "string"))
-      return value
+const parseNonNegativeInteger = (
+  value: unknown,
+): CreateProductPayload["price"] => {
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0) {
     throw createInvalidRequestError()
   }
+  return parsed
+}
 
-  const tags = normalizeTags(rawTags, allowUndefinedTags)
+const convertFileToImageData = async (
+  file: File,
+): Promise<NonNullable<CreateProductPayload["image"]>> => {
+  const buffer = await file.arrayBuffer()
+  const bytes = new Uint8Array(buffer)
+  const base64 = Buffer.from(bytes).toString("base64")
+  return { data: base64, mimeType: file.type }
+}
 
-  return { name, image: image ?? null, price, stock, tags: tags ?? [] }
+const parseCreateImage = async (
+  value: unknown,
+): Promise<CreateProductPayload["image"]> => {
+  if (value instanceof File && value.size > 0) {
+    return convertFileToImageData(value)
+  }
+  return null
+}
+
+const parseUpdateImage = async (
+  value: unknown,
+): Promise<UpdateProductPayload["image"]> => {
+  if (value instanceof File && value.size > 0) {
+    return convertFileToImageData(value)
+  }
+  return undefined
+}
+
+const parseTags = (value: unknown): CreateProductPayload["tags"] => {
+  if (value === undefined) return []
+  if (typeof value === "string") return [value]
+  if (Array.isArray(value) && value.every((tag) => typeof tag === "string")) {
+    return value
+  }
+  throw createInvalidRequestError()
+}
+
+const parseOptionalTags = (value: unknown): UpdateProductPayload["tags"] => {
+  if (value === undefined) return undefined
+  if (typeof value === "string") return [value]
+  if (Array.isArray(value) && value.every((tag) => typeof tag === "string")) {
+    return value
+  }
+  throw createInvalidRequestError()
+}
+
+export const parseCreateProductRequestBody = async (
+  body: unknown,
+): Promise<CreateProductPayload> => {
+  const record = ensureRecord(body)
+
+  const name = parseName(record.name)
+  const price = parseNonNegativeInteger(record.price)
+  const stock = parseNonNegativeInteger(record.stock)
+  const image = await parseCreateImage(record.image)
+  const tags = parseTags(record.tags)
+
+  return { name, price, stock, image, tags }
+}
+
+export const parseUpdateProductRequestBody = async (
+  body: unknown,
+): Promise<Omit<UpdateProductPayload, "id">> => {
+  const record = ensureRecord(body)
+
+  const name = record.name === undefined ? undefined : parseName(record.name)
+  const price =
+    record.price === undefined
+      ? undefined
+      : parseNonNegativeInteger(record.price)
+  const stock =
+    record.stock === undefined
+      ? undefined
+      : parseNonNegativeInteger(record.stock)
+  const image = await parseUpdateImage(record.image)
+  const tags = parseOptionalTags(record.tags)
+
+  return { name, price, stock, image, tags }
 }

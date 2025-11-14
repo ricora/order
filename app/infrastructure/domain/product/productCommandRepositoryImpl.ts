@@ -1,5 +1,4 @@
 import { eq } from "drizzle-orm"
-import type Product from "../../../domain/product/entities/product"
 import type {
   CreateProduct,
   DeleteProduct,
@@ -17,7 +16,6 @@ export const createProductImpl: CreateProduct = async ({
         .insert(productTable)
         .values({
           name: product.name,
-          image: product.image,
           price: product.price,
           stock: product.stock,
         })
@@ -33,15 +31,13 @@ export const createProductImpl: CreateProduct = async ({
       await dbClient.insert(productTagRelationTable).values(rows)
     }
 
-    const newProduct: Product = {
+    return {
       id: dbProduct.id,
       name: dbProduct.name,
-      image: dbProduct.image,
       tagIds: product.tagIds,
       price: dbProduct.price,
       stock: dbProduct.stock,
     }
-    return newProduct
   } catch {
     throw new Error("商品の作成に失敗しました")
   }
@@ -57,7 +53,6 @@ export const updateProductImpl: UpdateProduct = async ({
         .update(productTable)
         .set({
           name: product.name,
-          image: product.image,
           price: product.price,
           stock: product.stock,
         })
@@ -97,7 +92,6 @@ export const updateProductImpl: UpdateProduct = async ({
     return {
       id: dbProduct.id,
       name: dbProduct.name,
-      image: dbProduct.image,
       tagIds: updatedTagIds,
       price: dbProduct.price,
       stock: dbProduct.stock,

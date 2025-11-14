@@ -1,5 +1,6 @@
 import { asc, eq, inArray } from "drizzle-orm"
 import type {
+  CountProducts,
   FindAllProductStocks,
   FindAllProducts,
   FindAllProductsByIds,
@@ -27,7 +28,6 @@ export const findProductByIdImpl: FindProductById = async ({
   return {
     id: dbProduct.id,
     name: dbProduct.name,
-    image: dbProduct.image,
     tagIds: dbProduct.productTags.map((tag) => tag.tagId),
     price: dbProduct.price,
     stock: dbProduct.stock,
@@ -49,10 +49,10 @@ export const findProductByNameImpl: FindProductByName = async ({
     },
   })
   if (!dbProduct) return null
+
   return {
     id: dbProduct.id,
     name: dbProduct.name,
-    image: dbProduct.image,
     tagIds: dbProduct.productTags.map((tag) => tag.tagId),
     price: dbProduct.price,
     stock: dbProduct.stock,
@@ -75,15 +75,13 @@ export const findAllProductsImpl: FindAllProducts = async ({
     offset: pagination.offset,
     limit: pagination.limit,
   })
-  const products = dbProducts.map((dbProduct) => ({
+  return dbProducts.map((dbProduct) => ({
     id: dbProduct.id,
     name: dbProduct.name,
-    image: dbProduct.image,
     tagIds: dbProduct.productTags.map((tag) => tag.tagId),
     price: dbProduct.price,
     stock: dbProduct.stock,
   }))
-  return products
 }
 
 export const findAllProductStocksImpl: FindAllProductStocks = async ({
@@ -121,13 +119,15 @@ export const findAllProductsByIdsImpl: FindAllProductsByIds = async ({
     offset: pagination.offset,
     limit: pagination.limit,
   })
-  const products = dbProducts.map((dbProduct) => ({
+  return dbProducts.map((dbProduct) => ({
     id: dbProduct.id,
     name: dbProduct.name,
-    image: dbProduct.image,
     tagIds: dbProduct.productTags.map((tag) => tag.tagId),
     price: dbProduct.price,
     stock: dbProduct.stock,
   }))
-  return products
+}
+
+export const countProductsImpl: CountProducts = async ({ dbClient }) => {
+  return await dbClient.$count(productTable)
 }

@@ -37,7 +37,7 @@ describe("商品編集", () => {
       )
     })
 
-    test("商品名が空の場合にエラーを返す", async () => {
+    test("商品名が空の場合は既存の名前が保持される", async () => {
       const form = new URLSearchParams()
       form.append("price", "1000")
       form.append("stock", "10")
@@ -47,7 +47,7 @@ describe("商品編集", () => {
         headers: { "content-type": "application/x-www-form-urlencoded" },
       })
       expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(/success/)
     })
 
     test("価格が負数の場合にエラーを返す", async () => {
@@ -69,36 +69,6 @@ describe("商品編集", () => {
       form.append("name", generateUniqueName("編集在庫小数"))
       form.append("price", "1000")
       form.append("stock", "10.5")
-      const res = await app.request(endpoint, {
-        method: "POST",
-        body: form,
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-      })
-      expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/error/)
-    })
-
-    test("画像URLが501文字以上の場合にエラーを返す", async () => {
-      const form = new URLSearchParams()
-      form.append("name", generateUniqueName("編集画像長大"))
-      form.append("price", "1000")
-      form.append("stock", "10")
-      form.append("image", `https://${"a".repeat(495)}`)
-      const res = await app.request(endpoint, {
-        method: "POST",
-        body: form,
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-      })
-      expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/error/)
-    })
-
-    test("画像URLがhttp/httpsで始まらない場合にエラーを返す", async () => {
-      const form = new URLSearchParams()
-      form.append("name", generateUniqueName("編集画像不正"))
-      form.append("price", "1000")
-      form.append("stock", "10")
-      form.append("image", "ftp://example.com/image.jpg")
       const res = await app.request(endpoint, {
         method: "POST",
         body: form,

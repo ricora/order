@@ -17,3 +17,33 @@ export function setQueryParam(
   const query = params.toString()
   return query ? `?${query}` : ""
 }
+
+/**
+ * シリアライズされたData URIスキーム文字列を生成する。
+ * @param data - base64エンコードされた画像データ
+ * @param mimeType - 画像のMIMEタイプ
+ * @returns Data URIスキーム文字列
+ */
+export const serializeDataUriScheme = ({
+  data,
+  mimeType,
+}: {
+  data: string
+  mimeType: string
+}): string => {
+  return `data:${mimeType};base64,${data}`
+}
+
+/**
+ * Data URIスキーム文字列を解析し、base64データとMIMEタイプを抽出する。
+ * @param uri - Data URIスキーム文字列
+ * @returns データとMIMEタイプのオブジェクト、または無効な場合は`undefined`を返す。
+ */
+export const parseDataUriScheme = (
+  uri: string,
+): { data: string; mimeType: string } | undefined => {
+  const match = uri.match(/^data:([^;]+);base64,(.+)$/)
+  if (!match || typeof match[1] !== "string" || typeof match[2] !== "string")
+    return undefined
+  return { mimeType: match[1], data: match[2] }
+}
