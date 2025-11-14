@@ -34,17 +34,27 @@ export type ExportOrderHistoryCsvResult = {
 
 const fetchAllOrders = async (dbClient: DbClient): Promise<Order[]> => {
   const orders: Order[] = []
+  const pageSize = ORDER_HISTORY_EXPORT_PAGE_SIZE
+  const limit = pageSize + 1
+
   // fetch in deterministic order by primary key via existing repository
   while (true) {
     const chunk = await findAllOrders({
       dbClient,
       pagination: {
         offset: orders.length,
-        limit: ORDER_HISTORY_EXPORT_PAGE_SIZE,
+        limit,
       },
     })
-    orders.push(...chunk)
-    if (chunk.length < ORDER_HISTORY_EXPORT_PAGE_SIZE) {
+    if (chunk.length === 0) {
+      break
+    }
+
+    const hasNextPage = chunk.length > pageSize
+    const rowsToAppend = hasNextPage ? chunk.slice(0, pageSize) : chunk
+    orders.push(...rowsToAppend)
+
+    if (!hasNextPage) {
       break
     }
   }

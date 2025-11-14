@@ -1,4 +1,3 @@
-import { MAX_STORE_PRODUCT_COUNT } from "../domain/product/constants"
 import type Product from "../domain/product/entities/product"
 import { findAllProducts } from "../domain/product/repositories/productQueryRepository"
 import { findAllProductTagsByIds } from "../domain/product/repositories/productTagQueryRepository"
@@ -30,21 +29,27 @@ export type ExportProductCatalogCsvResult = {
 
 const fetchAllProducts = async (dbClient: DbClient): Promise<Product[]> => {
   const products: Product[] = []
-  const pageSize = Math.min(
-    PRODUCT_CATALOG_EXPORT_PAGE_SIZE,
-    MAX_STORE_PRODUCT_COUNT,
-  )
+  const pageSize = PRODUCT_CATALOG_EXPORT_PAGE_SIZE
+  const limit = pageSize + 1
 
   while (true) {
     const chunk = await findAllProducts({
       dbClient,
       pagination: {
         offset: products.length,
-        limit: pageSize,
+        limit,
       },
     })
-    products.push(...chunk)
-    if (chunk.length < pageSize) {
+
+    if (chunk.length === 0) {
+      break
+    }
+
+    const hasNextPage = chunk.length > pageSize
+    const rowsToAppend = hasNextPage ? chunk.slice(0, pageSize) : chunk
+    products.push(...rowsToAppend)
+
+    if (!hasNextPage) {
       break
     }
   }
