@@ -8,6 +8,7 @@ import {
   spyOn,
 } from "bun:test"
 import type { TransactionDbClient } from "../../../infrastructure/db/client"
+import { MAX_STORE_PRODUCT_COUNT } from "../constants"
 import type Product from "../entities/product"
 import {
   type CreateProduct,
@@ -47,6 +48,7 @@ const applyPartialToDefaultProduct = (
 describe("createProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
   let findProductByNameSpy: ReturnType<typeof spyOn>
+  let countProductsSpy: ReturnType<typeof spyOn>
   const mockDbClient = {} as TransactionDbClient
 
   beforeEach(() => {
@@ -59,6 +61,10 @@ describe("createProduct", () => {
       productQueryRepository,
       "findProductByName",
     ).mockImplementation(async () => null)
+    countProductsSpy = spyOn(
+      productQueryRepository,
+      "countProducts",
+    ).mockImplementation(async () => 0)
   })
 
   afterEach(() => {
@@ -201,6 +207,24 @@ describe("createProduct", () => {
     expect(result?.tagIds.length).toBe(20)
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("商品数の上限に達している場合はエラーを返す", async () => {
+    countProductsSpy.mockImplementation(async () => MAX_STORE_PRODUCT_COUNT)
+
+    await expect(
+      createProduct({
+        product: validProduct,
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow(
+      `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです`,
+    )
+
+    expect(countProductsSpy).toHaveBeenCalledTimes(1)
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
   })
 })
 

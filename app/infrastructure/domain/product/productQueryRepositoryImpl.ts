@@ -1,5 +1,6 @@
 import { asc, eq, inArray } from "drizzle-orm"
 import type {
+  CountProducts,
   FindAllProductStocks,
   FindAllProducts,
   FindAllProductsByIds,
@@ -130,4 +131,8 @@ export const findAllProductsByIdsImpl: FindAllProductsByIds = async ({
     stock: dbProduct.stock,
   }))
   return products
+}
+
+export const countProductsImpl: CountProducts = async ({ dbClient }) => {
+  return dbClient.$count(productTable)
 }
