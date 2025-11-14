@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { toCsv } from "./csv"
 
 describe("toCsv", () => {
-  it("converts rows into CSV format", () => {
+  it("行列をCSV形式に変換する", () => {
     const csv = toCsv([
       ["id", "name"],
       [1, "Alice"],
@@ -11,7 +11,7 @@ describe("toCsv", () => {
     expect(csv).toBe("id,name\n1,Alice\n2,Bob")
   })
 
-  it("escapes commas, quotes, and line breaks", () => {
+  it("カンマ・引用符・改行をエスケープする", () => {
     const csv = toCsv([
       ["note", "value"],
       ["needs,comma", '"quoted"'],
@@ -22,7 +22,7 @@ describe("toCsv", () => {
     )
   })
 
-  it("handles null, undefined, booleans, and dates", () => {
+  it("null/undefined/boolean/Dateを処理する", () => {
     const date = new Date("2024-01-01T00:00:00.000Z")
     const csv = toCsv([
       ["null", "undefined", "bool", "date"],
