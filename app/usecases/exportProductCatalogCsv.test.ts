@@ -47,7 +47,10 @@ describe("exportProductCatalogCsv", () => {
       { id: 2, name: "Seasonal" },
     ])
 
-    const result = await exportProductCatalogCsv({ dbClient })
+    const result = await exportProductCatalogCsv({
+      dbClient,
+      imageBaseUrl: "https://example.com",
+    })
 
     expect(result.productCount).toBe(2)
     expect(result.exportedAt).toBeInstanceOf(Date)
@@ -55,8 +58,8 @@ describe("exportProductCatalogCsv", () => {
     expect(result.csv).toBe(
       [
         "product_id,product_name,price,stock,image_url,tag_ids,tag_names,tag_count",
-        "1,Blend,450,10,https://example.com/1,1|2,Blend|Seasonal,2",
-        "2,Latte,500,0,,2,Seasonal,1",
+        "1,Blend,450,10,https://example.com/images/products/1,1|2,Blend|Seasonal,2",
+        "2,Latte,500,0,https://example.com/images/products/2,2,Seasonal,1",
       ].join("\n"),
     )
   })
@@ -90,7 +93,10 @@ describe("exportProductCatalogCsv", () => {
       "findAllProductTagsByIds",
     ).mockResolvedValue([{ id: 1, name: "Tag1" }])
 
-    const result = await exportProductCatalogCsv({ dbClient })
+    const result = await exportProductCatalogCsv({
+      dbClient,
+      imageBaseUrl: "https://example.com",
+    })
 
     expect(findProductsSpy).toHaveBeenCalledTimes(2)
     expect(findTagsSpy).toHaveBeenCalledTimes(1)
@@ -111,7 +117,10 @@ describe("exportProductCatalogCsv", () => {
       "findAllProductTagsByIds",
     ).mockResolvedValue([])
 
-    const result = await exportProductCatalogCsv({ dbClient })
+    const result = await exportProductCatalogCsv({
+      dbClient,
+      imageBaseUrl: "https://example.com",
+    })
 
     expect(findTagsSpy).not.toHaveBeenCalled()
     const [, row] = result.csv.split("\n")

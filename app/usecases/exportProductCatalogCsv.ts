@@ -19,6 +19,7 @@ export const PRODUCT_CATALOG_HEADER = [
 
 export type ExportProductCatalogCsvParams = {
   dbClient: DbClient
+  imageBaseUrl: string
 }
 
 export type ExportProductCatalogCsvResult = {
@@ -76,7 +77,11 @@ const buildTagMap = async (dbClient: DbClient, products: Product[]) => {
   return new Map(tags.map((tag) => [tag.id, tag.name]))
 }
 
-const buildProductRows = (products: Product[], tagMap: Map<number, string>) => {
+const buildProductRows = (
+  products: Product[],
+  tagMap: Map<number, string>,
+  imageBaseUrl: string,
+) => {
   return products.map((product) => {
     const sortedTagIds = [...product.tagIds].sort((a, b) => a - b)
     const tagNames = sortedTagIds
@@ -87,7 +92,7 @@ const buildProductRows = (products: Product[], tagMap: Map<number, string>) => {
       product.name,
       product.price,
       product.stock,
-      product.image ?? "",
+      new URL(`/images/products/${product.id}`, imageBaseUrl).toString(),
       sortedTagIds.join("|"),
       tagNames.join("|"),
       sortedTagIds.length,
@@ -97,10 +102,11 @@ const buildProductRows = (products: Product[], tagMap: Map<number, string>) => {
 
 export const exportProductCatalogCsv = async ({
   dbClient,
+  imageBaseUrl,
 }: ExportProductCatalogCsvParams): Promise<ExportProductCatalogCsvResult> => {
   const products = await fetchAllProducts(dbClient)
   const tagMap = await buildTagMap(dbClient, products)
-  const rows = buildProductRows(products, tagMap)
+  const rows = buildProductRows(products, tagMap, imageBaseUrl)
   const csvRows =
     rows.length > 0
       ? [PRODUCT_CATALOG_HEADER, ...rows]

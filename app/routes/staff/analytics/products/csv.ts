@@ -5,6 +5,7 @@ import { createCsvDownloadResponse } from "../-helpers/csvResponse"
 export default createRoute(async (c) => {
   const result = await exportProductCatalogCsv({
     dbClient: c.get("dbClient"),
+    imageBaseUrl: new URL(c.req.url).origin,
   })
   return createCsvDownloadResponse(
     result.csv,
