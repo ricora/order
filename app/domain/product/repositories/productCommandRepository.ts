@@ -6,9 +6,12 @@ import {
 } from "../../../infrastructure/domain/product/productCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
 import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
-import { MAX_STORE_PRODUCT_TAG_COUNT } from "../constants"
+import {
+  MAX_STORE_PRODUCT_COUNT,
+  MAX_STORE_PRODUCT_TAG_COUNT,
+} from "../constants"
 import type Product from "../entities/product"
-import { findProductByName } from "./productQueryRepository"
+import { countProducts, findProductByName } from "./productQueryRepository"
 import { findAllProductTags } from "./productTagQueryRepository"
 
 const validateProduct = (product: Partial<Omit<Product, "id">>) => {
@@ -68,6 +71,13 @@ const verifyProductNameUnique = async (
   }
 }
 
+const verifyProductCountLimit = async (dbClient: TransactionDbClient) => {
+  const totalProducts = await countProducts({ dbClient })
+  if (totalProducts >= MAX_STORE_PRODUCT_COUNT) {
+    throw new Error(`1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです`)
+  }
+}
+
 export type CreateProduct = CommandRepositoryFunction<
   { product: Omit<Product, "id"> },
   Product | null
@@ -87,6 +97,7 @@ export const createProduct: WithRepositoryImpl<CreateProduct> = async ({
   product,
 }) => {
   validateProduct(product)
+  await verifyProductCountLimit(dbClient)
   await verifyProductNameUnique(dbClient, product.name)
   await verifyAllTagIdsExist(dbClient, product.tagIds)
   return repositoryImpl({ product, dbClient })

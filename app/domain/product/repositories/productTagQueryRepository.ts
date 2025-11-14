@@ -1,4 +1,5 @@
 import {
+  countProductTagsImpl,
   findAllProductTagsByIdsImpl,
   findAllProductTagsImpl,
   findProductTagByIdImpl,
@@ -22,6 +23,11 @@ export type FindAllProductTags = PaginatedQueryRepositoryFunction<
 export type FindAllProductTagsByIds = PaginatedQueryRepositoryFunction<
   { productTag: { ids: ProductTag["id"][] } },
   ProductTag
+>
+
+export type CountProductTags = QueryRepositoryFunction<
+  Record<string, never>,
+  number
 >
 
 export const findProductTagById: WithRepositoryImpl<
@@ -53,4 +59,11 @@ export const findAllProductTagsByIds: WithRepositoryImpl<
   productTag,
 }) => {
   return repositoryImpl({ dbClient, pagination, productTag })
+}
+
+export const countProductTags: WithRepositoryImpl<CountProductTags> = async ({
+  repositoryImpl = countProductTagsImpl,
+  dbClient,
+}) => {
+  return repositoryImpl({ dbClient })
 }
