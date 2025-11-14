@@ -13,7 +13,6 @@ const dbClient = {} as DbClient
 const mockProduct = (id: number, overrides?: Partial<Product>): Product => ({
   id,
   name: `Product ${id}`,
-  image: `https://example.com/${id}`,
   price: 500,
   stock: 10,
   tagIds: [],
@@ -28,7 +27,7 @@ describe("exportProductCatalogCsv", () => {
   it("タグ付きの商品をCSV行に変換する", async () => {
     const products: Product[] = [
       mockProduct(1, { name: "Blend", tagIds: [2, 1], price: 450 }),
-      mockProduct(2, { name: "Latte", tagIds: [2], image: null, stock: 0 }),
+      mockProduct(2, { name: "Latte", tagIds: [2], stock: 0 }),
     ]
 
     spyOn(productQueryRepository, "findAllProducts").mockImplementation(
