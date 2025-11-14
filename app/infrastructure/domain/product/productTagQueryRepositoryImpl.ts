@@ -52,5 +52,5 @@ export const findAllProductTagsByIdsImpl: FindAllProductTagsByIds = async ({
 }
 
 export const countProductTagsImpl: CountProductTags = async ({ dbClient }) => {
-  return dbClient.$count(productTagTable)
+  return await dbClient.$count(productTagTable)
 }
