@@ -15,6 +15,12 @@ const escapeCsvValue = (value: string): string => {
   return `"${value.replace(/"/g, '""')}"`
 }
 
+/**
+ * 行列データをCSV文字列に変換する
+ *
+ * @param rows - 各行に含める値の配列
+ * @returns 改行区切りで結合されたCSV
+ */
 export const toCsv = (rows: CsvValue[][]): string => {
   return rows
     .map((row) =>
