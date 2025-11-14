@@ -2,7 +2,7 @@ import { Style } from "hono/css"
 import { jsxRenderer, useRequestContext } from "hono/jsx-renderer"
 import { Link, Script } from "honox/server"
 import Toast from "../components/ui/toast"
-import colorSchemeInitScript from "../helpers/ui/colorSchemaInit.entry.ts?js"
+import colorSchemeInitScript from "../helpers/ui/color-scheme-entry?js"
 import { deleteToastCookie, getToastCookie } from "../helpers/ui/toast"
 
 export default jsxRenderer(({ children }) => {
