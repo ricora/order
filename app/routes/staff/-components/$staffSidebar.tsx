@@ -20,6 +20,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile"
 
 export const DESKTOP_SIDEBAR_TOGGLE_BUTTON_ID = "desktop-sidebar-toggle-button"
 export const MAIN_CONTENT_ID = "staff-main-content"
+const SIDEBAR_STATE_STORAGE_KEY = "staff-sidebar-open"
 
 export const sidebarToggleButtonStyles = tv({
   slots: {
@@ -210,6 +211,20 @@ const SidebarProvider: FC<PropsWithChildren> = ({ children }) => {
   const toggle = () => setIsOpen((prev) => !prev)
 
   useEffect(() => {
+    // 復元可能な状態があればlocalStorageから読み出す
+    try {
+      const stored = window.localStorage.getItem(SIDEBAR_STATE_STORAGE_KEY)
+      if (stored === "open") {
+        setIsOpen(true)
+      } else if (stored === "closed") {
+        setIsOpen(false)
+      }
+    } catch {
+      // localStorageが使えない場合は無視して既定値を使う
+    }
+  }, [])
+
+  useEffect(() => {
     // トグルボタンはヘッダーにあるため、ID経由で取得してクリックイベントを登録する。
     // いい方法ではないが、以下の理由よりやむを得ない：
     //
@@ -234,6 +249,17 @@ const SidebarProvider: FC<PropsWithChildren> = ({ children }) => {
       toggle()
     })
   }, [])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        SIDEBAR_STATE_STORAGE_KEY,
+        isOpen ? "open" : "closed",
+      )
+    } catch {
+      // localStorageが利用できない場合は永続化を諦める
+    }
+  }, [isOpen])
 
   useEffect(() => {
     const mainContentElm = document.getElementById(MAIN_CONTENT_ID)
