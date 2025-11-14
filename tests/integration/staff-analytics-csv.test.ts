@@ -21,14 +21,23 @@ const assertCsvResponseHeaders = (res: Response, prefix: string) => {
 
 const normalizeCsv = (text: string) => text.replace(/^\ufeff/, "")
 
+const expectUtf8Bom = (buffer: ArrayBuffer) => {
+  const bytes = new Uint8Array(buffer)
+  expect(bytes.length).toBeGreaterThanOrEqual(3)
+  expect(bytes[0]).toBe(0xef)
+  expect(bytes[1]).toBe(0xbb)
+  expect(bytes[2]).toBe(0xbf)
+}
+
 describe("スタッフ分析のCSV出力", () => {
   describe("GET /staff/analytics/orders/csv", () => {
     test("注文履歴CSVをダウンロードできる", async () => {
       const res = await app.request("/staff/analytics/orders/csv")
       assertCsvResponseHeaders(res, "order-history")
 
-      const text = await res.text()
-      expect(text.charCodeAt(0)).toBe(0xfeff)
+      const buffer = await res.arrayBuffer()
+      expectUtf8Bom(buffer)
+      const text = new TextDecoder().decode(buffer)
       const csv = normalizeCsv(text)
       const lines = csv.split("\n")
       expect(lines[0]).toBe(ORDER_HISTORY_HEADER.join(","))
@@ -43,8 +52,9 @@ describe("スタッフ分析のCSV出力", () => {
       const res = await app.request("/staff/analytics/products/csv")
       assertCsvResponseHeaders(res, "product-catalog")
 
-      const text = await res.text()
-      expect(text.charCodeAt(0)).toBe(0xfeff)
+      const buffer = await res.arrayBuffer()
+      expectUtf8Bom(buffer)
+      const text = new TextDecoder().decode(buffer)
       const csv = normalizeCsv(text)
       const lines = csv.split("\n")
       expect(lines[0]).toBe(PRODUCT_CATALOG_HEADER.join(","))
