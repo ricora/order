@@ -12,17 +12,14 @@ app.get("/products/:id", async (c) => {
     return c.text("Invalid product ID", 400)
   }
   const id = Number.parseInt(paramId, 10)
-  const { product } = await getProductImageAssetData({
+  const { productImage } = await getProductImageAssetData({
     dbClient: c.get("dbClient"),
-    product: { id },
+    productImage: { productId: id },
   })
   let imageBuffer: Buffer<ArrayBuffer>
   let mimeType: string
 
-  if (product == null) {
-    return c.text("Image not found", 404)
-  }
-  if (product.image == null) {
+  if (productImage == null) {
     // TODO: 正式なデフォルト画像に差し替える
     const dummyUrl = `https://picsum.photos/id/${id % 1000}/200/200`
     const res = await fetch(dummyUrl)
@@ -33,8 +30,8 @@ app.get("/products/:id", async (c) => {
     imageBuffer = Buffer.from(arrayBuffer)
     mimeType = res.headers.get("content-type") || "image/jpeg"
   } else {
-    imageBuffer = Buffer.from(product.image.data, "base64")
-    mimeType = product.image.mimeType
+    imageBuffer = Buffer.from(productImage.data, "base64")
+    mimeType = productImage.mimeType
   }
 
   return c.body(imageBuffer, 200, {
