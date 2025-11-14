@@ -20,7 +20,9 @@ const NotFound = ({ homeHref, homeLabel }: NotFoundProps) => (
           href={homeHref}
           class="inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded border border-primary bg-primary px-3 py-2 font-medium text-primary-fg text-sm transition hover:bg-primary/90"
         >
-          <HouseIcon />
+          <div class="size-4">
+            <HouseIcon />
+          </div>
           {homeLabel}
         </a>
       </div>
