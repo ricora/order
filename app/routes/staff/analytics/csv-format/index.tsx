@@ -58,7 +58,7 @@ export default createRoute(async (c) => {
 
         <CsvFormatSection
           title="注文履歴CSV"
-          columns={[...ORDER_HISTORY_COLUMNS]}
+          columns={ORDER_HISTORY_COLUMNS}
         >
           <p>
             注文とその注文明細のネスト構造をフラット化した形式で出力されます。
