@@ -20,7 +20,12 @@ export const ORDER_HISTORY_COLUMNS = [
   },
   {
     name: "order_status",
-    description: "注文のステータス（pending/confirmed/completed）",
+    description: (
+      <>
+        注文のステータス（<code>pending</code> / <code>confirmed</code> /{" "}
+        <code>completed</code>）
+      </>
+    ),
   },
   {
     name: "customer_name",

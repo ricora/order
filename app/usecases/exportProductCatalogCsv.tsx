@@ -29,11 +29,19 @@ export const PRODUCT_CATALOG_COLUMNS = [
   },
   {
     name: "tag_ids",
-    description: "タグID（パイプ区切り、例: 1|3|5）",
+    description: (
+      <>
+        タグID（パイプ区切り、例: <code>1|3|5</code>）
+      </>
+    ),
   },
   {
     name: "tag_names",
-    description: "タグ名（パイプ区切り、例: 飲料|冷凍）",
+    description: (
+      <>
+        タグ名（パイプ区切り、例: <code>飲料|冷凍</code>）
+      </>
+    ),
   },
   {
     name: "tag_count",
