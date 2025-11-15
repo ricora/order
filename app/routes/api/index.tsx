@@ -49,6 +49,7 @@ const routes = app
       if (
         typeof orderId !== "number" ||
         !Number.isInteger(orderId) ||
+        orderId < 1 ||
         typeof status !== "string" ||
         !isValidStatus(status)
       ) {
