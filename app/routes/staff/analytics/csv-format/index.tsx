@@ -20,19 +20,19 @@ const CsvFormatSection: FC<CsvFormatSectionProps> = ({
   children,
   columns,
 }) => (
-  <div className="rounded-lg border bg-bg p-6">
-    <div className="mb-6">
-      <h2 className="font-semibold text-fg text-lg">{title}</h2>
-      <div className="mt-2 text-muted-fg text-sm">{children}</div>
+  <div class="rounded-lg border bg-bg p-6">
+    <div class="mb-6">
+      <h2 class="font-semibold text-fg text-lg">{title}</h2>
+      <div class="mt-2 text-muted-fg text-sm">{children}</div>
     </div>
-    <div className="grid grid-cols-1 gap-2 sm:grid-cols-[auto_1fr]">
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-[auto_1fr]">
       {columns.map((column) => (
         <div
           key={column.name}
-          className="grid grid-cols-subgrid gap-3 rounded border border-border bg-muted p-3 sm:col-span-2"
+          class="grid grid-cols-subgrid gap-3 rounded border border-border bg-muted p-3 sm:col-span-2"
         >
-          <code className="font-mono text-primary text-sm">{column.name}</code>
-          <span className="text-muted-fg text-sm">{column.description}</span>
+          <code class="font-mono text-primary text-sm">{column.name}</code>
+          <span class="text-muted-fg text-sm">{column.description}</span>
         </div>
       ))}
     </div>
@@ -45,10 +45,10 @@ export default createRoute(async (c) => {
       title="CSVフォーマット仕様"
       description="エクスポートされるCSVファイルの各カラムの説明です。"
     >
-      <div className="space-y-6">
-        <div className="rounded-lg border bg-bg p-6">
-          <h2 className="font-semibold text-fg text-lg">共通仕様</h2>
-          <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-fg text-sm">
+      <div class="space-y-6">
+        <div class="rounded-lg border bg-bg p-6">
+          <h2 class="font-semibold text-fg text-lg">共通仕様</h2>
+          <ul class="mt-4 list-disc space-y-2 pl-5 text-muted-fg text-sm">
             <li>文字エンコーディング: UTF-8</li>
             <li>ヘッダー行: 1行目に各カラム名が含まれます</li>
             <li>日付形式: ISO 8601形式（例: 2025-01-15T12:34:56.789Z）</li>
@@ -63,8 +63,8 @@ export default createRoute(async (c) => {
           <p>
             注文とその注文明細のネスト構造をフラット化した形式で出力されます。
           </p>
-          <p className="mt-2">1つの注文に複数の注文明細がある場合:</p>
-          <ul className="mt-1 list-disc space-y-1 pl-5">
+          <p class="mt-2">1つの注文に複数の注文明細がある場合:</p>
+          <ul class="mt-1 list-disc space-y-1 pl-5">
             <li>
               注文レベルのフィールド（order_id、order_created_atなど）は各明細行に繰り返し記録されます
             </li>
@@ -81,10 +81,10 @@ export default createRoute(async (c) => {
           <p>すべての商品情報が1商品につき1行で出力されます。</p>
         </CsvFormatSection>
 
-        <div className="rounded-lg border bg-bg p-6">
-          <div className="flex items-start gap-3">
-            <div className="rounded-lg border border-info-subtle bg-info-subtle p-2">
-              <div className="h-5 w-5 text-info-subtle-fg">
+        <div class="rounded-lg border bg-bg p-6">
+          <div class="flex items-start gap-3">
+            <div class="rounded-lg border border-info-subtle bg-info-subtle p-2">
+              <div class="h-5 w-5 text-info-subtle-fg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -101,21 +101,21 @@ export default createRoute(async (c) => {
                 </svg>
               </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-medium text-fg">注意事項</h3>
-              <p className="mt-2 text-muted-fg text-sm">
+            <div class="flex-1">
+              <h3 class="font-medium text-fg">注意事項</h3>
+              <p class="mt-2 text-muted-fg text-sm">
                 CSVファイルをExcelで開く場合、日付や数値の表示形式が自動変換される場合があります。データの正確性を保つため、テキストエディタやデータ分析ツールでの利用を推奨します。
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div class="flex justify-center">
           <a
             href="/staff/analytics"
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded border bg-muted px-3 py-2 font-medium text-secondary-fg text-sm transition hover:border-primary-subtle hover:bg-primary-subtle hover:text-primary-subtle-fg"
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded border bg-muted px-3 py-2 font-medium text-secondary-fg text-sm transition hover:border-primary-subtle hover:bg-primary-subtle hover:text-primary-subtle-fg"
           >
-            <div className="h-4 w-4">
+            <div class="h-4 w-4">
               <ArrowLeftIcon />
             </div>
             売上分析ページに戻る

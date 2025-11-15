@@ -52,20 +52,20 @@ const CSVExportItem = ({
   const Icon = icon
 
   return (
-    <div className={container()}>
-      <div className={content()}>
-        <div className={iconContainer()}>
-          <div className={iconClass()}>
+    <div class={container()}>
+      <div class={content()}>
+        <div class={iconContainer()}>
+          <div class={iconClass()}>
             <Icon />
           </div>
         </div>
-        <div className={textContent()}>
-          <h3 className={titleClass()}>{title}</h3>
-          <p className={descriptionClass()}>{description}</p>
+        <div class={textContent()}>
+          <h3 class={titleClass()}>{title}</h3>
+          <p class={descriptionClass()}>{description}</p>
         </div>
       </div>
-      <a href={exportUrl} className={button()}>
-        <div className={buttonIcon()}>
+      <a href={exportUrl} class={button()}>
+        <div class={buttonIcon()}>
           <DownloadIcon />
         </div>
         {exportLabel}
@@ -80,25 +80,25 @@ export default createRoute(async (c) => {
       title="売上分析"
       description="売上データをCSV形式でエクスポートできます。"
     >
-      <div className="rounded-lg border bg-bg p-6">
-        <div className="mb-6">
-          <h2 className="font-semibold text-fg text-lg">データエクスポート</h2>
-          <p className="mt-1 text-muted-fg text-sm">
+      <div class="rounded-lg border bg-bg p-6">
+        <div class="mb-6">
+          <h2 class="font-semibold text-fg text-lg">データエクスポート</h2>
+          <p class="mt-1 text-muted-fg text-sm">
             売上データをCSV形式でダウンロードして分析できます。
           </p>
-          <div className="mt-3">
+          <div class="mt-3">
             <a
               href="/staff/analytics/csv-format"
-              className="inline-flex items-center gap-1.5 text-primary-subtle-fg text-sm hover:underline"
+              class="inline-flex items-center gap-1.5 text-primary-subtle-fg text-sm hover:underline"
             >
-              <div className="h-4 w-4">
+              <div class="h-4 w-4">
                 <InfoIcon />
               </div>
               CSVフォーマット仕様を確認する
             </a>
           </div>
         </div>
-        <div className="space-y-4">
+        <div class="space-y-4">
           <CSVExportItem
             icon={ClipboardListIcon}
             title="注文履歴（CSV形式）"
