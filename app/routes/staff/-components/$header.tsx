@@ -1,5 +1,5 @@
 import type { FC } from "hono/jsx"
-import { DesktopSidebarToggleButton } from "./$staffSidebar"
+import { DesktopSidebarToggleButton } from "./$sidebar"
 
 type Breadcrumb = {
   label: string

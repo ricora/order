@@ -1,7 +1,7 @@
 import type { FC, PropsWithChildren } from "hono/jsx"
 import { useRequestContext } from "hono/jsx-renderer"
 import { Header } from "./$header"
-import { Sidebar } from "./$staffSidebar"
+import { Sidebar } from "./$sidebar"
 import { MAIN_CONTENT_ID } from "../-helpers/sidebar"
 
 export const Layout: FC<
