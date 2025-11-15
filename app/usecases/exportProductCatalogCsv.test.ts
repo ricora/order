@@ -56,11 +56,11 @@ describe("exportProductCatalogCsv", () => {
     expect(result.exportedAt).toBeInstanceOf(Date)
 
     expect(result.csv).toBe(
-      [
+      `${[
         "product_id,product_name,price,stock,image_url,tag_ids,tag_names,tag_count",
         "1,Blend,450,10,https://example.com/images/products/1,1|2,Blend|Seasonal,2",
         "2,Latte,500,0,https://example.com/images/products/2,2,Seasonal,1",
-      ].join("\n"),
+      ].join("\n")}\n`,
     )
   })
 

@@ -22,7 +22,7 @@ const escapeCsvValue = (value: string): string => {
  * @returns 改行区切りで結合されたCSV
  */
 export const toCsv = (rows: CsvValue[][]): string => {
-  return rows
+  return `${rows
     .map((row) =>
       row
         .map((value) => {
@@ -34,5 +34,6 @@ export const toCsv = (rows: CsvValue[][]): string => {
         })
         .join(","),
     )
-    .join("\n")
+    .join("\n")}
+`
 }

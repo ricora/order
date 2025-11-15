@@ -89,12 +89,12 @@ describe("exportOrderHistoryCsv", () => {
     expect(result.exportedAt).toBeInstanceOf(Date)
 
     expect(result.csv).toBe(
-      [
+      `${[
         "order_id,order_created_at,order_updated_at,order_status,customer_name,order_total_amount,order_item_count,line_index,product_id,product_name,unit_amount,quantity,line_total_amount",
         "1,2024-01-01T09:00:00.000Z,2024-01-01T10:00:00.000Z,completed,Alice,1500,2,1,10,Coffee,500,2,1000",
         "1,2024-01-01T09:00:00.000Z,2024-01-01T10:00:00.000Z,completed,Alice,1500,2,2,,Cookie,500,1,500",
         "2,2024-01-02T09:00:00.000Z,2024-01-02T09:30:00.000Z,pending,,1000,1,1,20,Tea,1000,1,1000",
-      ].join("\n"),
+      ].join("\n")}\n`,
     )
   })
 
