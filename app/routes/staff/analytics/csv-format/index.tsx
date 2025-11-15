@@ -1,4 +1,4 @@
-import type { FC, PropsWithChildren } from "hono/jsx"
+import type { Child, FC, PropsWithChildren } from "hono/jsx"
 import { createRoute } from "honox/factory"
 import ChevronLeftIcon from "../../../../components/icons/lucide/chevronLeftIcon"
 import Callout from "../../../../components/ui/callout"
@@ -8,7 +8,7 @@ import Layout from "../../-components/layout"
 
 type ColumnDescriptionProps = {
   name: string
-  description: string
+  description: Child
 }
 
 type CsvFormatSectionProps = PropsWithChildren<{
