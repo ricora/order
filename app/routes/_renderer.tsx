@@ -23,7 +23,7 @@ export default jsxRenderer(({ children }) => {
         <script dangerouslySetInnerHTML={{ __html: colorSchemeInitScript }} />
         {c.req.path.startsWith("/staff") && (
           <script
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: must inline pre-render staffsidebar script to prevent FOUC (Flash of Unstyled Content)
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: must inline pre-render staff sidebar script to prevent FOUC (Flash of Unstyled Content)
             dangerouslySetInnerHTML={{ __html: staffSidebarInitScript }}
           />
         )}
