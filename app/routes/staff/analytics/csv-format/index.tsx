@@ -1,3 +1,4 @@
+import type { FC, PropsWithChildren } from "hono/jsx"
 import { createRoute } from "honox/factory"
 import { ORDER_HISTORY_COLUMNS } from "../../../../usecases/exportOrderHistoryCsv"
 import { PRODUCT_CATALOG_COLUMNS } from "../../../../usecases/exportProductCatalogCsv"
@@ -8,21 +9,20 @@ type ColumnDescriptionProps = {
   description: string
 }
 
-type CsvFormatSectionProps = {
+type CsvFormatSectionProps = PropsWithChildren<{
   title: string
-  description: string
   columns: ColumnDescriptionProps[]
-}
+}>
 
-const CsvFormatSection = ({
+const CsvFormatSection: FC<CsvFormatSectionProps> = ({
   title,
-  description,
+  children,
   columns,
-}: CsvFormatSectionProps) => (
+}) => (
   <div className="rounded-lg border bg-bg p-6">
     <div className="mb-6">
       <h2 className="font-semibold text-fg text-lg">{title}</h2>
-      <p className="mt-1 text-muted-fg text-sm">{description}</p>
+      <div className="mt-2 text-muted-fg text-sm">{children}</div>
     </div>
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[auto_1fr]">
       {columns.map((column) => (
@@ -57,15 +57,28 @@ export default createRoute(async (c) => {
 
         <CsvFormatSection
           title="注文履歴CSV"
-          description="注文とその注文明細のネスト構造をフラット化した形式で出力されます。1つの注文に複数の注文明細がある場合、注文レベルのフィールド（order_id、order_created_atなど）は各明細行に繰り返し記録され、注文明細レベルのフィールド（product_id、quantityなど）は各明細行ごとに異なる値が記録されます。"
           columns={[...ORDER_HISTORY_COLUMNS]}
-        />
+        >
+          <p>
+            注文とその注文明細のネスト構造をフラット化した形式で出力されます。
+          </p>
+          <p className="mt-2">1つの注文に複数の注文明細がある場合:</p>
+          <ul className="mt-1 list-disc space-y-1 pl-5">
+            <li>
+              注文レベルのフィールド（order_id、order_created_atなど）は各明細行に繰り返し記録されます
+            </li>
+            <li>
+              注文明細レベルのフィールド（product_id、quantityなど）は各明細行ごとに異なる値が記録されます
+            </li>
+          </ul>
+        </CsvFormatSection>
 
         <CsvFormatSection
           title="商品カタログCSV"
-          description="すべての商品情報が1商品につき1行で出力されます。"
           columns={[...PRODUCT_CATALOG_COLUMNS]}
-        />
+        >
+          <p>すべての商品情報が1商品につき1行で出力されます。</p>
+        </CsvFormatSection>
 
         <div className="rounded-lg border bg-bg p-6">
           <div className="flex items-start gap-3">
