@@ -145,6 +145,9 @@ const statusLabel: Record<Order["status"], string> = {
   cancelled: "取消済",
 }
 
+const REFRESH_INTERVAL_MS = 30_000
+const FETCH_COOLDOWN_MS = 5_000
+
 const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
   const [text, setText] = useState("--:--")
   useEffect(() => {
@@ -371,7 +374,7 @@ const Card: FC<{
 type ColumnStatus = "pending" | "processing" | "completed" | "cancelled"
 
 const Countdown: FC<{
-  refreshInterval: number
+  refreshIntervalMs: number
   fetchRef: {
     current:
       | ((opts?: { suppressToastsForIds?: number[] }) => Promise<void>)
@@ -379,25 +382,25 @@ const Countdown: FC<{
       | undefined
   }
   resetSignal: number
-}> = ({ refreshInterval, fetchRef, resetSignal }) => {
-  const [seconds, setSeconds] = useState(refreshInterval)
+}> = ({ refreshIntervalMs, fetchRef, resetSignal }) => {
+  const [seconds, setSeconds] = useState(Math.ceil(refreshIntervalMs / 1000))
 
   useEffect(() => {
-    setSeconds(refreshInterval)
-  }, [resetSignal, refreshInterval])
+    setSeconds(Math.ceil(refreshIntervalMs / 1000))
+  }, [resetSignal, refreshIntervalMs])
 
   useEffect(() => {
     const id = setInterval(() => {
       setSeconds((prev) => {
         if (prev <= 1) {
           fetchRef?.current?.()
-          return refreshInterval
+          return Math.ceil(refreshIntervalMs / 1000)
         }
         return prev - 1
       })
     }, 1000)
     return () => clearInterval(id)
-  }, [refreshInterval, fetchRef])
+  }, [refreshIntervalMs, fetchRef])
 
   return <span className="font-mono">{seconds}</span>
 }
@@ -450,15 +453,38 @@ const OrderProgressManager: FC = () => {
   const [processingOrders, setProcessingOrders] = useState<Order[]>([])
   const [completedOrders, setCompletedOrders] = useState<Order[]>([])
   const [cancelledOrders, setCancelledOrders] = useState<Order[]>([])
-  const REFRESH_INTERVAL = 30
   const [fetchSignal, setFetchSignal] = useState(0)
   const [error, setError] = useState<string | null>(null)
+
+  const [isFetching, setIsFetching] = useState(false)
+  const [isFetchDisabled, setIsFetchDisabled] = useState(false)
+  const isFetchingRef = useRef(false)
+  const isFetchDisabledRef = useRef(false)
+  const cooldownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const prevOrdersRef = useRef<Map<number, Order> | null>(null)
   const hasInitialLoadRef = useRef(false)
 
   const fetchData = useCallback(
     async (opts?: { suppressToastsForIds?: number[] }) => {
+      const isLocalUpdate = !!(
+        opts?.suppressToastsForIds && opts.suppressToastsForIds.length > 0
+      )
+      if (
+        isFetchingRef.current ||
+        (isFetchDisabledRef.current && !isLocalUpdate)
+      )
+        return
+      setIsFetching(true)
+      isFetchingRef.current = true
+      if (!isLocalUpdate) {
+        setIsFetchDisabled(true)
+        isFetchDisabledRef.current = true
+        if (cooldownTimeoutRef.current) {
+          clearTimeout(cooldownTimeoutRef.current)
+          cooldownTimeoutRef.current = null
+        }
+      }
       try {
         setError(null)
         const honoClient = createHonoClient()
@@ -543,6 +569,17 @@ const OrderProgressManager: FC = () => {
         setError(err instanceof Error ? err.message : String(err))
       } finally {
         setFetchSignal((s) => s + 1)
+        setIsFetching(false)
+        isFetchingRef.current = false
+        if (!isLocalUpdate) {
+          if (cooldownTimeoutRef.current)
+            clearTimeout(cooldownTimeoutRef.current)
+          cooldownTimeoutRef.current = setTimeout(() => {
+            setIsFetchDisabled(false)
+            isFetchDisabledRef.current = false
+            cooldownTimeoutRef.current = null
+          }, FETCH_COOLDOWN_MS)
+        }
       }
     },
     [],
@@ -551,6 +588,12 @@ const OrderProgressManager: FC = () => {
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimeoutRef.current) clearTimeout(cooldownTimeoutRef.current)
+    }
+  }, [])
 
   const fetchDataRef = useRef(fetchData)
   useEffect(() => {
@@ -565,7 +608,7 @@ const OrderProgressManager: FC = () => {
           <div className="text-muted-fg text-xs">
             自動更新まであと
             <Countdown
-              refreshInterval={REFRESH_INTERVAL}
+              refreshIntervalMs={REFRESH_INTERVAL_MS}
               fetchRef={fetchDataRef}
               resetSignal={fetchSignal}
             />
@@ -575,6 +618,7 @@ const OrderProgressManager: FC = () => {
             type="button"
             variant="secondary"
             onClick={() => fetchData()}
+            disabled={isFetching || isFetchDisabled}
             ariaLabel="注文一覧を更新する"
           >
             <div class="size-4">
