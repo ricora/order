@@ -18,6 +18,7 @@ import TimerIcon from "../../../../../components/icons/lucide/timerIcon"
 import Button from "../../../../../components/ui/button"
 import type Order from "../../../../../domain/order/entities/order"
 import { createHonoClient } from "../../../../../helpers/api/hono-client"
+import { showToast } from "../../../../../helpers/ui/client-toast"
 import { formatDateTimeJP } from "../../../../../utils/date"
 import OrderStatusBadge from "../../-components/orderStatusBadge"
 
@@ -213,8 +214,13 @@ const Card: FC<{ order: Order; onStatusChange?: () => void }> = ({
       }
 
       onStatusChange?.()
+      showToast(
+        "success",
+        `#${order.id}の注文を「${statusLabel[toStatus]}」に更新しました。`,
+      )
     } catch (error) {
-      console.error("Status update error:", error)
+      const msg = error instanceof Error ? error.message : String(error)
+      showToast("error", `#${order.id}の注文を更新できませんでした: ${msg}`)
     }
   }
 
