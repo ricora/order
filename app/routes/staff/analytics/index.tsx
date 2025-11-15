@@ -89,7 +89,7 @@ export default createRoute(async (c) => {
           <div className="mt-3">
             <a
               href="/staff/analytics/csv-format"
-              className="inline-flex items-center gap-1.5 text-primary text-sm hover:underline"
+              className="inline-flex items-center gap-1.5 text-primary-subtle-fg text-sm hover:underline"
             >
               <div className="h-4 w-4">
                 <InfoIcon />
