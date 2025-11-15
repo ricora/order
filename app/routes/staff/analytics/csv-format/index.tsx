@@ -57,7 +57,7 @@ export default createRoute(async (c) => {
 
         <CsvFormatSection
           title="注文履歴CSV"
-          description="注文とその明細行がすべて含まれます。1つの注文に複数の明細行がある場合、注文情報は各行に繰り返されます。"
+          description="注文とその注文明細のネスト構造をフラット化した形式で出力されます。1つの注文に複数の注文明細がある場合、注文レベルのフィールド（order_id、order_created_atなど）は各明細行に繰り返し記録され、注文明細レベルのフィールド（product_id、quantityなど）は各明細行ごとに異なる値が記録されます。"
           columns={[...ORDER_HISTORY_COLUMNS]}
         />
 

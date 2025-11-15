@@ -12,51 +12,51 @@ export const ORDER_HISTORY_COLUMNS = [
   },
   {
     name: "order_created_at",
-    description: "注文作成日時（ISO 8601形式）",
+    description: "注文の作成日時（ISO 8601形式）",
   },
   {
     name: "order_updated_at",
-    description: "注文更新日時（ISO 8601形式）",
+    description: "注文の更新日時（ISO 8601形式）",
   },
   {
     name: "order_status",
-    description: "注文ステータス（pending/confirmed/completed）",
+    description: "注文のステータス（pending/confirmed/completed）",
   },
   {
     name: "customer_name",
-    description: "顧客名",
+    description: "注文の顧客名",
   },
   {
     name: "order_total_amount",
-    description: "注文合計金額（円）",
+    description: "注文全体の合計金額（円）",
   },
   {
     name: "order_item_count",
-    description: "注文明細行数",
+    description: "注文に含まれる注文明細の総数",
   },
   {
     name: "line_index",
-    description: "明細行番号（1から始まる連番）",
+    description: "注文明細の行番号（1から始まる連番）",
   },
   {
     name: "product_id",
-    description: "商品ID",
+    description: "注文明細の商品ID",
   },
   {
     name: "product_name",
-    description: "商品名",
+    description: "注文明細の商品名",
   },
   {
     name: "unit_amount",
-    description: "単価（円）",
+    description: "注文明細の単価（円）",
   },
   {
     name: "quantity",
-    description: "数量",
+    description: "注文明細の数量",
   },
   {
     name: "line_total_amount",
-    description: "明細行合計金額（単価×数量、円）",
+    description: "注文明細の合計金額（単価×数量、円）",
   },
 ] as const
 
