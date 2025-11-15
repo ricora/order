@@ -48,11 +48,44 @@ export default createRoute(async (c) => {
       <div class="space-y-6">
         <div class="rounded-lg border bg-bg p-6">
           <h2 class="font-semibold text-fg text-lg">共通仕様</h2>
-          <ul class="mt-4 list-disc space-y-2 pl-5 text-muted-fg text-sm">
+          <div class="my-4 rounded-lg border border-info-subtle bg-info-subtle px-6 py-4">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center gap-3">
+                <div class="flex items-center justify-center rounded-lg">
+                  <div class="h-5 w-5 text-info-subtle-fg">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      role="graphics-symbol"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4" />
+                      <path d="M12 8h.01" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="font-bold text-info-subtle-fg">注意事項</h3>
+              </div>
+              <p class="text-info-subtle-fg text-sm">
+                CSVファイルをExcelで開く場合、日付や数値の表示形式が自動変換される場合があります。データの正確性を保つため、テキストエディタやデータ分析ツールでの利用を推奨します。
+              </p>
+            </div>
+          </div>
+          <ul class="my-4 list-disc space-y-2 pl-5 text-muted-fg text-sm">
             <li>文字エンコーディング: UTF-8</li>
             <li>ヘッダー行: 1行目に各カラム名が含まれます</li>
-            <li>日付形式: ISO 8601形式（例: <code>2025-01-15T12:34:56.789Z</code>）</li>
-            <li>複数値の区切り: パイプ（<code>|</code>）で区切られます</li>
+            <li>
+              日付形式: ISO 8601形式（例: <code>2025-01-15T12:34:56.789Z</code>
+              ）
+            </li>
+            <li>
+              複数値の区切り: パイプ（<code>|</code>）で区切られます
+            </li>
           </ul>
         </div>
 
