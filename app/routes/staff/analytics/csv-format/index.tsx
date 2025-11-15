@@ -12,7 +12,7 @@ type ColumnDescriptionProps = {
 
 type CsvFormatSectionProps = PropsWithChildren<{
   title: string
-  columns: ColumnDescriptionProps[]
+  columns: ReadonlyArray<ColumnDescriptionProps>
 }>
 
 const CsvFormatSection: FC<CsvFormatSectionProps> = ({
