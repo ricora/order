@@ -103,14 +103,14 @@ export default createRoute(async (c) => {
           <CSVExportItem
             icon={ClipboardListIcon}
             title="注文履歴（CSV形式）"
-            description="すべての注文データをCSV形式でエクスポートします"
+            description="すべての注文データをCSV形式でエクスポートします。"
             exportUrl="/staff/analytics/orders/csv"
             exportLabel="CSVダウンロード"
           />
           <CSVExportItem
             icon={PackageIcon}
             title="商品カタログ（CSV形式）"
-            description="すべての商品データをCSV形式でエクスポートします"
+            description="すべての商品データをCSV形式でエクスポートします。"
             exportUrl="/staff/analytics/products/csv"
             exportLabel="CSVダウンロード"
           />
