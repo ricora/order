@@ -24,7 +24,7 @@ const CsvFormatSection: FC<CsvFormatSectionProps> = ({
   <div class="rounded-lg border bg-bg p-6">
     <div class="mb-6">
       <h2 class="font-semibold text-fg text-lg">{title}</h2>
-      <div class="mt-2 text-muted-fg text-sm">{children}</div>
+      <div class="mt-2 text-fg text-sm">{children}</div>
     </div>
     <div class="grid grid-cols-1 gap-2 sm:grid-cols-[auto_1fr]">
       {columns.map((column) => (
@@ -33,7 +33,7 @@ const CsvFormatSection: FC<CsvFormatSectionProps> = ({
           class="grid grid-cols-subgrid gap-3 rounded border border-border bg-muted p-3 sm:col-span-2"
         >
           <code class="font-mono text-primary text-sm">{column.name}</code>
-          <span class="text-muted-fg text-sm">{column.description}</span>
+          <span class="text-fg text-sm">{column.description}</span>
         </div>
       ))}
     </div>
@@ -49,15 +49,15 @@ export default createRoute(async (c) => {
       <div class="space-y-6">
         <div class="rounded-lg border bg-bg p-6">
           <h2 class="font-semibold text-fg text-lg">共通仕様</h2>
-          <ul class="my-4 list-disc space-y-2 pl-5 text-muted-fg text-sm">
-            <li>文字エンコーディング: UTF-8</li>
-            <li>ヘッダー行: 1行目に各カラム名が含まれます</li>
+          <ul class="my-4 list-disc space-y-2 pl-5 text-fg text-sm">
+            <li>文字エンコーディング： UTF-8</li>
+            <li>ヘッダー行： 1行目に各カラム名が含まれる</li>
             <li>
-              日付形式: ISO 8601形式（例: <code>2025-01-15T12:34:56.789Z</code>
+              日付形式： ISO 8601形式（例: <code>2025-01-15T12:34:56.789Z</code>
               ）
             </li>
             <li>
-              複数値の区切り: パイプ（<code>|</code>）で区切られます
+              複数値の区切り： パイプ（<code>|</code>）で区切られる
             </li>
           </ul>
           <div class="mt-4">
@@ -73,16 +73,16 @@ export default createRoute(async (c) => {
           <p>
             注文とその注文明細のネスト構造をフラット化した形式で出力されます。
           </p>
-          <p class="mt-2">1つの注文に複数の注文明細がある場合:</p>
+          <p class="mt-2">1つの注文に複数の注文明細がある場合：</p>
           <ul class="mt-1 list-disc space-y-1 pl-5">
             <li>
               注文レベルのフィールド（<code>order_id</code>、
               <code>order_created_at</code>
-              など）は各明細行に繰り返し記録されます
+              など）は各明細行に繰り返し記録される
             </li>
             <li>
               注文明細レベルのフィールド（<code>product_id</code>、
-              <code>quantity</code>など）は各明細行ごとに異なる値が記録されます
+              <code>quantity</code>など）は各明細行ごとに異なる値が記録される
             </li>
           </ul>
         </CsvFormatSection>
