@@ -6,13 +6,6 @@ type ColumnDescriptionProps = {
   description: string
 }
 
-const ColumnDescription = ({ name, description }: ColumnDescriptionProps) => (
-  <div className="flex flex-col gap-1 rounded border border-border bg-muted p-3 sm:flex-row sm:gap-3">
-    <code className="shrink-0 font-mono text-primary text-sm">{name}</code>
-    <span className="text-muted-fg text-sm">{description}</span>
-  </div>
-)
-
 type CsvFormatSectionProps = {
   title: string
   description: string
@@ -29,13 +22,22 @@ const CsvFormatSection = ({
       <h2 className="font-semibold text-fg text-lg">{title}</h2>
       <p className="mt-1 text-muted-fg text-sm">{description}</p>
     </div>
-    <div className="space-y-2">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-[auto_1fr]">
       {columns.map((column) => (
-        <ColumnDescription
-          key={column.name}
-          name={column.name}
-          description={column.description}
-        />
+        <>
+          <code
+            key={`${column.name}-name`}
+            className="rounded border border-border bg-muted p-3 font-mono text-primary text-sm"
+          >
+            {column.name}
+          </code>
+          <span
+            key={`${column.name}-desc`}
+            className="rounded border border-border bg-muted p-3 text-muted-fg text-sm"
+          >
+            {column.description}
+          </span>
+        </>
       ))}
     </div>
   </div>
