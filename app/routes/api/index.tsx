@@ -66,11 +66,8 @@ const routes = app
           order: { id: orderId, status },
         })
         return c.text("Success", 200)
-      } catch (e) {
-        return c.text(
-          `Error: ${e instanceof Error ? e.message : String(e)}`,
-          500,
-        )
+      } catch (_e) {
+        return c.text("Conflict", 409)
       }
     },
   )
