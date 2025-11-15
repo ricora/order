@@ -1,10 +1,9 @@
 import type { FC, PropsWithChildren } from "hono/jsx"
 import { createRoute } from "honox/factory"
-import ArrowLeftIcon from "../../../../components/icons/lucide/arrowLeftIcon"
+import ChevronLeftIcon from "../../../../components/icons/lucide/chevronLeftIcon"
 import { ORDER_HISTORY_COLUMNS } from "../../../../usecases/exportOrderHistoryCsv"
 import { PRODUCT_CATALOG_COLUMNS } from "../../../../usecases/exportProductCatalogCsv"
 import Layout from "../../-components/layout"
-import ChevronLeftIcon from "../../../../components/icons/lucide/chevronLeftIcon"
 
 type ColumnDescriptionProps = {
   name: string
