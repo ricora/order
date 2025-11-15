@@ -3,6 +3,7 @@ import { createRoute } from "honox/factory"
 import { tv } from "tailwind-variants"
 import ClipboardListIcon from "../../../components/icons/lucide/clipboardListIcon"
 import DownloadIcon from "../../../components/icons/lucide/downloadIcon"
+import InfoIcon from "../../../components/icons/lucide/infoIcon"
 import PackageIcon from "../../../components/icons/lucide/packageIcon"
 import Layout from "../-components/layout"
 
@@ -90,21 +91,9 @@ export default createRoute(async (c) => {
               href="/staff/analytics/csv-format"
               className="inline-flex items-center gap-1.5 text-primary text-sm hover:underline"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="h-4 w-4"
-                role="graphics-symbol"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4" />
-                <path d="M12 8h.01" />
-              </svg>
+              <div className="h-4 w-4">
+                <InfoIcon />
+              </div>
               CSVフォーマット仕様を確認する
             </a>
           </div>
