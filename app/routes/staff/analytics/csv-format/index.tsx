@@ -4,6 +4,7 @@ import ArrowLeftIcon from "../../../../components/icons/lucide/arrowLeftIcon"
 import { ORDER_HISTORY_COLUMNS } from "../../../../usecases/exportOrderHistoryCsv"
 import { PRODUCT_CATALOG_COLUMNS } from "../../../../usecases/exportProductCatalogCsv"
 import Layout from "../../-components/layout"
+import ChevronLeftIcon from "../../../../components/icons/lucide/chevronLeftIcon"
 
 type ColumnDescriptionProps = {
   name: string
@@ -96,10 +97,13 @@ export default createRoute(async (c) => {
           <p class="mt-2">1つの注文に複数の注文明細がある場合:</p>
           <ul class="mt-1 list-disc space-y-1 pl-5">
             <li>
-              注文レベルのフィールド（<code>order_id</code>、<code>order_created_at</code>など）は各明細行に繰り返し記録されます
+              注文レベルのフィールド（<code>order_id</code>、
+              <code>order_created_at</code>
+              など）は各明細行に繰り返し記録されます
             </li>
             <li>
-              注文明細レベルのフィールド（<code>product_id</code>、<code>quantity</code>など）は各明細行ごとに異なる値が記録されます
+              注文明細レベルのフィールド（<code>product_id</code>、
+              <code>quantity</code>など）は各明細行ごとに異なる値が記録されます
             </li>
           </ul>
         </CsvFormatSection>
@@ -146,7 +150,7 @@ export default createRoute(async (c) => {
             class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded border bg-muted px-3 py-2 font-medium text-secondary-fg text-sm transition hover:border-primary-subtle hover:bg-primary-subtle hover:text-primary-subtle-fg"
           >
             <div class="h-4 w-4">
-              <ArrowLeftIcon />
+              <ChevronLeftIcon />
             </div>
             売上分析ページに戻る
           </a>
