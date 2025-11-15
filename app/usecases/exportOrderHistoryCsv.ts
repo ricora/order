@@ -5,21 +5,62 @@ import { toCsv } from "../utils/csv"
 
 export const ORDER_HISTORY_EXPORT_PAGE_SIZE = 200
 
-export const ORDER_HISTORY_HEADER = [
-  "order_id",
-  "order_created_at",
-  "order_updated_at",
-  "order_status",
-  "customer_name",
-  "order_total_amount",
-  "order_item_count",
-  "line_index",
-  "product_id",
-  "product_name",
-  "unit_amount",
-  "quantity",
-  "line_total_amount",
-]
+export const ORDER_HISTORY_COLUMNS = [
+  {
+    name: "order_id",
+    description: "注文ID（一意の識別子）",
+  },
+  {
+    name: "order_created_at",
+    description: "注文作成日時（ISO 8601形式）",
+  },
+  {
+    name: "order_updated_at",
+    description: "注文更新日時（ISO 8601形式）",
+  },
+  {
+    name: "order_status",
+    description: "注文ステータス（pending/confirmed/completed）",
+  },
+  {
+    name: "customer_name",
+    description: "顧客名",
+  },
+  {
+    name: "order_total_amount",
+    description: "注文合計金額（円）",
+  },
+  {
+    name: "order_item_count",
+    description: "注文明細行数",
+  },
+  {
+    name: "line_index",
+    description: "明細行番号（1から始まる連番）",
+  },
+  {
+    name: "product_id",
+    description: "商品ID",
+  },
+  {
+    name: "product_name",
+    description: "商品名",
+  },
+  {
+    name: "unit_amount",
+    description: "単価（円）",
+  },
+  {
+    name: "quantity",
+    description: "数量",
+  },
+  {
+    name: "line_total_amount",
+    description: "明細行合計金額（単価×数量、円）",
+  },
+] as const
+
+export const ORDER_HISTORY_HEADER = ORDER_HISTORY_COLUMNS.map((col) => col.name)
 
 export type ExportOrderHistoryCsvParams = {
   dbClient: DbClient

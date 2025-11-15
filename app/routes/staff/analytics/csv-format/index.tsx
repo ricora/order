@@ -1,4 +1,6 @@
 import { createRoute } from "honox/factory"
+import { ORDER_HISTORY_COLUMNS } from "../../../../usecases/exportOrderHistoryCsv"
+import { PRODUCT_CATALOG_COLUMNS } from "../../../../usecases/exportProductCatalogCsv"
 import Layout from "../../-components/layout"
 
 type ColumnDescriptionProps = {
@@ -37,96 +39,6 @@ const CsvFormatSection = ({
 )
 
 export default createRoute(async (c) => {
-  const orderHistoryColumns: ColumnDescriptionProps[] = [
-    {
-      name: "order_id",
-      description: "注文ID（一意の識別子）",
-    },
-    {
-      name: "order_created_at",
-      description: "注文作成日時（ISO 8601形式）",
-    },
-    {
-      name: "order_updated_at",
-      description: "注文更新日時（ISO 8601形式）",
-    },
-    {
-      name: "order_status",
-      description: "注文ステータス（pending/confirmed/completed）",
-    },
-    {
-      name: "customer_name",
-      description: "顧客名",
-    },
-    {
-      name: "order_total_amount",
-      description: "注文合計金額（円）",
-    },
-    {
-      name: "order_item_count",
-      description: "注文明細行数",
-    },
-    {
-      name: "line_index",
-      description: "明細行番号（1から始まる連番）",
-    },
-    {
-      name: "product_id",
-      description: "商品ID",
-    },
-    {
-      name: "product_name",
-      description: "商品名",
-    },
-    {
-      name: "unit_amount",
-      description: "単価（円）",
-    },
-    {
-      name: "quantity",
-      description: "数量",
-    },
-    {
-      name: "line_total_amount",
-      description: "明細行合計金額（単価×数量、円）",
-    },
-  ]
-
-  const productCatalogColumns: ColumnDescriptionProps[] = [
-    {
-      name: "product_id",
-      description: "商品ID（一意の識別子）",
-    },
-    {
-      name: "product_name",
-      description: "商品名",
-    },
-    {
-      name: "price",
-      description: "価格（円）",
-    },
-    {
-      name: "stock",
-      description: "在庫数",
-    },
-    {
-      name: "image_url",
-      description: "商品画像URL（絶対URL）",
-    },
-    {
-      name: "tag_ids",
-      description: "タグID（パイプ区切り、例: 1|3|5）",
-    },
-    {
-      name: "tag_names",
-      description: "タグ名（パイプ区切り、例: 飲料|冷凍）",
-    },
-    {
-      name: "tag_count",
-      description: "タグ数",
-    },
-  ]
-
   return c.render(
     <Layout
       title="CSVフォーマット仕様"
@@ -146,13 +58,13 @@ export default createRoute(async (c) => {
         <CsvFormatSection
           title="注文履歴CSV"
           description="注文とその明細行がすべて含まれます。1つの注文に複数の明細行がある場合、注文情報は各行に繰り返されます。"
-          columns={orderHistoryColumns}
+          columns={[...ORDER_HISTORY_COLUMNS]}
         />
 
         <CsvFormatSection
           title="商品カタログCSV"
           description="すべての商品情報が1商品につき1行で出力されます。"
-          columns={productCatalogColumns}
+          columns={[...PRODUCT_CATALOG_COLUMNS]}
         />
 
         <div className="rounded-lg border bg-bg p-6">
