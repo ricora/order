@@ -63,10 +63,10 @@ export default createRoute(async (c) => {
           <p class="mt-2">1つの注文に複数の注文明細がある場合:</p>
           <ul class="mt-1 list-disc space-y-1 pl-5">
             <li>
-              注文レベルのフィールド（order_id、order_created_atなど）は各明細行に繰り返し記録されます
+              注文レベルのフィールド（<code>order_id</code>、<code>order_created_at</code>など）は各明細行に繰り返し記録されます
             </li>
             <li>
-              注文明細レベルのフィールド（product_id、quantityなど）は各明細行ごとに異なる値が記録されます
+              注文明細レベルのフィールド（<code>product_id</code>、<code>quantity</code>など）は各明細行ごとに異なる値が記録されます
             </li>
           </ul>
         </CsvFormatSection>
