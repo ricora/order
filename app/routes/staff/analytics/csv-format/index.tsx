@@ -76,7 +76,7 @@ export default createRoute(async (c) => {
 
         <CsvFormatSection
           title="商品カタログCSV"
-          columns={[...PRODUCT_CATALOG_COLUMNS]}
+          columns={PRODUCT_CATALOG_COLUMNS}
         >
           <p>すべての商品情報が1商品につき1行で出力されます。</p>
         </CsvFormatSection>
