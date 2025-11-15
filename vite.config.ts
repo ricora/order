@@ -3,6 +3,7 @@ import adapter from "@hono/vite-dev-server/bun"
 import tailwindcss from "@tailwindcss/vite"
 import honox from "honox/vite"
 import { defineConfig } from "vite"
+import { inlineJsPlugin } from "./vite-plugins/inline-js"
 
 export default defineConfig({
   define: {
@@ -10,6 +11,7 @@ export default defineConfig({
     "process.env": "process.env",
   },
   plugins: [
+    inlineJsPlugin(),
     honox({
       devServer: { adapter },
       client: { input: ["/app/client.ts", "/app/style.css"] },
