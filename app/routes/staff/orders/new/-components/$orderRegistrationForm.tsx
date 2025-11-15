@@ -24,9 +24,9 @@ const productButton = tv({
   base: "w-full rounded border px-3 py-3 text-left transition",
   variants: {
     disabled: {
-      true: "cursor-not-allowed bg-white opacity-50",
+      true: "cursor-not-allowed bg-bg opacity-50",
       false:
-        "cursor-pointer bg-white hover:border-primary-subtle hover:bg-primary-subtle",
+        "cursor-pointer bg-bg hover:border-primary-subtle hover:bg-primary-subtle",
     },
   },
   defaultVariants: {
@@ -271,10 +271,7 @@ const OrderRegistrationForm: FC = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex min-w-0 flex-1 items-center gap-3">
                             <img
-                              src={
-                                product.image ||
-                                "/placeholder.svg?height=60&width=60"
-                              }
+                              src={`/images/products/${product.id}`}
                               alt={product.name}
                               className="h-10 w-10 shrink-0 rounded object-cover"
                               loading="lazy"
@@ -358,7 +355,7 @@ const OrderRegistrationForm: FC = () => {
                 return (
                   <div
                     key={String(item.productId)}
-                    className="rounded border bg-white p-3"
+                    className="rounded border bg-bg p-3"
                     data-product-id={String(item.productId)}
                     data-price={String(item.unitAmount)}
                   >
@@ -370,10 +367,7 @@ const OrderRegistrationForm: FC = () => {
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                       <div className="flex min-w-0 flex-1 items-center gap-4">
                         <img
-                          src={
-                            productInList?.image ||
-                            "/placeholder.svg?height=60&width=60"
-                          }
+                          src={`/images/products/${item.productId}`}
                           alt={item.productName}
                           className="h-10 w-10 shrink-0 rounded object-cover"
                           loading="lazy"

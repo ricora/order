@@ -10,7 +10,6 @@ test.describe("商品登録", () => {
 
     // フォームに入力
     await page.getByLabel("商品名").fill("テスト商品")
-    await page.getByLabel("画像URL").fill("https://example.com/test.jpg")
     await page.getByLabel("価格（円）").fill("500")
     await page.getByLabel("在庫数").fill("10")
 

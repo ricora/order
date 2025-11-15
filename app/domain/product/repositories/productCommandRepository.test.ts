@@ -8,6 +8,7 @@ import {
   spyOn,
 } from "bun:test"
 import type { TransactionDbClient } from "../../../infrastructure/db/client"
+import { MAX_STORE_PRODUCT_COUNT } from "../constants"
 import type Product from "../entities/product"
 import {
   type CreateProduct,
@@ -25,7 +26,6 @@ const mockTags = [
 
 const validProduct: Omit<Product, "id"> = {
   name: "テスト商品",
-  image: "https://example.com/image.png",
   tagIds: [1, 2],
   price: 1000,
   stock: 5,
@@ -34,7 +34,6 @@ const validProduct: Omit<Product, "id"> = {
 const defaultProduct: Product = {
   id: 1,
   name: "テスト商品",
-  image: "https://example.com/image.png",
   tagIds: [1, 2],
   price: 1000,
   stock: 5,
@@ -47,6 +46,7 @@ const applyPartialToDefaultProduct = (
 describe("createProduct", () => {
   let findAllProductTagsSpy: ReturnType<typeof spyOn>
   let findProductByNameSpy: ReturnType<typeof spyOn>
+  let countProductsSpy: ReturnType<typeof spyOn>
   const mockDbClient = {} as TransactionDbClient
 
   beforeEach(() => {
@@ -59,6 +59,10 @@ describe("createProduct", () => {
       productQueryRepository,
       "findProductByName",
     ).mockImplementation(async () => null)
+    countProductsSpy = spyOn(
+      productQueryRepository,
+      "countProducts",
+    ).mockImplementation(async () => 0)
   })
 
   afterEach(() => {
@@ -85,7 +89,10 @@ describe("createProduct", () => {
     findProductByNameSpy.mockImplementation(async () => ({
       id: 1,
       name: validProduct.name,
-      image: "https://example.com/existing.png",
+      image: {
+        data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        mimeType: "image/png",
+      },
       tagIds: [1],
       price: 500,
       stock: 10,
@@ -110,49 +117,6 @@ describe("createProduct", () => {
         dbClient: mockDbClient,
       }),
     ).rejects.toThrow("商品名は1文字以上50文字以内である必要があります")
-    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
-    expect(findProductByNameSpy).not.toHaveBeenCalled()
-  })
-
-  it("画像URLが空ならエラーを返す", async () => {
-    await expect(
-      createProduct({
-        product: { ...validProduct, image: "" },
-        repositoryImpl: async () => null,
-        dbClient: mockDbClient,
-      }),
-    ).rejects.toThrow(
-      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-    )
-    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
-    expect(findProductByNameSpy).not.toHaveBeenCalled()
-  })
-
-  it("画像URLが500文字を超える場合はエラーを返す", async () => {
-    const longUrl = `https://example.com/${"a".repeat(490)}`
-    await expect(
-      createProduct({
-        product: { ...validProduct, image: longUrl },
-        repositoryImpl: async () => null,
-        dbClient: mockDbClient,
-      }),
-    ).rejects.toThrow(
-      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-    )
-    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
-    expect(findProductByNameSpy).not.toHaveBeenCalled()
-  })
-
-  it("画像URLがhttp/httpsで始まらない場合はエラーを返す", async () => {
-    await expect(
-      createProduct({
-        product: { ...validProduct, image: "ftp://example.com/image.png" },
-        repositoryImpl: async () => null,
-        dbClient: mockDbClient,
-      }),
-    ).rejects.toThrow(
-      "画像URLは1文字以上500文字以内かつhttp(s)で始まる必要があります",
-    )
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
     expect(findProductByNameSpy).not.toHaveBeenCalled()
   })
@@ -202,6 +166,24 @@ describe("createProduct", () => {
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
     expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
   })
+
+  it("商品数の上限に達している場合はエラーを返す", async () => {
+    countProductsSpy.mockImplementation(async () => MAX_STORE_PRODUCT_COUNT)
+
+    await expect(
+      createProduct({
+        product: validProduct,
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow(
+      `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです`,
+    )
+
+    expect(countProductsSpy).toHaveBeenCalledTimes(1)
+    expect(findProductByNameSpy).not.toHaveBeenCalled()
+    expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
 })
 
 describe("updateProduct", () => {
@@ -243,7 +225,6 @@ describe("updateProduct", () => {
     findProductByNameSpy.mockImplementation(async () => ({
       id: 2,
       name: validProduct.name,
-      image: "https://example.com/existing.png",
       tagIds: [1],
       price: 500,
       stock: 10,
@@ -264,7 +245,6 @@ describe("updateProduct", () => {
     findProductByNameSpy.mockImplementation(async () => ({
       id: 1,
       name: validProduct.name,
-      image: "https://example.com/existing.png",
       tagIds: [1],
       price: 500,
       stock: 10,

@@ -30,6 +30,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.1.4",
     "@electric-sql/pglite": "0.3.14",
+    "@happy-dom/global-registrator": "^20.0.10",
     "@hono/vite-build": "1.7.0",
     "@hono/vite-dev-server": "0.23.0",
     "@playwright/test": "1.56.1",

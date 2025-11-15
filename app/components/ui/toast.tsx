@@ -36,26 +36,26 @@ const toastAnimate = css`
 export const toast = tv({
   slots: {
     container:
-      "flex min-w-[240px] max-w-[400px] items-center rounded-lg border p-4 shadow-lg",
+      "flex min-w-[240px] max-w-[400px] items-center rounded-lg border bg-bg p-4 shadow-lg",
     icon: "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
     text: "ml-3 break-words font-normal text-sm",
   },
   variants: {
     type: {
       success: {
-        container: "border-emerald-400 bg-emerald-50",
-        icon: "text-emerald-600",
-        text: "text-emerald-600",
+        container: "border-success-subtle",
+        icon: "text-success",
+        text: "text-fg",
       },
       error: {
-        container: "border-rose-400 bg-rose-50",
-        icon: "text-rose-600",
-        text: "text-rose-600",
+        container: "border-danger-subtle",
+        icon: "text-danger",
+        text: "text-fg",
       },
       warning: {
-        container: "border-amber-400 bg-amber-50",
-        icon: "text-amber-600",
-        text: "text-amber-600",
+        container: "border-warning-subtle",
+        icon: "text-warning",
+        text: "text-fg",
       },
     },
   },
