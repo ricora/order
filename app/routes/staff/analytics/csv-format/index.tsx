@@ -2,6 +2,7 @@ import type { Child, FC, PropsWithChildren } from "hono/jsx"
 import { createRoute } from "honox/factory"
 import ChevronLeftIcon from "../../../../components/icons/lucide/chevronLeftIcon"
 import Callout from "../../../../components/ui/callout"
+import LinkButton from "../../../../components/ui/linkButton"
 import { ORDER_HISTORY_COLUMNS } from "../../../../usecases/exportOrderHistoryCsv"
 import { PRODUCT_CATALOG_COLUMNS } from "../../../../usecases/exportProductCatalogCsv"
 import Layout from "../../-components/layout"
@@ -94,16 +95,12 @@ export default createRoute(async (c) => {
           <p>すべての商品情報が1商品につき1行で出力されます。</p>
         </CsvFormatSection>
 
-        <div class="flex justify-center">
-          <a
-            href="/staff/analytics"
-            class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded border bg-muted px-3 py-2 font-medium text-secondary-fg text-sm transition hover:border-primary-subtle hover:bg-primary-subtle hover:text-primary-subtle-fg"
-          >
-            <div class="h-4 w-4">
-              <ChevronLeftIcon />
-            </div>
-            売上分析ページに戻る
-          </a>
+        <div class="rounded-lg border bg-bg p-6">
+          <div class="flex justify-center">
+            <LinkButton href="/staff/analytics" leftIcon={ChevronLeftIcon}>
+              売上分析ページに戻る
+            </LinkButton>
+          </div>
         </div>
       </div>
     </Layout>,
