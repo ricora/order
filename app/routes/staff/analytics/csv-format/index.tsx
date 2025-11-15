@@ -51,8 +51,8 @@ export default createRoute(async (c) => {
           <ul class="mt-4 list-disc space-y-2 pl-5 text-muted-fg text-sm">
             <li>文字エンコーディング: UTF-8</li>
             <li>ヘッダー行: 1行目に各カラム名が含まれます</li>
-            <li>日付形式: ISO 8601形式（例: 2025-01-15T12:34:56.789Z）</li>
-            <li>複数値の区切り: パイプ（|）で区切られます</li>
+            <li>日付形式: ISO 8601形式（例: <code>2025-01-15T12:34:56.789Z</code>）</li>
+            <li>複数値の区切り: パイプ（<code>|</code>）で区切られます</li>
           </ul>
         </div>
 
