@@ -85,7 +85,7 @@ export default createRoute(async (c) => {
       <div class="rounded-lg border bg-bg p-6">
         <div class="mb-6">
           <h2 class="font-semibold text-fg text-lg">データエクスポート</h2>
-          <p class="mt-1 text-muted-fg text-sm">
+          <p class="mt-1 text-muted-fg text-xs">
             売上データをCSV形式でダウンロードして分析できます。
           </p>
           <div class="mt-3">
