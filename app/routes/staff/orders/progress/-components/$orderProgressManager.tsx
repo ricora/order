@@ -179,7 +179,10 @@ const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
   )
 }
 
-const Card: FC<{ order: Order }> = ({ order }) => {
+const Card: FC<{ order: Order; onStatusChange?: () => void }> = ({
+  order,
+  onStatusChange,
+}) => {
   const created = new Date(order.createdAt)
   const createdIso = created.toISOString()
   const createdLabel = formatDateTimeJP(created)
@@ -195,29 +198,45 @@ const Card: FC<{ order: Order }> = ({ order }) => {
   const isPrevDisabled = order.status === "pending"
   const isNextDisabled = order.status === "completed"
 
-  const FormAction: FC<
+  const handleStatusChange = async (toStatus: Order["status"]) => {
+    try {
+      const honoClient = createHonoClient()
+      const response = await honoClient["order-progress-manager"][
+        "set-status"
+      ].$post({
+        json: { orderId: order.id, status: toStatus },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(errorText)
+      }
+
+      onStatusChange?.()
+    } catch (error) {
+      console.error("Status update error:", error)
+    }
+  }
+
+  const ActionButton: FC<
     PropsWithChildren<{
-      orderId: number
       toStatus: Order["status"]
       btnStatus?: Order["status"]
       disabled?: boolean
     }>
-  > = ({ orderId, toStatus, btnStatus, disabled, children }) => (
-    <form method="post" className="mt-0">
-      <input type="hidden" name="orderId" value={String(orderId)} />
-      <input type="hidden" name="status" value={toStatus} />
-      <button
-        type="submit"
-        className={btnTv({
-          status: btnStatus ?? toStatus,
-          disabled: !!disabled,
-          fixed: btnStatus !== "cancelled" && toStatus !== "cancelled",
-        })}
-        disabled={!!disabled}
-      >
-        {children}
-      </button>
-    </form>
+  > = ({ toStatus, btnStatus, disabled, children }) => (
+    <button
+      type="button"
+      onClick={() => handleStatusChange(toStatus)}
+      className={btnTv({
+        status: btnStatus ?? toStatus,
+        disabled: !!disabled,
+        fixed: btnStatus !== "cancelled" && toStatus !== "cancelled",
+      })}
+      disabled={!!disabled}
+    >
+      {children}
+    </button>
   )
 
   return (
@@ -259,34 +278,25 @@ const Card: FC<{ order: Order }> = ({ order }) => {
         <div className="flex-1">
           {order.status === "completed" || order.status === "cancelled" ? (
             <div className="flex gap-2">
-              <FormAction
-                orderId={order.id}
-                toStatus={"processing"}
-                btnStatus={"processing"}
-              >
+              <ActionButton toStatus={"processing"} btnStatus={"processing"}>
                 <span className="flex w-full items-center justify-between">
                   <div className="h-4 w-4">
                     <ChevronLeftIcon />
                   </div>
                   <span className="flex-1 text-center">処理中に移動</span>
                 </span>
-              </FormAction>
-              <FormAction
-                orderId={order.id}
-                toStatus={"pending"}
-                btnStatus={"pending"}
-              >
+              </ActionButton>
+              <ActionButton toStatus={"pending"} btnStatus={"pending"}>
                 <span className="flex w-full items-center justify-between">
                   <div className="h-4 w-4">
                     <ChevronLeftIcon />
                   </div>
                   <span className="flex-1 text-center">処理待ちに移動</span>
                 </span>
-              </FormAction>
+              </ActionButton>
             </div>
           ) : order.status !== "pending" ? (
-            <FormAction
-              orderId={order.id}
+            <ActionButton
               toStatus={prevStatus(order.status)}
               btnStatus={prevStatus(order.status)}
               disabled={isPrevDisabled}
@@ -306,14 +316,13 @@ const Card: FC<{ order: Order }> = ({ order }) => {
                   <span className="flex-1 text-center">処理待ちに移動</span>
                 </span>
               )}
-            </FormAction>
+            </ActionButton>
           ) : null}
         </div>
 
         <div>
           {order.status !== "completed" && order.status !== "cancelled" ? (
-            <FormAction
-              orderId={order.id}
+            <ActionButton
               toStatus={nextStatus(order.status)}
               btnStatus={nextStatus(order.status)}
               disabled={isNextDisabled}
@@ -333,22 +342,18 @@ const Card: FC<{ order: Order }> = ({ order }) => {
                   </div>
                 </span>
               )}
-            </FormAction>
+            </ActionButton>
           ) : null}
         </div>
       </div>
       {(order.status === "pending" || order.status === "processing") && (
         <div className="mt-3 flex justify-center">
-          <FormAction
-            orderId={order.id}
-            toStatus={"cancelled"}
-            btnStatus={"cancelled"}
-          >
+          <ActionButton toStatus={"cancelled"} btnStatus={"cancelled"}>
             <div className="h-4 w-4">
               <CircleXIcon />
             </div>
             <span>注文を取り消す</span>
-          </FormAction>
+          </ActionButton>
         </div>
       )}
     </div>
@@ -387,7 +392,8 @@ const Countdown: FC<{
 const Column: FC<{
   status: ColumnStatus
   items: Order[]
-}> = ({ status, items }) => {
+  onOrderUpdate?: () => void
+}> = ({ status, items, onOrderUpdate }) => {
   const statusIcons: Record<ColumnStatus, FC> = {
     pending: ShoppingCartIcon,
     processing: ChefHatIcon,
@@ -417,7 +423,7 @@ const Column: FC<{
       </div>
       <div className={innerScrollTv()}>
         {items.map((o) => (
-          <Card key={String(o.id)} order={o} />
+          <Card key={String(o.id)} order={o} onStatusChange={onOrderUpdate} />
         ))}
       </div>
     </section>
@@ -528,10 +534,26 @@ const OrderProgressManager: FC = () => {
           </div>
         ) : (
           <div className="flex h-full min-h-0 w-max gap-4">
-            <Column status="pending" items={pendingOrders} />
-            <Column status="processing" items={processingOrders} />
-            <Column status="completed" items={completedOrders} />
-            <Column status="cancelled" items={cancelledOrders} />
+            <Column
+              status="pending"
+              items={pendingOrders}
+              onOrderUpdate={fetchData}
+            />
+            <Column
+              status="processing"
+              items={processingOrders}
+              onOrderUpdate={fetchData}
+            />
+            <Column
+              status="completed"
+              items={completedOrders}
+              onOrderUpdate={fetchData}
+            />
+            <Column
+              status="cancelled"
+              items={cancelledOrders}
+              onOrderUpdate={fetchData}
+            />
           </div>
         )}
       </div>
