@@ -541,12 +541,12 @@ const OrderProgressManager: FC = () => {
           for (const [id, order] of fetchedMap.entries()) {
             if (!prevMap.has(id) && !suppressedIds.has(id)) {
               showToast("success", `注文#${order.id}が追加されました。`)
+              continue
             }
-          }
 
-          for (const [id, order] of fetchedMap.entries()) {
             const prev = prevMap.get(id)
             if (!prev) continue
+
             const updatedChanged =
               prev.updatedAt.getTime() !== order.updatedAt.getTime()
             const statusChanged = prev.status !== order.status
