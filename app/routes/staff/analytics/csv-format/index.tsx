@@ -140,18 +140,12 @@ export default createRoute(async (c) => {
       <div className="space-y-6">
         <div className="rounded-lg border bg-bg p-6">
           <h2 className="font-semibold text-fg text-lg">共通仕様</h2>
-          <div className="mt-4 space-y-2 text-sm">
-            <p className="text-muted-fg">・文字エンコーディング: UTF-8</p>
-            <p className="text-muted-fg">
-              ・ヘッダー行: 1行目に各カラム名が含まれます
-            </p>
-            <p className="text-muted-fg">
-              ・日付形式: ISO 8601形式（例: 2025-01-15T12:34:56.789Z）
-            </p>
-            <p className="text-muted-fg">
-              ・複数値の区切り: パイプ（|）で区切られます
-            </p>
-          </div>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-fg text-sm">
+            <li>文字エンコーディング: UTF-8</li>
+            <li>ヘッダー行: 1行目に各カラム名が含まれます</li>
+            <li>日付形式: ISO 8601形式（例: 2025-01-15T12:34:56.789Z）</li>
+            <li>複数値の区切り: パイプ（|）で区切られます</li>
+          </ul>
         </div>
 
         <CsvFormatSection
