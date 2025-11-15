@@ -18,6 +18,7 @@ import TimerIcon from "../../../../../components/icons/lucide/timerIcon"
 import Button from "../../../../../components/ui/button"
 import type Order from "../../../../../domain/order/entities/order"
 import { createHonoClient } from "../../../../../helpers/api/hono-client"
+import { showToast } from "../../../../../helpers/ui/client-toast"
 import { formatDateTimeJP } from "../../../../../utils/date"
 import OrderStatusBadge from "../../-components/orderStatusBadge"
 
@@ -144,6 +145,9 @@ const statusLabel: Record<Order["status"], string> = {
   cancelled: "取消済",
 }
 
+const REFRESH_INTERVAL_MS = 30_000
+const FETCH_COOLDOWN_MS = 5_000
+
 const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
   const [text, setText] = useState("--:--")
   useEffect(() => {
@@ -179,7 +183,12 @@ const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
   )
 }
 
-const Card: FC<{ order: Order }> = ({ order }) => {
+const Card: FC<{
+  order: Order
+  onStatusChange?: (opts?: {
+    suppressToastsForIds?: number[]
+  }) => Promise<void> | void
+}> = ({ order, onStatusChange }) => {
   const created = new Date(order.createdAt)
   const createdIso = created.toISOString()
   const createdLabel = formatDateTimeJP(created)
@@ -195,29 +204,50 @@ const Card: FC<{ order: Order }> = ({ order }) => {
   const isPrevDisabled = order.status === "pending"
   const isNextDisabled = order.status === "completed"
 
-  const FormAction: FC<
+  const handleStatusChange = async (toStatus: Order["status"]) => {
+    try {
+      const honoClient = createHonoClient()
+      const response = await honoClient["order-progress-manager"][
+        "set-status"
+      ].$post({
+        json: { orderId: order.id, status: toStatus },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(errorText)
+      }
+
+      onStatusChange?.({ suppressToastsForIds: [order.id] })
+      showToast(
+        "success",
+        `注文#${order.id}を「${statusLabel[toStatus]}」に更新しました。`,
+      )
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      showToast("error", `注文#${order.id}を更新できませんでした: ${msg}`)
+    }
+  }
+
+  const ActionButton: FC<
     PropsWithChildren<{
-      orderId: number
       toStatus: Order["status"]
       btnStatus?: Order["status"]
       disabled?: boolean
     }>
-  > = ({ orderId, toStatus, btnStatus, disabled, children }) => (
-    <form method="post" className="mt-0">
-      <input type="hidden" name="orderId" value={String(orderId)} />
-      <input type="hidden" name="status" value={toStatus} />
-      <button
-        type="submit"
-        className={btnTv({
-          status: btnStatus ?? toStatus,
-          disabled: !!disabled,
-          fixed: btnStatus !== "cancelled" && toStatus !== "cancelled",
-        })}
-        disabled={!!disabled}
-      >
-        {children}
-      </button>
-    </form>
+  > = ({ toStatus, btnStatus, disabled, children }) => (
+    <button
+      type="button"
+      onClick={() => handleStatusChange(toStatus)}
+      className={btnTv({
+        status: btnStatus ?? toStatus,
+        disabled: !!disabled,
+        fixed: btnStatus !== "cancelled" && toStatus !== "cancelled",
+      })}
+      disabled={!!disabled}
+    >
+      {children}
+    </button>
   )
 
   return (
@@ -259,34 +289,25 @@ const Card: FC<{ order: Order }> = ({ order }) => {
         <div className="flex-1">
           {order.status === "completed" || order.status === "cancelled" ? (
             <div className="flex gap-2">
-              <FormAction
-                orderId={order.id}
-                toStatus={"processing"}
-                btnStatus={"processing"}
-              >
+              <ActionButton toStatus={"processing"} btnStatus={"processing"}>
                 <span className="flex w-full items-center justify-between">
                   <div className="h-4 w-4">
                     <ChevronLeftIcon />
                   </div>
                   <span className="flex-1 text-center">処理中に移動</span>
                 </span>
-              </FormAction>
-              <FormAction
-                orderId={order.id}
-                toStatus={"pending"}
-                btnStatus={"pending"}
-              >
+              </ActionButton>
+              <ActionButton toStatus={"pending"} btnStatus={"pending"}>
                 <span className="flex w-full items-center justify-between">
                   <div className="h-4 w-4">
                     <ChevronLeftIcon />
                   </div>
                   <span className="flex-1 text-center">処理待ちに移動</span>
                 </span>
-              </FormAction>
+              </ActionButton>
             </div>
           ) : order.status !== "pending" ? (
-            <FormAction
-              orderId={order.id}
+            <ActionButton
               toStatus={prevStatus(order.status)}
               btnStatus={prevStatus(order.status)}
               disabled={isPrevDisabled}
@@ -306,14 +327,13 @@ const Card: FC<{ order: Order }> = ({ order }) => {
                   <span className="flex-1 text-center">処理待ちに移動</span>
                 </span>
               )}
-            </FormAction>
+            </ActionButton>
           ) : null}
         </div>
 
         <div>
           {order.status !== "completed" && order.status !== "cancelled" ? (
-            <FormAction
-              orderId={order.id}
+            <ActionButton
               toStatus={nextStatus(order.status)}
               btnStatus={nextStatus(order.status)}
               disabled={isNextDisabled}
@@ -333,22 +353,18 @@ const Card: FC<{ order: Order }> = ({ order }) => {
                   </div>
                 </span>
               )}
-            </FormAction>
+            </ActionButton>
           ) : null}
         </div>
       </div>
       {(order.status === "pending" || order.status === "processing") && (
         <div className="mt-3 flex justify-center">
-          <FormAction
-            orderId={order.id}
-            toStatus={"cancelled"}
-            btnStatus={"cancelled"}
-          >
+          <ActionButton toStatus={"cancelled"} btnStatus={"cancelled"}>
             <div className="h-4 w-4">
               <CircleXIcon />
             </div>
             <span>注文を取り消す</span>
-          </FormAction>
+          </ActionButton>
         </div>
       )}
     </div>
@@ -358,28 +374,33 @@ const Card: FC<{ order: Order }> = ({ order }) => {
 type ColumnStatus = "pending" | "processing" | "completed" | "cancelled"
 
 const Countdown: FC<{
-  refreshInterval: number
-  fetchRef: { current: (() => Promise<void>) | null | undefined }
+  refreshIntervalMs: number
+  fetchRef: {
+    current:
+      | ((opts?: { suppressToastsForIds?: number[] }) => Promise<void>)
+      | null
+      | undefined
+  }
   resetSignal: number
-}> = ({ refreshInterval, fetchRef, resetSignal }) => {
-  const [seconds, setSeconds] = useState(refreshInterval)
+}> = ({ refreshIntervalMs, fetchRef, resetSignal }) => {
+  const [seconds, setSeconds] = useState(Math.ceil(refreshIntervalMs / 1000))
 
   useEffect(() => {
-    setSeconds(refreshInterval)
-  }, [resetSignal, refreshInterval])
+    setSeconds(Math.ceil(refreshIntervalMs / 1000))
+  }, [resetSignal, refreshIntervalMs])
 
   useEffect(() => {
     const id = setInterval(() => {
       setSeconds((prev) => {
         if (prev <= 1) {
           fetchRef?.current?.()
-          return refreshInterval
+          return Math.ceil(refreshIntervalMs / 1000)
         }
         return prev - 1
       })
     }, 1000)
     return () => clearInterval(id)
-  }, [refreshInterval, fetchRef])
+  }, [refreshIntervalMs, fetchRef])
 
   return <span className="font-mono">{seconds}</span>
 }
@@ -387,7 +408,10 @@ const Countdown: FC<{
 const Column: FC<{
   status: ColumnStatus
   items: Order[]
-}> = ({ status, items }) => {
+  onOrderUpdate?: (opts?: {
+    suppressToastsForIds?: number[]
+  }) => Promise<void> | void
+}> = ({ status, items, onOrderUpdate }) => {
   const statusIcons: Record<ColumnStatus, FC> = {
     pending: ShoppingCartIcon,
     processing: ChefHatIcon,
@@ -417,7 +441,7 @@ const Column: FC<{
       </div>
       <div className={innerScrollTv()}>
         {items.map((o) => (
-          <Card key={String(o.id)} order={o} />
+          <Card key={String(o.id)} order={o} onStatusChange={onOrderUpdate} />
         ))}
       </div>
     </section>
@@ -429,65 +453,147 @@ const OrderProgressManager: FC = () => {
   const [processingOrders, setProcessingOrders] = useState<Order[]>([])
   const [completedOrders, setCompletedOrders] = useState<Order[]>([])
   const [cancelledOrders, setCancelledOrders] = useState<Order[]>([])
-  const REFRESH_INTERVAL = 30
   const [fetchSignal, setFetchSignal] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchData = useCallback(async () => {
-    try {
-      setError(null)
-      const honoClient = createHonoClient()
-      const response = await honoClient["order-progress-manager"].$get()
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch orders: ${response.status} ${response.statusText}`,
-        )
-      }
-      const {
-        pendingOrders: fetchedPending,
-        processingOrders: fetchedProcessing,
-        completedOrders: fetchedCompleted,
-        cancelledOrders: fetchedCancelled,
-      } = await response.json()
+  const [isFetching, setIsFetching] = useState(false)
+  const [isFetchDisabled, setIsFetchDisabled] = useState(false)
+  const isFetchingRef = useRef(false)
+  const isFetchDisabledRef = useRef(false)
+  const cooldownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-      setPendingOrders(
-        fetchedPending.map((order) => ({
+  const prevOrdersRef = useRef<Map<number, Order> | null>(null)
+  const hasInitialLoadRef = useRef(false)
+
+  const fetchData = useCallback(
+    async (opts?: { suppressToastsForIds?: number[] }) => {
+      const isLocalUpdate = !!(
+        opts?.suppressToastsForIds && opts.suppressToastsForIds.length > 0
+      )
+      if (
+        isFetchingRef.current ||
+        (isFetchDisabledRef.current && !isLocalUpdate)
+      )
+        return
+      setIsFetching(true)
+      isFetchingRef.current = true
+      if (!isLocalUpdate) {
+        setIsFetchDisabled(true)
+        isFetchDisabledRef.current = true
+        if (cooldownTimeoutRef.current) {
+          clearTimeout(cooldownTimeoutRef.current)
+          cooldownTimeoutRef.current = null
+        }
+      }
+      try {
+        setError(null)
+        const honoClient = createHonoClient()
+        const response = await honoClient["order-progress-manager"].$get()
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch orders: ${response.status} ${response.statusText}`,
+          )
+        }
+        const {
+          pendingOrders: fetchedPending,
+          processingOrders: fetchedProcessing,
+          completedOrders: fetchedCompleted,
+          cancelledOrders: fetchedCancelled,
+        } = await response.json()
+
+        const mappedPending = fetchedPending.map((order) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt),
-        })),
-      )
-      setProcessingOrders(
-        fetchedProcessing.map((order) => ({
+        }))
+        setPendingOrders(mappedPending)
+        const mappedProcessing = fetchedProcessing.map((order) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt),
-        })),
-      )
-      setCompletedOrders(
-        fetchedCompleted.map((order) => ({
+        }))
+        setProcessingOrders(mappedProcessing)
+        const mappedCompleted = fetchedCompleted.map((order) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt),
-        })),
-      )
-      setCancelledOrders(
-        fetchedCancelled.map((order) => ({
+        }))
+        setCompletedOrders(mappedCompleted)
+        const mappedCancelled = fetchedCancelled.map((order) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt),
-        })),
-      )
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setFetchSignal((s) => s + 1)
-    }
-  }, [])
+        }))
+        setCancelledOrders(mappedCancelled)
+        const allFetched = [
+          ...mappedPending,
+          ...mappedProcessing,
+          ...mappedCompleted,
+          ...mappedCancelled,
+        ]
+        const fetchedMap = new Map<number, Order>()
+        allFetched.forEach((o) => fetchedMap.set(o.id, o))
+
+        if (hasInitialLoadRef.current) {
+          const suppressedIds = new Set(opts?.suppressToastsForIds ?? [])
+          const prevMap = prevOrdersRef.current ?? new Map<number, Order>()
+
+          for (const [id, order] of fetchedMap.entries()) {
+            if (!prevMap.has(id) && !suppressedIds.has(id)) {
+              showToast("success", `注文#${order.id}が追加されました。`)
+              continue
+            }
+
+            const prev = prevMap.get(id)
+            if (!prev) continue
+
+            const updatedChanged =
+              prev.updatedAt.getTime() !== order.updatedAt.getTime()
+            const statusChanged = prev.status !== order.status
+            if ((updatedChanged || statusChanged) && !suppressedIds.has(id)) {
+              if (statusChanged) {
+                showToast(
+                  "success",
+                  `注文#${order.id}が「${statusLabel[prev.status]}」から「${statusLabel[order.status]}」に更新されました。`,
+                )
+              } else {
+                showToast("success", `注文#${order.id}が更新されました。`)
+              }
+            }
+          }
+        }
+
+        prevOrdersRef.current = fetchedMap
+        hasInitialLoadRef.current = true
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err))
+      } finally {
+        setFetchSignal((s) => s + 1)
+        setIsFetching(false)
+        isFetchingRef.current = false
+        if (!isLocalUpdate) {
+          if (cooldownTimeoutRef.current)
+            clearTimeout(cooldownTimeoutRef.current)
+          cooldownTimeoutRef.current = setTimeout(() => {
+            setIsFetchDisabled(false)
+            isFetchDisabledRef.current = false
+            cooldownTimeoutRef.current = null
+          }, FETCH_COOLDOWN_MS)
+        }
+      }
+    },
+    [],
+  )
 
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimeoutRef.current) clearTimeout(cooldownTimeoutRef.current)
+    }
+  }, [])
 
   const fetchDataRef = useRef(fetchData)
   useEffect(() => {
@@ -502,7 +608,7 @@ const OrderProgressManager: FC = () => {
           <div className="text-muted-fg text-xs">
             自動更新まであと
             <Countdown
-              refreshInterval={REFRESH_INTERVAL}
+              refreshIntervalMs={REFRESH_INTERVAL_MS}
               fetchRef={fetchDataRef}
               resetSignal={fetchSignal}
             />
@@ -511,7 +617,8 @@ const OrderProgressManager: FC = () => {
           <Button
             type="button"
             variant="secondary"
-            onClick={fetchData}
+            onClick={() => fetchData()}
+            disabled={isFetching || isFetchDisabled}
             ariaLabel="注文一覧を更新する"
           >
             <div class="size-4">
@@ -528,10 +635,26 @@ const OrderProgressManager: FC = () => {
           </div>
         ) : (
           <div className="flex h-full min-h-0 w-max gap-4">
-            <Column status="pending" items={pendingOrders} />
-            <Column status="processing" items={processingOrders} />
-            <Column status="completed" items={completedOrders} />
-            <Column status="cancelled" items={cancelledOrders} />
+            <Column
+              status="pending"
+              items={pendingOrders}
+              onOrderUpdate={fetchData}
+            />
+            <Column
+              status="processing"
+              items={processingOrders}
+              onOrderUpdate={fetchData}
+            />
+            <Column
+              status="completed"
+              items={completedOrders}
+              onOrderUpdate={fetchData}
+            />
+            <Column
+              status="cancelled"
+              items={cancelledOrders}
+              onOrderUpdate={fetchData}
+            />
           </div>
         )}
       </div>
