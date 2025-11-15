@@ -180,10 +180,12 @@ const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
   )
 }
 
-const Card: FC<{ order: Order; onStatusChange?: () => void }> = ({
-  order,
-  onStatusChange,
-}) => {
+const Card: FC<{
+  order: Order
+  onStatusChange?: (opts?: {
+    suppressToastsForIds?: number[]
+  }) => Promise<void> | void
+}> = ({ order, onStatusChange }) => {
   const created = new Date(order.createdAt)
   const createdIso = created.toISOString()
   const createdLabel = formatDateTimeJP(created)
@@ -213,14 +215,14 @@ const Card: FC<{ order: Order; onStatusChange?: () => void }> = ({
         throw new Error(errorText)
       }
 
-      onStatusChange?.()
+      onStatusChange?.({ suppressToastsForIds: [order.id] })
       showToast(
         "success",
-        `#${order.id}の注文を「${statusLabel[toStatus]}」に更新しました。`,
+        `注文#${order.id}を「${statusLabel[toStatus]}」に更新しました。`,
       )
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error)
-      showToast("error", `#${order.id}の注文を更新できませんでした: ${msg}`)
+      showToast("error", `注文#${order.id}を更新できませんでした: ${msg}`)
     }
   }
 
@@ -370,7 +372,12 @@ type ColumnStatus = "pending" | "processing" | "completed" | "cancelled"
 
 const Countdown: FC<{
   refreshInterval: number
-  fetchRef: { current: (() => Promise<void>) | null | undefined }
+  fetchRef: {
+    current:
+      | ((opts?: { suppressToastsForIds?: number[] }) => Promise<void>)
+      | null
+      | undefined
+  }
   resetSignal: number
 }> = ({ refreshInterval, fetchRef, resetSignal }) => {
   const [seconds, setSeconds] = useState(refreshInterval)
@@ -398,7 +405,9 @@ const Countdown: FC<{
 const Column: FC<{
   status: ColumnStatus
   items: Order[]
-  onOrderUpdate?: () => void
+  onOrderUpdate?: (opts?: {
+    suppressToastsForIds?: number[]
+  }) => Promise<void> | void
 }> = ({ status, items, onOrderUpdate }) => {
   const statusIcons: Record<ColumnStatus, FC> = {
     pending: ShoppingCartIcon,
@@ -445,57 +454,99 @@ const OrderProgressManager: FC = () => {
   const [fetchSignal, setFetchSignal] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchData = useCallback(async () => {
-    try {
-      setError(null)
-      const honoClient = createHonoClient()
-      const response = await honoClient["order-progress-manager"].$get()
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch orders: ${response.status} ${response.statusText}`,
-        )
-      }
-      const {
-        pendingOrders: fetchedPending,
-        processingOrders: fetchedProcessing,
-        completedOrders: fetchedCompleted,
-        cancelledOrders: fetchedCancelled,
-      } = await response.json()
+  const prevOrdersRef = useRef<Map<number, Order> | null>(null)
+  const hasInitialLoadRef = useRef(false)
 
-      setPendingOrders(
-        fetchedPending.map((order) => ({
+  const fetchData = useCallback(
+    async (opts?: { suppressToastsForIds?: number[] }) => {
+      try {
+        setError(null)
+        const honoClient = createHonoClient()
+        const response = await honoClient["order-progress-manager"].$get()
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch orders: ${response.status} ${response.statusText}`,
+          )
+        }
+        const {
+          pendingOrders: fetchedPending,
+          processingOrders: fetchedProcessing,
+          completedOrders: fetchedCompleted,
+          cancelledOrders: fetchedCancelled,
+        } = await response.json()
+
+        const mappedPending = fetchedPending.map((order) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt),
-        })),
-      )
-      setProcessingOrders(
-        fetchedProcessing.map((order) => ({
+        }))
+        setPendingOrders(mappedPending)
+        const mappedProcessing = fetchedProcessing.map((order) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt),
-        })),
-      )
-      setCompletedOrders(
-        fetchedCompleted.map((order) => ({
+        }))
+        setProcessingOrders(mappedProcessing)
+        const mappedCompleted = fetchedCompleted.map((order) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt),
-        })),
-      )
-      setCancelledOrders(
-        fetchedCancelled.map((order) => ({
+        }))
+        setCompletedOrders(mappedCompleted)
+        const mappedCancelled = fetchedCancelled.map((order) => ({
           ...order,
           createdAt: new Date(order.createdAt),
           updatedAt: new Date(order.updatedAt),
-        })),
-      )
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setFetchSignal((s) => s + 1)
-    }
-  }, [])
+        }))
+        setCancelledOrders(mappedCancelled)
+        const allFetched = [
+          ...mappedPending,
+          ...mappedProcessing,
+          ...mappedCompleted,
+          ...mappedCancelled,
+        ]
+        const fetchedMap = new Map<number, Order>()
+        allFetched.forEach((o) => fetchedMap.set(o.id, o))
+
+        if (hasInitialLoadRef.current) {
+          const suppressedIds = new Set(opts?.suppressToastsForIds ?? [])
+          const prevMap = prevOrdersRef.current ?? new Map<number, Order>()
+
+          for (const [id, order] of fetchedMap.entries()) {
+            if (!prevMap.has(id) && !suppressedIds.has(id)) {
+              showToast("success", `注文#${order.id}が追加されました。`)
+            }
+          }
+
+          for (const [id, order] of fetchedMap.entries()) {
+            const prev = prevMap.get(id)
+            if (!prev) continue
+            const updatedChanged =
+              prev.updatedAt.getTime() !== order.updatedAt.getTime()
+            const statusChanged = prev.status !== order.status
+            if ((updatedChanged || statusChanged) && !suppressedIds.has(id)) {
+              if (statusChanged) {
+                showToast(
+                  "success",
+                  `注文#${order.id}が「${statusLabel[prev.status]}」から「${statusLabel[order.status]}」に更新されました。`,
+                )
+              } else {
+                showToast("success", `注文#${order.id}が更新されました。`)
+              }
+            }
+          }
+        }
+
+        prevOrdersRef.current = fetchedMap
+        hasInitialLoadRef.current = true
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err))
+      } finally {
+        setFetchSignal((s) => s + 1)
+      }
+    },
+    [],
+  )
 
   useEffect(() => {
     fetchData()
@@ -523,7 +574,7 @@ const OrderProgressManager: FC = () => {
           <Button
             type="button"
             variant="secondary"
-            onClick={fetchData}
+            onClick={() => fetchData()}
             ariaLabel="注文一覧を更新する"
           >
             <div class="size-4">
