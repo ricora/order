@@ -1,10 +1,12 @@
 import type { FC } from "hono/jsx"
 import { createRoute } from "honox/factory"
 import { tv } from "tailwind-variants"
+import ChevronRightIcon from "../../../components/icons/lucide/chevronRightIcon"
 import ClipboardListIcon from "../../../components/icons/lucide/clipboardListIcon"
 import DownloadIcon from "../../../components/icons/lucide/downloadIcon"
 import InfoIcon from "../../../components/icons/lucide/infoIcon"
 import PackageIcon from "../../../components/icons/lucide/packageIcon"
+import LinkButton from "../../../components/ui/linkButton"
 import Layout from "../-components/layout"
 
 const csvExportItemVariants = tv({
@@ -87,15 +89,14 @@ export default createRoute(async (c) => {
             売上データをCSV形式でダウンロードして分析できます。
           </p>
           <div class="mt-3">
-            <a
+            <LinkButton
               href="/staff/analytics/csv-format"
-              class="inline-flex items-center gap-1.5 text-primary-subtle-fg text-sm hover:underline"
+              leftIcon={InfoIcon}
+              rightIcon={ChevronRightIcon}
+              ariaLabel="CSVフォーマット仕様を確認する"
             >
-              <div class="h-4 w-4">
-                <InfoIcon />
-              </div>
               CSVフォーマット仕様を確認する
-            </a>
+            </LinkButton>
           </div>
         </div>
         <div class="space-y-4">
