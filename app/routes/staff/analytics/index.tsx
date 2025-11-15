@@ -12,12 +12,12 @@ import Layout from "../-components/layout"
 const csvExportItemVariants = tv({
   slots: {
     container:
-      "flex flex-col gap-4 rounded-lg border border-border bg-muted p-4 sm:flex-row sm:items-center sm:justify-between",
+      "flex flex-col gap-4 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:justify-between",
     content: "flex items-center gap-3",
-    iconContainer: "rounded-lg border border-border bg-bg p-2.5",
-    icon: "h-6 w-6 text-fg",
+    iconContainer: "rounded-lg bg-muted p-2.5",
+    icon: "h-6 w-6 text-secondary-fg",
     textContent: "flex-1",
-    title: "font-medium text-fg",
+    title: "font-semibold text-secondary-fg",
     description: "mt-0.5 text-muted-fg text-sm",
     button:
       "inline-flex w-full items-center justify-center gap-2 rounded border border-primary bg-primary px-4 py-2 font-medium text-primary-fg text-sm transition hover:bg-primary/90 sm:w-auto",
