@@ -24,20 +24,13 @@ const CsvFormatSection = ({
     </div>
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[auto_1fr]">
       {columns.map((column) => (
-        <>
-          <code
-            key={`${column.name}-name`}
-            className="rounded border border-border bg-muted p-3 font-mono text-primary text-sm"
-          >
-            {column.name}
-          </code>
-          <span
-            key={`${column.name}-desc`}
-            className="rounded border border-border bg-muted p-3 text-muted-fg text-sm"
-          >
-            {column.description}
-          </span>
-        </>
+        <div
+          key={column.name}
+          className="grid grid-cols-subgrid gap-3 rounded border border-border bg-muted p-3 sm:col-span-2"
+        >
+          <code className="font-mono text-primary text-sm">{column.name}</code>
+          <span className="text-muted-fg text-sm">{column.description}</span>
+        </div>
       ))}
     </div>
   </div>
