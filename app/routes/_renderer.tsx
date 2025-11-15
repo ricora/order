@@ -1,10 +1,10 @@
 import { Style } from "hono/css"
 import { jsxRenderer, useRequestContext } from "hono/jsx-renderer"
 import { Link, Script } from "honox/server"
-import staffSidebarInitScript from "./staff/-helpers/sidebar-entry?js"
 import Toast from "../components/ui/toast"
 import colorSchemeInitScript from "../helpers/ui/color-scheme-entry?js"
 import { deleteToastCookie, getToastCookie } from "../helpers/ui/toast"
+import staffSidebarInitScript from "./staff/-helpers/sidebar-entry?js"
 
 export default jsxRenderer(({ children }) => {
   const c = useRequestContext()

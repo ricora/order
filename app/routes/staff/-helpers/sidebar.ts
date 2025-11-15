@@ -1,4 +1,5 @@
-export const DESKTOP_SIDEBAR_TOGGLE_BUTTON_ID = "staff-desktop-sidebar-toggle-button"
+export const DESKTOP_SIDEBAR_TOGGLE_BUTTON_ID =
+  "staff-desktop-sidebar-toggle-button"
 export const MAIN_CONTENT_ID = "staff-main-content"
 
 export const SIDEBAR_STATE_STORAGE_KEY = "staff-sidebar-open"
@@ -43,7 +44,8 @@ export const writeSidebarState = (
 
 export const toggleSidebarState = () => {
   if (typeof document === "undefined") return
-  const currentState = document.documentElement.dataset[SIDEBAR_STATE_DATASET_PROP]
+  const currentState =
+    document.documentElement.dataset[SIDEBAR_STATE_DATASET_PROP]
   const nextState: SidebarState = currentState === "closed" ? "open" : "closed"
   writeSidebarState(nextState)
 }

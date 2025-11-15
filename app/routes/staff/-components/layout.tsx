@@ -1,8 +1,8 @@
 import type { FC, PropsWithChildren } from "hono/jsx"
 import { useRequestContext } from "hono/jsx-renderer"
+import { MAIN_CONTENT_ID } from "../-helpers/sidebar"
 import { Header } from "./$header"
 import { Sidebar } from "./$sidebar"
-import { MAIN_CONTENT_ID } from "../-helpers/sidebar"
 
 export const Layout: FC<
   PropsWithChildren<{ title: string; description: string }>
