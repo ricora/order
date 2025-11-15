@@ -1,5 +1,6 @@
 import type { FC, PropsWithChildren } from "hono/jsx"
 import { createRoute } from "honox/factory"
+import ArrowLeftIcon from "../../../../components/icons/lucide/arrowLeftIcon"
 import { ORDER_HISTORY_COLUMNS } from "../../../../usecases/exportOrderHistoryCsv"
 import { PRODUCT_CATALOG_COLUMNS } from "../../../../usecases/exportProductCatalogCsv"
 import Layout from "../../-components/layout"
@@ -112,22 +113,11 @@ export default createRoute(async (c) => {
         <div className="flex justify-center">
           <a
             href="/staff/analytics"
-            className="inline-flex items-center gap-2 rounded border border-border bg-muted px-4 py-2 text-fg text-sm transition hover:border-primary hover:bg-primary-subtle hover:text-primary-subtle-fg"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded border bg-muted px-3 py-2 font-medium text-secondary-fg text-sm transition hover:border-primary-subtle hover:bg-primary-subtle hover:text-primary-subtle-fg"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-4 w-4"
-              role="graphics-symbol"
-            >
-              <path d="m12 19-7-7 7-7" />
-              <path d="M19 12H5" />
-            </svg>
+            <div className="h-4 w-4">
+              <ArrowLeftIcon />
+            </div>
             売上分析ページに戻る
           </a>
         </div>
