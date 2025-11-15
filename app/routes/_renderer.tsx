@@ -1,6 +1,7 @@
 import { Style } from "hono/css"
 import { jsxRenderer, useRequestContext } from "hono/jsx-renderer"
 import { Link, Script } from "honox/server"
+import staffSidebarInitScript from "./staff/-helpers/sidebar-entry?js"
 import Toast from "../components/ui/toast"
 import colorSchemeInitScript from "../helpers/ui/color-scheme-entry?js"
 import { deleteToastCookie, getToastCookie } from "../helpers/ui/toast"
@@ -20,6 +21,12 @@ export default jsxRenderer(({ children }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: must inline pre-render color scheme script to prevent FOUC (Flash of Unstyled Content) */}
         <script dangerouslySetInnerHTML={{ __html: colorSchemeInitScript }} />
+        {c.req.path.startsWith("/staff") && (
+          <script
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: must inline pre-render staffsidebar script to prevent FOUC (Flash of Unstyled Content)
+            dangerouslySetInnerHTML={{ __html: staffSidebarInitScript }}
+          />
+        )}
         <link rel="icon" href="/favicon.ico" />
         <Link href="/app/style.css" rel="stylesheet" />
         <Script src="/app/client.ts" async />
