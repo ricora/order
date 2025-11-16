@@ -145,8 +145,8 @@ const statusLabel: Record<Order["status"], string> = {
   cancelled: "取消済",
 }
 
-const REFRESH_INTERVAL_MS = 30_000
-const FETCH_COOLDOWN_MS = 5_000
+const REFRESH_INTERVAL_MS = 10_000
+const FETCH_COOLDOWN_MS = 1_000
 
 const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
   const [text, setText] = useState("--:--")
