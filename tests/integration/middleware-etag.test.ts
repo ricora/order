@@ -14,19 +14,20 @@ describe("ETag Middleware", () => {
     expect(res2.status).toBe(304)
   })
 
-  test("JSON APIエンドポイントにETagが設定され、条件付きGETが304を返す", async () => {
+  test("JSON APIエンドポイントではETagが設定されない", async () => {
     const res = await app.request("/api/order-progress-manager")
     expect(res.status).toBe(200)
-    const etag = res.headers.get("etag")
-    expect(etag).toBeTruthy()
+    expect(res.headers.get("etag")).toBeNull()
 
     const json = await res.json()
     expect(json).toBeTruthy()
 
     const res2 = await app.request("/api/order-progress-manager", {
-      headers: { "If-None-Match": String(etag) },
+      headers: { "If-None-Match": "dummy" },
     })
-    expect(res2.status).toBe(304)
+    expect(res2.status).toBe(200)
+    const json2 = await res2.json()
+    expect(json2).toBeTruthy()
   })
 
   test("画像エンドポイントにETagが設定され、条件付きGETが304を返す", async () => {
