@@ -1,4 +1,5 @@
 import HouseIcon from "../icons/lucide/house"
+import LinkButton from "./linkButton"
 
 type NotFoundProps = {
   homeHref: string
@@ -18,15 +19,9 @@ const NotFound = ({ homeHref, homeLabel }: NotFoundProps) => (
           </p>
         </div>
         <div class="mt-8">
-          <a
-            href={homeHref}
-            class="inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded border border-primary bg-primary px-3 py-2 font-medium text-primary-fg text-sm transition hover:bg-primary/90"
-          >
-            <div class="size-4">
-              <HouseIcon />
-            </div>
+          <LinkButton href={homeHref} leftIcon={HouseIcon}>
             {homeLabel}
-          </a>
+          </LinkButton>
         </div>
       </div>
     </div>
