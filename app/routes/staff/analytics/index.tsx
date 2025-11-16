@@ -1,0 +1,117 @@
+import type { FC } from "hono/jsx"
+import { createRoute } from "honox/factory"
+import { tv } from "tailwind-variants"
+import ChevronRightIcon from "../../../components/icons/lucide/chevronRightIcon"
+import ClipboardListIcon from "../../../components/icons/lucide/clipboardListIcon"
+import DownloadIcon from "../../../components/icons/lucide/downloadIcon"
+import InfoIcon from "../../../components/icons/lucide/infoIcon"
+import PackageIcon from "../../../components/icons/lucide/packageIcon"
+import LinkButton from "../../../components/ui/linkButton"
+import Layout from "../-components/layout"
+
+const csvExportItemVariants = tv({
+  slots: {
+    container:
+      "flex flex-col gap-4 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:justify-between",
+    content: "flex items-center gap-3",
+    iconContainer: "rounded-lg bg-muted p-2.5",
+    icon: "h-6 w-6 text-secondary-fg",
+    textContent: "flex-1",
+    title: "font-semibold text-secondary-fg",
+    description: "mt-0.5 text-muted-fg text-sm",
+    // button and buttonIcon slots are removed in favor of using LinkButton component
+  },
+})
+
+type CSVExportItemProps = {
+  icon: FC
+  title: string
+  description: string
+  exportUrl: string
+  exportLabel: string
+}
+
+const CSVExportItem = ({
+  icon,
+  title,
+  description,
+  exportUrl,
+  exportLabel,
+}: CSVExportItemProps) => {
+  const {
+    container,
+    content,
+    iconContainer,
+    icon: iconClass,
+    textContent,
+    title: titleClass,
+    description: descriptionClass,
+    // no button/buttonIcon slots — use LinkButton instead
+  } = csvExportItemVariants()
+  const Icon = icon
+
+  return (
+    <div class={container()}>
+      <div class={content()}>
+        <div class={iconContainer()}>
+          <div class={iconClass()}>
+            <Icon />
+          </div>
+        </div>
+        <div class={textContent()}>
+          <h3 class={titleClass()}>{title}</h3>
+          <p class={descriptionClass()}>{description}</p>
+        </div>
+      </div>
+      <div class="w-full sm:w-auto">
+        <LinkButton href={exportUrl} leftIcon={DownloadIcon} kind="default">
+          {exportLabel}
+        </LinkButton>
+      </div>
+    </div>
+  )
+}
+
+export default createRoute(async (c) => {
+  return c.render(
+    <Layout
+      title="売上分析"
+      description="売上データをCSV形式でエクスポートできます。"
+    >
+      <div class="rounded-lg border bg-bg p-6">
+        <div class="mb-6">
+          <h2 class="font-semibold text-fg text-lg">データエクスポート</h2>
+          <p class="mt-1 text-muted-fg text-xs">
+            売上データをCSV形式でダウンロードして分析できます。
+          </p>
+          <div class="mt-3">
+            <LinkButton
+              href="/staff/analytics/csv-format"
+              leftIcon={InfoIcon}
+              rightIcon={ChevronRightIcon}
+              ariaLabel="CSVフォーマット仕様を確認する"
+            >
+              CSVフォーマット仕様を確認する
+            </LinkButton>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <CSVExportItem
+            icon={ClipboardListIcon}
+            title="注文履歴（CSV形式）"
+            description="すべての注文データをCSV形式でエクスポートします。"
+            exportUrl="/staff/analytics/orders/csv"
+            exportLabel="CSVダウンロード"
+          />
+          <CSVExportItem
+            icon={PackageIcon}
+            title="商品カタログ（CSV形式）"
+            description="すべての商品データをCSV形式でエクスポートします。"
+            exportUrl="/staff/analytics/products/csv"
+            exportLabel="CSVダウンロード"
+          />
+        </div>
+      </div>
+    </Layout>,
+  )
+})
