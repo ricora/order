@@ -201,8 +201,9 @@ const Card: FC<{
   const prevStatus = (s: Order["status"]): Order["status"] =>
     s === "completed" ? "processing" : "pending"
 
-  const isPrevDisabled = order.status === "pending"
-  const isNextDisabled = order.status === "completed"
+  const [loadingToStatus, setLoadingToStatus] = useState<
+    Order["status"] | null
+  >(null)
 
   const handleStatusChange = async (toStatus: Order["status"]) => {
     try {
@@ -218,7 +219,8 @@ const Card: FC<{
         throw new Error(errorText)
       }
 
-      onStatusChange?.({ suppressToastsForIds: [order.id] })
+      if (onStatusChange)
+        await onStatusChange({ suppressToastsForIds: [order.id] })
       showToast(
         "success",
         `注文#${order.id}を「${statusLabel[toStatus]}」に更新しました。`,
@@ -238,13 +240,21 @@ const Card: FC<{
   > = ({ toStatus, btnStatus, disabled, children }) => (
     <button
       type="button"
-      onClick={() => handleStatusChange(toStatus)}
+      onClick={async () => {
+        if (loadingToStatus === toStatus || disabled) return
+        setLoadingToStatus(toStatus)
+        try {
+          await handleStatusChange(toStatus)
+        } finally {
+          setLoadingToStatus(null)
+        }
+      }}
       className={btnTv({
         status: btnStatus ?? toStatus,
-        disabled: !!disabled,
+        disabled: !!disabled || loadingToStatus === toStatus,
         fixed: btnStatus !== "cancelled" && toStatus !== "cancelled",
       })}
-      disabled={!!disabled}
+      disabled={!!disabled || loadingToStatus === toStatus}
     >
       {children}
     </button>
@@ -286,87 +296,97 @@ const Card: FC<{
       </div>
 
       <div className="flex items-center">
-        <div className="flex-1">
-          {order.status === "completed" || order.status === "cancelled" ? (
-            <div className="flex gap-2">
-              <ActionButton toStatus={"processing"} btnStatus={"processing"}>
-                <span className="flex w-full items-center justify-between">
-                  <div className="h-4 w-4">
-                    <ChevronLeftIcon />
-                  </div>
-                  <span className="flex-1 text-center">処理中に移動</span>
-                </span>
-              </ActionButton>
-              <ActionButton toStatus={"pending"} btnStatus={"pending"}>
-                <span className="flex w-full items-center justify-between">
-                  <div className="h-4 w-4">
-                    <ChevronLeftIcon />
-                  </div>
-                  <span className="flex-1 text-center">処理待ちに移動</span>
-                </span>
-              </ActionButton>
+        {loadingToStatus ? (
+          <div className="flex w-full items-center justify-center">
+            <span className="text-muted-fg text-sm">更新中…</span>
+          </div>
+        ) : (
+          <>
+            <div className="flex-1">
+              {order.status === "completed" || order.status === "cancelled" ? (
+                <div className="flex gap-2">
+                  <ActionButton
+                    toStatus={"processing"}
+                    btnStatus={"processing"}
+                  >
+                    <span className="flex w-full items-center justify-between">
+                      <div className="h-4 w-4">
+                        <ChevronLeftIcon />
+                      </div>
+                      <span className="flex-1 text-center">処理中に移動</span>
+                    </span>
+                  </ActionButton>
+                  <ActionButton toStatus={"pending"} btnStatus={"pending"}>
+                    <span className="flex w-full items-center justify-between">
+                      <div className="h-4 w-4">
+                        <ChevronLeftIcon />
+                      </div>
+                      <span className="flex-1 text-center">処理待ちに移動</span>
+                    </span>
+                  </ActionButton>
+                </div>
+              ) : order.status !== "pending" ? (
+                <ActionButton
+                  toStatus={prevStatus(order.status)}
+                  btnStatus={prevStatus(order.status)}
+                >
+                  {prevStatus(order.status) === "processing" ? (
+                    <span className="flex w-full items-center justify-between">
+                      <div className="h-4 w-4">
+                        <ChevronLeftIcon />
+                      </div>
+                      <span className="flex-1 text-center">処理中に移動</span>
+                    </span>
+                  ) : (
+                    <span className="flex w-full items-center justify-between">
+                      <div className="h-4 w-4">
+                        <ChevronLeftIcon />
+                      </div>
+                      <span className="flex-1 text-center">処理待ちに移動</span>
+                    </span>
+                  )}
+                </ActionButton>
+              ) : null}
             </div>
-          ) : order.status !== "pending" ? (
-            <ActionButton
-              toStatus={prevStatus(order.status)}
-              btnStatus={prevStatus(order.status)}
-              disabled={isPrevDisabled}
-            >
-              {prevStatus(order.status) === "processing" ? (
-                <span className="flex w-full items-center justify-between">
-                  <div className="h-4 w-4">
-                    <ChevronLeftIcon />
-                  </div>
-                  <span className="flex-1 text-center">処理中に移動</span>
-                </span>
-              ) : (
-                <span className="flex w-full items-center justify-between">
-                  <div className="h-4 w-4">
-                    <ChevronLeftIcon />
-                  </div>
-                  <span className="flex-1 text-center">処理待ちに移動</span>
-                </span>
-              )}
-            </ActionButton>
-          ) : null}
-        </div>
 
-        <div>
-          {order.status !== "completed" && order.status !== "cancelled" ? (
-            <ActionButton
-              toStatus={nextStatus(order.status)}
-              btnStatus={nextStatus(order.status)}
-              disabled={isNextDisabled}
-            >
-              {nextStatus(order.status) === "processing" ? (
-                <span className="flex w-full items-center justify-between">
-                  <span className="flex-1 text-center">処理中に移動</span>
-                  <div className="h-4 w-4">
-                    <ChevronRightIcon />
-                  </div>
-                </span>
-              ) : (
-                <span className="flex w-full items-center justify-between">
-                  <span className="flex-1 text-center">完了に移動</span>
-                  <div className="h-4 w-4">
-                    <ChevronRightIcon />
-                  </div>
-                </span>
-              )}
-            </ActionButton>
-          ) : null}
-        </div>
-      </div>
-      {(order.status === "pending" || order.status === "processing") && (
-        <div className="mt-3 flex justify-center">
-          <ActionButton toStatus={"cancelled"} btnStatus={"cancelled"}>
-            <div className="h-4 w-4">
-              <CircleXIcon />
+            <div>
+              {order.status !== "completed" && order.status !== "cancelled" ? (
+                <ActionButton
+                  toStatus={nextStatus(order.status)}
+                  btnStatus={nextStatus(order.status)}
+                >
+                  {nextStatus(order.status) === "processing" ? (
+                    <span className="flex w-full items-center justify-between">
+                      <span className="flex-1 text-center">処理中に移動</span>
+                      <div className="h-4 w-4">
+                        <ChevronRightIcon />
+                      </div>
+                    </span>
+                  ) : (
+                    <span className="flex w-full items-center justify-between">
+                      <span className="flex-1 text-center">完了に移動</span>
+                      <div className="h-4 w-4">
+                        <ChevronRightIcon />
+                      </div>
+                    </span>
+                  )}
+                </ActionButton>
+              ) : null}
             </div>
-            <span>注文を取り消す</span>
-          </ActionButton>
-        </div>
-      )}
+          </>
+        )}
+      </div>
+      {!loadingToStatus &&
+        (order.status === "pending" || order.status === "processing") && (
+          <div className="mt-3 flex justify-center">
+            <ActionButton toStatus={"cancelled"} btnStatus={"cancelled"}>
+              <div className="h-4 w-4">
+                <CircleXIcon />
+              </div>
+              <span>注文を取り消す</span>
+            </ActionButton>
+          </div>
+        )}
     </div>
   )
 }
