@@ -41,14 +41,14 @@ export default function LinkButton({
   disabled = false,
   ariaLabel,
 }: LinkButtonProps) {
-  const cls = linkButtonTv({ kind, layout, disabled })
-
   return (
     <a
-      href={href}
-      className={cls}
+      href={disabled ? undefined : href}
+      className={linkButtonTv({ kind, layout, disabled })}
       aria-disabled={disabled}
       aria-label={ariaLabel}
+      onClick={disabled ? (e) => e.preventDefault() : undefined}
+      tabIndex={disabled ? -1 : 0}
     >
       {LeftIcon ? (
         <div className="h-4 w-4">
