@@ -5,6 +5,7 @@ import Grid3X3Icon from "../icons/lucide/grid3X3Icon"
 import SquarePenIcon from "../icons/lucide/squarePenIcon"
 import TableIcon from "../icons/lucide/tableIcon"
 import Trash2Icon from "../icons/lucide/trash2Icon"
+import LinkButton from "./linkButton"
 import Pagination from "./pagination"
 
 const itemCollectionTv = tv({
@@ -160,18 +161,22 @@ const ItemCard = ({ item, columns }: { item: Item; columns: Column[] }) => {
           })}
         </div>
         <div className={styles.cardFooter()}>
-          <a href={item.editUrl} className={styles.editButton()}>
-            <div className={styles.buttonIcon()}>
-              <SquarePenIcon />
-            </div>
+          <LinkButton
+            href={item.editUrl}
+            leftIcon={SquarePenIcon}
+            kind="default"
+            layout="full"
+          >
             編集
-          </a>
-          <a href={item.deleteUrl} className={styles.deleteButton()}>
-            <div className={styles.buttonIcon()}>
-              <Trash2Icon />
-            </div>
+          </LinkButton>
+          <LinkButton
+            href={item.deleteUrl}
+            leftIcon={Trash2Icon}
+            kind="danger"
+            layout="full"
+          >
             削除
-          </a>
+          </LinkButton>
         </div>
       </div>
     </div>
@@ -282,21 +287,20 @@ const ItemCollectionViewer = ({
                     })}
                     <td className={styles.tableCell()}>
                       <div className={styles.tableActions()}>
-                        <a href={item.editUrl} className={styles.editButton()}>
-                          <div className={styles.buttonIcon()}>
-                            <SquarePenIcon />
-                          </div>
-                          編集
-                        </a>
-                        <a
-                          href={item.deleteUrl}
-                          className={styles.deleteButton()}
+                        <LinkButton
+                          href={item.editUrl}
+                          leftIcon={SquarePenIcon}
+                          kind="default"
                         >
-                          <div className={styles.buttonIcon()}>
-                            <Trash2Icon />
-                          </div>
+                          編集
+                        </LinkButton>
+                        <LinkButton
+                          href={item.deleteUrl}
+                          leftIcon={Trash2Icon}
+                          kind="danger"
+                        >
                           削除
-                        </a>
+                        </LinkButton>
                       </div>
                     </td>
                   </tr>

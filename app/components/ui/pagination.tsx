@@ -3,6 +3,7 @@ import { tv } from "tailwind-variants"
 import { setQueryParam } from "../../utils/url"
 import ChevronLeftIcon from "../icons/lucide/chevronLeftIcon"
 import ChevronRightIcon from "../icons/lucide/chevronRightIcon"
+import LinkButton from "./linkButton"
 
 const paginationTv = tv({
   slots: {
@@ -40,27 +41,25 @@ const Pagination = ({
 
   return (
     <div className={styles.container()}>
-      <a
+      <LinkButton
         href={setQueryParam(urlSearch, "page", String(currentPage - 1))}
-        className={styles.button({ disabled: !hasPreviousPage })}
-        aria-disabled={!hasPreviousPage}
+        leftIcon={ChevronLeftIcon}
+        ariaLabel="前へ"
+        disabled={!hasPreviousPage}
+        kind="default"
       >
-        <div class="size-4">
-          <ChevronLeftIcon />
-        </div>
         前へ
-      </a>
+      </LinkButton>
       <div className={styles.info()}>ページ {currentPage}</div>
-      <a
+      <LinkButton
         href={setQueryParam(urlSearch, "page", String(currentPage + 1))}
-        className={styles.button({ disabled: !hasNextPage })}
-        aria-disabled={!hasNextPage}
+        rightIcon={ChevronRightIcon}
+        ariaLabel="次へ"
+        disabled={!hasNextPage}
+        kind="default"
       >
         次へ
-        <div class="size-4">
-          <ChevronRightIcon />
-        </div>
-      </a>
+      </LinkButton>
     </div>
   )
 }
