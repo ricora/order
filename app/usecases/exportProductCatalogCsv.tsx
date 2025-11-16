@@ -6,16 +6,52 @@ import { toCsv } from "../utils/csv"
 
 export const PRODUCT_CATALOG_EXPORT_PAGE_SIZE = 200
 
-export const PRODUCT_CATALOG_HEADER = [
-  "product_id",
-  "product_name",
-  "price",
-  "stock",
-  "image_url",
-  "tag_ids",
-  "tag_names",
-  "tag_count",
-]
+export const PRODUCT_CATALOG_COLUMNS = [
+  {
+    name: "product_id",
+    description: "商品ID（一意の識別子）",
+  },
+  {
+    name: "product_name",
+    description: "商品名",
+  },
+  {
+    name: "price",
+    description: "価格（円）",
+  },
+  {
+    name: "stock",
+    description: "在庫数",
+  },
+  {
+    name: "image_url",
+    description: "商品画像URL（絶対URL）",
+  },
+  {
+    name: "tag_ids",
+    description: (
+      <>
+        タグID（パイプ区切り、例: <code>1|3|5</code>）
+      </>
+    ),
+  },
+  {
+    name: "tag_names",
+    description: (
+      <>
+        タグ名（パイプ区切り、例: <code>飲料|冷凍</code>）
+      </>
+    ),
+  },
+  {
+    name: "tag_count",
+    description: "タグ数",
+  },
+] as const
+
+export const PRODUCT_CATALOG_HEADER = PRODUCT_CATALOG_COLUMNS.map(
+  (col) => col.name,
+)
 
 export type ExportProductCatalogCsvParams = {
   dbClient: DbClient
