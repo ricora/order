@@ -33,7 +33,7 @@ export const sidebarToggleButtonStyles = tv({
         icon: "size-6",
       },
       desktop: {
-        base: "mr-4 hidden rounded-lg hover:bg-muted md:block",
+        base: "mr-4 hidden rounded-lg transition hover:bg-muted md:block",
         icon: "size-4",
       },
     },
