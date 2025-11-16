@@ -48,8 +48,25 @@ describe("注文進捗管理", () => {
         headers: { "content-type": "application/json" },
       })
       expect(res.status).toBe(200)
-      const text = await res.text()
-      expect(text).toBe("Success")
+      const apiJson = (await res.json()) as ApiJson
+      expect(apiJson.pendingOrders.length).toBeGreaterThanOrEqual(1)
+      const pendingNames = apiJson.pendingOrders.map((o) => o.customerName)
+      expect(pendingNames).toContain("顧客B")
+
+      expect(apiJson.processingOrders.length).toBeGreaterThanOrEqual(1)
+      expect(
+        apiJson.processingOrders.some((o) => o.customerName === null),
+      ).toBe(true)
+
+      expect(apiJson.completedOrders.length).toBeGreaterThanOrEqual(1)
+      expect(
+        apiJson.completedOrders.some((o) => o.customerName === "顧客C"),
+      ).toBe(true)
+
+      expect(apiJson.cancelledOrders.length).toBeGreaterThanOrEqual(1)
+      expect(
+        apiJson.cancelledOrders.some((o) => o.customerName === "顧客D"),
+      ).toBe(true)
     })
     test("存在しない注文IDのときにエラーを返す", async () => {
       const res = await app.request("/api/order-progress-manager/set-status", {

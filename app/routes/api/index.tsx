@@ -19,20 +19,10 @@ const routes = app
     return c.json({ products, tags })
   })
   .get("/order-progress-manager", async (c) => {
-    const {
-      pendingOrders,
-      processingOrders,
-      completedOrders,
-      cancelledOrders,
-    } = await getOrderProgressManagerComponentData({
+    const payload = await getOrderProgressManagerComponentData({
       dbClient: c.get("dbClient"),
     })
-    return c.json({
-      pendingOrders,
-      processingOrders,
-      completedOrders,
-      cancelledOrders,
-    })
+    return c.json(payload)
   })
   .post(
     "/order-progress-manager/set-status",
@@ -60,12 +50,14 @@ const routes = app
     async (c) => {
       try {
         const { orderId, status } = await c.req.valid("json")
-
         await setOrderStatus({
           dbClient: c.get("dbClient"),
           order: { id: orderId, status },
         })
-        return c.text("Success", 200)
+        const payload = await getOrderProgressManagerComponentData({
+          dbClient: c.get("dbClient"),
+        })
+        return c.json(payload, 200)
       } catch (_e) {
         return c.text("Conflict", 409)
       }

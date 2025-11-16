@@ -22,6 +22,11 @@ import { showToast } from "../../../../../helpers/ui/client-toast"
 import { formatDateTimeJP } from "../../../../../utils/date"
 import OrderStatusBadge from "../../-components/orderStatusBadge"
 
+type RawOrder = Omit<Order, "createdAt" | "updatedAt"> & {
+  createdAt: string
+  updatedAt: string
+}
+
 const sectionTv = tv({
   base: "flex min-h-0 flex-col rounded border p-4",
   variants: {
@@ -185,9 +190,17 @@ const ElapsedTime: FC<{ iso: string }> = ({ iso }) => {
 
 const Card: FC<{
   order: Order
-  onStatusChange?: (opts?: {
-    suppressToastsForIds?: number[]
-  }) => Promise<void> | void
+  onStatusChange?: (
+    opts?: {
+      suppressToastsForIds?: number[]
+    },
+    responseData?: {
+      pendingOrders: Order[]
+      processingOrders: Order[]
+      completedOrders: Order[]
+      cancelledOrders: Order[]
+    },
+  ) => Promise<void> | void
 }> = ({ order, onStatusChange }) => {
   const created = new Date(order.createdAt)
   const createdIso = created.toISOString()
@@ -219,8 +232,34 @@ const Card: FC<{
         throw new Error(errorText)
       }
 
+      const responseData = await response.json()
+      const mappedResponseData = {
+        pendingOrders: responseData.pendingOrders.map((o: RawOrder) => ({
+          ...o,
+          createdAt: new Date(o.createdAt),
+          updatedAt: new Date(o.updatedAt),
+        })),
+        processingOrders: responseData.processingOrders.map((o: RawOrder) => ({
+          ...o,
+          createdAt: new Date(o.createdAt),
+          updatedAt: new Date(o.updatedAt),
+        })),
+        completedOrders: responseData.completedOrders.map((o: RawOrder) => ({
+          ...o,
+          createdAt: new Date(o.createdAt),
+          updatedAt: new Date(o.updatedAt),
+        })),
+        cancelledOrders: responseData.cancelledOrders.map((o: RawOrder) => ({
+          ...o,
+          createdAt: new Date(o.createdAt),
+          updatedAt: new Date(o.updatedAt),
+        })),
+      }
       if (onStatusChange)
-        await onStatusChange({ suppressToastsForIds: [order.id] })
+        await onStatusChange(
+          { suppressToastsForIds: [order.id] },
+          mappedResponseData,
+        )
       showToast(
         "success",
         `注文#${order.id}を「${statusLabel[toStatus]}」に更新しました。`,
@@ -397,7 +436,15 @@ const Countdown: FC<{
   refreshIntervalMs: number
   fetchRef: {
     current:
-      | ((opts?: { suppressToastsForIds?: number[] }) => Promise<void>)
+      | ((
+          opts?: { suppressToastsForIds?: number[] },
+          responseData?: {
+            pendingOrders: Order[]
+            processingOrders: Order[]
+            completedOrders: Order[]
+            cancelledOrders: Order[]
+          },
+        ) => Promise<void>)
       | null
       | undefined
   }
@@ -428,9 +475,17 @@ const Countdown: FC<{
 const Column: FC<{
   status: ColumnStatus
   items: Order[]
-  onOrderUpdate?: (opts?: {
-    suppressToastsForIds?: number[]
-  }) => Promise<void> | void
+  onOrderUpdate?: (
+    opts?: {
+      suppressToastsForIds?: number[]
+    },
+    responseData?: {
+      pendingOrders: Order[]
+      processingOrders: Order[]
+      completedOrders: Order[]
+      cancelledOrders: Order[]
+    },
+  ) => Promise<void> | void
 }> = ({ status, items, onOrderUpdate }) => {
   const statusIcons: Record<ColumnStatus, FC> = {
     pending: ShoppingCartIcon,
@@ -486,7 +541,17 @@ const OrderProgressManager: FC = () => {
   const hasInitialLoadRef = useRef(false)
 
   const fetchData = useCallback(
-    async (opts?: { suppressToastsForIds?: number[] }) => {
+    async (
+      opts?: {
+        suppressToastsForIds?: number[]
+      },
+      responseData?: {
+        pendingOrders: Order[]
+        processingOrders: Order[]
+        completedOrders: Order[]
+        cancelledOrders: Order[]
+      },
+    ) => {
       const isLocalUpdate = !!(
         opts?.suppressToastsForIds && opts.suppressToastsForIds.length > 0
       )
@@ -507,49 +572,63 @@ const OrderProgressManager: FC = () => {
       }
       try {
         setError(null)
-        const honoClient = createHonoClient()
-        const response = await honoClient["order-progress-manager"].$get()
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch orders: ${response.status} ${response.statusText}`,
-          )
+        let fetchedData: {
+          pendingOrders: Order[]
+          processingOrders: Order[]
+          completedOrders: Order[]
+          cancelledOrders: Order[]
         }
-        const {
-          pendingOrders: fetchedPending,
-          processingOrders: fetchedProcessing,
-          completedOrders: fetchedCompleted,
-          cancelledOrders: fetchedCancelled,
-        } = await response.json()
 
-        const mappedPending = fetchedPending.map((order) => ({
-          ...order,
-          createdAt: new Date(order.createdAt),
-          updatedAt: new Date(order.updatedAt),
-        }))
-        setPendingOrders(mappedPending)
-        const mappedProcessing = fetchedProcessing.map((order) => ({
-          ...order,
-          createdAt: new Date(order.createdAt),
-          updatedAt: new Date(order.updatedAt),
-        }))
-        setProcessingOrders(mappedProcessing)
-        const mappedCompleted = fetchedCompleted.map((order) => ({
-          ...order,
-          createdAt: new Date(order.createdAt),
-          updatedAt: new Date(order.updatedAt),
-        }))
-        setCompletedOrders(mappedCompleted)
-        const mappedCancelled = fetchedCancelled.map((order) => ({
-          ...order,
-          createdAt: new Date(order.createdAt),
-          updatedAt: new Date(order.updatedAt),
-        }))
-        setCancelledOrders(mappedCancelled)
+        if (responseData) {
+          fetchedData = responseData
+        } else {
+          const honoClient = createHonoClient()
+          const response = await honoClient["order-progress-manager"].$get()
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch orders: ${response.status} ${response.statusText}`,
+            )
+          }
+          const jsonData = await response.json()
+          fetchedData = {
+            pendingOrders: jsonData.pendingOrders.map((order: RawOrder) => ({
+              ...order,
+              createdAt: new Date(order.createdAt),
+              updatedAt: new Date(order.updatedAt),
+            })),
+            processingOrders: jsonData.processingOrders.map(
+              (order: RawOrder) => ({
+                ...order,
+                createdAt: new Date(order.createdAt),
+                updatedAt: new Date(order.updatedAt),
+              }),
+            ),
+            completedOrders: jsonData.completedOrders.map(
+              (order: RawOrder) => ({
+                ...order,
+                createdAt: new Date(order.createdAt),
+                updatedAt: new Date(order.updatedAt),
+              }),
+            ),
+            cancelledOrders: jsonData.cancelledOrders.map(
+              (order: RawOrder) => ({
+                ...order,
+                createdAt: new Date(order.createdAt),
+                updatedAt: new Date(order.updatedAt),
+              }),
+            ),
+          }
+        }
+
+        setPendingOrders(fetchedData.pendingOrders)
+        setProcessingOrders(fetchedData.processingOrders)
+        setCompletedOrders(fetchedData.completedOrders)
+        setCancelledOrders(fetchedData.cancelledOrders)
         const allFetched = [
-          ...mappedPending,
-          ...mappedProcessing,
-          ...mappedCompleted,
-          ...mappedCancelled,
+          ...fetchedData.pendingOrders,
+          ...fetchedData.processingOrders,
+          ...fetchedData.completedOrders,
+          ...fetchedData.cancelledOrders,
         ]
         const fetchedMap = new Map<number, Order>()
         allFetched.forEach((o) => fetchedMap.set(o.id, o))
