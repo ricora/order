@@ -15,7 +15,6 @@ FROM oven/bun:${BUN_VERSION}-slim
 WORKDIR /app
 
 COPY package.json bun.lock ./
-RUN bun install --production --frozen-lockfile
 
 COPY --from=builder /app/dist ./dist
 
