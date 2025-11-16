@@ -19,9 +19,7 @@ const csvExportItemVariants = tv({
     textContent: "flex-1",
     title: "font-semibold text-secondary-fg",
     description: "mt-0.5 text-muted-fg text-sm",
-    button:
-      "inline-flex w-full items-center justify-center gap-2 rounded border border-primary bg-primary px-4 py-2 font-medium text-primary-fg text-sm transition hover:bg-primary/90 sm:w-auto",
-    buttonIcon: "h-4 w-4",
+    // button and buttonIcon slots are removed in favor of using LinkButton component
   },
 })
 
@@ -48,8 +46,7 @@ const CSVExportItem = ({
     textContent,
     title: titleClass,
     description: descriptionClass,
-    button,
-    buttonIcon,
+    // no button/buttonIcon slots — use LinkButton instead
   } = csvExportItemVariants()
   const Icon = icon
 
@@ -66,12 +63,11 @@ const CSVExportItem = ({
           <p class={descriptionClass()}>{description}</p>
         </div>
       </div>
-      <a href={exportUrl} class={button()}>
-        <div class={buttonIcon()}>
-          <DownloadIcon />
-        </div>
-        {exportLabel}
-      </a>
+      <div class="w-full sm:w-auto">
+        <LinkButton href={exportUrl} leftIcon={DownloadIcon} kind="default">
+          {exportLabel}
+        </LinkButton>
+      </div>
     </div>
   )
 }
