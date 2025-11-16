@@ -5,6 +5,13 @@ import CircleXIcon from "../icons/lucide/circleXIcon"
 import InfoIcon from "../icons/lucide/infoIcon"
 import TriangleAlertIcon from "../icons/lucide/triangleAlertIcon"
 
+const variantIcons = {
+  info: InfoIcon,
+  warning: TriangleAlertIcon,
+  success: CircleCheckIcon,
+  danger: CircleXIcon,
+} as const
+
 const calloutTv = tv({
   slots: {
     root: "rounded-lg border px-6 py-4",
@@ -53,21 +60,9 @@ type CalloutProps = PropsWithChildren<{
   title?: string
 }>
 
-const Callout: FC<CalloutProps> = ({ variant, title, children }) => {
+const Callout: FC<CalloutProps> = ({ variant = "info", title, children }) => {
   const styles = calloutTv({ variant })
-
-  const Icon = () => {
-    switch (variant) {
-      case "warning":
-        return <TriangleAlertIcon />
-      case "success":
-        return <CircleCheckIcon />
-      case "danger":
-        return <CircleXIcon />
-      default:
-        return <InfoIcon />
-    }
-  }
+  const Icon = variantIcons[variant]
 
   return (
     <div class={styles.root()}>
