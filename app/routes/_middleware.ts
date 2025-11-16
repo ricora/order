@@ -12,7 +12,7 @@ export default createRoute(
   createMiddleware(async (c, next) => {
     await next()
     const contentType = (c.res.headers.get("content-type") || "").toLowerCase()
-    if (!contentType || contentType.includes("json")) {
+    if (contentType?.includes("json")) {
       return
     }
     const eTagHandler = etag()
