@@ -678,6 +678,9 @@ const OrderProgressManager: FC = () => {
             isFetchDisabledRef.current = false
             cooldownTimeoutRef.current = null
           }, FETCH_COOLDOWN_MS)
+        } else {
+          setIsFetchDisabled(false)
+          isFetchDisabledRef.current = false
         }
       }
     },
