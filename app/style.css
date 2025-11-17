@@ -244,3 +244,7 @@ https://intentui.com/themes
     border-radius: 4px;
   }
 }
+
+/* see ./staff/-helpers/sidebar.ts */
+@custom-variant staff-sidebar-open (&:is([data-staff-sidebar-state="open"] *));
+@custom-variant staff-sidebar-closed (&:is([data-staff-sidebar-state="closed"] *));
