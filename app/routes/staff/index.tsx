@@ -6,16 +6,21 @@ import ClipboardListIcon from "../../components/icons/lucide/clipboardListIcon"
 import PackageIcon from "../../components/icons/lucide/packageIcon"
 import SettingsIcon from "../../components/icons/lucide/settingsIcon"
 import ShoppingCartIcon from "../../components/icons/lucide/shoppingCartIcon"
+import { getStaffDashboardData } from "../../usecases/getStaffDashboardData"
+import { formatCurrencyJPY } from "../../utils/money"
+import DailyOrdersTrendCard from "./-components/$dailyOrdersTrendCard"
+import StatusDistributionCard from "./-components/$statusDistributionCard"
+import DashboardStatCard from "./-components/dashboardStatCard"
 import Layout from "./-components/layout"
 
-type DashboardCard = {
+type QuickAccessCard = {
   title: string
   description: string
   href: string
   icon: FC
 }
 
-const dashboardCards: DashboardCard[] = [
+const quickAccessCards: QuickAccessCard[] = [
   {
     title: "注文一覧",
     description: "注文の確認と管理を行います",
@@ -54,7 +59,7 @@ const dashboardCards: DashboardCard[] = [
   },
 ]
 
-const DashboardCard: FC<DashboardCard> = ({
+const QuickAccessCard: FC<QuickAccessCard> = ({
   title,
   description,
   href,
@@ -80,16 +85,66 @@ const DashboardCard: FC<DashboardCard> = ({
   )
 }
 
-export default createRoute((c) => {
+export default createRoute(async (c) => {
+  const dashboardData = await getStaffDashboardData({
+    dbClient: c.get("dbClient"),
+  })
+
+  const statCards = [
+    {
+      title: "本日の注文数",
+      value: `${dashboardData.summary.todayOrderCount}件`,
+      description: "本日0時以降の累計",
+    },
+    {
+      title: "本日の売上",
+      value: formatCurrencyJPY(dashboardData.summary.todayRevenue),
+      description: "税込み想定",
+    },
+    {
+      title: "未処理の注文",
+      value: `${dashboardData.summary.pendingOrderCount}件`,
+      description: "pending状態の件数",
+    },
+    {
+      title: "7日間の平均客単価",
+      value: formatCurrencyJPY(dashboardData.summary.averageOrderValue7d),
+      description: `7日間の売上合計 ${formatCurrencyJPY(
+        dashboardData.summary.totalRevenue7d,
+      )}`,
+    },
+  ]
+
   return c.render(
     <Layout title="ダッシュボード" description="Order管理システムへようこそ">
-      <div className="rounded-lg border bg-bg p-6">
-        <h2 className="mb-4 font-bold text-lg">クイックアクセス</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {dashboardCards.map((card) => (
-            <DashboardCard {...card} />
-          ))}
-        </div>
+      <div className="space-y-6">
+        <section className="rounded-lg border bg-bg p-6">
+          <h2 className="mb-4 font-bold text-lg">サマリー</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {statCards.map((card) => (
+              <DashboardStatCard
+                key={card.title}
+                title={card.title}
+                value={card.value}
+                description={card.description}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <StatusDistributionCard data={dashboardData.statusDistribution} />
+          <DailyOrdersTrendCard data={dashboardData.dailyOrders} />
+        </section>
+
+        <section className="rounded-lg border bg-bg p-6">
+          <h2 className="mb-4 font-bold text-lg">クイックアクセス</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {quickAccessCards.map((card) => (
+              <QuickAccessCard key={card.href} {...card} />
+            ))}
+          </div>
+        </section>
       </div>
     </Layout>,
   )

@@ -2,7 +2,9 @@ import {
   findAllOrdersByActiveStatusByUpdatedAtAscImpl,
   findAllOrdersByInactiveStatusByUpdatedAtDescImpl,
   findAllOrdersImpl,
+  findDailyOrderAggregationsImpl,
   findOrderByIdImpl,
+  findOrderStatusCountsImpl,
 } from "../../../infrastructure/domain/order/orderQueryRepositoryImpl"
 import type {
   PaginatedQueryRepositoryFunction,
@@ -23,6 +25,30 @@ export type FindAllOrdersByActiveStatusOrderByUpdatedAtAsc =
   PaginatedQueryRepositoryFunction<Record<string, never>, Order>
 export type FindAllOrdersByInactiveStatusOrderByUpdatedAtDesc =
   PaginatedQueryRepositoryFunction<Record<string, never>, Order>
+
+export type OrderStatusCount = {
+  status: Order["status"]
+  count: number
+}
+
+export type OrderDailyAggregation = {
+  date: Date
+  orderCount: number
+  revenue: number
+}
+
+export type FindOrderStatusCounts = QueryRepositoryFunction<
+  Record<string, never>,
+  OrderStatusCount[]
+>
+
+export type FindDailyOrderAggregations = QueryRepositoryFunction<
+  {
+    from: Date
+    to: Date
+  },
+  OrderDailyAggregation[]
+>
 
 export const findOrderById: WithRepositoryImpl<FindOrderById> = async ({
   order,
@@ -58,4 +84,21 @@ export const findAllOrdersByInactiveStatusOrderByUpdatedAtDesc: WithRepositoryIm
   pagination,
 }) => {
   return repositoryImpl({ dbClient, pagination })
+}
+
+export const findOrderStatusCounts: WithRepositoryImpl<
+  FindOrderStatusCounts
+> = async ({ repositoryImpl = findOrderStatusCountsImpl, dbClient }) => {
+  return repositoryImpl({ dbClient })
+}
+
+export const findDailyOrderAggregations: WithRepositoryImpl<
+  FindDailyOrderAggregations
+> = async ({
+  repositoryImpl = findDailyOrderAggregationsImpl,
+  dbClient,
+  from,
+  to,
+}) => {
+  return repositoryImpl({ dbClient, from, to })
 }

@@ -115,6 +115,8 @@ const useChart = ({ options, data }: UseChartArgs): UseChartResult => {
 
       resizeObserver.observe(containerEl)
       resizeObserverRef.current = resizeObserver
+
+      console.log("Chart initialized")
     },
     [destroyChart],
   )
