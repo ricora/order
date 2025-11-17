@@ -1,4 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from "hono/jsx"
+import ChevronLeftIcon from "../../../../components/icons/lucide/chevronLeftIcon"
 import SendIcon from "../../../../components/icons/lucide/sendIcon"
 import TagIcon from "../../../../components/icons/lucide/tagIcon"
 import XIcon from "../../../../components/icons/lucide/xIcon"
@@ -9,6 +10,7 @@ import ChipButton from "../../../../components/ui/chipButton"
 import FileInput from "../../../../components/ui/fileInput"
 import Input from "../../../../components/ui/input"
 import Label from "../../../../components/ui/label"
+import LinkButton from "../../../../components/ui/linkButton"
 import type Product from "../../../../domain/product/entities/product"
 import type ProductTag from "../../../../domain/product/entities/productTag"
 import { createHonoClient } from "../../../../helpers/api/hono-client"
@@ -341,11 +343,15 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
               />
             </div>
             <div className="mt-6 flex gap-4">
+              {mode === "edit" ? (
+                <div>
+                  <LinkButton href="/staff/products" leftIcon={ChevronLeftIcon}>
+                    商品管理に戻る
+                  </LinkButton>
+                </div>
+              ) : null}
               <div className="ml-auto">
-                <Button type="submit">
-                  <div className="size-4">
-                    <SendIcon />
-                  </div>
+                <Button type="submit" leftIcon={SendIcon}>
                   <span>{submitLabel}</span>
                 </Button>
               </div>

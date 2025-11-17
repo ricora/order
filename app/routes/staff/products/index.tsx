@@ -1,4 +1,5 @@
 import type { FC } from "hono/jsx"
+import { validator } from "hono/validator"
 import { createRoute } from "honox/factory"
 import { tv } from "tailwind-variants"
 import CircleCheckIcon from "../../../components/icons/lucide/circleCheckIcon"
@@ -169,23 +170,32 @@ const OrderStatusBadge = ({ status }: OrderStatusBadgeProps) => {
   )
 }
 
-export const POST = createRoute(async (c) => {
-  try {
-    const body = await c.req.parseBody({ all: true })
+export const POST = createRoute(
+  validator("form", async (value, c) => {
+    try {
+      const parsed = await parseCreateProductRequestBody(value)
+      return parsed
+    } catch (e) {
+      setToastCookie(c, "error", String(e))
+      return c.redirect(c.req.url)
+    }
+  }),
+  async (c) => {
+    try {
+      const parsedProduct = c.req.valid("form")
 
-    const product = await parseCreateProductRequestBody(body)
+      await registerProduct({
+        dbClient: c.get("dbClient"),
+        product: parsedProduct,
+      })
 
-    await registerProduct({
-      dbClient: c.get("dbClient"),
-      product,
-    })
-
-    setToastCookie(c, "success", "商品を登録しました")
-  } catch (e) {
-    setToastCookie(c, "error", String(e))
-  }
-  return c.redirect(c.req.url)
-})
+      setToastCookie(c, "success", "商品を登録しました")
+    } catch (e) {
+      setToastCookie(c, "error", String(e))
+    }
+    return c.redirect(c.req.url)
+  },
+)
 
 export default createRoute(async (c) => {
   const url = new URL(c.req.url)
