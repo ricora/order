@@ -4,10 +4,8 @@ import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
 import Button from "../../../../../components/ui/button"
 import Chip from "../../../../../components/ui/chip"
 import LinkButton from "../../../../../components/ui/linkButton"
-import { findAllProductTagsByIds } from "../../../../../domain/product/repositories/productTagQueryRepository"
 import { setToastCookie } from "../../../../../helpers/ui/toast"
-import type { TransactionDbClient } from "../../../../../infrastructure/db/client"
-import { getProductEditPageData } from "../../../../../usecases/getProductEditPageData"
+import { getProductDeletePageData } from "../../../../../usecases/getProductDeletePageData"
 import { removeProduct } from "../../../../../usecases/removeProduct"
 import { formatCurrencyJPY } from "../../../../../utils/money"
 import Layout from "../../../-components/layout"
@@ -39,16 +37,11 @@ export default createRoute(async (c) => {
     return c.text("Not found", 404)
   }
 
-  const { product } = await getProductEditPageData({
+  const { product } = await getProductDeletePageData({
     product: { id },
     dbClient: c.get("dbClient"),
   })
   if (!product) return c.text("Not found", 404)
-  const tags = await findAllProductTagsByIds({
-    dbClient: c.get("dbClient") as unknown as TransactionDbClient,
-    productTag: { ids: product.tagIds },
-    pagination: { offset: 0, limit: product.tagIds.length },
-  })
 
   return c.render(
     <Layout title={"商品削除"} description={"商品情報の削除を行います。"}>
@@ -70,9 +63,9 @@ export default createRoute(async (c) => {
               <div className="font-medium">{product.name}</div>
               <div className="mt-1 text-muted-foreground text-sm">
                 <div className="flex flex-wrap gap-1">
-                  {tags.map((tag) => (
-                    <Chip key={tag.id} size="xs">
-                      {tag.name}
+                  {product.tags.map((tag) => (
+                    <Chip key={tag} size="xs">
+                      {tag}
                     </Chip>
                   ))}
                 </div>
