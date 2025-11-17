@@ -13,7 +13,7 @@ export async function waitForHydration(page: Page, url: string): Promise<void> {
   // Wait for network to be idle after DOM is loaded, which typically indicates
   // that hono/jsx hydration has completed
   try {
-    await page.waitForLoadState("networkidle", { timeout: 5000 })
+    await page.waitForLoadState("networkidle", { timeout: 15000 })
   } catch {
     // If networkidle times out, continue anyway as the page may still be functional
     // This is a fallback for cases where the page has ongoing network activity
