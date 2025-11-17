@@ -8,5 +8,14 @@ export default createRoute(
     c.set("dbClient", await createDbClient())
     await next()
   }),
-  etag(),
+  // https://github.com/honojs/hono/issues/4031
+  createMiddleware(async (c, next) => {
+    await next()
+    const contentType = (c.res.headers.get("content-type") || "").toLowerCase()
+    if (contentType?.includes("json")) {
+      return
+    }
+    const eTagHandler = etag()
+    await eTagHandler(c, async () => {})
+  }),
 )
