@@ -1,5 +1,8 @@
 import type { TransactionDbClient } from "../../../infrastructure/db/client"
-import { createProductTagImpl } from "../../../infrastructure/domain/product/productTagCommandRepositoryImpl"
+import {
+  createProductTagImpl,
+  deleteAllProductTagsByIdsImpl,
+} from "../../../infrastructure/domain/product/productTagCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
 import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import { MAX_STORE_PRODUCT_TAG_COUNT } from "../constants"
@@ -9,6 +12,11 @@ import { countProductTags } from "./productTagQueryRepository"
 export type CreateProductTag = CommandRepositoryFunction<
   { productTag: Omit<ProductTag, "id"> },
   ProductTag
+>
+
+export type DeleteAllProductTagsByIds = CommandRepositoryFunction<
+  { productTag: { ids: ProductTag["id"][] } },
+  void
 >
 
 const validateProductTag = (tag: Omit<ProductTag, "id">) => {
@@ -34,4 +42,14 @@ export const createProductTag: WithRepositoryImpl<CreateProductTag> = async ({
   validateProductTag(productTag)
   await verifyProductTagCountLimit(dbClient)
   return repositoryImpl({ productTag, dbClient })
+}
+
+export const deleteAllProductTagsByIds: WithRepositoryImpl<
+  DeleteAllProductTagsByIds
+> = async ({
+  repositoryImpl = deleteAllProductTagsByIdsImpl,
+  dbClient,
+  productTag,
+}) => {
+  return repositoryImpl({ dbClient, productTag })
 }

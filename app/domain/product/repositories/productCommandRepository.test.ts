@@ -13,10 +13,14 @@ import type Product from "../entities/product"
 import {
   type CreateProduct,
   createProduct,
+  type DeleteProduct,
+  deleteProduct,
   type UpdateProduct,
   updateProduct,
 } from "./productCommandRepository"
+import * as productImageCommandRepository from "./productImageCommandRepository"
 import * as productQueryRepository from "./productQueryRepository"
+import * as productTagCommandRepository from "./productTagCommandRepository"
 import * as productTagQueryRepository from "./productTagQueryRepository"
 
 const mockTags = [
@@ -201,6 +205,16 @@ describe("updateProduct", () => {
       productQueryRepository,
       "findProductByName",
     ).mockImplementation(async () => null)
+
+    spyOn(productQueryRepository, "findProductById").mockImplementation(
+      async () => ({
+        id: 1,
+        name: "既存商品",
+        tagIds: [1, 2],
+        price: 1000,
+        stock: 5,
+      }),
+    )
   })
 
   afterEach(() => {
@@ -208,6 +222,31 @@ describe("updateProduct", () => {
   })
 
   it("バリデーションを通過した商品を更新できる", async () => {
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagsByIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        id,
+        name: `タグ${id}`,
+      }))
+    })
+
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagRelationCountsByTagIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        tagId: id,
+        count: 2,
+      }))
+    })
+
+    spyOn(
+      productTagCommandRepository,
+      "deleteAllProductTagsByIds",
+    ).mockImplementation(async () => undefined)
+
     const mockImpl: UpdateProduct = async ({ product }) =>
       applyPartialToDefaultProduct(product)
     const result = await updateProduct({
@@ -250,6 +289,31 @@ describe("updateProduct", () => {
       stock: 10,
     }))
 
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagsByIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        id,
+        name: `タグ${id}`,
+      }))
+    })
+
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagRelationCountsByTagIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        tagId: id,
+        count: 2,
+      }))
+    })
+
+    spyOn(
+      productTagCommandRepository,
+      "deleteAllProductTagsByIds",
+    ).mockImplementation(async () => undefined)
+
     const mockImpl: UpdateProduct = async ({ product }) =>
       applyPartialToDefaultProduct(product)
     const result = await updateProduct({
@@ -261,5 +325,206 @@ describe("updateProduct", () => {
     expect(result?.id).toBe(1)
     expect(findProductByNameSpy).toHaveBeenCalledTimes(1)
     expect(findAllProductTagsSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("タグが更新された際、削除されたタグが孤立していれば削除される", async () => {
+    spyOn(productQueryRepository, "findProductById").mockImplementation(
+      async () => ({
+        id: 1,
+        name: "既存商品",
+        tagIds: [1, 2],
+        price: 1000,
+        stock: 5,
+      }),
+    )
+
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagsByIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return productTag.ids
+        .map((id) => ({ id, name: `タグ${id}` }))
+        .filter((tag) => productTag.ids.includes(tag.id))
+    })
+
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagRelationCountsByTagIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return productTag.ids.map((id) => ({
+        tagId: id,
+        count: id === 2 ? 1 : 2,
+      }))
+    })
+
+    const deleteAllProductTagsByIdsSpy = spyOn(
+      productTagCommandRepository,
+      "deleteAllProductTagsByIds",
+    ).mockImplementation(async () => undefined)
+
+    const mockImpl: UpdateProduct = async ({ product }) =>
+      applyPartialToDefaultProduct(product)
+
+    await updateProduct({
+      product: { id: 1, tagIds: [1] },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+
+    expect(deleteAllProductTagsByIdsSpy).toHaveBeenCalledTimes(1)
+    const calls = deleteAllProductTagsByIdsSpy.mock.calls
+    expect(calls[0]?.[0]?.productTag?.ids).toEqual([2])
+  })
+
+  it("タグ更新時、削除されたタグが他の商品と紐づいていれば削除しない", async () => {
+    spyOn(productQueryRepository, "findProductById").mockImplementation(
+      async () => ({
+        id: 1,
+        name: "既存商品",
+        tagIds: [1, 2],
+        price: 1000,
+        stock: 5,
+      }),
+    )
+
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagsByIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        id,
+        name: `タグ${id}`,
+      }))
+    })
+
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagRelationCountsByTagIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        tagId: id,
+        count: 2,
+      }))
+    })
+
+    const deleteAllProductTagsByIdsSpy = spyOn(
+      productTagCommandRepository,
+      "deleteAllProductTagsByIds",
+    ).mockImplementation(async () => undefined)
+
+    const mockImpl: UpdateProduct = async ({ product }) =>
+      applyPartialToDefaultProduct(product)
+
+    await updateProduct({
+      product: { id: 1, tagIds: [1] },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+
+    expect(deleteAllProductTagsByIdsSpy).not.toHaveBeenCalled()
+  })
+})
+
+describe("deleteProduct", () => {
+  let deleteAllProductTagsByIdsSpy: ReturnType<typeof spyOn>
+  let deleteProductImageByProductIdSpy: ReturnType<typeof spyOn>
+  const mockDbClient = {} as TransactionDbClient
+
+  beforeEach(() => {
+    spyOn(productQueryRepository, "findProductById").mockImplementation(
+      async () => ({
+        id: 1,
+        name: "削除対象商品",
+        tagIds: [1, 2],
+        price: 1000,
+        stock: 5,
+      }),
+    )
+
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagsByIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        id,
+        name: `タグ${id}`,
+      }))
+    })
+
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagRelationCountsByTagIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        tagId: id,
+        count: 1,
+      }))
+    })
+
+    deleteAllProductTagsByIdsSpy = spyOn(
+      productTagCommandRepository,
+      "deleteAllProductTagsByIds",
+    ).mockImplementation(async () => undefined)
+
+    deleteProductImageByProductIdSpy = spyOn(
+      productImageCommandRepository,
+      "deleteProductImageByProductId",
+    ).mockImplementation(async () => undefined)
+  })
+
+  afterEach(() => {
+    mock.restore()
+  })
+
+  it("商品が見つからない場合はエラーを返す", async () => {
+    spyOn(productQueryRepository, "findProductById").mockImplementation(
+      async () => null,
+    )
+
+    await expect(
+      deleteProduct({
+        product: { id: 999 },
+        repositoryImpl: async () => undefined,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow("商品が見つかりません")
+  })
+
+  it("商品削除時に孤立したタグが削除される", async () => {
+    const mockImpl: DeleteProduct = async () => undefined
+
+    await deleteProduct({
+      product: { id: 1 },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+
+    expect(deleteProductImageByProductIdSpy).toHaveBeenCalledTimes(1)
+    expect(deleteAllProductTagsByIdsSpy).toHaveBeenCalledTimes(1)
+    const calls = deleteAllProductTagsByIdsSpy.mock.calls
+    expect(calls[0]?.[0]?.productTag?.ids).toEqual([1, 2])
+  })
+
+  it("商品削除時に孤立していないタグは削除されない", async () => {
+    spyOn(
+      productTagQueryRepository,
+      "findAllProductTagRelationCountsByTagIds",
+    ).mockImplementation(async ({ productTag }) => {
+      return (productTag.ids as number[]).map((id) => ({
+        tagId: id,
+        count: 2,
+      }))
+    })
+
+    const mockImpl: DeleteProduct = async () => undefined
+
+    await deleteProduct({
+      product: { id: 1 },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+
+    expect(deleteAllProductTagsByIdsSpy).not.toHaveBeenCalled()
+    expect(deleteProductImageByProductIdSpy).toHaveBeenCalledTimes(1)
   })
 })

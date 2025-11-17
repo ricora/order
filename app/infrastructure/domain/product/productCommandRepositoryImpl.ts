@@ -107,6 +107,9 @@ export const deleteProductImpl: DeleteProduct = async ({
 }) => {
   try {
     await dbClient.delete(productTable).where(eq(productTable.id, product.id))
+    await dbClient
+      .delete(productTagRelationTable)
+      .where(eq(productTagRelationTable.productId, product.id))
   } catch {
     throw new Error("商品の削除に失敗しました")
   }

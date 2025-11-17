@@ -1,11 +1,12 @@
-import { asc, eq, inArray } from "drizzle-orm"
+import { asc, count, eq, inArray } from "drizzle-orm"
 import type {
   CountProductTags,
+  FindAllProductTagRelationCountsByTagIds,
   FindAllProductTags,
   FindAllProductTagsByIds,
   FindProductTagById,
 } from "../../../domain/product/repositories/productTagQueryRepository"
-import { productTagTable } from "../../db/schema"
+import { productTagRelationTable, productTagTable } from "../../db/schema"
 
 export const findProductTagByIdImpl: FindProductTagById = async ({
   dbClient,
@@ -54,3 +55,22 @@ export const findAllProductTagsByIdsImpl: FindAllProductTagsByIds = async ({
 export const countProductTagsImpl: CountProductTags = async ({ dbClient }) => {
   return await dbClient.$count(productTagTable)
 }
+
+export const findAllProductTagRelationCountsByTagIdsImpl: FindAllProductTagRelationCountsByTagIds =
+  async ({ dbClient, productTag, pagination }) => {
+    const results = await dbClient
+      .select({
+        tagId: productTagRelationTable.tagId,
+        count: count(),
+      })
+      .from(productTagRelationTable)
+      .where(inArray(productTagRelationTable.tagId, productTag.ids))
+      .groupBy(productTagRelationTable.tagId)
+      .offset(pagination.offset)
+      .limit(pagination.limit)
+
+    return results.map((result) => ({
+      tagId: result.tagId,
+      count: result.count,
+    }))
+  }

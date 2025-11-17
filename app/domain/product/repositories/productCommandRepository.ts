@@ -9,10 +9,20 @@ import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import {
   MAX_STORE_PRODUCT_COUNT,
   MAX_STORE_PRODUCT_TAG_COUNT,
+  MAX_TAGS_PER_PRODUCT,
 } from "../constants"
 import type Product from "../entities/product"
-import { countProducts, findProductByName } from "./productQueryRepository"
-import { findAllProductTags } from "./productTagQueryRepository"
+import { deleteProductImageByProductId } from "./productImageCommandRepository"
+import {
+  countProducts,
+  findProductById,
+  findProductByName,
+} from "./productQueryRepository"
+import { deleteAllProductTagsByIds } from "./productTagCommandRepository"
+import {
+  findAllProductTagRelationCountsByTagIds,
+  findAllProductTags,
+} from "./productTagQueryRepository"
 
 const validateProduct = (product: Partial<Omit<Product, "id">>) => {
   if (product.name !== undefined) {
@@ -24,8 +34,10 @@ const validateProduct = (product: Partial<Omit<Product, "id">>) => {
     }
   }
   if (product.tagIds !== undefined) {
-    if (product.tagIds.length > 20) {
-      throw new Error("商品タグは20個以内である必要があります")
+    if (product.tagIds.length > MAX_TAGS_PER_PRODUCT) {
+      throw new Error(
+        `商品タグは${MAX_TAGS_PER_PRODUCT}個以内である必要があります`,
+      )
     }
     if (product.tagIds.some((tagId) => !Number.isInteger(tagId) || tagId < 1)) {
       throw new Error("タグIDは1以上の整数の配列である必要があります")
@@ -78,6 +90,32 @@ const verifyProductCountLimit = async (dbClient: TransactionDbClient) => {
   }
 }
 
+const deleteOrphanedTags = async (
+  dbClient: TransactionDbClient,
+  tagIds: number[],
+) => {
+  if (tagIds.length === 0) {
+    return
+  }
+
+  const tagRelationCounts = await findAllProductTagRelationCountsByTagIds({
+    dbClient,
+    productTag: { ids: tagIds },
+    pagination: { offset: 0, limit: tagIds.length },
+  })
+
+  const orphanedTagIds = tagRelationCounts
+    .filter((tagCount) => tagCount.count <= 1)
+    .map((tagCount) => tagCount.tagId)
+
+  if (orphanedTagIds.length > 0) {
+    await deleteAllProductTagsByIds({
+      productTag: { ids: orphanedTagIds },
+      dbClient,
+    })
+  }
+}
+
 export type CreateProduct = CommandRepositoryFunction<
   { product: Omit<Product, "id"> },
   Product | null
@@ -108,6 +146,14 @@ export const updateProduct: WithRepositoryImpl<UpdateProduct> = async ({
   dbClient,
   product,
 }) => {
+  const foundProduct = await findProductById({
+    dbClient,
+    product: { id: product.id },
+  })
+  if (!foundProduct) {
+    throw new Error("商品が見つかりません")
+  }
+
   validateProduct(product)
   if (product.name) {
     await verifyProductNameUnique(dbClient, product.name, product.id)
@@ -115,6 +161,15 @@ export const updateProduct: WithRepositoryImpl<UpdateProduct> = async ({
   if (product.tagIds) {
     await verifyAllTagIdsExist(dbClient, product.tagIds)
   }
+
+  if (product.tagIds !== undefined) {
+    const oldTagIds = foundProduct.tagIds
+    const removedTagIds = oldTagIds.filter(
+      (tagId) => !product.tagIds?.includes(tagId),
+    )
+    await deleteOrphanedTags(dbClient, removedTagIds)
+  }
+
   return repositoryImpl({ product, dbClient })
 }
 
@@ -123,5 +178,19 @@ export const deleteProduct: WithRepositoryImpl<DeleteProduct> = async ({
   product,
   dbClient,
 }) => {
-  return repositoryImpl({ product, dbClient })
+  const foundProduct = await findProductById({
+    dbClient,
+    product: { id: product.id },
+  })
+  if (!foundProduct) {
+    throw new Error("商品が見つかりません")
+  }
+
+  await deleteProductImageByProductId({
+    productImage: { productId: product.id },
+    dbClient,
+  })
+
+  await deleteOrphanedTags(dbClient, foundProduct.tagIds)
+  await repositoryImpl({ product, dbClient })
 }

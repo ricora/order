@@ -1,6 +1,10 @@
+import { inArray } from "drizzle-orm"
 import type ProductTag from "../../../domain/product/entities/productTag"
-import type { CreateProductTag } from "../../../domain/product/repositories/productTagCommandRepository"
-import { productTagTable } from "../../db/schema"
+import type {
+  CreateProductTag,
+  DeleteAllProductTagsByIds,
+} from "../../../domain/product/repositories/productTagCommandRepository"
+import { productTagRelationTable, productTagTable } from "../../db/schema"
 
 export const createProductTagImpl: CreateProductTag = async ({
   dbClient,
@@ -21,5 +25,21 @@ export const createProductTagImpl: CreateProductTag = async ({
     return newTag
   } catch {
     throw new Error("商品タグの作成に失敗しました")
+  }
+}
+
+export const deleteAllProductTagsByIdsImpl: DeleteAllProductTagsByIds = async ({
+  dbClient,
+  productTag,
+}) => {
+  try {
+    await dbClient
+      .delete(productTagTable)
+      .where(inArray(productTagTable.id, productTag.ids))
+    await dbClient
+      .delete(productTagRelationTable)
+      .where(inArray(productTagRelationTable.tagId, productTag.ids))
+  } catch {
+    throw new Error("商品タグの削除に失敗しました")
   }
 }
