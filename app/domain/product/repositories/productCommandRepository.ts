@@ -101,7 +101,7 @@ const deleteOrphanedTags = async (
   const tagRelationCounts = await findAllProductTagRelationCountsByTagIds({
     dbClient,
     productTag: { ids: tagIds },
-    pagination: { offset: 0, limit: MAX_TAGS_PER_PRODUCT },
+    pagination: { offset: 0, limit: tagIds.length },
   })
 
   const orphanedTagIds = tagRelationCounts
