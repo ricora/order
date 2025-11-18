@@ -11,7 +11,7 @@ export const POST = createRoute(
   validator("form", async (value, c) => {
     try {
       const parsed = await parseProductRegistrationFormData(value)
-      return parsed
+      return { product: parsed }
     } catch (e) {
       setToastCookie(c, "error", String(e))
       return c.redirect(c.req.url)
@@ -24,11 +24,11 @@ export const POST = createRoute(
         return c.notFound()
       }
 
-      const parsedProduct = c.req.valid("form")
+      const { product } = c.req.valid("form")
 
       await registerProduct({
         dbClient: c.get("dbClient"),
-        product: { id, ...parsedProduct },
+        product: { id, ...product },
       })
 
       setToastCookie(c, "success", "商品を更新しました")
