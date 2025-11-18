@@ -2,40 +2,37 @@ import type { ChartConfig } from "../../../components/ui/$chart"
 import Chart from "../../../components/ui/$chart"
 import type { StaffDashboardData } from "../../../usecases/getStaffDashboardData"
 
-const STATUS_COLORS: Record<
-  StaffDashboardData["statusDistribution"][number]["status"],
-  string
-> = {
-  pending: "var(--color-chart-1)",
-  processing: "var(--color-chart-2)",
-  completed: "var(--color-chart-3)",
-  cancelled: "var(--color-chart-4)",
-}
-
 type StatusDistributionCardProps = {
   data: StaffDashboardData["statusDistribution"]
 }
 
+const STATUS_COLOR_TOKENS: Record<
+  StaffDashboardData["statusDistribution"][number]["status"],
+  string
+> = {
+  pending: "--color-chart-1",
+  processing: "--color-chart-2",
+  completed: "--color-chart-3",
+  cancelled: "--color-chart-4",
+}
+
 const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
   const chartConfig: ChartConfig = {
-    type: "line",
+    type: "pie",
     data: {
       labels: data.map((entry) => entry.label),
       datasets: [
         {
-          label: "注文数",
+          label: "件数",
           data: data.map((entry) => entry.count),
-          fill: true,
         },
       ],
     },
     options: {
-      scales: {
-        x: { grid: { display: false } },
-        y: { beginAtZero: true },
-      },
       plugins: {
-        legend: { display: false },
+        legend: {
+          position: "right",
+        },
       },
     },
   }
@@ -50,7 +47,7 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
       </div>
       <div class="h-64">
         <Chart
-          ariaLabel="ステータス別の件数推移"
+          ariaLabel="ステータス別件数の内訳"
           class="size-full"
           config={chartConfig}
         />
@@ -64,7 +61,9 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
             <div class="flex items-center gap-2">
               <span
                 class="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: STATUS_COLORS[entry.status] }}
+                style={{
+                  backgroundColor: `var(${STATUS_COLOR_TOKENS[entry.status]})`,
+                }}
               />
               <span class="text-secondary-fg">{entry.label}</span>
             </div>
