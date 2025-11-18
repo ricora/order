@@ -110,7 +110,7 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("注文項目は1種類以上20種類以下である必要があります"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("顧客名が51文字以上のときにエラーを返す", async () => {
@@ -139,9 +139,7 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       const cookie = res.headers.get("set-cookie")
-      expect(cookie).toMatch(
-        encodeURIComponent("注文項目は1種類以上20種類以下である必要があります"),
-      )
+      expect(cookie).toMatch(encodeURIComponent("不正なリクエストです"))
     })
     test("FormDataで商品IDが整数でない場合にエラーを返す", async () => {
       const form = new URLSearchParams()
