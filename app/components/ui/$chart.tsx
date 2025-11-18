@@ -120,7 +120,7 @@ const prepareDatasets = (
   labelCount: number,
 ) => {
   return config.data.datasets.map((dataset, index) => {
-    const datasetType = (dataset.type ?? config.type) as ChartType
+    const datasetType: ChartType = dataset.type ?? config.type
     const paletteColor =
       tokens.palette[index % tokens.palette.length] ??
       tokens.palette[0] ??
@@ -192,35 +192,37 @@ const prepareScales = (
 ): ScalesSetting => {
   const provided = config.options?.scales
   if (provided) {
-    const entries = Object.entries(provided).map(([axis, scale]) => {
+    const next: NonNullable<ScalesSetting> = {}
+    for (const axis of Object.keys(provided) as Array<
+      keyof NonNullable<ScalesSetting>
+    >) {
+      const scale = provided[axis]
       if (!scale) {
-        return [axis, scale]
+        next[axis] = scale
+        continue
       }
       const grid = scale.grid ?? {}
       const ticks = scale.ticks ?? {}
-      return [
-        axis,
-        {
-          ...scale,
-          grid: {
-            color: grid.color ?? tokens.gridColor,
-            ...grid,
-          },
-          ticks: {
-            color: ticks.color ?? tokens.textColor,
-            ...ticks,
-          },
+      next[axis] = {
+        ...scale,
+        grid: {
+          color: grid.color ?? tokens.gridColor,
+          ...grid,
         },
-      ]
-    })
-    return Object.fromEntries(entries) as NonNullable<ScalesSetting>
+        ticks: {
+          color: ticks.color ?? tokens.textColor,
+          ...ticks,
+        },
+      }
+    }
+    return next
   }
 
   if (CIRCULAR_CHART_TYPES.has(config.type)) {
     return undefined
   }
 
-  return {
+  const fallback: NonNullable<ScalesSetting> = {
     x: {
       grid: { color: tokens.gridColor },
     },
@@ -230,6 +232,7 @@ const prepareScales = (
       ticks: { color: tokens.textColor },
     },
   }
+  return fallback
 }
 
 const buildChartConfig = (
@@ -238,16 +241,17 @@ const buildChartConfig = (
 ): ChartConfig => {
   const labels = config.data.labels ? [...config.data.labels] : []
   const datasets = prepareDatasets(config, tokens, labels.length)
-  const pluginOverrides = (config.options?.plugins ?? {}) as ChartPluginOptions
+  const baseOptions = config.options ?? {}
+  const pluginOverrides = baseOptions.plugins
 
   const options: ChartOptions<ChartType> = {
-    responsive: config.options?.responsive ?? true,
-    maintainAspectRatio: config.options?.maintainAspectRatio ?? false,
-    ...config.options,
+    responsive: baseOptions.responsive ?? true,
+    maintainAspectRatio: baseOptions.maintainAspectRatio ?? false,
+    ...baseOptions,
     plugins: {
       ...pluginOverrides,
-      legend: prepareLegend(pluginOverrides.legend, tokens),
-      tooltip: prepareTooltip(pluginOverrides.tooltip, tokens),
+      legend: prepareLegend(pluginOverrides?.legend, tokens),
+      tooltip: prepareTooltip(pluginOverrides?.tooltip, tokens),
     },
     scales: prepareScales(config, tokens),
   }
@@ -271,7 +275,7 @@ const updateChartInstance = (chart: ChartJS, config: ChartConfig) => {
   chartConfig.data = config.data
   chartConfig.plugins = config.plugins
   chart.data.labels = config.data.labels ?? []
-  chart.data.datasets = config.data.datasets as ChartDataset[]
+  chart.data.datasets = config.data.datasets
   chart.update()
 }
 
@@ -281,9 +285,11 @@ const extractTitleText = (config: ChartConfig) => {
   return Array.isArray(title) ? title.join(" / ") : title
 }
 
+type ChartInstance = ChartJS<ChartType, DefaultDataPoint<ChartType>, unknown>
+
 const Chart = ({ config, class: className, ariaLabel }: ChartProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const chartRef = useRef<ChartJS | null>(null)
+  const chartRef = useRef<ChartInstance | null>(null)
   const themeVersion = useThemeVersion()
 
   useEffect(() => {
@@ -291,7 +297,7 @@ const Chart = ({ config, class: className, ariaLabel }: ChartProps) => {
     const tokens = readDesignTokens()
     if (!tokens) return
 
-    const normalizedConfig = buildChartConfig(config as ChartConfig, tokens)
+    const normalizedConfig = buildChartConfig(config, tokens)
     if (!chartRef.current) {
       chartRef.current = new ChartJS(canvasRef.current, normalizedConfig)
       return
@@ -306,7 +312,7 @@ const Chart = ({ config, class: className, ariaLabel }: ChartProps) => {
     }
   }, [])
 
-  const fallbackLabel = ariaLabel ?? extractTitleText(config as ChartConfig)
+  const fallbackLabel = ariaLabel ?? extractTitleText(config)
   const containerClass = twMerge("relative h-full w-full min-h-0", className)
 
   return (
