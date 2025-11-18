@@ -1,7 +1,7 @@
 import {
-  Chart as ChartJS,
   type ChartConfiguration,
   type ChartDataset,
+  Chart as ChartJS,
   type ChartOptions,
   type ChartType,
   type DefaultDataPoint,
