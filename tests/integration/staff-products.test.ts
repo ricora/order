@@ -84,6 +84,23 @@ describe("商品管理", () => {
       expect(text).toMatch(/href="[^"]*page=1/)
       expect(text).toMatch(/aria-disabled="true"/)
     })
+
+    test("商品編集ページが表示される", async () => {
+      const res = await app.request(`/staff/products/1/edit`)
+      const text = await res.text()
+      assertBasicHtmlResponse(res, text)
+      expect(text).toMatch(/商品編集/)
+      expect(text).toMatch(/テスト商品1/)
+    })
+
+    test("商品削除ページが表示される", async () => {
+      const res = await app.request(`/staff/products/1/delete`)
+      const text = await res.text()
+      assertBasicHtmlResponse(res, text)
+      expect(text).toMatch(/商品削除/)
+      expect(text).toMatch(/テスト商品1/)
+      expect(text).toMatch(/削除する/)
+    })
   })
   describe("POST", () => {
     const endpoint = "/staff/products"
@@ -373,6 +390,48 @@ describe("商品管理", () => {
       expect(res.headers.get("set-cookie")).toMatch(
         encodeURIComponent("画像のMIMEタイプは"),
       )
+    })
+
+    test("商品を編集できる", async () => {
+      const form = new URLSearchParams()
+      form.append("name", "テスト商品1-編集済み")
+      form.append("price", "2000")
+      form.append("stock", "50")
+      const res = await app.request(`/staff/products/1/edit`, {
+        method: "POST",
+        body: form,
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      })
+      expect(res.status).toBe(302)
+      expect(res.headers.get("set-cookie")).toMatch(/success/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("商品を更新しました"),
+      )
+    })
+
+    test("商品を削除できる", async () => {
+      const res = await app.request(`/staff/products/25/delete`, {
+        method: "POST",
+        body: new URLSearchParams(),
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      })
+      expect(res.status).toBe(302)
+      expect(res.headers.get("set-cookie")).toMatch(/success/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("商品を削除しました"),
+      )
+
+      const res2 = await app.request(`/staff/products/25/edit`)
+      expect(res2.status).toBe(404)
+      const form = new URLSearchParams()
+      form.append("name", "テスト商品25")
+      form.append("price", "2000")
+      form.append("stock", "50")
+      await app.request(`/staff/products`, {
+        method: "POST",
+        body: form,
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      })
     })
   })
 })

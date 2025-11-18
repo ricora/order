@@ -1,3 +1,4 @@
+import { validator } from "hono/validator"
 import { createRoute } from "honox/factory"
 import { setToastCookie } from "../../../../../helpers/ui/toast"
 import { getProductEditPageData } from "../../../../../usecases/getProductEditPageData"
@@ -6,29 +7,38 @@ import Layout from "../../../-components/layout"
 import ProductRegistrationForm from "../../-components/$productRegistrationForm"
 import { parseUpdateProductRequestBody } from "../../-helpers/parseRequestBody"
 
-export const POST = createRoute(async (c) => {
-  try {
-    const id = Number(c.req.param("id"))
-    if (!Number.isInteger(id) || id <= 0) {
-      return c.notFound()
+export const POST = createRoute(
+  validator("form", async (value, c) => {
+    try {
+      const parsed = await parseUpdateProductRequestBody(value)
+      return parsed
+    } catch (e) {
+      setToastCookie(c, "error", String(e))
+      return c.redirect(c.req.url)
     }
+  }),
+  async (c) => {
+    try {
+      const id = Number(c.req.param("id"))
+      if (!Number.isInteger(id) || id <= 0) {
+        return c.notFound()
+      }
 
-    const body = await c.req.parseBody({ all: true })
+      const parsedProduct = c.req.valid("form")
 
-    const parsedProduct = await parseUpdateProductRequestBody(body)
+      await registerProduct({
+        dbClient: c.get("dbClient"),
+        product: { id, ...parsedProduct },
+      })
 
-    await registerProduct({
-      dbClient: c.get("dbClient"),
-      product: { id, ...parsedProduct },
-    })
-
-    setToastCookie(c, "success", "商品を更新しました")
-    return c.redirect(`/staff/products`)
-  } catch (e) {
-    setToastCookie(c, "error", String(e))
-    return c.redirect(c.req.url)
-  }
-})
+      setToastCookie(c, "success", "商品を更新しました")
+      return c.redirect(`/staff/products`)
+    } catch (e) {
+      setToastCookie(c, "error", String(e))
+      return c.redirect(c.req.url)
+    }
+  },
+)
 
 export default createRoute(async (c) => {
   const idParam = c.req.param("id")

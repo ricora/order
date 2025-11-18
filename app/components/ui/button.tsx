@@ -1,9 +1,10 @@
-import type { PropsWithChildren } from "hono/jsx"
+import type { FC, PropsWithChildren } from "hono/jsx"
 import { tv } from "tailwind-variants"
 
 type ButtonProps = PropsWithChildren<{
   type?: "button" | "submit" | "reset"
   disabled?: boolean
+  leftIcon?: FC
   variant?: "primary" | "secondary" | "danger"
   onClick?: (e: Event) => void
   ariaLabel?: string
@@ -49,6 +50,7 @@ const Button = ({
   children,
   onClick,
   ariaLabel,
+  leftIcon: LeftIcon,
 }: ButtonProps) => {
   return (
     <button
@@ -58,6 +60,11 @@ const Button = ({
       onClick={onClick}
       aria-label={ariaLabel}
     >
+      {LeftIcon ? (
+        <div className="h-4 w-4">
+          <LeftIcon />
+        </div>
+      ) : null}
       {children}
     </button>
   )

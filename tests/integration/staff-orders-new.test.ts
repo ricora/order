@@ -19,10 +19,10 @@ describe("注文登録", () => {
       expect(res.status).toBe(200)
       const apiJson = (await res.json()) as ApiJson
       const productNames = apiJson.products.map((p) => p.name)
-      expect(productNames).toContain("テスト商品1")
-      expect(productNames).toContain("テスト商品2")
-      expect(productNames).toContain("テスト商品3")
-      expect(productNames).toContain("テスト商品4")
+      expect(productNames.some((n) => n.includes("テスト商品1"))).toBeTruthy()
+      expect(productNames.some((n) => n.includes("テスト商品2"))).toBeTruthy()
+      expect(productNames.some((n) => n.includes("テスト商品3"))).toBeTruthy()
+      expect(productNames.some((n) => n.includes("テスト商品4"))).toBeTruthy()
 
       const tagNames = apiJson.tags.map((t) => t.name)
       expect(tagNames).toContain("タグA")
@@ -211,8 +211,7 @@ describe("注文登録", () => {
     test("注文項目が21種類以上の場合にエラーを返す", async () => {
       const form = new URLSearchParams()
       for (let i = 0; i < 21; i++) {
-        const pid = String((i % 4) + 1)
-        form.append("items[][productId]", pid)
+        form.append("items[][productId]", `${i + 1}`)
         form.append("items[][quantity]", "1")
       }
       form.append("customerName", "テスト顧客")
