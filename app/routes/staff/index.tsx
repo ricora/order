@@ -145,7 +145,6 @@ export default createRoute(async (c) => {
           <StatusDistributionCard data={dashboardData.statusDistribution} />
           <DailyOrdersTrendCard data={dashboardData.dailyOrders} />
         </section>
-
       </div>
     </Layout>,
   )

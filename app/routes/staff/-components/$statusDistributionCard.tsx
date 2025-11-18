@@ -35,13 +35,11 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
           各ステータスの注文数と比率を把握できます
         </p>
       </div>
-      <div class="h-64">
-        <Chart
-          ariaLabel="ステータス別注文数の内訳"
-          class="size-full"
-          config={chartConfig}
-        />
-      </div>
+      <Chart
+        ariaLabel="ステータス別注文数の内訳"
+        class="h-64"
+        config={chartConfig}
+      />
     </section>
   )
 }

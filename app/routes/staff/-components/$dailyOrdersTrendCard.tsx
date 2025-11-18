@@ -108,15 +108,11 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
           </p>
         </div>
       </div>
-      <div class="rounded-lg border border-border/50 bg-muted p-4">
-        <div class="h-72">
-          <Chart
-            ariaLabel="日別の注文数と売上の推移"
-            class="size-full"
-            config={chartConfig}
-          />
-        </div>
-      </div>
+      <Chart
+        ariaLabel="日別の注文数と売上の推移"
+        class="h-80 rounded-lg border bg-muted/30 p-4"
+        config={chartConfig}
+      />
     </section>
   )
 }
