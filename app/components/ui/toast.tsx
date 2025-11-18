@@ -72,19 +72,21 @@ const Toast: FC<ToastProps> = ({ message, type }) => {
   const { container, icon, text } = toast({ type })
   return (
     <div class={toastAnimate}>
-      <div class={container()} role="alert">
-        <div class={icon()}>
-          <div class="size-5">
-            {type === "error" ? (
-              <CircleXIcon />
-            ) : type === "warning" ? (
-              <TriangleAlertIcon />
-            ) : (
-              <CircleCheckIcon />
-            )}
+      <div class="rounded-lg bg-bg shadow-lg">
+        <div class={container()} role="alert">
+          <div class={icon()}>
+            <div class="size-5">
+              {type === "error" ? (
+                <CircleXIcon />
+              ) : type === "warning" ? (
+                <TriangleAlertIcon />
+              ) : (
+                <CircleCheckIcon />
+              )}
+            </div>
           </div>
+          <div class={text()}>{message}</div>
         </div>
-        <div class={text()}>{message}</div>
       </div>
     </div>
   )
