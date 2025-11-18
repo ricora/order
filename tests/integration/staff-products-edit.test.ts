@@ -37,7 +37,7 @@ describe("商品編集", () => {
       )
     })
 
-    test("商品名が空の場合は既存の名前が保持される", async () => {
+    test("商品名が空の場合はエラーを返す", async () => {
       const form = new URLSearchParams()
       form.append("price", "1000")
       form.append("stock", "10")
@@ -47,7 +47,10 @@ describe("商品編集", () => {
         headers: { "content-type": "application/x-www-form-urlencoded" },
       })
       expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/success/)
+      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("不正なリクエストです"),
+      )
     })
 
     test("価格が負数の場合にエラーを返す", async () => {
@@ -64,7 +67,7 @@ describe("商品編集", () => {
       expect(res.headers.get("set-cookie")).toMatch(/error/)
     })
 
-    test("在庫数が小数の場合にエラーを返す", async () => {
+    test("在庫数が小数の場合には整数に丸められて正常に編集できる", async () => {
       const form = new URLSearchParams()
       form.append("name", generateUniqueName("編集在庫小数"))
       form.append("price", "1000")
@@ -75,7 +78,7 @@ describe("商品編集", () => {
         headers: { "content-type": "application/x-www-form-urlencoded" },
       })
       expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/error/)
+      expect(res.headers.get("set-cookie")).toMatch(/success/)
     })
 
     test("商品タグが21個以上の場合にエラーを返す", async () => {

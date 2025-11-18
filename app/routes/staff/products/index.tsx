@@ -18,7 +18,7 @@ import { registerProduct } from "../../../usecases/registerProduct"
 import { formatCurrencyJPY } from "../../../utils/money"
 import Layout from "../-components/layout"
 import ProductRegistrationForm from "./-components/$productRegistrationForm"
-import { parseCreateProductRequestBody } from "./-helpers/parseRequestBody"
+import { parseProductRegistrationFormData } from "./-helpers/parseProductRegistrationFormData"
 
 const statusCardVariants = tv({
   slots: {
@@ -173,8 +173,8 @@ const OrderStatusBadge = ({ status }: OrderStatusBadgeProps) => {
 export const POST = createRoute(
   validator("form", async (value, c) => {
     try {
-      const parsed = await parseCreateProductRequestBody(value)
-      return parsed
+      const parsed = await parseProductRegistrationFormData(value)
+      return { product: parsed }
     } catch (e) {
       setToastCookie(c, "error", String(e))
       return c.redirect(c.req.url)
@@ -182,11 +182,11 @@ export const POST = createRoute(
   }),
   async (c) => {
     try {
-      const parsedProduct = c.req.valid("form")
+      const { product } = c.req.valid("form")
 
       await registerProduct({
         dbClient: c.get("dbClient"),
-        product: parsedProduct,
+        product,
       })
 
       setToastCookie(c, "success", "商品を登録しました")
