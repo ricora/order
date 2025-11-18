@@ -27,10 +27,6 @@ const toastAnimate = css`
   animation-duration: 0.3s, 0.5s;
   animation-delay: 0s, 2.5s;
   animation-fill-mode: forwards;
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 50;
 `
 
 export const toast = tv({
