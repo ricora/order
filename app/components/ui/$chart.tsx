@@ -7,6 +7,7 @@ import {
   type DefaultDataPoint,
 } from "chart.js/auto"
 import { useEffect, useRef, useState } from "hono/jsx"
+import { twMerge } from "tailwind-merge"
 
 const CHART_COLOR_TOKENS = [
   "--color-chart-1",
@@ -16,39 +17,62 @@ const CHART_COLOR_TOKENS = [
   "--color-chart-5",
 ] as const
 
-type DesignTokenSet = {
-  palette: string[]
-  textColor: string
-  gridColor: string
-  backgroundColor: string
-  tooltipBackground: string
-  tooltipForeground: string
-  borderColor: string
-}
+const CIRCULAR_CHART_TYPES = new Set<ChartType>([
+  "pie",
+  "doughnut",
+  "polarArea",
+])
 
-const FALLBACK_TOKENS: DesignTokenSet = {
-  palette: [
-    "rgb(248, 113, 113)",
-    "rgb(249, 146, 60)",
-    "rgb(34, 197, 94)",
-    "rgb(56, 189, 248)",
-    "rgb(129, 140, 248)",
-  ],
-  textColor: "rgb(51, 65, 85)",
-  gridColor: "rgba(148, 163, 184, 0.5)",
-  backgroundColor: "rgb(255, 255, 255)",
-  tooltipBackground: "rgba(15, 23, 42, 0.9)",
-  tooltipForeground: "rgb(248, 250, 252)",
-  borderColor: "rgba(148, 163, 184, 0.5)",
-}
-
-export type ChartConfig =
-  ChartConfiguration<ChartType, DefaultDataPoint<ChartType>, unknown>
+export type ChartConfig = ChartConfiguration<
+  ChartType,
+  DefaultDataPoint<ChartType>,
+  unknown
+>
 
 export type ChartProps = {
   config: ChartConfig
   class?: string
   ariaLabel?: string
+}
+
+type ChartDesignTokens = {
+  palette: string[]
+  textColor: string
+  gridColor: string
+  tooltipBackground: string
+  tooltipForeground: string
+  borderColor: string
+}
+
+type ChartPluginOptions = NonNullable<ChartOptions<ChartType>["plugins"]>
+type LegendSetting = ChartPluginOptions["legend"]
+type TooltipSetting = ChartPluginOptions["tooltip"]
+type ScalesSetting = ChartOptions<ChartType>["scales"]
+
+const cssVar = (style: CSSStyleDeclaration, token: string, fallback = "") => {
+  const value = style.getPropertyValue(token).trim()
+  return value || fallback
+}
+
+const readDesignTokens = (): ChartDesignTokens | null => {
+  if (typeof window === "undefined") {
+    return null
+  }
+  const style = window.getComputedStyle(document.documentElement)
+  return {
+    palette: CHART_COLOR_TOKENS.map((token, index) =>
+      cssVar(style, token, `rgba(0, 0, 0, ${0.8 - index * 0.1})`),
+    ),
+    textColor: cssVar(style, "--color-muted-fg", "#1f2937"),
+    gridColor: cssVar(style, "--color-border", "rgba(148, 163, 184, 0.5)"),
+    tooltipBackground: cssVar(
+      style,
+      "--color-overlay",
+      "rgba(15, 23, 42, 0.9)",
+    ),
+    tooltipForeground: cssVar(style, "--color-overlay-fg", "#f8fafc"),
+    borderColor: cssVar(style, "--color-border", "rgba(148, 163, 184, 0.5)"),
+  }
 }
 
 const useThemeVersion = () => {
@@ -57,34 +81,22 @@ const useThemeVersion = () => {
   useEffect(() => {
     if (typeof window === "undefined") return
     const target = document.documentElement
-    const handleThemeChange = () => {
-      setVersion((prev) => prev + 1)
-    }
-    const observer = new MutationObserver(handleThemeChange)
+    const handleChange = () => setVersion((prev) => prev + 1)
+    const observer = new MutationObserver(handleChange)
     observer.observe(target, {
       attributes: true,
       attributeFilter: ["class", "data-theme", "style"],
     })
 
-    const media = window.matchMedia
-      ? window.matchMedia("(prefers-color-scheme: dark)")
-      : null
-
-    if (media) {
-      if (typeof media.addEventListener === "function") {
-        media.addEventListener("change", handleThemeChange)
-      } else if (typeof media.addListener === "function") {
-        media.addListener(handleThemeChange)
-      }
+    const media = window.matchMedia("(prefers-color-scheme: dark)")
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", handleChange)
     }
 
     return () => {
       observer.disconnect()
-      if (!media) return
       if (typeof media.removeEventListener === "function") {
-        media.removeEventListener("change", handleThemeChange)
-      } else if (typeof media.removeListener === "function") {
-        media.removeListener(handleThemeChange)
+        media.removeEventListener("change", handleChange)
       }
     }
   }, [])
@@ -92,339 +104,162 @@ const useThemeVersion = () => {
   return version
 }
 
-const resolveDesignTokens = (element?: HTMLElement | null): DesignTokenSet => {
-  if (typeof window === "undefined") {
-    return FALLBACK_TOKENS
+const buildSegmentColors = (count: number, palette: string[]) => {
+  if (count <= 0) {
+    return palette
   }
-
-  const doc = element?.ownerDocument ?? window.document
-  const container = element ?? doc.body
-  const probe = doc.createElement("span")
-  probe.style.position = "absolute"
-  probe.style.width = "0"
-  probe.style.height = "0"
-  probe.style.pointerEvents = "none"
-  probe.style.opacity = "0"
-  container.appendChild(probe)
-
-  const getComputedColor = (token: string) => {
-    probe.style.color = `var(${token})`
-    return doc.defaultView?.getComputedStyle(probe).color ?? ""
-  }
-
-  const getComputedBackground = (token: string) => {
-    probe.style.backgroundColor = `var(${token})`
-    return doc.defaultView?.getComputedStyle(probe).backgroundColor ?? ""
-  }
-
-  const palette = CHART_COLOR_TOKENS.map<string>((token, index) => {
-    const color = getComputedColor(token)
-    const fallbackIndex = index % FALLBACK_TOKENS.palette.length
-    const fallbackColor =
-      FALLBACK_TOKENS.palette[fallbackIndex] ??
-      FALLBACK_TOKENS.palette[0] ??
-      "rgb(0, 0, 0)"
-    return color || fallbackColor
+  return Array.from({ length: count }, (_, index) => {
+    const paletteIndex = index % palette.length
+    return palette[paletteIndex] ?? palette[0] ?? "rgba(0, 0, 0, 0.6)"
   })
-  const textColor =
-    getComputedColor("--color-muted-fg") || FALLBACK_TOKENS.textColor
-  const borderColor =
-    getComputedColor("--color-border") || FALLBACK_TOKENS.borderColor
-  const backgroundColor =
-    getComputedBackground("--color-bg") || FALLBACK_TOKENS.backgroundColor
-  const tooltipBackground =
-    getComputedBackground("--color-overlay") ||
-    FALLBACK_TOKENS.tooltipBackground
-  const tooltipForeground =
-    getComputedBackground("--color-overlay-fg") ||
-    FALLBACK_TOKENS.tooltipForeground
-
-  probe.remove()
-
-  return {
-    palette,
-    textColor,
-    gridColor: borderColor,
-    backgroundColor,
-    tooltipBackground,
-    tooltipForeground,
-    borderColor,
-  }
 }
 
-type AnyObject = Record<string, unknown>
-
-const isObject = (value: unknown): value is AnyObject =>
-  typeof value === "object" && value !== null
-
-type ChartPluginOptions = NonNullable<ChartOptions<ChartType>["plugins"]>
-type LegendConfig = NonNullable<ChartPluginOptions["legend"]>
-type TooltipConfig = NonNullable<ChartPluginOptions["tooltip"]>
-type TitleConfig = NonNullable<ChartPluginOptions["title"]>
-type ScalesConfig = NonNullable<ChartOptions<ChartType>["scales"]>
-
-const clampAlpha = (alpha: number) => Math.min(Math.max(alpha, 0), 1)
-
-const applyAlpha = (color: string, alpha: number) => {
-  const match = color.match(
-    /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*(\d+(?:\.\d+)?))?\s*\)/i,
-  )
-  if (!match) {
-    return color
-  }
-  const [, r, g, b] = match
-  const nextAlpha = clampAlpha(alpha)
-  return `rgba(${r}, ${g}, ${b}, ${nextAlpha})`
-}
-
-const resolveFontWeight = (
-  value: unknown,
-  fallback: number | "bold" | "normal" | "lighter" | "bolder" = 600,
+const prepareDatasets = (
+  config: ChartConfig,
+  tokens: ChartDesignTokens,
+  labelCount: number,
 ) => {
-  if (typeof value === "number") {
-    return value
-  }
-  if (
-    value === "bold" ||
-    value === "normal" ||
-    value === "lighter" ||
-    value === "bolder"
-  ) {
-    return value
-  }
-  return fallback
+  return config.data.datasets.map((dataset, index) => {
+    const datasetType = (dataset.type ?? config.type) as ChartType
+    const paletteColor =
+      tokens.palette[index % tokens.palette.length] ??
+      tokens.palette[0] ??
+      "rgba(0, 0, 0, 0.6)"
+    const styled: ChartDataset<ChartType> = { ...dataset }
+
+    if (CIRCULAR_CHART_TYPES.has(datasetType)) {
+      const segmentCount = Array.isArray(dataset.data)
+        ? dataset.data.length
+        : labelCount
+      const colors = buildSegmentColors(segmentCount, tokens.palette)
+      const borderColors = colors.map(() => tokens.borderColor)
+      if (!styled.backgroundColor) {
+        styled.backgroundColor = colors
+      }
+      if (!styled.borderColor) {
+        styled.borderColor =
+          segmentCount > 0 ? borderColors : tokens.borderColor
+      }
+      return styled
+    }
+
+    if (!styled.borderColor) {
+      styled.borderColor = paletteColor
+    }
+    if (!styled.backgroundColor) {
+      styled.backgroundColor = paletteColor
+    }
+
+    return styled
+  })
 }
 
-const withDefaultClass = (...classes: Array<string | undefined>) =>
-  classes.filter(Boolean).join(" ")
-
-const mergeLegendOptions = (
-  legendOptions: LegendConfig | false | undefined,
-  tokens: DesignTokenSet,
-): LegendConfig => {
-  if (legendOptions === false) {
-    return {
-      display: false,
-    } as LegendConfig
-  }
-  const overrides = (legendOptions ?? {}) as LegendConfig
-  const labelOverrides = (overrides?.labels ?? {}) as LegendConfig["labels"]
-
+const prepareLegend = (
+  legend: LegendSetting | undefined,
+  tokens: ChartDesignTokens,
+): LegendSetting => {
+  const labels = legend?.labels ?? {}
   return {
-    ...overrides,
-    display: overrides?.display ?? true,
-    position: overrides?.position ?? "top",
-    labels: overrides?.labels
-      ? {
-          ...overrides.labels,
-          color: labelOverrides?.color ?? tokens.textColor,
-          usePointStyle: labelOverrides?.usePointStyle ?? true,
-          boxWidth: labelOverrides?.boxWidth ?? 10,
-          boxHeight: labelOverrides?.boxHeight ?? 10,
-          padding: labelOverrides?.padding ?? 12,
-        }
-      : {
-          color: tokens.textColor,
-          usePointStyle: true,
-          boxWidth: 10,
-          boxHeight: 10,
-          padding: 12,
-        },
-  }
-}
-
-const mergeTooltipOptions = (
-  tooltipOptions: TooltipConfig | false | undefined,
-  tokens: DesignTokenSet,
-): TooltipConfig => {
-  if (tooltipOptions === false) {
-    return {
-      enabled: false,
-    } as TooltipConfig
-  }
-  const overrides = (tooltipOptions ?? {}) as TooltipConfig
-  const titleFontOverrides = isObject(overrides?.titleFont)
-    ? (overrides.titleFont as AnyObject)
-    : undefined
-  const bodyFontOverrides = isObject(overrides?.bodyFont)
-    ? (overrides.bodyFont as AnyObject)
-    : undefined
-  const resolvedTitleWeight = resolveFontWeight(titleFontOverrides?.weight)
-  const resolvedBodySize =
-    typeof bodyFontOverrides?.size === "number" ? bodyFontOverrides.size : 13
-
-  return {
-    ...overrides,
-    enabled: overrides?.enabled ?? true,
-    backgroundColor:
-      overrides?.backgroundColor ?? tokens.tooltipBackground,
-    titleColor: overrides?.titleColor ?? tokens.tooltipForeground,
-    bodyColor: overrides?.bodyColor ?? tokens.tooltipForeground,
-    borderColor: overrides?.borderColor ?? tokens.borderColor,
-    borderWidth: overrides?.borderWidth ?? 1,
-    displayColors: overrides?.displayColors ?? true,
-    padding: overrides?.padding ?? 12,
-    caretPadding: overrides?.caretPadding ?? 8,
-    titleFont: titleFontOverrides
-      ? {
-          ...titleFontOverrides,
-          size:
-            typeof titleFontOverrides.size === "number"
-              ? titleFontOverrides.size
-              : 14,
-          weight: resolvedTitleWeight,
-        }
-      : { size: 14, weight: 600 },
-    bodyFont: bodyFontOverrides
-      ? {
-          ...bodyFontOverrides,
-          size: resolvedBodySize,
-        }
-      : { size: 13 },
-  }
-}
-
-const mergeTitleOptions = (
-  titleOptions: TitleConfig | undefined,
-  tokens: DesignTokenSet,
-): TitleConfig => {
-  const overrides = (titleOptions ?? {}) as TitleConfig
-  const fontOverrides = isObject(overrides?.font)
-    ? (overrides.font as AnyObject)
-    : undefined
-  return {
-    ...overrides,
-    display: overrides?.display ?? Boolean(overrides?.text),
-    color: overrides?.color ?? tokens.textColor,
-    padding: overrides?.padding ?? { bottom: 12 },
-    font: fontOverrides
-      ? {
-          ...fontOverrides,
-          size:
-            typeof fontOverrides.size === "number"
-              ? fontOverrides.size
-              : 16,
-          weight: resolveFontWeight(fontOverrides.weight),
-        }
-      : { size: 16, weight: 600 },
-  }
-}
-
-const mergeOptionsWithTokens = (
-  options: ChartOptions<ChartType> | undefined,
-  tokens: DesignTokenSet,
-): ChartOptions<ChartType> => {
-  const pluginOverrides = (options?.plugins ?? {}) as ChartPluginOptions
-  const titleOptions = pluginOverrides.title
-  const merged: ChartOptions<ChartType> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: "index",
-      intersect: false,
-      ...options?.interaction,
+    display: legend?.display ?? true,
+    position: legend?.position ?? "top",
+    ...legend,
+    labels: {
+      color: labels.color ?? tokens.textColor,
+      usePointStyle: labels.usePointStyle ?? true,
+      ...labels,
     },
-    layout: {
-      padding: options?.layout?.padding ?? 12,
-      ...options?.layout,
-    },
-    scales: (() => {
-      const provided = options?.scales as ScalesConfig | undefined
-      const rawScales: ScalesConfig =
-        provided && Object.keys(provided).length > 0
-          ? provided
-          : ({
-              x: { grid: { display: false } },
-              y: { beginAtZero: true },
-            } satisfies ScalesConfig)
-      const entries = Object.entries(rawScales).map(([scaleId, scale]) => {
-        const scaleRecord = (scale ?? {}) as AnyObject
-        const border = (scaleRecord.border ?? {}) as AnyObject
-        const grid = (scaleRecord.grid ?? {}) as AnyObject
-        const ticks = (scaleRecord.ticks ?? {}) as AnyObject
-        return [
-          scaleId,
-          {
-            ...scaleRecord,
-            border: {
-              display: border.display ?? false,
-              color: border.color ?? tokens.gridColor,
-              ...border,
-            },
-            grid: {
-              color: grid.color ?? tokens.gridColor,
-              ...grid,
-            },
-            ticks: {
-              color: ticks.color ?? tokens.textColor,
-              padding: ticks.padding ?? 6,
-              ...ticks,
-            },
+  }
+}
+
+const prepareTooltip = (
+  tooltip: TooltipSetting | undefined,
+  tokens: ChartDesignTokens,
+): TooltipSetting => {
+  return {
+    backgroundColor: tooltip?.backgroundColor ?? tokens.tooltipBackground,
+    titleColor: tooltip?.titleColor ?? tokens.tooltipForeground,
+    bodyColor: tooltip?.bodyColor ?? tokens.tooltipForeground,
+    borderColor: tooltip?.borderColor ?? tokens.borderColor,
+    borderWidth: tooltip?.borderWidth ?? 1,
+    displayColors: tooltip?.displayColors ?? true,
+    ...tooltip,
+  }
+}
+
+const prepareScales = (
+  config: ChartConfig,
+  tokens: ChartDesignTokens,
+): ScalesSetting => {
+  const provided = config.options?.scales
+  if (provided) {
+    const entries = Object.entries(provided).map(([axis, scale]) => {
+      if (!scale) {
+        return [axis, scale]
+      }
+      const grid = scale.grid ?? {}
+      const ticks = scale.ticks ?? {}
+      return [
+        axis,
+        {
+          ...scale,
+          grid: {
+            color: grid.color ?? tokens.gridColor,
+            ...grid,
           },
-        ]
-      })
-      return Object.fromEntries(entries) as ScalesConfig
-    })(),
+          ticks: {
+            color: ticks.color ?? tokens.textColor,
+            ...ticks,
+          },
+        },
+      ]
+    })
+    return Object.fromEntries(entries) as NonNullable<ScalesSetting>
+  }
+
+  if (CIRCULAR_CHART_TYPES.has(config.type)) {
+    return undefined
+  }
+
+  return {
+    x: {
+      grid: { color: tokens.gridColor },
+    },
+    y: {
+      beginAtZero: true,
+      grid: { color: tokens.gridColor },
+      ticks: { color: tokens.textColor },
+    },
+  }
+}
+
+const buildChartConfig = (
+  config: ChartConfig,
+  tokens: ChartDesignTokens,
+): ChartConfig => {
+  const labels = config.data.labels ? [...config.data.labels] : []
+  const datasets = prepareDatasets(config, tokens, labels.length)
+  const pluginOverrides = (config.options?.plugins ?? {}) as ChartPluginOptions
+
+  const options: ChartOptions<ChartType> = {
+    responsive: config.options?.responsive ?? true,
+    maintainAspectRatio: config.options?.maintainAspectRatio ?? false,
+    ...config.options,
     plugins: {
       ...pluginOverrides,
-      legend: mergeLegendOptions(pluginOverrides.legend, tokens),
-      tooltip: mergeTooltipOptions(pluginOverrides.tooltip, tokens),
-      title: mergeTitleOptions(titleOptions, tokens),
+      legend: prepareLegend(pluginOverrides.legend, tokens),
+      tooltip: prepareTooltip(pluginOverrides.tooltip, tokens),
     },
+    scales: prepareScales(config, tokens),
   }
-
-  return merged
-}
-
-const normalizeDataset = (
-  dataset: ChartDataset,
-  tokens: DesignTokenSet,
-  paletteIndex: number,
-  fallbackType: ChartType,
-): ChartDataset => {
-  const datasetType = dataset.type ?? fallbackType
-  const paletteColor =
-    tokens.palette[paletteIndex % tokens.palette.length] ??
-    tokens.textColor
-  const fillValue = (dataset as { fill?: unknown }).fill
-  const hasExplicitFill =
-    fillValue !== undefined && fillValue !== false
-  const shouldFill =
-    datasetType === "bar" ? true : Boolean(hasExplicitFill)
-
-  const normalized = { ...dataset } as ChartDataset<ChartType>
-  if (!normalized.borderColor) {
-    normalized.borderColor = paletteColor
-  }
-  if (!normalized.backgroundColor) {
-    normalized.backgroundColor = applyAlpha(
-      paletteColor,
-      shouldFill ? 0.25 : 0.12,
-    )
-  }
-  if (!normalized.borderWidth) {
-    normalized.borderWidth = datasetType === "bar" ? 1 : 2
-  }
-
-  return normalized
-}
-
-const buildChartConfiguration = (
-  config: ChartConfig,
-  tokens: DesignTokenSet,
-): ChartConfig => {
-  const normalizedDatasets = config.data.datasets.map((dataset, index) =>
-    normalizeDataset(dataset, tokens, index, config.type),
-  )
 
   return {
     ...config,
     data: {
       ...config.data,
-      labels: config.data.labels ? [...config.data.labels] : [],
-      datasets: normalizedDatasets,
+      labels,
+      datasets,
     },
-    options: mergeOptionsWithTokens(config.options, tokens),
+    options,
   }
 }
 
@@ -446,35 +281,21 @@ const extractTitleText = (config: ChartConfig) => {
   return Array.isArray(title) ? title.join(" / ") : title
 }
 
-const Chart = ({
-  config,
-  class: className,
-  ariaLabel,
-}: ChartProps) => {
-  const containerRef = useRef<HTMLDivElement | null>(null)
+const Chart = ({ config, class: className, ariaLabel }: ChartProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const chartRef = useRef<ChartJS | null>(null)
   const themeVersion = useThemeVersion()
 
   useEffect(() => {
-    if (!canvasRef.current || !containerRef.current) {
-      return
-    }
+    if (!canvasRef.current) return
+    const tokens = readDesignTokens()
+    if (!tokens) return
 
-    const tokens = resolveDesignTokens(containerRef.current)
-    const normalizedConfig = buildChartConfiguration(
-      config as ChartConfig,
-      tokens,
-    )
-
+    const normalizedConfig = buildChartConfig(config as ChartConfig, tokens)
     if (!chartRef.current) {
-      chartRef.current = new ChartJS(
-        canvasRef.current,
-        normalizedConfig,
-      )
+      chartRef.current = new ChartJS(canvasRef.current, normalizedConfig)
       return
     }
-
     updateChartInstance(chartRef.current, normalizedConfig)
   }, [config, themeVersion])
 
@@ -486,15 +307,10 @@ const Chart = ({
   }, [])
 
   const fallbackLabel = ariaLabel ?? extractTitleText(config as ChartConfig)
-  const containerClass = withDefaultClass(
-    "relative h-full w-full min-h-0",
-    className,
-  )
-
-  console.log("Rendering Chart component")
+  const containerClass = twMerge("relative h-full w-full min-h-0", className)
 
   return (
-    <div class={containerClass} ref={containerRef}>
+    <div class={containerClass}>
       <canvas
         ref={canvasRef}
         role="img"

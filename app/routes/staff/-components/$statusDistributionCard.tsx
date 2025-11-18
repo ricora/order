@@ -6,16 +6,6 @@ type StatusDistributionCardProps = {
   data: StaffDashboardData["statusDistribution"]
 }
 
-const STATUS_COLOR_TOKENS: Record<
-  StaffDashboardData["statusDistribution"][number]["status"],
-  string
-> = {
-  pending: "--color-chart-1",
-  processing: "--color-chart-2",
-  completed: "--color-chart-3",
-  cancelled: "--color-chart-4",
-}
-
 const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
   const chartConfig: ChartConfig = {
     type: "pie",
@@ -52,25 +42,6 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
           config={chartConfig}
         />
       </div>
-      <ul class="mt-4 grid grid-cols-2 gap-4 text-sm">
-        {data.map((entry) => (
-          <li
-            key={entry.status}
-            class="flex items-center justify-between gap-3"
-          >
-            <div class="flex items-center gap-2">
-              <span
-                class="inline-block h-2.5 w-2.5 rounded-full"
-                style={{
-                  backgroundColor: `var(${STATUS_COLOR_TOKENS[entry.status]})`,
-                }}
-              />
-              <span class="text-secondary-fg">{entry.label}</span>
-            </div>
-            <span class="font-semibold">{entry.count}件</span>
-          </li>
-        ))}
-      </ul>
     </section>
   )
 }

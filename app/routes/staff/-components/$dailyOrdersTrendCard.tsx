@@ -12,7 +12,8 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
   const labels = data.map((entry) => formatDateJP(entry.date))
   const orderCounts = data.map((entry) => entry.orderCount)
   const revenues = data.map((entry) => entry.revenue)
-  const orderTrendConfig: ChartConfig = {
+
+  const chartConfig: ChartConfig = {
     type: "line",
     data: {
       labels,
@@ -20,15 +21,26 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
         {
           label: "注文数",
           data: orderCounts,
-          fill: false,
+          yAxisID: "orders",
           tension: 0.35,
+          fill: false,
+        },
+        {
+          label: "売上",
+          data: revenues,
+          yAxisID: "revenue",
+          tension: 0.35,
+          fill: false,
         },
       ],
     },
     options: {
+      interaction: { mode: "index", intersect: false },
       scales: {
         x: { grid: { display: false } },
-        y: {
+        orders: {
+          type: "linear",
+          position: "left",
           beginAtZero: true,
           title: { display: true, text: "件数" },
           ticks: {
@@ -42,41 +54,11 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
             },
           },
         },
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (context) => {
-              const parsedValue =
-                typeof context.parsed === "number"
-                  ? context.parsed
-                  : (context.parsed as { y?: number })?.y ?? 0
-              return `${parsedValue}件`
-            },
-          },
-        },
-      },
-    },
-  }
-  const revenueTrendConfig: ChartConfig = {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "売上",
-          data: revenues,
-          fill: false,
-          tension: 0.35,
-        },
-      ],
-    },
-    options: {
-      scales: {
-        x: { grid: { display: false } },
-        y: {
+        revenue: {
+          type: "linear",
+          position: "right",
           beginAtZero: true,
+          grid: { display: false },
           title: { display: true, text: "売上" },
           ticks: {
             callback: (value) => {
@@ -91,15 +73,17 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
         },
       },
       plugins: {
-        legend: { display: false },
         tooltip: {
           callbacks: {
             label: (context) => {
               const parsedValue =
                 typeof context.parsed === "number"
                   ? context.parsed
-                  : (context.parsed as { y?: number })?.y ?? 0
-              return formatCurrencyJPY(parsedValue)
+                  : ((context.parsed as { y?: number })?.y ?? 0)
+              if (context.dataset.yAxisID === "revenue") {
+                return `${context.dataset.label ?? ""}: ${formatCurrencyJPY(parsedValue)}`
+              }
+              return `${context.dataset.label ?? ""}: ${parsedValue}件`
             },
           },
         },
@@ -118,41 +102,26 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
         </div>
         {lastDay ? (
           <div class="text-right text-sm">
-            <p class="text-muted-fg">
-              最新日 ({formatDateJP(lastDay.date)})
-            </p>
+            <p class="text-muted-fg">最新日 ({formatDateJP(lastDay.date)})</p>
             <p class="font-semibold text-secondary-fg">
               {lastDay.orderCount}件 / {formatCurrencyJPY(lastDay.revenue)}
             </p>
           </div>
         ) : null}
       </div>
-      <div class="grid gap-4 md:grid-cols-2">
-        <div class="rounded-lg border border-border/50 bg-muted p-4">
-          <div class="mb-2 flex items-center justify-between text-sm">
-            <p class="font-semibold text-secondary-fg">注文数</p>
-            <p class="text-muted-fg">7日間の推移</p>
-          </div>
-          <div class="h-56">
-            <Chart
-              ariaLabel="日別の注文数推移"
-              class="size-full"
-              config={orderTrendConfig}
-            />
-          </div>
+      <div class="rounded-lg border border-border/50 bg-muted p-4">
+        <div class="mb-2 flex items-center justify-between text-sm">
+          <p class="font-semibold text-secondary-fg">
+            注文数 / 売上の7日間推移
+          </p>
+          <p class="text-muted-fg">件数と金額の2軸表示</p>
         </div>
-        <div class="rounded-lg border border-border/50 bg-muted p-4">
-          <div class="mb-2 flex items-center justify-between text-sm">
-            <p class="font-semibold text-secondary-fg">売上</p>
-            <p class="text-muted-fg">7日間の推移</p>
-          </div>
-          <div class="h-56">
-            <Chart
-              ariaLabel="日別の売上推移"
-              class="size-full"
-              config={revenueTrendConfig}
-            />
-          </div>
+        <div class="h-72">
+          <Chart
+            ariaLabel="日別の注文数と売上の推移"
+            class="size-full"
+            config={chartConfig}
+          />
         </div>
       </div>
     </section>
