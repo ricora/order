@@ -5,12 +5,12 @@ import { getProductEditPageData } from "../../../../../usecases/getProductEditPa
 import { registerProduct } from "../../../../../usecases/registerProduct"
 import Layout from "../../../-components/layout"
 import ProductRegistrationForm from "../../-components/$productRegistrationForm"
-import { parseUpdateProductRequestBody } from "../../-helpers/parseRequestBody"
+import { parseProductRegistrationFormData } from "../../-helpers/parseProductRegistrationFormData"
 
 export const POST = createRoute(
   validator("form", async (value, c) => {
     try {
-      const parsed = await parseUpdateProductRequestBody(value)
+      const parsed = await parseProductRegistrationFormData(value)
       return parsed
     } catch (e) {
       setToastCookie(c, "error", String(e))
