@@ -1,16 +1,15 @@
-import { useEffect } from "hono/jsx"
-import type { ChartOptions } from "../../../components/ui/$chart"
-import { useChart } from "../../../components/ui/$chart"
+import type { ChartConfig } from "../../../components/ui/$chart"
+import Chart from "../../../components/ui/$chart"
 import type { StaffDashboardData } from "../../../usecases/getStaffDashboardData"
 
 const STATUS_COLORS: Record<
   StaffDashboardData["statusDistribution"][number]["status"],
   string
 > = {
-  pending: "#f87171",
-  processing: "#facc15",
-  completed: "#34d399",
-  cancelled: "#94a3b8",
+  pending: "var(--color-chart-1)",
+  processing: "var(--color-chart-2)",
+  completed: "var(--color-chart-3)",
+  cancelled: "var(--color-chart-4)",
 }
 
 type StatusDistributionCardProps = {
@@ -18,50 +17,28 @@ type StatusDistributionCardProps = {
 }
 
 const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
-  const xValues = data.map((_, index) => index)
-  const counts = data.map((entry) => entry.count)
-
-  const chartOptions: ChartOptions = {
-    width: "100%",
-    height: "100%",
-    scales: {
-      x: { time: false },
+  const chartConfig: ChartConfig = {
+    type: "line",
+    data: {
+      labels: data.map((entry) => entry.label),
+      datasets: [
+        {
+          label: "注文数",
+          data: data.map((entry) => entry.count),
+          fill: true,
+        },
+      ],
     },
-    series: [
-      {},
-      {
-        label: "注文数",
-        fill: "rgba(59, 130, 246, 0.3)",
-        stroke: "#3b82f6",
-        points: { show: true },
+    options: {
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true },
       },
-    ],
-    axes: [
-      {
-        values: (_, ticks) =>
-          ticks.map((tick) => {
-            const index = Math.round(tick)
-            if (index < 0 || index >= data.length) return ""
-            return data[index]?.label ?? ""
-          }),
-        grid: { show: false },
+      plugins: {
+        legend: { display: false },
       },
-      {
-        grid: { stroke: "rgba(148, 163, 184, 0.4)" },
-      },
-    ],
+    },
   }
-
-  useEffect(() => {
-    console.log("StatusDistributionCard mounted")
-  }, [])
-
-  console.log("Rendering StatusDistributionCard")
-
-  const { ref } = useChart({
-    options: chartOptions,
-    data: [xValues, counts],
-  })
 
   return (
     <section class="flex flex-col rounded-lg border bg-bg p-6">
@@ -72,7 +49,11 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
         </p>
       </div>
       <div class="h-64">
-        <div ref={ref} class="size-full" />
+        <Chart
+          ariaLabel="ステータス別の件数推移"
+          class="size-full"
+          config={chartConfig}
+        />
       </div>
       <ul class="mt-4 grid grid-cols-2 gap-4 text-sm">
         {data.map((entry) => (
