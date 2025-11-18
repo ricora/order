@@ -15,20 +15,34 @@ export const POST = createRoute(
         const quantityEntries = value["items[][quantity]"]
 
         if (productIdEntries === undefined || quantityEntries === undefined) {
-          return [] as { productId: number; quantity: number }[]
+          throw createInvalidRequestError()
         }
 
-        const parseAndValidate = (pidStr: string, qtyStr: string) => {
-          const pid = Number(pidStr)
-          const qty = Number(qtyStr)
-          if (!Number.isFinite(pid) || !Number.isInteger(pid) || pid <= 0) {
+        const parseAndValidate = (
+          productIdEntry: string,
+          quantityEntry: string,
+        ) => {
+          const productId = Number(productIdEntry)
+          const quantity = Number(quantityEntry)
+          if (
+            !Number.isFinite(productId) ||
+            !Number.isInteger(productId) ||
+            productId <= 0
+          ) {
             throw createInvalidRequestError()
           }
-          if (!Number.isFinite(qty) || !Number.isInteger(qty) || qty <= 0) {
+          if (
+            !Number.isFinite(quantity) ||
+            !Number.isInteger(quantity) ||
+            quantity <= 0
+          ) {
             throw createInvalidRequestError()
           }
-          return { productId: pid, quantity: qty }
+          return { productId, quantity }
         }
+
+        const isStringArray = (v: unknown): v is string[] =>
+          Array.isArray(v) && v.every((e) => typeof e === "string")
 
         if (
           typeof productIdEntries === "string" &&
@@ -38,13 +52,15 @@ export const POST = createRoute(
         }
 
         if (
-          Array.isArray(productIdEntries) &&
-          Array.isArray(quantityEntries) &&
+          isStringArray(productIdEntries) &&
+          isStringArray(quantityEntries) &&
           productIdEntries.length === quantityEntries.length
         ) {
-          return productIdEntries.map((id, index) =>
-            parseAndValidate(id as string, quantityEntries[index] as string),
-          )
+          return productIdEntries.map((id, index) => {
+            const q = quantityEntries[index]
+            if (q === undefined) throw createInvalidRequestError()
+            return parseAndValidate(id, q)
+          })
         }
 
         throw createInvalidRequestError()
