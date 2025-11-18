@@ -123,7 +123,7 @@ describe("商品管理", () => {
         encodeURIComponent("商品を登録しました"),
       )
     })
-    test("商品名が空の場合にエラーを返す", async () => {
+    test("商品名が空の場合はエラーを返す", async () => {
       const form = new URLSearchParams()
       form.append("price", "1000")
       form.append("stock", "10")

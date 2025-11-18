@@ -37,7 +37,7 @@ describe("商品編集", () => {
       )
     })
 
-    test("商品名が空の場合はにエラーを返す", async () => {
+    test("商品名が空の場合はエラーを返す", async () => {
       const form = new URLSearchParams()
       form.append("price", "1000")
       form.append("stock", "10")
