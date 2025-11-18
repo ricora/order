@@ -13,7 +13,7 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
       labels: data.map((entry) => entry.label),
       datasets: [
         {
-          label: "件数",
+          label: "注文数",
           data: data.map((entry) => entry.count),
         },
       ],
@@ -30,14 +30,14 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
   return (
     <section class="flex flex-col rounded-lg border bg-bg p-6">
       <div class="mb-4">
-        <h2 class="font-bold text-lg">ステータス別件数</h2>
+        <h2 class="font-bold text-lg">ステータス別注文数</h2>
         <p class="text-muted-fg text-sm">
-          各ステータスの件数と比率を把握できます
+          各ステータスの注文数と比率を把握できます
         </p>
       </div>
       <div class="h-64">
         <Chart
-          ariaLabel="ステータス別件数の内訳"
+          ariaLabel="ステータス別注文数の内訳"
           class="size-full"
           config={chartConfig}
         />

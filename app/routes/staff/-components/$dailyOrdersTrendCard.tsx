@@ -110,11 +110,8 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
         ) : null}
       </div>
       <div class="rounded-lg border border-border/50 bg-muted p-4">
-        <div class="mb-2 flex items-center justify-between text-sm">
-          <p class="font-semibold text-secondary-fg">
-            注文数 / 売上の7日間推移
-          </p>
-          <p class="text-muted-fg">件数と金額の2軸表示</p>
+        <div class="mb-2 text-sm font-semibold text-secondary-fg">
+          注文数 / 売上の7日間推移
         </div>
         <div class="h-72">
           <Chart
