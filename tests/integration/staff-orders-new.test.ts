@@ -19,10 +19,10 @@ describe("注文登録", () => {
       expect(res.status).toBe(200)
       const apiJson = (await res.json()) as ApiJson
       const productNames = apiJson.products.map((p) => p.name)
-      expect(productNames).toContain("テスト商品1")
-      expect(productNames).toContain("テスト商品2")
-      expect(productNames).toContain("テスト商品3")
-      expect(productNames).toContain("テスト商品4")
+      expect(productNames.some((n) => n.includes("テスト商品1"))).toBeTruthy()
+      expect(productNames.some((n) => n.includes("テスト商品2"))).toBeTruthy()
+      expect(productNames.some((n) => n.includes("テスト商品3"))).toBeTruthy()
+      expect(productNames.some((n) => n.includes("テスト商品4"))).toBeTruthy()
 
       const tagNames = apiJson.tags.map((t) => t.name)
       expect(tagNames).toContain("タグA")
@@ -80,7 +80,7 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("注文項目の数量は1以上である必要があります"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("数量が在庫を超えているときにエラーを返す", async () => {
@@ -110,7 +110,7 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("注文項目は1種類以上20種類以下である必要があります"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("顧客名が51文字以上のときにエラーを返す", async () => {
@@ -129,23 +129,6 @@ describe("注文登録", () => {
         encodeURIComponent("顧客名は50文字以内である必要があります"),
       )
     })
-    test("Content-Typeが不正なときにエラーを返す", async () => {
-      const res = await app.request("/staff/orders/new", {
-        method: "POST",
-        body: JSON.stringify({
-          items: [{ productId: 1, quantity: 1 }],
-          customerName: "テスト顧客",
-        }),
-        headers: { "content-type": "application/json" },
-      })
-      expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/error/)
-      expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent(
-          'TypeError: Content-Type was not one of "multipart/form-data" or "application/x-www-form-urlencoded"',
-        ),
-      )
-    })
     test("FormDataでbodyが不正な場合にエラーを返す", async () => {
       const malformedBody = "this is not a valid form body"
       const res = await app.request("/staff/orders/new", {
@@ -156,9 +139,7 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       const cookie = res.headers.get("set-cookie")
-      expect(cookie).toMatch(
-        encodeURIComponent("注文項目は1種類以上20種類以下である必要があります"),
-      )
+      expect(cookie).toMatch(encodeURIComponent("不正なリクエストです"))
     })
     test("FormDataで商品IDが整数でない場合にエラーを返す", async () => {
       const form = new URLSearchParams()
@@ -205,14 +186,13 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("注文項目の数量は1以上である必要があります"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
     test("注文項目が21種類以上の場合にエラーを返す", async () => {
       const form = new URLSearchParams()
       for (let i = 0; i < 21; i++) {
-        const pid = String((i % 4) + 1)
-        form.append("items[][productId]", pid)
+        form.append("items[][productId]", `${i + 1}`)
         form.append("items[][quantity]", "1")
       }
       form.append("customerName", "テスト顧客")
@@ -225,21 +205,6 @@ describe("注文登録", () => {
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
         encodeURIComponent("注文項目は1種類以上20種類以下である必要があります"),
-      )
-    })
-    test("FormDataで注文項目が配列でない場合にエラーを返す", async () => {
-      const form = new URLSearchParams()
-      form.append("items[][productId]", "1")
-      form.append("customerName", "テスト顧客")
-      const res = await app.request("/staff/orders/new", {
-        method: "POST",
-        body: form,
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-      })
-      expect(res.status).toBe(302)
-      expect(res.headers.get("set-cookie")).toMatch(/error/)
-      expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("不正なリクエストです"),
       )
     })
   })

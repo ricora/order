@@ -34,8 +34,10 @@ export default jsxRenderer(({ children }) => {
       </head>
       <body class="h-full">
         {toastMessage && (
-          <div className="fixed top-4 right-4 z-50">
-            <Toast message={toastMessage} type={toastType} />
+          <div class="fixed right-4 bottom-4 z-50 flex max-w-[420px] flex-col items-end gap-2">
+            <div class="w-max self-end">
+              <Toast message={toastMessage} type={toastType} />
+            </div>
           </div>
         )}
         {children}

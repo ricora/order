@@ -21,7 +21,7 @@ type OrderItem = RegisterOrderParams["order"]["orderItems"][number] & {
 }
 
 const productButton = tv({
-  base: "w-full rounded border px-3 py-3 text-left transition",
+  base: "group w-full rounded border px-3 py-3 text-left transition",
   variants: {
     disabled: {
       true: "cursor-not-allowed bg-bg opacity-50",
@@ -277,7 +277,7 @@ const OrderRegistrationForm: FC = () => {
                               loading="lazy"
                             />
                             <div className="min-w-0">
-                              <div className="truncate font-medium">
+                              <div className="truncate font-medium transition-colors group-hover:text-primary-subtle-fg">
                                 {product.name}
                               </div>
                               <div className="mt-1 flex flex-wrap gap-1">
@@ -297,7 +297,7 @@ const OrderRegistrationForm: FC = () => {
                             </div>
                           </div>
 
-                          <div className="font-mono">
+                          <div className="font-mono transition-colors group-hover:text-primary-subtle-fg">
                             {formatCurrencyJPY(product.price)}
                           </div>
                         </div>
