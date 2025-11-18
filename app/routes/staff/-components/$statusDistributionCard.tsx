@@ -1,6 +1,6 @@
 import { useEffect } from "hono/jsx"
 import type { ChartOptions } from "../../../components/ui/$chart"
-import Chart from "../../../components/ui/$chart"
+import { useChart } from "../../../components/ui/$chart"
 import type { StaffDashboardData } from "../../../usecases/getStaffDashboardData"
 
 const STATUS_COLORS: Record<
@@ -58,35 +58,36 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
 
   console.log("Rendering StatusDistributionCard")
 
+  const { ref } = useChart({
+    options: chartOptions,
+    data: [xValues, counts],
+  })
+
   return (
-    <section className="flex flex-col rounded-lg border bg-bg p-6">
-      <div className="mb-4">
-        <h2 className="font-bold text-lg">ステータス別件数</h2>
-        <p className="text-muted-fg text-sm">
+    <section class="flex flex-col rounded-lg border bg-bg p-6">
+      <div class="mb-4">
+        <h2 class="font-bold text-lg">ステータス別件数</h2>
+        <p class="text-muted-fg text-sm">
           各ステータスの件数と比率を把握できます
         </p>
       </div>
-      <div className="h-64">
-        <Chart
-          options={chartOptions}
-          data={[xValues, counts]}
-          class="h-full w-full"
-        />
+      <div class="h-64">
+        <div ref={ref} class="size-full" />
       </div>
-      <ul className="mt-4 grid grid-cols-2 gap-4 text-sm">
+      <ul class="mt-4 grid grid-cols-2 gap-4 text-sm">
         {data.map((entry) => (
           <li
             key={entry.status}
-            className="flex items-center justify-between gap-3"
+            class="flex items-center justify-between gap-3"
           >
-            <div className="flex items-center gap-2">
+            <div class="flex items-center gap-2">
               <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
+                class="inline-block h-2.5 w-2.5 rounded-full"
                 style={{ backgroundColor: STATUS_COLORS[entry.status] }}
               />
-              <span className="text-secondary-fg">{entry.label}</span>
+              <span class="text-secondary-fg">{entry.label}</span>
             </div>
-            <span className="font-semibold">{entry.count}件</span>
+            <span class="font-semibold">{entry.count}件</span>
           </li>
         ))}
       </ul>

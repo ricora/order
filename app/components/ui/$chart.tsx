@@ -1,6 +1,5 @@
 import type { FC } from "hono/jsx"
 import type { AlignedData } from "uplot"
-import "uplot/dist/uPlot.min.css"
 import { useCallback, useEffect, useRef, useState } from "hono/jsx"
 import uPlot from "uplot"
 
@@ -31,7 +30,7 @@ const getResolvedDimension = (value: number | "100%", fallback: number) => {
   return value === "100%" ? fallback : value
 }
 
-const useChart = ({ options, data }: UseChartArgs): UseChartResult => {
+export const useChart = ({ options, data }: UseChartArgs): UseChartResult => {
   const [container, setContainer] = useState<HTMLDivElement | null>(null)
   const chartRef = useRef<uPlot | null>(null)
   const dataRef = useRef<AlignedData>(data)
@@ -80,7 +79,7 @@ const useChart = ({ options, data }: UseChartArgs): UseChartResult => {
 
       const resizedWidth = Math.max(width, legendWidth, titleWidth)
       const resizedHeight = Math.max(0, height - legendHeight - titleHeight)
-      nextChart.setSize({ width: resizedWidth, height: resizedHeight })
+      // nextChart.setSize({ width: resizedWidth, height: resizedHeight })
 
       const shouldObserve =
         typeof ResizeObserver !== "undefined" &&

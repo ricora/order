@@ -1,5 +1,5 @@
 import type { ChartOptions } from "../../../components/ui/$chart"
-import Chart from "../../../components/ui/$chart"
+import { useChart } from "../../../components/ui/$chart"
 import type { StaffDashboardData } from "../../../usecases/getStaffDashboardData"
 import { formatDateJP } from "../../../utils/date"
 import { formatCurrencyJPY } from "../../../utils/money"
@@ -56,6 +56,10 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
   }
 
   const lastDay = data[data.length - 1]
+  const { ref } = useChart({
+    options: chartOptions,
+    data: [xValues, orderCounts, revenues],
+  })
 
   return (
     <section className="flex flex-col rounded-lg border bg-bg p-6">
@@ -76,11 +80,7 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
         ) : null}
       </div>
       <div className="h-64">
-        <Chart
-          options={chartOptions}
-          data={[xValues, orderCounts, revenues]}
-          class="h-full w-full"
-        />
+        <div ref={ref} className="h-full w-full" />
       </div>
     </section>
   )
