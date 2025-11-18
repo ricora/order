@@ -29,7 +29,7 @@ const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {
 
   return (
     <section class="flex flex-col rounded-lg border bg-bg p-6">
-      <div class="mb-4">
+      <div class="mb-4 space-y-1">
         <h2 class="font-bold text-lg">ステータス別注文数</h2>
         <p class="text-muted-fg text-sm">
           各ステータスの注文数と比率を把握できます

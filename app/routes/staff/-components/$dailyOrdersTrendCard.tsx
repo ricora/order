@@ -91,28 +91,24 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
     },
   }
 
-  const lastDay = data[data.length - 1]
+  const totalOrders = data.reduce((sum, day) => sum + day.orderCount, 0)
+  const totalRevenue = data.reduce((sum, day) => sum + day.revenue, 0)
 
   return (
     <section class="flex flex-col rounded-lg border bg-bg p-6">
       <div class="mb-4 flex flex-wrap items-baseline justify-between gap-4">
-        <div>
+        <div class="space-y-1">
           <h2 class="font-bold text-lg">7日間の推移</h2>
           <p class="text-muted-fg text-sm">日別の注文数と売上の推移です</p>
         </div>
-        {lastDay ? (
-          <div class="text-right text-sm">
-            <p class="text-muted-fg">最新日 ({formatDateJP(lastDay.date)})</p>
-            <p class="font-semibold text-secondary-fg">
-              {lastDay.orderCount}件 / {formatCurrencyJPY(lastDay.revenue)}
-            </p>
-          </div>
-        ) : null}
+        <div class="text-right text-sm">
+          <p class="text-muted-fg text-xs">7日間の合計</p>
+          <p class="font-semibold text-secondary-fg">
+            {totalOrders}件 / {formatCurrencyJPY(totalRevenue)}
+          </p>
+        </div>
       </div>
       <div class="rounded-lg border border-border/50 bg-muted p-4">
-        <div class="mb-2 text-sm font-semibold text-secondary-fg">
-          注文数 / 売上の7日間推移
-        </div>
         <div class="h-72">
           <Chart
             ariaLabel="日別の注文数と売上の推移"
