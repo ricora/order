@@ -27,10 +27,6 @@ const toastAnimate = css`
   animation-duration: 0.3s, 0.5s;
   animation-delay: 0s, 2.5s;
   animation-fill-mode: forwards;
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 50;
 `
 
 export const toast = tv({
@@ -72,19 +68,21 @@ const Toast: FC<ToastProps> = ({ message, type }) => {
   const { container, icon, text } = toast({ type })
   return (
     <div class={toastAnimate}>
-      <div class={container()} role="alert">
-        <div class={icon()}>
-          <div class="size-5">
-            {type === "error" ? (
-              <CircleXIcon />
-            ) : type === "warning" ? (
-              <TriangleAlertIcon />
-            ) : (
-              <CircleCheckIcon />
-            )}
+      <div class="rounded-lg bg-bg shadow-lg">
+        <div class={container()} role="alert">
+          <div class={icon()}>
+            <div class="size-5">
+              {type === "error" ? (
+                <CircleXIcon />
+              ) : type === "warning" ? (
+                <TriangleAlertIcon />
+              ) : (
+                <CircleCheckIcon />
+              )}
+            </div>
           </div>
+          <div class={text()}>{message}</div>
         </div>
-        <div class={text()}>{message}</div>
       </div>
     </div>
   )

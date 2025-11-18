@@ -28,9 +28,9 @@ export default function ToastProvider() {
 
   if (!toasts.length) return null
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
+    <div class="fixed right-4 bottom-4 z-50 flex max-w-[420px] flex-col items-end gap-2">
       {toasts.map((t) => (
-        <div key={String(t.id)}>
+        <div key={String(t.id)} class="w-max self-end">
           <Toast message={t.message} type={t.type} />
         </div>
       ))}
