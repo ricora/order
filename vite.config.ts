@@ -19,4 +19,7 @@ export default defineConfig({
     tailwindcss(),
     build(),
   ],
+  optimizeDeps: {
+    exclude: ["@electric-sql/pglite"],
+  },
 })
