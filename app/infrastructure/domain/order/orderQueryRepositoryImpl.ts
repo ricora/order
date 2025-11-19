@@ -155,6 +155,11 @@ export const findDailyOrderAggregationsImpl: FindDailyOrderAggregations =
     return rows.map((row) => {
       const dayValue =
         row.day instanceof Date ? row.day : new Date(row.day as string)
+      if (Number.isNaN(dayValue.getTime())) {
+        throw new Error(
+          `Invalid date value encountered in daily order aggregation: ${row.day}`,
+        )
+      }
       return {
         date: dayValue,
         orderCount: Number(row.orderCount ?? 0),
