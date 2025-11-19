@@ -1,4 +1,5 @@
 import type Order from "../domain/order/entities/order"
+import { ORDER_STATUSES as DOMAIN_ORDER_STATUSES } from "../domain/order/entities/order"
 import {
   findDailyOrderAggregations,
   findOrderStatusCounts,
@@ -12,12 +13,18 @@ import {
   startOfDay,
 } from "../utils/date"
 
-const ORDER_STATUSES: { status: Order["status"]; label: string }[] = [
-  { status: "pending", label: "受付待ち" },
-  { status: "processing", label: "処理中" },
-  { status: "completed", label: "完了" },
-  { status: "cancelled", label: "取消済" },
-]
+const ORDER_STATUS_LABELS: Record<Order["status"], string> = {
+  pending: "受付待ち",
+  processing: "処理中",
+  completed: "完了",
+  cancelled: "取消済",
+} as const
+
+const ORDER_STATUSES: { status: Order["status"]; label: string }[] =
+  DOMAIN_ORDER_STATUSES.map((status) => ({
+    status,
+    label: ORDER_STATUS_LABELS[status],
+  }))
 
 const DAILY_RANGE_DAYS = 7
 export type StaffDashboardData = {
