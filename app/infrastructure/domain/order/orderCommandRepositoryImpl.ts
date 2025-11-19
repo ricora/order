@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm"
 import type Order from "../../../domain/order/entities/order"
 import type {
   CreateOrder,
+  DeleteOrder,
   UpdateOrder,
 } from "../../../domain/order/repositories/orderCommandRepository"
 import { orderItemTable, orderTable } from "../../db/schema"
@@ -92,5 +93,16 @@ export const updateOrderImpl: UpdateOrder = async ({ dbClient, order }) => {
     return newOrder
   } catch {
     throw new Error("注文の更新に失敗しました")
+  }
+}
+
+export const deleteOrderImpl: DeleteOrder = async ({ dbClient, order }) => {
+  try {
+    await dbClient
+      .delete(orderItemTable)
+      .where(eq(orderItemTable.orderId, order.id))
+    await dbClient.delete(orderTable).where(eq(orderTable.id, order.id))
+  } catch {
+    throw new Error("注文の削除に失敗しました")
   }
 }
