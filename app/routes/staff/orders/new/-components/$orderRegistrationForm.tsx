@@ -441,7 +441,7 @@ const OrderRegistrationForm: FC = () => {
                   value={customerName}
                   onChange={setCustomerName}
                   maxLength={50}
-                  placeholder="顧客名（省略可）"
+                  placeholder="顧客名"
                 />
               </div>
             </div>
