@@ -14,6 +14,13 @@ import type {
 } from "../domain/order/repositories/orderQueryRepository"
 import * as orderQueryRepository from "../domain/order/repositories/orderQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
+import {
+  addDays,
+  buildDateRange,
+  endOfDay,
+  formatDateKey,
+  startOfDay,
+} from "../utils/date"
 import { getStaffDashboardData } from "./getStaffDashboardData"
 
 const dbClient = {} as DbClient
@@ -35,26 +42,6 @@ class FixedDate extends OriginalDate {
   }
 }
 
-const cloneDate = (date: Date) => new OriginalDate(date.getTime())
-const addDays = (date: Date, days: number) => {
-  const next = cloneDate(date)
-  next.setDate(next.getDate() + days)
-  return next
-}
-const startOfDay = (date: Date) => {
-  const next = cloneDate(date)
-  next.setHours(0, 0, 0, 0)
-  return next
-}
-const endOfDay = (date: Date) => {
-  const next = cloneDate(date)
-  next.setHours(23, 59, 59, 999)
-  return next
-}
-const buildDateRange = (start: Date, days: number) =>
-  Array.from({ length: days }, (_, index) => addDays(start, index))
-const formatDateKey = (date: Date) =>
-  startOfDay(date).toISOString().slice(0, 10)
 const getDateRangeStart = () =>
   startOfDay(addDays(FIXED_NOW, -(DAILY_RANGE_DAYS - 1)))
 const getDateRangeEnd = () => endOfDay(FIXED_NOW)
