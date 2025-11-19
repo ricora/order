@@ -34,14 +34,14 @@ export default createRoute(async (c) => {
   const idParam = c.req.param("id")
   const id = Number(idParam)
   if (!Number.isInteger(id) || id <= 0) {
-    return c.text("Not found", 404)
+    return c.notFound()
   }
 
   const { order } = await getOrderDeletePageData({
     order: { id },
     dbClient: c.get("dbClient"),
   })
-  if (!order) return c.text("Not found", 404)
+  if (!order) return c.notFound()
   return c.render(
     <Layout title={"注文削除"} description={"注文情報の削除を行います。"}>
       <div class="rounded-lg border bg-bg p-6">
