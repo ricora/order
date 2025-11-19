@@ -16,9 +16,6 @@ export const getOrderDeletePageData = async ({
   order,
 }: GetOrderDeletePageDataParams): Promise<OrderDeletePageData> => {
   const foundOrder = await findOrderById({ dbClient, order })
-  if (!foundOrder) {
-    return { order: null }
-  }
   return {
     order: foundOrder,
   }
