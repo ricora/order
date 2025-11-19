@@ -4,6 +4,13 @@ import {
   findOrderStatusCounts,
 } from "../domain/order/repositories/orderQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
+import {
+  addDays,
+  buildDateRange,
+  endOfDay,
+  formatDateKey,
+  startOfDay,
+} from "../utils/date"
 
 const ORDER_STATUSES: { status: Order["status"]; label: string }[] = [
   { status: "pending", label: "受付待ち" },
@@ -107,30 +114,4 @@ export const getStaffDashboardData = async ({
     statusDistribution,
     dailyOrders,
   }
-}
-
-const addDays = (date: Date, days: number) => {
-  const next = new Date(date)
-  next.setDate(next.getDate() + days)
-  return next
-}
-
-const startOfDay = (date: Date) => {
-  const next = new Date(date)
-  next.setHours(0, 0, 0, 0)
-  return next
-}
-
-const endOfDay = (date: Date) => {
-  const next = new Date(date)
-  next.setHours(23, 59, 59, 999)
-  return next
-}
-
-const buildDateRange = (start: Date, days: number) => {
-  return Array.from({ length: days }, (_, index) => addDays(start, index))
-}
-
-const formatDateKey = (date: Date) => {
-  return date.toISOString().slice(0, 10)
 }
