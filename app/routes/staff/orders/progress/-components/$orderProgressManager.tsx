@@ -56,10 +56,10 @@ const bandTv = tv({
   defaultVariants: { status: "pending" },
 })
 
-const headerRowTv = tv({ base: "my-2 flex items-center justify-between px-2" })
+const headerRowTv = tv({ base: "my-2 flex items-center justify-between" })
 
 const headerTitleTv = tv({
-  base: "flex items-center gap-2 font-semibold",
+  base: "flex items-center gap-1 font-semibold text-sm",
   variants: {
     status: {
       pending: "text-danger-subtle-fg",
@@ -119,7 +119,7 @@ const labelTv = tv({
 })
 
 const btnTv = tv({
-  base: "flex h-8 min-w-24 items-center justify-center gap-1 whitespace-nowrap rounded-md border bg-bg px-2 py-1 font-medium text-xs transition",
+  base: "flex h-8 min-w-24 items-center justify-center gap-1 whitespace-nowrap rounded-md border bg-bg px-2 py-1 font-medium text-[0.65rem] transition",
   variants: {
     fixed: {
       true: "w-28",
@@ -505,7 +505,7 @@ const Column: FC<{
           </div>
           <span>{statusLabel[status]}</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {(status === "completed" || status === "cancelled") && (
             <div className={headerNoticeTv({ status })}>
               直近の注文のみを表示します。
