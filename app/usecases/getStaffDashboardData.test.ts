@@ -1,7 +1,5 @@
 import {
-  afterAll,
   afterEach,
-  beforeAll,
   describe,
   expect,
   it,
@@ -25,22 +23,7 @@ import { getStaffDashboardData } from "./getStaffDashboardData"
 
 const dbClient = {} as DbClient
 const DAILY_RANGE_DAYS = 7
-const OriginalDate = Date
-const FIXED_NOW = new OriginalDate("2025-02-08T10:15:30.000Z")
-
-class FixedDate extends OriginalDate {
-  constructor(...args: ConstructorParameters<typeof OriginalDate>) {
-    if (args[0] === undefined) {
-      super(FIXED_NOW.getTime())
-    } else {
-      super(...args)
-    }
-  }
-
-  static now() {
-    return FIXED_NOW.getTime()
-  }
-}
+const FIXED_NOW = new Date("2025-02-08T10:15:30.000Z")
 
 const getDateRangeStart = () =>
   startOfDay(addDays(FIXED_NOW, -(DAILY_RANGE_DAYS - 1)))
@@ -54,14 +37,6 @@ const createAggregationDate = (base: Date, offset: number, hour = 10) => {
 }
 
 describe("getStaffDashboardData", () => {
-  beforeAll(() => {
-    globalThis.Date = FixedDate as typeof Date
-  })
-
-  afterAll(() => {
-    globalThis.Date = OriginalDate
-  })
-
   afterEach(() => {
     mock.restore()
   })
@@ -95,7 +70,10 @@ describe("getStaffDashboardData", () => {
       "findDailyOrderAggregations",
     ).mockResolvedValue(dailyAggregations)
 
-    const result = await getStaffDashboardData({ dbClient })
+    const result = await getStaffDashboardData({
+      dbClient,
+      getCurrentTime: () => FIXED_NOW,
+    })
 
     expect(orderQueryRepository.findOrderStatusCounts).toHaveBeenCalledWith({
       dbClient,
@@ -152,7 +130,10 @@ describe("getStaffDashboardData", () => {
       [],
     )
 
-    const result = await getStaffDashboardData({ dbClient })
+    const result = await getStaffDashboardData({
+      dbClient,
+      getCurrentTime: () => FIXED_NOW,
+    })
 
     expect(result.statusDistribution).toEqual([
       { status: "pending", label: "受付待ち", count: 0 },

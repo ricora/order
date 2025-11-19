@@ -49,12 +49,14 @@ export type StaffDashboardData = {
 
 type GetStaffDashboardDataParams = {
   dbClient: DbClient
+  getCurrentTime?: () => Date
 }
 
 export const getStaffDashboardData = async ({
   dbClient,
+  getCurrentTime = () => new Date(),
 }: GetStaffDashboardDataParams): Promise<StaffDashboardData> => {
-  const now = new Date()
+  const now = getCurrentTime()
   const dateRangeStart = startOfDay(addDays(now, -(DAILY_RANGE_DAYS - 1)))
   const dateRangeEnd = endOfDay(now)
   const todayKey = formatDateKey(startOfDay(now))
