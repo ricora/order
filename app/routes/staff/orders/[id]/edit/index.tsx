@@ -77,8 +77,8 @@ export default createRoute(async (c) => {
 
   return c.render(
     <Layout title={"注文編集"} description={"注文情報の編集を行います。"}>
-      <div className="rounded-lg border bg-bg p-6">
-        <h2 className="mb-2 font-bold text-lg">注文編集</h2>
+      <div class="rounded-lg border bg-bg p-6">
+        <h2 class="mb-2 font-bold text-lg">注文編集</h2>
         <div class="p-4">
           <OrderSummary order={order} />
           <div class="mt-4">
