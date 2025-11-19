@@ -1,5 +1,6 @@
 import {
   createOrderImpl,
+  deleteOrderImpl,
   updateOrderImpl,
 } from "../../../infrastructure/domain/order/orderCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
@@ -111,4 +112,12 @@ export const updateOrder: WithRepositoryImpl<UpdateOrder> = async ({
 }) => {
   validateOrder(order, "update")
   return repositoryImpl({ order, dbClient })
+}
+
+export const deleteOrder: WithRepositoryImpl<DeleteOrder> = async ({
+  repositoryImpl = deleteOrderImpl,
+  dbClient,
+  order,
+}) => {
+  return repositoryImpl({ dbClient, order })
 }
