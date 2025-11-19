@@ -23,15 +23,24 @@ const CIRCULAR_CHART_TYPES = new Set<ChartType>([
   "polarArea",
 ])
 
+/**
+ * Chart.jsの設定型
+ */
 export type ChartConfig = ChartConfiguration<
   ChartType,
   DefaultDataPoint<ChartType>,
   unknown
 >
 
+/**
+ * Chartコンポーネントのプロパティ
+ */
 export type ChartProps = {
+  /** Chart.jsの設定 */
   config: ChartConfig
+  /** 追加のCSSクラス */
   class?: string
+  /** アクセシビリティ用のラベル（未指定の場合はconfigのtitleを使用） */
   ariaLabel?: string
 }
 
@@ -287,6 +296,11 @@ const extractTitleText = (config: ChartConfig) => {
 
 type ChartInstance = ChartJS<ChartType, DefaultDataPoint<ChartType>, unknown>
 
+/**
+ * Chart.jsを使用したチャートコンポーネント
+ *
+ * デザイントークンを自動的に適用し、テーマの変更に対応します。
+ */
 const Chart = ({ config, class: className, ariaLabel }: ChartProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const chartRef = useRef<ChartInstance | null>(null)
