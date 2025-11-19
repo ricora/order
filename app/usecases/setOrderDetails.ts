@@ -17,9 +17,8 @@ export const setOrderDetails = async ({
       dbClient: tx,
       order: {
         id: order.id,
-        customerName:
-          order.customerName === undefined ? undefined : order.customerName,
-        status: order.status === undefined ? undefined : order.status,
+        customerName: order.customerName,
+        status: order.status,
         updatedAt: new Date(),
       },
     })
