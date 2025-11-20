@@ -62,7 +62,7 @@ export const getStaffDashboardPageData = async ({
   const dateRangeEnd = endOfDay(now)
   const pagination = {
     offset: 0,
-    limit: Math.round(
+    limit: Math.floor(
       (dateRangeEnd.getTime() - dateRangeStart.getTime()) / DAY_IN_MS,
     ) + 1,
   }
