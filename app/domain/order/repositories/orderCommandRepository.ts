@@ -41,6 +41,11 @@ const validateOrder = (
       throw new Error("顧客名は50文字以内である必要があります")
     }
   }
+  if (order.comment !== undefined) {
+    if (order.comment !== null && countStringLength(order.comment) > 250) {
+      throw new Error("コメントは250文字以内である必要があります")
+    }
+  }
   if (order.orderItems) {
     if (
       order.totalAmount !==
@@ -87,7 +92,7 @@ export type CreateOrder = CommandRepositoryFunction<
 export type UpdateOrder = CommandRepositoryFunction<
   {
     order: Pick<Order, "id" | "updatedAt"> &
-      Partial<Pick<Order, "customerName" | "status">>
+      Partial<Pick<Order, "customerName" | "comment" | "status">>
   },
   Order | null
 >

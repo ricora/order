@@ -11,6 +11,10 @@ import FileInput from "../../../../components/ui/fileInput"
 import Input from "../../../../components/ui/input"
 import Label from "../../../../components/ui/label"
 import LinkButton from "../../../../components/ui/linkButton"
+import {
+  MAX_PRODUCT_PRICE,
+  MAX_PRODUCT_STOCK,
+} from "../../../../domain/product/constants"
 import type Product from "../../../../domain/product/entities/product"
 import type ProductTag from "../../../../domain/product/entities/productTag"
 import { createHonoClient } from "../../../../helpers/api/hono-client"
@@ -298,6 +302,7 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
                   type="number"
                   name="price"
                   min={0}
+                  max={MAX_PRODUCT_PRICE}
                   step={1}
                   required
                   placeholder="0"
@@ -316,6 +321,7 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
                   type="number"
                   name="stock"
                   min={0}
+                  max={MAX_PRODUCT_STOCK}
                   step={1}
                   required
                   placeholder="0"

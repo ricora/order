@@ -115,7 +115,7 @@ const itemRowTv = tv({
 })
 
 const labelTv = tv({
-  base: "font-semibold text-overlay-fg text-sm",
+  base: "font-semibold text-sm",
 })
 
 const btnTv = tv({
@@ -317,6 +317,19 @@ const Card: FC<{
         <div className={metaLineTv()}>更新日時 {updatedLabel}</div>
         <div className={metaLineTv()}>顧客名 {order.customerName ?? "-"}</div>
       </div>
+
+      {order.comment && (
+        <div className="mb-3">
+          <div className="mb-2">
+            <div className={labelTv()}>コメント</div>
+          </div>
+          <div className="rounded border border-border bg-overlay p-1.5">
+            <p className="break-word mt-0.5 whitespace-pre-wrap text-overlay-fg text-xs">
+              {order.comment}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="mb-3">
         <div className="mb-2">

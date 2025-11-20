@@ -145,6 +145,7 @@ export const orderTable = pgTable(
   {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     customerName: text("customer_name"),
+    comment: text("comment"),
     totalAmount: integer("total_amount").notNull(),
     status: orderStatusEnum().notNull().default("pending"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -161,6 +162,10 @@ export const orderTable = pgTable(
     check(
       "order_customer_name_length",
       sql`${table.customerName} IS NULL OR (char_length(${table.customerName}) >= 1 AND char_length(${table.customerName}) <= 50)`,
+    ),
+    check(
+      "order_comment_length",
+      sql`${table.comment} IS NULL OR (char_length(${table.comment}) >= 1 AND char_length(${table.comment}) <= 250)`,
     ),
   ],
 )

@@ -4,6 +4,7 @@ import { createOrder, updateOrder } from "./orderCommandRepository"
 
 const baseOrder: Parameters<typeof createOrder>[0]["order"] = {
   customerName: "Taro",
+  comment: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   status: "pending",
@@ -186,6 +187,49 @@ describe("createOrder", () => {
     expect(result).not.toBeNull()
     expect(result?.id).toBe(99)
   })
+
+  it("コメントが長すぎる場合はエラーを投げる", async () => {
+    const mockDbClient = {} as TransactionDbClient
+    const longComment = "あ".repeat(251)
+    const mockImpl: Parameters<typeof createOrder>[0]["repositoryImpl"] = vi.fn(
+      async () => null,
+    )
+    await expect(
+      createOrder({
+        order: { ...baseOrder, comment: longComment },
+        dbClient: mockDbClient,
+        repositoryImpl: mockImpl,
+      }),
+    ).rejects.toThrow("コメントは250文字以内である必要があります")
+    expect(mockImpl).not.toHaveBeenCalled()
+  })
+
+  it("コメントがnullの場合は作成できる", async () => {
+    const mockDbClient = {} as TransactionDbClient
+    const mockImpl: Parameters<typeof createOrder>[0]["repositoryImpl"] =
+      async ({ order }) => ({ ...order, id: 100 })
+    const result = await createOrder({
+      order: { ...baseOrder, comment: null },
+      dbClient: mockDbClient,
+      repositoryImpl: mockImpl,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.id).toBe(100)
+  })
+
+  it("コメントが250文字の場合は作成できる", async () => {
+    const mockDbClient = {} as TransactionDbClient
+    const comment250 = "あ".repeat(250)
+    const mockImpl: Parameters<typeof createOrder>[0]["repositoryImpl"] =
+      async ({ order }) => ({ ...order, id: 101 })
+    const result = await createOrder({
+      order: { ...baseOrder, comment: comment250 },
+      dbClient: mockDbClient,
+      repositoryImpl: mockImpl,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.id).toBe(101)
+  })
 })
 
 describe("updateOrder", () => {
@@ -195,6 +239,7 @@ describe("updateOrder", () => {
       async ({ order }) => ({
         id: order.id,
         customerName: order.customerName ?? null,
+        comment: order.comment ?? null,
         createdAt: new Date(),
         updatedAt: order.updatedAt,
         status: order.status ?? "pending",
@@ -252,6 +297,7 @@ describe("updateOrder", () => {
       async ({ order }) => ({
         id: order.id,
         customerName: "X",
+        comment: order.comment ?? null,
         createdAt: new Date(),
         updatedAt: order.updatedAt,
         status: order.status ?? "pending",
@@ -266,5 +312,45 @@ describe("updateOrder", () => {
     })
     expect(result).not.toBeNull()
     expect(result?.status).toBe("processing")
+  })
+
+  it("コメントが長すぎる場合はエラーを投げる", async () => {
+    const mockDbClient = {} as TransactionDbClient
+    const longComment = "あ".repeat(251)
+    const mockImpl: Parameters<typeof updateOrder>[0]["repositoryImpl"] = vi.fn(
+      async () => null,
+    )
+    await expect(
+      updateOrder({
+        order: { id: 1, comment: longComment, updatedAt: new Date() },
+        dbClient: mockDbClient,
+        repositoryImpl: mockImpl,
+      }),
+    ).rejects.toThrow("コメントは250文字以内である必要があります")
+    expect(mockImpl).not.toHaveBeenCalled()
+  })
+
+  it("コメントを更新できる", async () => {
+    const mockDbClient = {} as TransactionDbClient
+    const mockImpl: Parameters<typeof updateOrder>[0]["repositoryImpl"] =
+      async ({ order }) => ({
+        id: order.id,
+        customerName: "X",
+        comment: order.comment ?? null,
+        createdAt: new Date(),
+        updatedAt: order.updatedAt,
+        status: order.status ?? "pending",
+        orderItems: baseOrder.orderItems,
+        totalAmount: baseOrder.totalAmount,
+      })
+
+    const testComment = "これはコメントです"
+    const result = await updateOrder({
+      order: { id: 8, comment: testComment, updatedAt: new Date() },
+      dbClient: mockDbClient,
+      repositoryImpl: mockImpl,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.comment).toBe(testComment)
   })
 })

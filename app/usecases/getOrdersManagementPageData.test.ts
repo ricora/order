@@ -16,6 +16,7 @@ const mockOrders: Order[] = [
   {
     id: 1,
     customerName: "田中太郎",
+    comment: null,
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
     status: "pending",
@@ -27,6 +28,7 @@ const mockOrders: Order[] = [
   {
     id: 2,
     customerName: "鈴木花子",
+    comment: null,
     createdAt: new Date("2025-01-02"),
     updatedAt: new Date("2025-01-02"),
     status: "completed",
@@ -38,6 +40,7 @@ const mockOrders: Order[] = [
   {
     id: 3,
     customerName: null,
+    comment: null,
     createdAt: new Date("2025-01-03"),
     updatedAt: new Date("2025-01-03"),
     status: "pending",
@@ -75,6 +78,7 @@ describe("getOrdersManagementPageData", () => {
     const manyOrders: Order[] = Array.from({ length: 21 }, (_, i) => ({
       id: i + 1,
       customerName: `顧客${i + 1}`,
+      comment: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       status: "pending",
@@ -98,6 +102,7 @@ describe("getOrdersManagementPageData", () => {
     const manyOrders: Order[] = Array.from({ length: 21 }, (_, i) => ({
       id: i + 1,
       customerName: `顧客${i + 1}`,
+      comment: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       status: "pending",

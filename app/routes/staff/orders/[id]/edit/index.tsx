@@ -11,11 +11,19 @@ export const POST = createRoute(
   validator("form", (value, c) => {
     try {
       const customerNameRaw = value.customerName
+      const commentRaw = value.comment
       const statusRaw = value.status
       const customerName =
         typeof customerNameRaw === "string"
           ? customerNameRaw.trim().length > 0
             ? customerNameRaw.trim()
+            : null
+          : null
+
+      const comment =
+        typeof commentRaw === "string"
+          ? commentRaw.trim().length > 0
+            ? commentRaw.trim()
             : null
           : null
 
@@ -34,7 +42,7 @@ export const POST = createRoute(
         throw new Error("不正なリクエストです")
       }
       const status = candidateStatus
-      return { order: { customerName, status } }
+      return { order: { customerName, comment, status } }
     } catch (e) {
       setToastCookie(c, "error", String(e))
       return c.redirect(c.req.url)
