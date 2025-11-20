@@ -33,7 +33,7 @@ const OrderSummary: FC<{
               <div className="font-semibold">コメント</div>
               <div className="mt-2 rounded border border-border bg-bg p-2">
                 <p className="break-word whitespace-pre-wrap text-sm">
-                  {order.comment ?? "-"}
+                  {order.comment}
                 </p>
               </div>
             </div>
