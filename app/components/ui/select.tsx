@@ -18,7 +18,7 @@ type SelectProps = {
 }
 
 const selectTv = tv({
-  base: "mt-1 block w-full rounded border border-input px-3 py-2 text-fg text-sm placeholder:text-muted-fg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary-subtle",
+  base: "mt-1 block w-full rounded border border-input bg-bg px-3 py-2 text-fg text-sm placeholder:text-muted-fg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary-subtle",
   variants: {
     variant: {
       primary: "",
