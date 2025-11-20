@@ -147,15 +147,6 @@ export default createRoute(async (c) => {
     <Layout title="ダッシュボード" description="Order管理システムへようこそ">
       <div className="space-y-6">
         <section className="rounded-lg border bg-bg p-6">
-          <h2 className="mb-4 font-bold text-lg">クイックアクセス</h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {quickAccessCards.map((card) => (
-              <QuickAccessCard {...card} />
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-lg border bg-bg p-6">
           <h2 className="mb-4 font-bold text-lg">サマリー</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             {statCards.map((card) => (
@@ -165,6 +156,15 @@ export default createRoute(async (c) => {
                 value={card.value}
                 description={card.description}
               />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-lg border bg-bg p-6">
+          <h2 className="mb-4 font-bold text-lg">クイックアクセス</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {quickAccessCards.map((card) => (
+              <QuickAccessCard {...card} />
             ))}
           </div>
         </section>
