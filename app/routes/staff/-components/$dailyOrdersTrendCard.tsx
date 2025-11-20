@@ -43,6 +43,8 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
           yAxisID: "orders",
           tension: 0.35,
           fill: false,
+          colorToken: "--color-chart-1",
+          borderWidth: 2,
         },
         {
           label: "売上",
@@ -50,6 +52,8 @@ const DailyOrdersTrendCard = ({ data }: DailyOrdersTrendCardProps) => {
           yAxisID: "revenue",
           tension: 0.35,
           fill: false,
+          colorToken: "--color-chart-4",
+          borderWidth: 2,
         },
       ],
     },

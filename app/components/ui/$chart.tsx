@@ -16,6 +16,7 @@ const CHART_COLOR_TOKENS = [
   "--color-chart-4",
   "--color-chart-5",
 ] as const
+type ChartColorToken = (typeof CHART_COLOR_TOKENS)[number]
 
 const CIRCULAR_CHART_TYPES = new Set<ChartType>([
   "pie",
@@ -26,11 +27,20 @@ const CIRCULAR_CHART_TYPES = new Set<ChartType>([
 /**
  * Chart.jsの設定型
  */
-export type ChartConfig = ChartConfiguration<
+type BaseChartConfig = ChartConfiguration<
   ChartType,
   DefaultDataPoint<ChartType>,
   unknown
 >
+type BaseChartData = BaseChartConfig["data"]
+type ChartDatasetWithToken = ChartDataset<ChartType> & {
+  colorToken?: ChartColorToken
+}
+export type ChartConfig = Omit<BaseChartConfig, "data"> & {
+  data: Omit<BaseChartData, "datasets"> & {
+    datasets: ChartDatasetWithToken[]
+  }
+}
 
 /**
  * Chartコンポーネントのプロパティ
@@ -123,6 +133,20 @@ const buildSegmentColors = (count: number, palette: string[]) => {
   })
 }
 
+const resolveColorToken = (
+  token: ChartColorToken | undefined,
+  tokens: ChartDesignTokens,
+) => {
+  if (!token) {
+    return null
+  }
+  const index = CHART_COLOR_TOKENS.indexOf(token)
+  if (index === -1) {
+    return null
+  }
+  return tokens.palette[index] ?? null
+}
+
 const prepareDatasets = (
   config: ChartConfig,
   tokens: ChartDesignTokens,
@@ -130,11 +154,14 @@ const prepareDatasets = (
 ) => {
   return config.data.datasets.map((dataset, index) => {
     const datasetType: ChartType = dataset.type ?? config.type
-    const paletteColor =
+    const { colorToken, ...datasetRest } = dataset
+    const styled: ChartDataset<ChartType> = { ...datasetRest }
+    const paletteFallback =
       tokens.palette[index % tokens.palette.length] ??
       tokens.palette[0] ??
       "rgba(0, 0, 0, 0.6)"
-    const styled: ChartDataset<ChartType> = { ...dataset }
+    const paletteColor =
+      resolveColorToken(colorToken, tokens) ?? paletteFallback
 
     if (CIRCULAR_CHART_TYPES.has(datasetType)) {
       const segmentCount = Array.isArray(dataset.data)
