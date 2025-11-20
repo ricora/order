@@ -88,15 +88,15 @@ const StatusCard = ({
   } = statusCardVariants({ variant })
   const Icon = icon
   return (
-    <div className={container()}>
-      <div className={header()}>
-        <span className={titleClass()}>{title}</span>
-        <div className={iconClass()}>
+    <div class={container()}>
+      <div class={header()}>
+        <span class={titleClass()}>{title}</span>
+        <div class={iconClass()}>
           <Icon />
         </div>
       </div>
-      <div className={valueClass()}>{value}</div>
-      <p className={descriptionClass()}>{description}</p>
+      <div class={valueClass()}>{value}</div>
+      <p class={descriptionClass()}>{description}</p>
     </div>
   )
 }
@@ -114,11 +114,11 @@ const ProductStockStatusCards = ({
   outOfStockCount,
   lowStockCount,
 }: ProductStockStatusCardsProps) => (
-  <div className="mx-auto max-w-7xl rounded-lg border bg-bg p-6">
-    <div className="mb-2 flex items-baseline justify-between">
-      <h2 className="font-bold text-lg">在庫状況</h2>
+  <div class="mx-auto max-w-7xl rounded-lg border bg-bg p-6">
+    <div class="mb-2 flex items-baseline justify-between">
+      <h2 class="font-bold text-lg">在庫状況</h2>
     </div>
-    <div className="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-4">
       <StatusCard
         variant="info"
         icon={PackageIcon}
@@ -255,7 +255,7 @@ export default createRoute(async (c) => {
             {
               type: "custom",
               content: (
-                <div className="flex flex-wrap gap-1">
+                <div class="flex flex-wrap gap-1">
                   {product.tags.map((tag) => (
                     <Chip key={tag} size="xs">
                       {tag}
@@ -267,7 +267,7 @@ export default createRoute(async (c) => {
             {
               type: "custom",
               content: (
-                <span className="font-mono">
+                <span class="font-mono">
                   {formatCurrencyJPY(product.price)}
                 </span>
               ),
