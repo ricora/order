@@ -110,6 +110,11 @@ describe("buildDateRange", () => {
     ])
     expect(start.toISOString()).toBe("2024-01-10T00:00:00.000Z")
   })
+
+  it("0日を指定した場合は空配列を返す", () => {
+    const start = new Date("2024-01-10T00:00:00Z")
+    expect(buildDateRange(start, 0)).toEqual([])
+  })
 })
 
 describe("formatDateKey", () => {
@@ -118,5 +123,10 @@ describe("formatDateKey", () => {
     const result = formatDateKey(date)
 
     expect(result).toBe("2024-01-15")
+  })
+
+  it("UTCに正規化された日付文字列を返す", () => {
+    const date = new Date("2024-01-15T23:30:00-05:00")
+    expect(formatDateKey(date)).toBe("2024-01-16")
   })
 })
