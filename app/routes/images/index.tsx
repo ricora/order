@@ -23,6 +23,15 @@ const DEFAULT_IMAGES = [
 ] as const
 
 /**
+ * Determine the image file path based on the runtime environment.
+ */
+const getImageFilePath = (relativePath: string): string => {
+  const cwd = process.cwd()
+  const isDistEnvironment = cwd.endsWith("dist")
+  return isDistEnvironment ? resolve(cwd, `.${relativePath}`) : resolve(cwd, `public${relativePath}`)
+}
+
+/**
  * Deterministic hash-based selection that varies by product ID.
  *
  * Uses XOR hash to distribute different product IDs across images uniformly.
@@ -54,7 +63,8 @@ app.get("/products/:id", async (c) => {
   if (productImage == null) {
     try {
       const defaultPath = getDefaultImagePath(id)
-      imageBuffer = await readFile(resolve(`public${defaultPath}`))
+      const imagePath = getImageFilePath(defaultPath)
+      imageBuffer = await readFile(imagePath)
       mimeType = "image/jpeg"
     } catch {
       return c.text("Failed to load default image", 500)
