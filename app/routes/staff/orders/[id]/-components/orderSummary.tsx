@@ -28,18 +28,32 @@ const OrderSummary: FC<{
             顧客名 {order.customerName ?? "-"}
           </div>
 
-          <div className="my-2 space-y-1">
-            {order.orderItems.map((item) => (
-              <div className="flex items-center justify-between rounded border border-border/50 bg-muted px-2 py-1">
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium text-sm">
-                    {item.productName}
-                  </div>
-                </div>
-                <div className="ml-4 text-sm">×{item.quantity}</div>
+          {order.comment && (
+            <div class="mt-2">
+              <div className="font-semibold">コメント</div>
+              <div className="mt-2 rounded border border-border bg-bg p-2">
+                <p className="break-word whitespace-pre-wrap text-sm">
+                  {order.comment ?? "-"}
+                </p>
               </div>
-            ))}
+            </div>
+          )}
+          <div class="mt-2">
+            <div className="font-semibold">注文内容</div>
+            <div className="my-2 space-y-1">
+              {order.orderItems.map((item) => (
+                <div className="flex items-center justify-between rounded border border-border/50 bg-muted px-2 py-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-medium text-sm">
+                      {item.productName}
+                    </div>
+                  </div>
+                  <div className="ml-4 text-sm">×{item.quantity}</div>
+                </div>
+              ))}
+            </div>
           </div>
+
           <div className="mt-1">
             合計{" "}
             <span className="font-mono">

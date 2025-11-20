@@ -15,6 +15,7 @@ import { getOrderDeletePageData } from "./getOrderDeletePageData"
 const mockOrder: Order = {
   id: 1,
   customerName: "Taro",
+  comment: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   status: "pending",

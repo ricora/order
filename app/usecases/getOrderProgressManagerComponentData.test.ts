@@ -21,6 +21,7 @@ const activeOrders: Order[] = [
   {
     id: 1,
     customerName: "Taro",
+    comment: null,
     createdAt: oneHourAgo,
     updatedAt: oneHourAgo,
     status: "pending",
@@ -32,6 +33,7 @@ const activeOrders: Order[] = [
   {
     id: 2,
     customerName: "Hanako",
+    comment: null,
     createdAt: new Date(now.getTime() - 1800000),
     updatedAt: new Date(now.getTime() - 1800000),
     status: "processing",
@@ -46,6 +48,7 @@ const inactiveOrders: Order[] = [
   {
     id: 3,
     customerName: "Jiro",
+    comment: null,
     createdAt: new Date(now.getTime() - 7200000),
     updatedAt: now,
     status: "completed",
@@ -57,6 +60,7 @@ const inactiveOrders: Order[] = [
   {
     id: 4,
     customerName: null,
+    comment: null,
     createdAt: new Date(now.getTime() - 10800000),
     updatedAt: now,
     status: "cancelled",

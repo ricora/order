@@ -4,7 +4,8 @@ import type { DbClient } from "../infrastructure/db/client"
 
 export type SetOrderDetailsParams = {
   dbClient: DbClient
-  order: Pick<Order, "id"> & Partial<Pick<Order, "customerName" | "status">>
+  order: Pick<Order, "id"> &
+    Partial<Pick<Order, "customerName" | "comment" | "status">>
 }
 
 export const setOrderDetails = async ({
@@ -18,6 +19,7 @@ export const setOrderDetails = async ({
       order: {
         id: order.id,
         customerName: order.customerName,
+        comment: order.comment,
         status: order.status,
         updatedAt: new Date(),
       },

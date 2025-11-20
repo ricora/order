@@ -19,6 +19,7 @@ export const findOrderByIdImpl: FindOrderById = async ({ dbClient, order }) => {
   return {
     id: dbOrder.id,
     customerName: dbOrder.customerName,
+    comment: dbOrder.comment,
     createdAt: dbOrder.createdAt,
     status: dbOrder.status,
     updatedAt: dbOrder.updatedAt,
@@ -47,6 +48,7 @@ export const findAllOrdersImpl: FindAllOrders = async ({
   const orders = dbOrders.map((dbOrder) => ({
     id: dbOrder.id,
     customerName: dbOrder.customerName,
+    comment: dbOrder.comment,
     createdAt: dbOrder.createdAt,
     status: dbOrder.status,
     updatedAt: dbOrder.updatedAt,
@@ -75,6 +77,7 @@ export const findAllOrdersByActiveStatusByUpdatedAtAscImpl: FindAllOrdersByActiv
     const orders = dbOrders.map((dbOrder) => ({
       id: dbOrder.id,
       customerName: dbOrder.customerName,
+      comment: dbOrder.comment,
       createdAt: dbOrder.createdAt,
       status: dbOrder.status,
       updatedAt: dbOrder.updatedAt,
@@ -103,6 +106,7 @@ export const findAllOrdersByInactiveStatusByUpdatedAtDescImpl: FindAllOrdersByIn
     const orders = dbOrders.map((dbOrder) => ({
       id: dbOrder.id,
       customerName: dbOrder.customerName,
+      comment: dbOrder.comment,
       createdAt: dbOrder.createdAt,
       status: dbOrder.status,
       updatedAt: dbOrder.updatedAt,

@@ -14,6 +14,7 @@ export const createOrderImpl: CreateOrder = async ({ dbClient, order }) => {
         .insert(orderTable)
         .values({
           customerName: order.customerName,
+          comment: order.comment,
           createdAt: order.createdAt,
           status: order.status,
           totalAmount: order.totalAmount,
@@ -39,6 +40,7 @@ export const createOrderImpl: CreateOrder = async ({ dbClient, order }) => {
     const newOrder: Order = {
       id: dbOrder.id,
       customerName: dbOrder.customerName,
+      comment: dbOrder.comment,
       createdAt: dbOrder.createdAt,
       status: dbOrder.status,
       updatedAt: dbOrder.updatedAt,
@@ -63,6 +65,7 @@ export const updateOrderImpl: UpdateOrder = async ({ dbClient, order }) => {
         .update(orderTable)
         .set({
           customerName: order.customerName,
+          comment: order.comment,
           status: order.status,
           updatedAt: order.updatedAt,
         })
@@ -79,6 +82,7 @@ export const updateOrderImpl: UpdateOrder = async ({ dbClient, order }) => {
     const newOrder: Order = {
       id: updatedOrder.id,
       customerName: updatedOrder.customerName,
+      comment: updatedOrder.comment,
       createdAt: updatedOrder.createdAt,
       status: updatedOrder.status,
       updatedAt: updatedOrder.updatedAt,

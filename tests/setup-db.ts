@@ -35,6 +35,7 @@ await registerOrder({
   dbClient,
   order: {
     customerName: "顧客A",
+    comment: null,
     orderItems: [
       { productId: 1, quantity: 2 },
       { productId: 2, quantity: 1 },
@@ -45,6 +46,7 @@ await registerOrder({
   dbClient,
   order: {
     customerName: "顧客B",
+    comment: null,
     orderItems: [
       { productId: 2, quantity: 1 },
       { productId: 3, quantity: 2 },
@@ -55,6 +57,7 @@ const order3 = await registerOrder({
   dbClient,
   order: {
     customerName: null,
+    comment: null,
     orderItems: [
       { productId: 1, quantity: 1 },
       { productId: 3, quantity: 2 },
@@ -71,6 +74,7 @@ const order4 = await registerOrder({
   dbClient,
   order: {
     customerName: "顧客C",
+    comment: null,
     orderItems: [{ productId: 4, quantity: 5 }],
   },
 })
@@ -83,6 +87,7 @@ const order5 = await registerOrder({
   dbClient,
   order: {
     customerName: "顧客D",
+    comment: null,
     orderItems: [{ productId: 1, quantity: 5 }],
   },
 })
@@ -102,6 +107,7 @@ for (let i = 6; i <= 25; i++) {
     dbClient,
     order: {
       customerName: `テスト顧客${customerNumber}`,
+      comment: null,
       orderItems: [{ productId, quantity }],
     },
   })

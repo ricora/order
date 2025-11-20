@@ -15,7 +15,7 @@ const createInsufficientStockError = () => {
 
 export type RegisterOrderParams = {
   dbClient: DbClient
-  order: Pick<Order, "customerName"> & {
+  order: Pick<Order, "customerName" | "comment"> & {
     orderItems: Pick<Order["orderItems"][number], "productId" | "quantity">[]
   }
 }
@@ -80,6 +80,7 @@ export const registerOrder = async ({
     createdOrder = await createOrder({
       order: {
         customerName: order.customerName ?? null,
+        comment: order.comment ?? null,
         createdAt: new Date(),
         updatedAt: new Date(),
         status: "pending",

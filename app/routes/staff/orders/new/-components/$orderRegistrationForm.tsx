@@ -5,6 +5,7 @@ import RotateCwIcon from "../../../../../components/icons/lucide/rotateCwIcon"
 import SendIcon from "../../../../../components/icons/lucide/sendIcon"
 import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
 import GraphemeInput from "../../../../../components/ui/$graphemeInput"
+import GraphemeTextarea from "../../../../../components/ui/$graphemeTextarea"
 import Button from "../../../../../components/ui/button"
 import Chip from "../../../../../components/ui/chip"
 import ChipButton from "../../../../../components/ui/chipButton"
@@ -166,6 +167,7 @@ const OrderRegistrationForm: FC = () => {
 
   const isCartEmpty = items.length === 0
   const [customerName, setCustomerName] = useState("")
+  const [comment, setComment] = useState("")
 
   useEffect(() => {
     fetchData()
@@ -442,6 +444,21 @@ const OrderRegistrationForm: FC = () => {
                   onChange={setCustomerName}
                   maxLength={50}
                   placeholder="顧客名"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <div className="flex-1">
+                <Label htmlFor="comment">備考欄</Label>
+                <GraphemeTextarea
+                  id="comment"
+                  name="comment"
+                  value={comment}
+                  onChange={setComment}
+                  maxLength={250}
+                  placeholder="注文に関する備考のコメントを入力"
+                  rows={3}
                 />
               </div>
             </div>
