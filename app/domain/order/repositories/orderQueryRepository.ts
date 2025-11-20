@@ -1,8 +1,8 @@
 import {
+  findAllDailyOrderAggregationsImpl,
   findAllOrdersByActiveStatusByUpdatedAtAscImpl,
   findAllOrdersByInactiveStatusByUpdatedAtDescImpl,
   findAllOrdersImpl,
-  findAllDailyOrderAggregationsImpl,
   findOrderByIdImpl,
   findOrderStatusCountsImpl,
 } from "../../../infrastructure/domain/order/orderQueryRepositoryImpl"
@@ -42,14 +42,13 @@ export type FindOrderStatusCounts = QueryRepositoryFunction<
   OrderStatusCount[]
 >
 
-export type FindAllDailyOrderAggregations =
-  PaginatedQueryRepositoryFunction<
-    {
-      from: Date
-      to: Date
-    },
-    OrderDailyAggregation
-  >
+export type FindAllDailyOrderAggregations = PaginatedQueryRepositoryFunction<
+  {
+    from: Date
+    to: Date
+  },
+  OrderDailyAggregation
+>
 
 export const findOrderById: WithRepositoryImpl<FindOrderById> = async ({
   order,

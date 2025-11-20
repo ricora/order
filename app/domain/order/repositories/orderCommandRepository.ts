@@ -5,8 +5,8 @@ import {
 } from "../../../infrastructure/domain/order/orderCommandRepositoryImpl"
 import { countStringLength } from "../../../utils/text"
 import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
-import type Order from "../entities/order"
 import { ORDER_STATUSES } from "../constants"
+import type Order from "../entities/order"
 
 const ALLOWED_ORDER_STATUSES = new Set(ORDER_STATUSES)
 

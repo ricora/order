@@ -30,8 +30,9 @@ const createAggregationDate = (base: Date, offset: number, hour = 10) => {
 }
 
 type OrderStatusCount = Awaited<ReturnType<FindOrderStatusCounts>>[number]
-type OrderDailyAggregation =
-  Awaited<ReturnType<FindAllDailyOrderAggregations>>[number]
+type OrderDailyAggregation = Awaited<
+  ReturnType<FindAllDailyOrderAggregations>
+>[number]
 
 describe("getStaffDashboardPageData", () => {
   afterEach(() => {

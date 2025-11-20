@@ -1,5 +1,5 @@
-import type Order from "../domain/order/entities/order"
 import { ORDER_STATUSES as DOMAIN_ORDER_STATUSES } from "../domain/order/constants"
+import type Order from "../domain/order/entities/order"
 import {
   findAllDailyOrderAggregations,
   findOrderStatusCounts,
@@ -62,9 +62,10 @@ export const getStaffDashboardPageData = async ({
   const dateRangeEnd = endOfDay(now)
   const pagination = {
     offset: 0,
-    limit: Math.floor(
-      (dateRangeEnd.getTime() - dateRangeStart.getTime()) / DAY_IN_MS,
-    ) + 1,
+    limit:
+      Math.floor(
+        (dateRangeEnd.getTime() - dateRangeStart.getTime()) / DAY_IN_MS,
+      ) + 1,
   }
   const todayKey = formatDateKey(startOfDay(now))
 
