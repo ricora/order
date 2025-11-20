@@ -4,6 +4,11 @@ import type { Env } from "hono"
 import { Hono } from "hono"
 import { getProductImageAssetData } from "../../usecases/getProductImageAssetData"
 
+/**
+ * CC0 default images obtained from "Free-Images.com".
+ *
+ * @link https://free-images.com/
+ */
 const DEFAULT_IMAGES = [
   "/images/defaults/lilac_syringa_ornamental_shrub.jpg",
   "/images/defaults/haematopus_ostralegus_bird_flight.jpg",
