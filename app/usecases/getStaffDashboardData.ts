@@ -1,5 +1,5 @@
 import type Order from "../domain/order/entities/order"
-import { ORDER_STATUSES as DOMAIN_ORDER_STATUSES } from "../domain/order/entities/order"
+import { ORDER_STATUSES as DOMAIN_ORDER_STATUSES } from "../domain/order/constants"
 import {
   findDailyOrderAggregations,
   findOrderStatusCounts,
