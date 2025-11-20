@@ -1,7 +1,7 @@
 import type Order from "../domain/order/entities/order"
 import { ORDER_STATUSES as DOMAIN_ORDER_STATUSES } from "../domain/order/constants"
 import {
-  findDailyOrderAggregations,
+  findAllDailyOrderAggregations,
   findOrderStatusCounts,
 } from "../domain/order/repositories/orderQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
@@ -27,6 +27,7 @@ const ORDER_STATUSES: { status: Order["status"]; label: string }[] =
   }))
 
 const DAILY_RANGE_DAYS = 7
+const DAY_IN_MS = 1000 * 60 * 60 * 24
 export type StaffDashboardData = {
   summary: {
     todayOrderCount: number
@@ -59,14 +60,21 @@ export const getStaffDashboardData = async ({
   const now = getCurrentTime()
   const dateRangeStart = startOfDay(addDays(now, -(DAILY_RANGE_DAYS - 1)))
   const dateRangeEnd = endOfDay(now)
+  const pagination = {
+    offset: 0,
+    limit: Math.round(
+      (dateRangeEnd.getTime() - dateRangeStart.getTime()) / DAY_IN_MS,
+    ) + 1,
+  }
   const todayKey = formatDateKey(startOfDay(now))
 
   const [statusCounts, dailyAggregations] = await Promise.all([
     findOrderStatusCounts({ dbClient }),
-    findDailyOrderAggregations({
+    findAllDailyOrderAggregations({
       dbClient,
       from: dateRangeStart,
       to: dateRangeEnd,
+      pagination,
     }),
   ])
 

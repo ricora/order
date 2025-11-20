@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, mock, spyOn } from "bun:test"
 import type {
-  FindDailyOrderAggregations,
+  FindAllDailyOrderAggregations,
   FindOrderStatusCounts,
 } from "../domain/order/repositories/orderQueryRepository"
 import * as orderQueryRepository from "../domain/order/repositories/orderQueryRepository"
@@ -31,7 +31,7 @@ const createAggregationDate = (base: Date, offset: number, hour = 10) => {
 
 type OrderStatusCount = Awaited<ReturnType<FindOrderStatusCounts>>[number]
 type OrderDailyAggregation =
-  Awaited<ReturnType<FindDailyOrderAggregations>>[number]
+  Awaited<ReturnType<FindAllDailyOrderAggregations>>[number]
 
 describe("getStaffDashboardData", () => {
   afterEach(() => {
@@ -62,9 +62,9 @@ describe("getStaffDashboardData", () => {
         ...summary,
       }),
     )
-    const findDailyOrderAggregationsSpy = spyOn(
+    const findAllDailyOrderAggregationsSpy = spyOn(
       orderQueryRepository,
-      "findDailyOrderAggregations",
+      "findAllDailyOrderAggregations",
     ).mockResolvedValue(dailyAggregations)
 
     const result = await getStaffDashboardData({
@@ -75,10 +75,11 @@ describe("getStaffDashboardData", () => {
     expect(orderQueryRepository.findOrderStatusCounts).toHaveBeenCalledWith({
       dbClient,
     })
-    expect(findDailyOrderAggregationsSpy).toHaveBeenCalledWith({
+    expect(findAllDailyOrderAggregationsSpy).toHaveBeenCalledWith({
       dbClient,
       from: dateRangeStart,
       to: getDateRangeEnd(),
+      pagination: { offset: 0, limit: DAILY_RANGE_DAYS },
     })
 
     const expectedDailyOrders = buildExpectedDailyKeys().map(
@@ -123,9 +124,10 @@ describe("getStaffDashboardData", () => {
 
   it("データがない場合はゼロ埋めした結果を返す", async () => {
     spyOn(orderQueryRepository, "findOrderStatusCounts").mockResolvedValue([])
-    spyOn(orderQueryRepository, "findDailyOrderAggregations").mockResolvedValue(
-      [],
-    )
+    spyOn(
+      orderQueryRepository,
+      "findAllDailyOrderAggregations",
+    ).mockResolvedValue([])
 
     const result = await getStaffDashboardData({
       dbClient,

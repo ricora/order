@@ -3,7 +3,7 @@ import type {
   FindAllOrders,
   FindAllOrdersByActiveStatusOrderByUpdatedAtAsc,
   FindAllOrdersByInactiveStatusOrderByUpdatedAtDesc,
-  FindDailyOrderAggregations,
+  FindAllDailyOrderAggregations,
   FindOrderById,
   FindOrderStatusCounts,
 } from "../../../domain/order/repositories/orderQueryRepository"
@@ -136,8 +136,8 @@ export const findOrderStatusCountsImpl: FindOrderStatusCounts = async ({
   }))
 }
 
-export const findDailyOrderAggregationsImpl: FindDailyOrderAggregations =
-  async ({ dbClient, from, to }) => {
+export const findAllDailyOrderAggregationsImpl: FindAllDailyOrderAggregations =
+  async ({ dbClient, from, to, pagination }) => {
     const dayExpression = sql<Date>`date_trunc('day', ${orderTable.createdAt})`
     const rows = await dbClient
       .select({
@@ -151,6 +151,8 @@ export const findDailyOrderAggregationsImpl: FindDailyOrderAggregations =
       )
       .groupBy(dayExpression)
       .orderBy(dayExpression)
+      .limit(pagination.limit)
+      .offset(pagination.offset)
 
     return rows.map((row) => {
       const dayValue =

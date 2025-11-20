@@ -2,7 +2,7 @@ import {
   findAllOrdersByActiveStatusByUpdatedAtAscImpl,
   findAllOrdersByInactiveStatusByUpdatedAtDescImpl,
   findAllOrdersImpl,
-  findDailyOrderAggregationsImpl,
+  findAllDailyOrderAggregationsImpl,
   findOrderByIdImpl,
   findOrderStatusCountsImpl,
 } from "../../../infrastructure/domain/order/orderQueryRepositoryImpl"
@@ -42,13 +42,14 @@ export type FindOrderStatusCounts = QueryRepositoryFunction<
   OrderStatusCount[]
 >
 
-export type FindDailyOrderAggregations = QueryRepositoryFunction<
-  {
-    from: Date
-    to: Date
-  },
-  OrderDailyAggregation[]
->
+export type FindAllDailyOrderAggregations =
+  PaginatedQueryRepositoryFunction<
+    {
+      from: Date
+      to: Date
+    },
+    OrderDailyAggregation
+  >
 
 export const findOrderById: WithRepositoryImpl<FindOrderById> = async ({
   order,
@@ -92,13 +93,14 @@ export const findOrderStatusCounts: WithRepositoryImpl<
   return repositoryImpl({ dbClient })
 }
 
-export const findDailyOrderAggregations: WithRepositoryImpl<
-  FindDailyOrderAggregations
+export const findAllDailyOrderAggregations: WithRepositoryImpl<
+  FindAllDailyOrderAggregations
 > = async ({
-  repositoryImpl = findDailyOrderAggregationsImpl,
+  repositoryImpl = findAllDailyOrderAggregationsImpl,
   dbClient,
   from,
   to,
+  pagination,
 }) => {
-  return repositoryImpl({ dbClient, from, to })
+  return repositoryImpl({ dbClient, from, to, pagination })
 }
