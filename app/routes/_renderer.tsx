@@ -28,6 +28,21 @@ export default jsxRenderer(({ children }) => {
           />
         )}
         <link rel="icon" href="/favicon.ico" />
+        {/* Preload frequently used fonts to prevent FOUT (Flash of Unstyled Text) */}
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/m-plus-rounded-1c/m-plus-rounded-1c-regular.ttf"
+          type="font/ttf"
+          crossorigin="anonymous"
+        />
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/m-plus-rounded-1c/m-plus-rounded-1c-bold.ttf"
+          type="font/ttf"
+          crossorigin="anonymous"
+        />
         <Link href="/app/style.css" rel="stylesheet" />
         <Script src="/app/client.ts" async />
         <Style />

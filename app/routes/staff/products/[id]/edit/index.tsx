@@ -44,14 +44,14 @@ export default createRoute(async (c) => {
   const idParam = c.req.param("id")
   const id = Number(idParam)
   if (!Number.isInteger(id) || id <= 0) {
-    return c.text("Not found", 404)
+    return c.notFound()
   }
 
   const { product } = await getProductEditPageData({
     product: { id },
     dbClient: c.get("dbClient"),
   })
-  if (!product) return c.text("Not found", 404)
+  if (!product) return c.notFound()
 
   return c.render(
     <Layout title={"商品編集"} description={"商品情報の編集を行います。"}>

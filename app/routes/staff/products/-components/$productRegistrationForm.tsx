@@ -186,7 +186,7 @@ const TagInput: FC<TagInputProps> = ({
               {tag}
               <button
                 type="button"
-                className="ml-1 cursor-pointer rounded-full p-1 text-muted-fg/80 transition hover:bg-danger-subtle hover:text-danger"
+                className="ml-1 cursor-pointer rounded-full p-1 text-muted-fg transition hover:bg-danger-subtle hover:text-danger"
                 onClick={() => removeTag(tag)}
                 aria-label={`${tag}を削除`}
               >
@@ -256,7 +256,7 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
   const submitLabel = mode === "edit" ? "商品を更新" : "商品を登録"
 
   return (
-    <div className="mx-auto mt-6 mb-6 max-w-7xl rounded-lg border bg-bg p-6">
+    <div className="mx-auto max-w-7xl rounded-lg border bg-bg p-6">
       <div>
         <div className="mb-2 flex items-baseline justify-between">
           <span className="font-bold text-lg">{heading}</span>
