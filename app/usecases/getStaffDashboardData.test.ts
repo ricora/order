@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, mock, spyOn } from "bun:test"
 import type {
-  OrderDailyAggregation,
-  OrderStatusCount,
+  FindDailyOrderAggregations,
+  FindOrderStatusCounts,
 } from "../domain/order/repositories/orderQueryRepository"
 import * as orderQueryRepository from "../domain/order/repositories/orderQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
@@ -28,6 +28,10 @@ const createAggregationDate = (base: Date, offset: number, hour = 10) => {
   date.setHours(hour, 0, 0, 0)
   return date
 }
+
+type OrderStatusCount = Awaited<ReturnType<FindOrderStatusCounts>>[number]
+type OrderDailyAggregation =
+  Awaited<ReturnType<FindDailyOrderAggregations>>[number]
 
 describe("getStaffDashboardData", () => {
   afterEach(() => {

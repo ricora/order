@@ -26,12 +26,12 @@ export type FindAllOrdersByActiveStatusOrderByUpdatedAtAsc =
 export type FindAllOrdersByInactiveStatusOrderByUpdatedAtDesc =
   PaginatedQueryRepositoryFunction<Record<string, never>, Order>
 
-export type OrderStatusCount = {
+type OrderStatusCount = {
   status: Order["status"]
   count: number
 }
 
-export type OrderDailyAggregation = {
+type OrderDailyAggregation = {
   date: Date
   orderCount: number
   revenue: number
