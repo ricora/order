@@ -18,28 +18,41 @@ let hasWarned = false
  * DBクライアントはシングルトンとして扱う。
  */
 let dbClientInstance: DbClient | null = null
+let dbClientInitPromise: Promise<DbClient> | null = null
 
 export const createDbClient = async (): Promise<DbClient> => {
   if (dbClientInstance) {
     return dbClientInstance
   }
-  if (!process.env.DATABASE_URL && import.meta.env.DEV) {
-    if (!hasWarned) {
-      console.warn(`DATABASE_URL environment variable is not set.
+  if (dbClientInitPromise) {
+    return dbClientInitPromise
+  }
+  dbClientInitPromise = (async (): Promise<DbClient> => {
+    try {
+      if (!process.env.DATABASE_URL && import.meta.env.DEV) {
+        if (!hasWarned) {
+          console.warn(`DATABASE_URL environment variable is not set.
 Using native filesystem Postgres database via PGLite for testing purposes.`)
-      hasWarned = true
-    }
+          hasWarned = true
+        }
 
-    const { drizzle } = await import("drizzle-orm/pglite")
-    dbClientInstance = drizzle("./pgdata", { schema })
-    return dbClientInstance
-  }
-  if (!process.env.DATABASE_URL) {
-    throw new Error(`DATABASE_URL environment variable is not set.
+        const { drizzle } = await import("drizzle-orm/pglite")
+        dbClientInstance = drizzle("./pgdata", { schema })
+        return dbClientInstance
+      }
+      if (!process.env.DATABASE_URL) {
+        throw new Error(`DATABASE_URL environment variable is not set.
 Production environment requires a valid Postgres connection string.`)
-  }
+      }
 
-  const { drizzle } = await import("drizzle-orm/postgres-js")
-  dbClientInstance = drizzle(process.env.DATABASE_URL, { schema })
-  return dbClientInstance
+      const { drizzle } = await import("drizzle-orm/postgres-js")
+      dbClientInstance = drizzle(process.env.DATABASE_URL, { schema })
+      return dbClientInstance
+    } catch (err) {
+      dbClientInitPromise = null
+      throw err
+    }
+  })()
+
+  return dbClientInitPromise
 }
