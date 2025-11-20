@@ -114,35 +114,40 @@ const ProductStockStatusCards = ({
   outOfStockCount,
   lowStockCount,
 }: ProductStockStatusCardsProps) => (
-  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-    <StatusCard
-      variant="info"
-      icon={PackageIcon}
-      title="総商品数"
-      value={totalProducts}
-      description="登録済み商品"
-    />
-    <StatusCard
-      variant="success"
-      icon={CircleCheckIcon}
-      title="在庫十分"
-      value={inStockCount}
-      description={`在庫${LOW_STOCK_THRESHOLD + 1}個以上`}
-    />
-    <StatusCard
-      variant="warning"
-      icon={TriangleAlertIcon}
-      title="在庫わずか"
-      value={lowStockCount}
-      description={`在庫${LOW_STOCK_THRESHOLD}個以下`}
-    />
-    <StatusCard
-      variant="danger"
-      icon={SirenIcon}
-      title="在庫切れ"
-      value={outOfStockCount}
-      description="要補充商品"
-    />
+  <div className="mx-auto max-w-7xl rounded-lg border bg-bg p-6">
+    <div className="mb-2 flex items-baseline justify-between">
+      <h2 className="font-bold text-lg">在庫状況</h2>
+    </div>
+    <div className="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-4">
+      <StatusCard
+        variant="info"
+        icon={PackageIcon}
+        title="総商品数"
+        value={totalProducts}
+        description="登録済み商品"
+      />
+      <StatusCard
+        variant="success"
+        icon={CircleCheckIcon}
+        title="在庫十分"
+        value={inStockCount}
+        description={`在庫${LOW_STOCK_THRESHOLD + 1}個以上`}
+      />
+      <StatusCard
+        variant="warning"
+        icon={TriangleAlertIcon}
+        title="在庫わずか"
+        value={lowStockCount}
+        description={`在庫${LOW_STOCK_THRESHOLD}個以下`}
+      />
+      <StatusCard
+        variant="danger"
+        icon={SirenIcon}
+        title="在庫切れ"
+        value={outOfStockCount}
+        description="要補充商品"
+      />
+    </div>
   </div>
 )
 
@@ -225,7 +230,9 @@ export default createRoute(async (c) => {
         outOfStockCount={outOfStockCount}
         lowStockCount={lowStockCount}
       />
-      <ProductRegistrationForm />
+      <div>
+        <ProductRegistrationForm />
+      </div>
       <ItemCollectionViewer
         title="商品一覧"
         columns={[

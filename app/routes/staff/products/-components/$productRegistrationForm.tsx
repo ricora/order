@@ -259,7 +259,7 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
     <div className="mx-auto max-w-7xl rounded-lg border bg-bg p-6">
       <div>
         <div className="mb-2 flex items-baseline justify-between">
-          <span className="font-bold text-lg">{heading}</span>
+          <h2 className="font-bold text-lg">{heading}</h2>
         </div>
         <div id="product-register-form" className="p-4">
           <form method="post" encType="multipart/form-data">
