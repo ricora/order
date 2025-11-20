@@ -27,8 +27,10 @@ const DEFAULT_IMAGES = [
  */
 const getImageFilePath = (relativePath: string): string => {
   const cwd = process.cwd()
-  const isDistEnvironment = cwd.endsWith("dist")
-  return isDistEnvironment ? resolve(cwd, `.${relativePath}`) : resolve(cwd, `public${relativePath}`)
+  const isProduction = process.env.NODE_ENV === "production"
+  return isProduction
+    ? resolve(cwd, `.${relativePath}`)
+    : resolve(cwd, `public${relativePath}`)
 }
 
 /**
