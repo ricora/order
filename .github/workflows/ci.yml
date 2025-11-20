@@ -17,13 +17,12 @@ jobs:
       matrix:
         task:
           [
-            type-check,
-            biome,
-            build,
-            prettier,
-            test:unit,
-            test:integration,
-            test:e2e,
+            "type-check",
+            "biome",
+            "build",
+            "prettier",
+            "test:unit",
+            "test:integration",
           ]
       fail-fast: false
     steps:
@@ -33,9 +32,6 @@ jobs:
         uses: jdx/mise-action@9dc7d5dd454262207dea3ab5a06a3df6afc8ff26 # v3.4.1
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Install Playwright browsers
-        if: matrix.task == 'test:e2e'
-        run: bun playwright install --with-deps
       - name: Run TypeScript type check
         if: matrix.task == 'type-check'
         run: bun run tsc --noEmit --pretty
@@ -54,12 +50,52 @@ jobs:
       - name: Run integration tests
         if: matrix.task == 'test:integration'
         run: bun run test:integration
+
+  ci-e2e:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: mypassword
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Setup tools
+        uses: jdx/mise-action@9dc7d5dd454262207dea3ab5a06a3df6afc8ff26 # v3.4.1
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: bun playwright install --with-deps
+      - name: Install PostgreSQL client for health checks
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres to accept connections on localhost
+        env:
+          PGPASSWORD: mypassword
+        run: |
+          for i in $(seq 1 60); do
+            if pg_isready -h localhost -U postgres >/dev/null 2>&1; then
+              echo "Postgres is accepting connections on localhost" && break
+            fi
+            echo "Waiting for Postgres... ($i/60)" && sleep 1
+          done
+          if ! pg_isready -h localhost -U postgres >/dev/null 2>&1; then
+            echo "Postgres did not accept connections on localhost within timeout" && exit 1
+          fi
+          echo "DATABASE_URL=postgres://postgres:mypassword@localhost:5432/postgres" >> $GITHUB_ENV
       - name: Run e2e tests
-        if: matrix.task == 'test:e2e'
-        run: bun run test:e2e
+        run: bun run test:e2e:ci
       - name: Upload Playwright report
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-        if: matrix.task == 'test:e2e' && !cancelled()
+        if: ${{ !cancelled() }}
         with:
           name: playwright-report
           path: playwright-report/
