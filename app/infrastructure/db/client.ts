@@ -29,20 +29,18 @@ export const createDbClient = async (): Promise<DbClient> => {
   }
   dbClientInitPromise = (async (): Promise<DbClient> => {
     try {
-      if (!process.env.DATABASE_URL && import.meta.env.DEV) {
+      // プロダクションビルドではPGliteを依存関係から除外する
+      if (!process.env.DATABASE_URL) {
         if (!hasWarned) {
           console.warn(`DATABASE_URL environment variable is not set.
-Using native filesystem Postgres database via PGLite for testing purposes.`)
+Development environment will fall back to PGlite which provides a filesystem Postgres for development and testing.
+Production environment requires a valid Postgres connection string.`)
           hasWarned = true
         }
 
         const { drizzle } = await import("drizzle-orm/pglite")
         dbClientInstance = drizzle("./pgdata", { schema })
         return dbClientInstance
-      }
-      if (!process.env.DATABASE_URL) {
-        throw new Error(`DATABASE_URL environment variable is not set.
-Production environment requires a valid Postgres connection string.`)
       }
 
       const { drizzle } = await import("drizzle-orm/postgres-js")
