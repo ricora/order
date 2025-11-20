@@ -28,7 +28,7 @@ const ORDER_STATUSES: { status: Order["status"]; label: string }[] =
 
 const DAILY_RANGE_DAYS = 7
 const DAY_IN_MS = 1000 * 60 * 60 * 24
-export type StaffDashboardData = {
+export type StaffDashboardPageData = {
   summary: {
     todayOrderCount: number
     todayRevenue: number
@@ -48,15 +48,15 @@ export type StaffDashboardData = {
   }[]
 }
 
-type GetStaffDashboardDataParams = {
+type GetStaffDashboardPageDataParams = {
   dbClient: DbClient
   getCurrentTime?: () => Date
 }
 
-export const getStaffDashboardData = async ({
+export const getStaffDashboardPageData = async ({
   dbClient,
   getCurrentTime = () => new Date(),
-}: GetStaffDashboardDataParams): Promise<StaffDashboardData> => {
+}: GetStaffDashboardPageDataParams): Promise<StaffDashboardPageData> => {
   const now = getCurrentTime()
   const dateRangeStart = startOfDay(addDays(now, -(DAILY_RANGE_DAYS - 1)))
   const dateRangeEnd = endOfDay(now)

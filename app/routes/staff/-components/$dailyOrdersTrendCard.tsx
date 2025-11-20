@@ -1,11 +1,11 @@
 import type { ChartConfig } from "../../../components/ui/$chart"
 import Chart from "../../../components/ui/$chart"
-import type { StaffDashboardData } from "../../../usecases/getStaffDashboardData"
+import type { StaffDashboardPageData } from "../../../usecases/getStaffDashboardPageData"
 import { formatDateJP } from "../../../utils/date"
 import { formatCurrencyJPY } from "../../../utils/money"
 
 type DailyOrdersTrendCardProps = {
-  data: StaffDashboardData["dailyOrders"]
+  data: StaffDashboardPageData["dailyOrders"]
 }
 
 /**

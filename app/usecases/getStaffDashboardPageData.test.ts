@@ -12,7 +12,7 @@ import {
   formatDateKey,
   startOfDay,
 } from "../utils/date"
-import { getStaffDashboardData } from "./getStaffDashboardData"
+import { getStaffDashboardPageData } from "./getStaffDashboardPageData"
 
 const dbClient = {} as DbClient
 const DAILY_RANGE_DAYS = 7
@@ -33,7 +33,7 @@ type OrderStatusCount = Awaited<ReturnType<FindOrderStatusCounts>>[number]
 type OrderDailyAggregation =
   Awaited<ReturnType<FindAllDailyOrderAggregations>>[number]
 
-describe("getStaffDashboardData", () => {
+describe("getStaffDashboardPageData", () => {
   afterEach(() => {
     mock.restore()
   })
@@ -67,7 +67,7 @@ describe("getStaffDashboardData", () => {
       "findAllDailyOrderAggregations",
     ).mockResolvedValue(dailyAggregations)
 
-    const result = await getStaffDashboardData({
+    const result = await getStaffDashboardPageData({
       dbClient,
       getCurrentTime: () => FIXED_NOW,
     })
@@ -129,7 +129,7 @@ describe("getStaffDashboardData", () => {
       "findAllDailyOrderAggregations",
     ).mockResolvedValue([])
 
-    const result = await getStaffDashboardData({
+    const result = await getStaffDashboardPageData({
       dbClient,
       getCurrentTime: () => FIXED_NOW,
     })

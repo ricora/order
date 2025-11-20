@@ -1,9 +1,9 @@
 import type { ChartConfig } from "../../../components/ui/$chart"
 import Chart from "../../../components/ui/$chart"
-import type { StaffDashboardData } from "../../../usecases/getStaffDashboardData"
+import type { StaffDashboardPageData } from "../../../usecases/getStaffDashboardPageData"
 
 type StatusDistributionCardProps = {
-  data: StaffDashboardData["statusDistribution"]
+  data: StaffDashboardPageData["statusDistribution"]
 }
 
 const StatusDistributionCard = ({ data }: StatusDistributionCardProps) => {

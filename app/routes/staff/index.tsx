@@ -7,9 +7,9 @@ import PackageIcon from "../../components/icons/lucide/packageIcon"
 import SettingsIcon from "../../components/icons/lucide/settingsIcon"
 import ShoppingCartIcon from "../../components/icons/lucide/shoppingCartIcon"
 import {
-  getStaffDashboardData,
-  type StaffDashboardData,
-} from "../../usecases/getStaffDashboardData"
+  getStaffDashboardPageData,
+  type StaffDashboardPageData,
+} from "../../usecases/getStaffDashboardPageData"
 import { formatCurrencyJPY } from "../../utils/money"
 import DailyOrdersTrendCard from "./-components/$dailyOrdersTrendCard"
 import StatusDistributionCard from "./-components/$statusDistributionCard"
@@ -110,7 +110,7 @@ const DashboardStatCard = ({
 }
 
 const buildDashboardStatCards = (
-  summary: StaffDashboardData["summary"],
+  summary: StaffDashboardPageData["summary"],
 ): DashboardStatCardProps[] => {
   return [
     {
@@ -137,7 +137,7 @@ const buildDashboardStatCards = (
 }
 
 export default createRoute(async (c) => {
-  const dashboardData = await getStaffDashboardData({
+  const dashboardData = await getStaffDashboardPageData({
     dbClient: c.get("dbClient"),
   })
 
