@@ -37,6 +37,7 @@ describe("注文登録", () => {
       form.append("items[][productId]", "1")
       form.append("items[][quantity]", "2")
       form.append("customerName", "テスト顧客")
+      form.append("comment", "テストコメント")
 
       const res = await app.request("/staff/orders/new", {
         method: "POST",
