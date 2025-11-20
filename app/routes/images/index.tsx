@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs"
+import { resolve } from "node:path"
 import type { Env } from "hono"
 import { Hono } from "hono"
 import { getProductImageAssetData } from "../../usecases/getProductImageAssetData"
@@ -46,8 +48,8 @@ app.get("/products/:id", async (c) => {
 
   if (productImage == null) {
     const defaultPath = getDefaultImagePath(id)
-
-    return c.redirect(defaultPath)
+    imageBuffer = readFileSync(resolve(`public${defaultPath}`))
+    mimeType = "image/jpeg"
   } else {
     imageBuffer = Buffer.from(productImage.data, "base64")
     mimeType = productImage.mimeType
