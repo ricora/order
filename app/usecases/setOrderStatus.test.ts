@@ -37,6 +37,7 @@ describe("setOrderStatus", () => {
     ).mockImplementation(async ({ order }) => ({
       ...order,
       id: order.id,
+      comment: order.comment === undefined ? null : order.comment,
       customerName:
         order.customerName === undefined ? "Taro" : order.customerName,
       createdAt: new Date(),

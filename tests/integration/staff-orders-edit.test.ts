@@ -22,6 +22,8 @@ describe("注文編集", () => {
     test("注文を正常に編集できる", async () => {
       const form = new URLSearchParams()
       form.append("customerName", "編集後顧客名")
+      const comment = "テストコメント編集"
+      form.append("comment", comment)
       form.append("status", "processing")
       const res = await app.request("/staff/orders/6/edit", {
         method: "POST",
@@ -29,6 +31,10 @@ describe("注文編集", () => {
         headers: { "content-type": "application/x-www-form-urlencoded" },
       })
       assertSuccessRedirect(res, "注文を更新しました")
+
+      const getRes = await app.request("/staff/orders/6/edit")
+      const html = await getRes.text()
+      expect(html).toContain(comment)
     })
 
     test("存在しない注文IDの場合はエラークッキーを返す", async () => {

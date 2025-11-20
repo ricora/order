@@ -73,6 +73,10 @@ export const POST = createRoute(
             value.customerName.trim().length > 0
               ? value.customerName.trim()
               : null,
+          comment:
+            typeof value.comment === "string" && value.comment.trim().length > 0
+              ? value.comment.trim()
+              : null,
           orderItems,
         },
       }

@@ -35,6 +35,7 @@ export default createRoute(async (c) => {
           { header: "顧客名", align: "left" },
           { header: "注文内容", align: "left" },
           { header: "合計金額", align: "right" },
+          { header: "コメント", align: "left" },
           { header: "ステータス", align: "center" },
         ]}
         items={orders.map((order) => ({
@@ -73,6 +74,14 @@ export default createRoute(async (c) => {
                 <span className="font-mono">
                   {formatCurrencyJPY(order.totalAmount)}
                 </span>
+              ),
+            },
+            {
+              type: "custom",
+              content: order.comment ? (
+                <div className="max-w-xs truncate text-sm">{order.comment}</div>
+              ) : (
+                <span>-</span>
               ),
             },
             {

@@ -79,6 +79,7 @@ describe("registerOrder", () => {
       dbClient,
       order: {
         customerName: "Taro",
+        comment: null,
         orderItems: [
           { productId: 1, quantity: 2 },
           { productId: 2, quantity: 1 },
@@ -111,6 +112,7 @@ describe("registerOrder", () => {
         dbClient,
         order: {
           customerName: "Taro",
+          comment: null,
           orderItems: [
             { productId: 1, quantity: 1 },
             { productId: 2, quantity: 1 },
@@ -134,6 +136,7 @@ describe("registerOrder", () => {
         dbClient,
         order: {
           customerName: "Taro",
+          comment: null,
           orderItems: [
             { productId: 1, quantity: 1 },
             { productId: 2, quantity: 1 },
@@ -150,6 +153,7 @@ describe("registerOrder", () => {
       dbClient,
       order: {
         customerName: "Taro",
+        comment: null,
         orderItems: [
           { productId: 1, quantity: 1 },
           { productId: 2, quantity: 1 },

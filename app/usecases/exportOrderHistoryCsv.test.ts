@@ -12,6 +12,7 @@ const dbClient = {} as DbClient
 const mockOrder = (id: number, overrides?: Partial<Order>): Order => ({
   id,
   customerName: `Customer ${id}`,
+  comment: null,
   createdAt: new Date("2024-01-01T00:00:00.000Z"),
   updatedAt: new Date("2024-01-01T01:00:00.000Z"),
   status: "completed",
@@ -37,6 +38,7 @@ describe("exportOrderHistoryCsv", () => {
       {
         id: 1,
         customerName: "Alice",
+        comment: null,
         createdAt: new Date("2024-01-01T09:00:00.000Z"),
         updatedAt: new Date("2024-01-01T10:00:00.000Z"),
         status: "completed",
@@ -59,6 +61,7 @@ describe("exportOrderHistoryCsv", () => {
       {
         id: 2,
         customerName: null,
+        comment: null,
         createdAt: new Date("2024-01-02T09:00:00.000Z"),
         updatedAt: new Date("2024-01-02T09:30:00.000Z"),
         status: "pending",

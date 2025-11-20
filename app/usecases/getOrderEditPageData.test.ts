@@ -15,6 +15,7 @@ import { getOrderEditPageData } from "./getOrderEditPageData"
 const mockOrder: Order = {
   id: 2,
   customerName: "Hanako",
+  comment: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   status: "processing",

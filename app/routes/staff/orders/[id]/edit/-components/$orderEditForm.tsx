@@ -3,6 +3,7 @@ import { useState } from "hono/jsx"
 import ChevronLeftIcon from "../../../../../../components/icons/lucide/chevronLeftIcon"
 import SendIcon from "../../../../../../components/icons/lucide/sendIcon"
 import GraphemeInput from "../../../../../../components/ui/$graphemeInput"
+import GraphemeTextarea from "../../../../../../components/ui/$graphemeTextarea"
 import Button from "../../../../../../components/ui/button"
 import Label from "../../../../../../components/ui/label"
 import LinkButton from "../../../../../../components/ui/linkButton"
@@ -17,6 +18,7 @@ const OrderEditForm: FC<Props> = ({ initialValues }) => {
   const [customerName, setCustomerName] = useState<string>(
     initialValues.customerName ?? "",
   )
+  const [comment, setComment] = useState<string>(initialValues.comment ?? "")
   return (
     <div className="grid grid-cols-1 gap-6">
       <section>
@@ -32,6 +34,18 @@ const OrderEditForm: FC<Props> = ({ initialValues }) => {
                 maxLength={50}
                 onChange={(v: string) => setCustomerName(v)}
                 placeholder="顧客名"
+              />
+            </div>
+            <div>
+              <Label htmlFor="comment">備考欄</Label>
+              <GraphemeTextarea
+                id="comment"
+                name="comment"
+                value={comment}
+                onChange={setComment}
+                maxLength={250}
+                placeholder="注文に関する備考のコメントを入力"
+                rows={3}
               />
             </div>
             <div>
