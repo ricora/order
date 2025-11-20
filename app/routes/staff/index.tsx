@@ -6,11 +6,14 @@ import ClipboardListIcon from "../../components/icons/lucide/clipboardListIcon"
 import PackageIcon from "../../components/icons/lucide/packageIcon"
 import SettingsIcon from "../../components/icons/lucide/settingsIcon"
 import ShoppingCartIcon from "../../components/icons/lucide/shoppingCartIcon"
-import { getStaffDashboardData } from "../../usecases/getStaffDashboardData"
+import {
+  getStaffDashboardData,
+  type StaffDashboardData,
+} from "../../usecases/getStaffDashboardData"
+import { formatCurrencyJPY } from "../../utils/money"
 import DailyOrdersTrendCard from "./-components/$dailyOrdersTrendCard"
 import StatusDistributionCard from "./-components/$statusDistributionCard"
 import Layout from "./-components/layout"
-import { buildDashboardStatCards } from "./-helpers/dashboardStatCards"
 
 type QuickAccessCard = {
   title: string
@@ -104,6 +107,33 @@ const DashboardStatCard = ({
       )}
     </div>
   )
+}
+
+const buildDashboardStatCards = (
+  summary: StaffDashboardData["summary"],
+): DashboardStatCardProps[] => {
+  return [
+    {
+      title: "本日の注文数",
+      value: `${summary.todayOrderCount}件`,
+      description: "本日0時以降の累計",
+    },
+    {
+      title: "本日の売上",
+      value: formatCurrencyJPY(summary.todayRevenue),
+      description: "税込み想定",
+    },
+    {
+      title: "未処理の注文",
+      value: `${summary.pendingOrderCount}件`,
+      description: "pending状態の件数",
+    },
+    {
+      title: "7日間の平均客単価",
+      value: formatCurrencyJPY(summary.averageOrderValue7d),
+      description: `7日間の売上合計 ${formatCurrencyJPY(summary.totalRevenue7d)}`,
+    },
+  ]
 }
 
 export default createRoute(async (c) => {
