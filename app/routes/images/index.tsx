@@ -52,9 +52,13 @@ app.get("/products/:id", async (c) => {
   let mimeType: string
 
   if (productImage == null) {
-    const defaultPath = getDefaultImagePath(id)
-    imageBuffer = await readFile(resolve(`public${defaultPath}`))
-    mimeType = "image/jpeg"
+    try {
+      const defaultPath = getDefaultImagePath(id)
+      imageBuffer = await readFile(resolve(`public${defaultPath}`))
+      mimeType = "image/jpeg"
+    } catch {
+      return c.text("Failed to load default image", 500)
+    }
   } else {
     imageBuffer = Buffer.from(productImage.data, "base64")
     mimeType = productImage.mimeType
