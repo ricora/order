@@ -19,4 +19,9 @@ export default defineConfig({
     tailwindcss(),
     build(),
   ],
+  build: {
+    rollupOptions: {
+      external: ["@electric-sql/pglite", "drizzle-orm/pglite"],
+    },
+  },
 })
