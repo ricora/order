@@ -2,6 +2,31 @@ import type { Env } from "hono"
 import { Hono } from "hono"
 import { getProductImageAssetData } from "../../usecases/getProductImageAssetData"
 
+const DEFAULT_IMAGES = [
+  "/images/defaults/lilac_syringa_ornamental_shrub.jpg",
+  "/images/defaults/haematopus_ostralegus_bird_flight.jpg",
+  "/images/defaults/cherry_tree_blossom_2007.jpg",
+  "/images/defaults/dolphin_marine_mammals_water.jpg",
+  "/images/defaults/hoover_nevada_arizona_colorado.jpg",
+  "/images/defaults/netherlands_landscape_sky_clouds.jpg",
+  "/images/defaults/new_york_skyline_usa.jpg",
+  "/images/defaults/pennsylvania_landscape_scenic_97427.jpg",
+  "/images/defaults/squirrel_tree_mammal_paw.jpg",
+  "/images/defaults/white_bengal_tiger_tiger_0.jpg",
+] as const
+
+/**
+ * Deterministic hash-based selection that varies by product ID.
+ *
+ * Uses XOR hash to distribute different product IDs across images uniformly.
+ */
+const getDefaultImagePath = (id: number): string => {
+  const imageCount = DEFAULT_IMAGES.length
+  const hash = (id * 73856093) ^ 19349663
+  const selectedIndex = Math.abs(hash) % imageCount
+  return DEFAULT_IMAGES[selectedIndex] ?? DEFAULT_IMAGES[0]
+}
+
 /**
  * Web API for image assets.
  */
@@ -20,15 +45,9 @@ app.get("/products/:id", async (c) => {
   let mimeType: string
 
   if (productImage == null) {
-    // TODO: 正式なデフォルト画像に差し替える
-    const dummyUrl = `https://picsum.photos/id/${id % 1000}/200/200`
-    const res = await fetch(dummyUrl)
-    if (!res.ok) {
-      return c.text("Failed to fetch default image", 502)
-    }
-    const arrayBuffer = await res.arrayBuffer()
-    imageBuffer = Buffer.from(arrayBuffer)
-    mimeType = res.headers.get("content-type") || "image/jpeg"
+    const defaultPath = getDefaultImagePath(id)
+
+    return c.redirect(defaultPath)
   } else {
     imageBuffer = Buffer.from(productImage.data, "base64")
     mimeType = productImage.mimeType
