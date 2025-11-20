@@ -7,6 +7,8 @@ import {
 import { countStringLength } from "../../../utils/text"
 import type { CommandRepositoryFunction, WithRepositoryImpl } from "../../types"
 import {
+  MAX_PRODUCT_PRICE,
+  MAX_PRODUCT_STOCK,
   MAX_STORE_PRODUCT_COUNT,
   MAX_STORE_PRODUCT_TAG_COUNT,
   MAX_TAGS_PER_PRODUCT,
@@ -47,10 +49,16 @@ const validateProduct = (product: Partial<Omit<Product, "id">>) => {
     if (product.price < 0 || !Number.isInteger(product.price)) {
       throw new Error("価格は0以上の整数である必要があります")
     }
+    if (product.price > MAX_PRODUCT_PRICE) {
+      throw new Error(`価格は${MAX_PRODUCT_PRICE}以下である必要があります`)
+    }
   }
   if (product.stock !== undefined) {
     if (product.stock < 0 || !Number.isInteger(product.stock)) {
       throw new Error("在庫数は0以上の整数である必要があります")
+    }
+    if (product.stock > MAX_PRODUCT_STOCK) {
+      throw new Error(`在庫数は${MAX_PRODUCT_STOCK}以下である必要があります`)
     }
   }
 }

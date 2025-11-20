@@ -8,7 +8,11 @@ import {
   spyOn,
 } from "bun:test"
 import type { TransactionDbClient } from "../../../infrastructure/db/client"
-import { MAX_STORE_PRODUCT_COUNT } from "../constants"
+import {
+  MAX_PRODUCT_PRICE,
+  MAX_PRODUCT_STOCK,
+  MAX_STORE_PRODUCT_COUNT,
+} from "../constants"
 import type Product from "../entities/product"
 import {
   type CreateProduct,
@@ -187,6 +191,54 @@ describe("createProduct", () => {
     expect(countProductsSpy).toHaveBeenCalledTimes(1)
     expect(findProductByNameSpy).not.toHaveBeenCalled()
     expect(findAllProductTagsSpy).not.toHaveBeenCalled()
+  })
+
+  it("価格が上限を超える場合はエラーを返す", async () => {
+    await expect(
+      createProduct({
+        product: { ...validProduct, price: MAX_PRODUCT_PRICE + 1 },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow(`価格は${MAX_PRODUCT_PRICE}以下である必要があります`)
+  })
+
+  it("価格が上限と同じ値の場合は正常に作成できる", async () => {
+    const mockImpl: CreateProduct = async ({ product }) => ({
+      ...product,
+      id: 99,
+    })
+    const result = await createProduct({
+      product: { ...validProduct, price: MAX_PRODUCT_PRICE },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.price).toBe(MAX_PRODUCT_PRICE)
+  })
+
+  it("在庫数が上限を超える場合はエラーを返す", async () => {
+    await expect(
+      createProduct({
+        product: { ...validProduct, stock: MAX_PRODUCT_STOCK + 1 },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow(`在庫数は${MAX_PRODUCT_STOCK}以下である必要があります`)
+  })
+
+  it("在庫数が上限と同じ値の場合は正常に作成できる", async () => {
+    const mockImpl: CreateProduct = async ({ product }) => ({
+      ...product,
+      id: 99,
+    })
+    const result = await createProduct({
+      product: { ...validProduct, stock: MAX_PRODUCT_STOCK },
+      repositoryImpl: mockImpl,
+      dbClient: mockDbClient,
+    })
+    expect(result).not.toBeNull()
+    expect(result?.stock).toBe(MAX_PRODUCT_STOCK)
   })
 })
 
@@ -422,6 +474,26 @@ describe("updateProduct", () => {
     })
 
     expect(deleteAllProductTagsByIdsSpy).not.toHaveBeenCalled()
+  })
+
+  it("更新時に価格が上限を超える場合はエラーを返す", async () => {
+    await expect(
+      updateProduct({
+        product: { id: 1, price: MAX_PRODUCT_PRICE + 1 },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow(`価格は${MAX_PRODUCT_PRICE}以下である必要があります`)
+  })
+
+  it("更新時に在庫数が上限を超える場合はエラーを返す", async () => {
+    await expect(
+      updateProduct({
+        product: { id: 1, stock: MAX_PRODUCT_STOCK + 1 },
+        repositoryImpl: async () => null,
+        dbClient: mockDbClient,
+      }),
+    ).rejects.toThrow(`在庫数は${MAX_PRODUCT_STOCK}以下である必要があります`)
   })
 })
 

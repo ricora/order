@@ -6,3 +6,9 @@ export const MAX_STORE_PRODUCT_TAG_COUNT = 1000
 
 /** 単一商品に紐づけ可能なタグ数の最大値 */
 export const MAX_TAGS_PER_PRODUCT = 20
+
+/** 商品の価格の最大値 */
+export const MAX_PRODUCT_PRICE = 1_000_000_000
+
+/** 商品の在庫数の最大値 */
+export const MAX_PRODUCT_STOCK = 1_000_000_000
