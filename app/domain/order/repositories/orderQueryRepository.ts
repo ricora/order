@@ -44,8 +44,10 @@ export type FindOrderStatusCounts = QueryRepositoryFunction<
 
 export type FindAllDailyOrderAggregations = PaginatedQueryRepositoryFunction<
   {
-    from: Date
-    to: Date
+    orderCreatedAtRange: {
+      from: Date
+      to: Date
+    }
   },
   OrderDailyAggregation
 >
@@ -97,9 +99,8 @@ export const findAllDailyOrderAggregations: WithRepositoryImpl<
 > = async ({
   repositoryImpl = findAllDailyOrderAggregationsImpl,
   dbClient,
-  from,
-  to,
+  orderCreatedAtRange,
   pagination,
 }) => {
-  return repositoryImpl({ dbClient, from, to, pagination })
+  return repositoryImpl({ dbClient, pagination, orderCreatedAtRange })
 }

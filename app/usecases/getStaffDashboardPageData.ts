@@ -73,8 +73,7 @@ export const getStaffDashboardPageData = async ({
     findOrderStatusCounts({ dbClient }),
     findAllDailyOrderAggregations({
       dbClient,
-      from: dateRangeStart,
-      to: dateRangeEnd,
+      orderCreatedAtRange: { from: dateRangeStart, to: dateRangeEnd },
       pagination,
     }),
   ])

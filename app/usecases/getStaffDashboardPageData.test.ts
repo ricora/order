@@ -78,8 +78,10 @@ describe("getStaffDashboardPageData", () => {
     })
     expect(findAllDailyOrderAggregationsSpy).toHaveBeenCalledWith({
       dbClient,
-      from: dateRangeStart,
-      to: getDateRangeEnd(),
+      orderCreatedAtRange: {
+        from: dateRangeStart,
+        to: getDateRangeEnd(),
+      },
       pagination: { offset: 0, limit: DAILY_RANGE_DAYS },
     })
 

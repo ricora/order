@@ -137,7 +137,7 @@ export const findOrderStatusCountsImpl: FindOrderStatusCounts = async ({
 }
 
 export const findAllDailyOrderAggregationsImpl: FindAllDailyOrderAggregations =
-  async ({ dbClient, from, to, pagination }) => {
+  async ({ dbClient, pagination, orderCreatedAtRange }) => {
     const dayExpression = sql<Date>`date_trunc('day', ${orderTable.createdAt})`
     const rows = await dbClient
       .select({
@@ -147,14 +147,17 @@ export const findAllDailyOrderAggregationsImpl: FindAllDailyOrderAggregations =
       })
       .from(orderTable)
       .where(
-        and(gte(orderTable.createdAt, from), lte(orderTable.createdAt, to)),
+        and(
+          gte(orderTable.createdAt, orderCreatedAtRange.from),
+          lte(orderTable.createdAt, orderCreatedAtRange.to),
+        ),
       )
       .groupBy(dayExpression)
       .orderBy(dayExpression)
       .limit(pagination.limit)
       .offset(pagination.offset)
 
-    return rows.map((row) => {
+    const aggregations = rows.map((row) => {
       const dayValue =
         row.day instanceof Date ? row.day : new Date(row.day as string)
       if (Number.isNaN(dayValue.getTime())) {
@@ -168,4 +171,6 @@ export const findAllDailyOrderAggregationsImpl: FindAllDailyOrderAggregations =
         revenue: Number(row.revenue ?? 0),
       }
     })
+
+    return aggregations
   }
