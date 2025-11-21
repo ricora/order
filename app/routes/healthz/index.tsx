@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory"
-import Counter from "../../islands/counter"
+import Counter from "./-components/$counter"
 
 export default createRoute((c) => {
   const name = c.req.query("name") ?? "Hono"
