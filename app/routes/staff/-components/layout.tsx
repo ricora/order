@@ -10,7 +10,10 @@ export const Layout: FC<
   const c = useRequestContext()
   return (
     <div className="min-h-full bg-muted">
-      <Sidebar currentPath={c.req.path} />
+      <Sidebar
+        currentPath={c.req.path}
+        gitCommitHash={process.env.GIT_COMMIT_HASH}
+      />
       <div
         className="ml-0 staff-sidebar-closed:md:ml-0 staff-sidebar-open:md:ml-64"
         id={MAIN_CONTENT_ID}
