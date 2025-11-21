@@ -88,9 +88,11 @@ const SidebarNavItem: FC<
 const SidebarInternal = ({
   currentPath,
   className,
+  gitCommitHash,
 }: {
   currentPath: string
   className?: string
+  gitCommitHash: string | undefined
 }) => (
   <aside
     className={twJoin(
@@ -170,6 +172,9 @@ const SidebarInternal = ({
         </SidebarNavItem>
       </SidebarNavSection>
     </nav>
+    <div className="px-6 py-3 text-muted-fg text-xs">
+      {gitCommitHash ? `Version ${gitCommitHash}` : null}
+    </div>
   </aside>
 )
 
@@ -185,13 +190,19 @@ const MobileSidebarToggleButton: FC = () => {
   )
 }
 
-const MobileSidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
+const MobileSidebar: FC<{
+  currentPath: string
+  gitCommitHash: string | undefined
+}> = ({ currentPath, gitCommitHash }) => {
   return (
     <DrawerRoot side="left">
       <MobileSidebarToggleButton />
       <DrawerOverlay />
       <DrawerContent className="w-64">
-        <SidebarInternal currentPath={currentPath} />
+        <SidebarInternal
+          currentPath={currentPath}
+          gitCommitHash={gitCommitHash}
+        />
       </DrawerContent>
     </DrawerRoot>
   )
@@ -213,19 +224,26 @@ export const DesktopSidebarToggleButton = () => {
     </button>
   )
 }
-const DesktopSidebar: FC<{ currentPath: string }> = ({ currentPath }) => (
+const DesktopSidebar: FC<{
+  currentPath: string
+  gitCommitHash: string | undefined
+}> = ({ currentPath, gitCommitHash }) => (
   <SidebarInternal
     currentPath={currentPath}
+    gitCommitHash={gitCommitHash}
     className="hidden staff-sidebar-open:md:flex staff-sidebar-closed:md:hidden"
   />
 )
 
-export const Sidebar: FC<{ currentPath: string }> = ({ currentPath }) => {
+export const Sidebar: FC<{
+  currentPath: string
+  gitCommitHash: string | undefined
+}> = ({ currentPath, gitCommitHash }) => {
   const isMobile = useIsMobile()
 
   return isMobile ? (
-    <MobileSidebar currentPath={currentPath} />
+    <MobileSidebar currentPath={currentPath} gitCommitHash={gitCommitHash} />
   ) : (
-    <DesktopSidebar currentPath={currentPath} />
+    <DesktopSidebar currentPath={currentPath} gitCommitHash={gitCommitHash} />
   )
 }
