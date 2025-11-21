@@ -6,6 +6,6 @@ describe("サイドバー", () => {
     const res = await app.request("/staff")
     const html = await res.text()
     assertBasicHtmlResponse(res, html)
-  expect(html).toMatch(/Version\s*[0-9a-f]{7}/)
+    expect(html).toMatch(/Version\s*[0-9a-f]{7}/)
   })
 })
