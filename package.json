@@ -16,7 +16,10 @@
     "test:unit": "bun test app/",
     "test:integration": "bun run setup-test-db && vitest tests/integration/",
     "test:e2e": "bun run setup-test-db && playwright test",
-    "setup-test-db": "rm -rf pgdata && bun --bun drizzle-kit push --config drizzle-test.config.ts && DATABASE_URL='' bun tests/setup-db.ts"
+    "test:e2e:ci": "bun run setup-test-db:postgres && playwright test",
+    "setup-test-db": "bun run setup-test-db:pglite",
+    "setup-test-db:pglite": "rm -rf pgdata && bun --bun drizzle-kit push --config drizzle-test.config.ts && DATABASE_URL='' bun tests/setup-db.ts",
+    "setup-test-db:postgres": "bun --bun drizzle-kit push --config drizzle.config.ts && bun tests/setup-db.ts"
   },
   "private": true,
   "dependencies": {

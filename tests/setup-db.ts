@@ -132,3 +132,6 @@ for (let i = 6; i <= 25; i++) {
     })
   }
 }
+
+console.info("Database setup completed.")
+process.exit(0)
