@@ -5,7 +5,7 @@ export type ParsedProductRegistrationFormData = {
   price: number
   stock: number
   tags: string[]
-  image: { data: string; mimeType: string } | null
+  image: { data: string; mimeType: string } | null | undefined
 }
 
 export const parseProductRegistrationFormData = async (
@@ -56,7 +56,7 @@ const parseCreateImage = async (
   if (value instanceof File && value.size > 0) {
     return await convertFileToImageData(value)
   }
-  return null
+  return undefined
 }
 
 const parseTags = (value: unknown): string[] => {

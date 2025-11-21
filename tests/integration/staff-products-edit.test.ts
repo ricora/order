@@ -37,6 +37,37 @@ describe("商品編集", () => {
       )
     })
 
+    test("画像をアップロードせずに商品を編集すると既存の画像が保持される", async () => {
+      const beforeEditRes = await app.request("/images/products/1")
+      expect(beforeEditRes.status).toBe(200)
+      const beforeImageBuffer = await beforeEditRes.arrayBuffer()
+      const beforeImageSize = beforeImageBuffer.byteLength
+      expect(beforeImageSize).toBeGreaterThan(0)
+
+      const form = new URLSearchParams()
+      form.append("name", generateUniqueName("画像なし編集"))
+      form.append("price", "3000")
+      form.append("stock", "8")
+      form.append("tags", "タグA")
+      const editRes = await app.request(endpoint, {
+        method: "POST",
+        body: form,
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      })
+      expect(editRes.status).toBe(302)
+      expect(editRes.headers.get("set-cookie")).toMatch(/success/)
+      expect(editRes.headers.get("set-cookie")).toMatch(
+        encodeURIComponent("商品を更新しました"),
+      )
+
+      const afterEditRes = await app.request("/images/products/1")
+      expect(afterEditRes.status).toBe(200)
+      const afterImageBuffer = await afterEditRes.arrayBuffer()
+      const afterImageSize = afterImageBuffer.byteLength
+
+      expect(afterImageSize).toBe(beforeImageSize)
+    })
+
     test("商品名が空の場合はエラーを返す", async () => {
       const form = new URLSearchParams()
       form.append("price", "1000")

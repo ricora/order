@@ -48,7 +48,10 @@ const resolveTagNamesToIds = async ({
   return tagIds
 }
 
-type ProductImageInput = Pick<ProductImage, "data" | "mimeType"> | null
+type ProductImageInput =
+  | Pick<ProductImage, "data" | "mimeType">
+  | null
+  | undefined
 
 export type CreateProductPayload = Omit<Product, "tagIds" | "id"> & {
   tags: string[]
