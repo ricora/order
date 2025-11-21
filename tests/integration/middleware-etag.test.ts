@@ -3,12 +3,12 @@ import { app } from "./utils"
 
 describe("ETag Middleware", () => {
   test("HTMLページにETagが設定され、条件付きGETが304を返す", async () => {
-    const res = await app.request("/")
+    const res = await app.request("/healthz")
     expect(res.status).toBe(200)
     const etag = res.headers.get("etag")
     expect(etag).toBeTruthy()
 
-    const res2 = await app.request("/", {
+    const res2 = await app.request("/healthz", {
       headers: { "If-None-Match": String(etag) },
     })
     expect(res2.status).toBe(304)
