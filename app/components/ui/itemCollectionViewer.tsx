@@ -23,8 +23,8 @@ const itemCollectionTv = tv({
     emptyState: "py-12 text-center text-lg text-muted-fg",
     cardGrid:
       "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-    tableWrapper: "w-full overflow-x-auto",
-    tableContainer: "w-max overflow-hidden rounded-md border bg-bg",
+    tableWrapper: "w-full overflow-x-auto rounded-md border bg-bg",
+    tableContainer: "min-w-full",
     table: "min-w-full divide-y divide-border",
     thead: "rounded-t-md bg-muted",
     tbody: "divide-y divide-border/60 bg-bg",
