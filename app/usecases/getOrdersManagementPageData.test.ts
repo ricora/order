@@ -75,7 +75,7 @@ describe("getOrdersManagementPageData", () => {
     expect(result.orders[2]?.status).toBe("pending")
     expect(result.hasNextPage).toBe(false)
     expect(result.currentPage).toBe(1)
-    expect(result.pageSize).toBe(20)
+    expect(result.pageSize).toBe(50)
   })
 
   it("sort='asc'で昇順を指定できる", async () => {
@@ -90,7 +90,7 @@ describe("getOrdersManagementPageData", () => {
   })
 
   it("pageSize+1を取得して次ページの有無を判定できる", async () => {
-    const manyOrders: Order[] = Array.from({ length: 21 }, (_, i) => ({
+    const manyOrders: Order[] = Array.from({ length: 51 }, (_, i) => ({
       id: i + 1,
       customerName: `顧客${i + 1}`,
       comment: null,
@@ -109,13 +109,13 @@ describe("getOrdersManagementPageData", () => {
     ).mockImplementationOnce(async () => manyOrders)
 
     const result = await getOrdersManagementPageData({ dbClient })
-    expect(result.orders.length).toBe(20)
+    expect(result.orders.length).toBe(50)
     expect(result.hasNextPage).toBe(true)
     expect(result.currentPage).toBe(1)
   })
 
   it("ページネーション: page=2の場合、currentPageが正しい", async () => {
-    const manyOrders: Order[] = Array.from({ length: 21 }, (_, i) => ({
+    const manyOrders: Order[] = Array.from({ length: 51 }, (_, i) => ({
       id: i + 1,
       customerName: `顧客${i + 1}`,
       comment: null,
@@ -135,7 +135,7 @@ describe("getOrdersManagementPageData", () => {
 
     const result = await getOrdersManagementPageData({ dbClient, page: 2 })
     expect(result.currentPage).toBe(2)
-    expect(result.pageSize).toBe(20)
+    expect(result.pageSize).toBe(50)
   })
 
   it("customerNameがnullの場合も正しく処理できる", async () => {

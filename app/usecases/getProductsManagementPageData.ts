@@ -44,7 +44,7 @@ export const getProductsManagementPageData = async ({
   dbClient,
   page = 1,
 }: GetProductsManagementPageDataParams): Promise<ProductsManagementPageData> => {
-  const pageSize = 20
+  const pageSize = 50
   const offset = Math.max(0, (page - 1) * pageSize)
 
   const productsWithExtra = await findAllProducts({
