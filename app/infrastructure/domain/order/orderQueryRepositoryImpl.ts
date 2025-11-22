@@ -1,9 +1,11 @@
-import { asc, desc, eq, inArray } from "drizzle-orm"
+import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm"
 import type {
+  FindAllDailyOrderAggregations,
   FindAllOrders,
   FindAllOrdersByActiveStatusOrderByUpdatedAtAsc,
   FindAllOrdersByInactiveStatusOrderByUpdatedAtDesc,
   FindOrderById,
+  FindOrderStatusCounts,
 } from "../../../domain/order/repositories/orderQueryRepository"
 import { orderTable } from "../../db/schema"
 
@@ -119,4 +121,60 @@ export const findAllOrdersByInactiveStatusByUpdatedAtDescImpl: FindAllOrdersByIn
       totalAmount: dbOrder.totalAmount,
     }))
     return orders
+  }
+
+export const findOrderStatusCountsImpl: FindOrderStatusCounts = async ({
+  dbClient,
+}) => {
+  const rows = await dbClient
+    .select({
+      status: orderTable.status,
+      count: sql<number>`count(${orderTable.id})`,
+    })
+    .from(orderTable)
+    .groupBy(orderTable.status)
+
+  return rows.map((row) => ({
+    status: row.status,
+    count: Number(row.count ?? 0),
+  }))
+}
+
+export const findAllDailyOrderAggregationsImpl: FindAllDailyOrderAggregations =
+  async ({ dbClient, pagination, orderCreatedAtRange }) => {
+    const dayExpression = sql<Date>`date_trunc('day', ${orderTable.createdAt})`
+    const rows = await dbClient
+      .select({
+        day: dayExpression,
+        orderCount: sql<number>`count(${orderTable.id})`,
+        revenue: sql<number>`coalesce(sum(${orderTable.totalAmount}), 0)`,
+      })
+      .from(orderTable)
+      .where(
+        and(
+          gte(orderTable.createdAt, orderCreatedAtRange.from),
+          lte(orderTable.createdAt, orderCreatedAtRange.to),
+        ),
+      )
+      .groupBy(dayExpression)
+      .orderBy(dayExpression)
+      .limit(pagination.limit)
+      .offset(pagination.offset)
+
+    const aggregations = rows.map((row) => {
+      const dayValue =
+        row.day instanceof Date ? row.day : new Date(row.day as string)
+      if (Number.isNaN(dayValue.getTime())) {
+        throw new Error(
+          `Invalid date value encountered in daily order aggregation: ${row.day}`,
+        )
+      }
+      return {
+        date: dayValue,
+        orderCount: Number(row.orderCount ?? 0),
+        revenue: Number(row.revenue ?? 0),
+      }
+    })
+
+    return aggregations
   }
