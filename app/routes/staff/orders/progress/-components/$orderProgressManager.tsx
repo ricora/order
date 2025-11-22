@@ -37,7 +37,7 @@ const sectionTv = tv({
       cancelled: "border-info-subtle bg-info-subtle",
     },
     width: {
-      responsive: "w-72 md:w-80",
+      responsive: "w-68 sm:w-72 md:w-80",
     },
   },
   defaultVariants: { status: "pending", width: "responsive" },
@@ -139,8 +139,16 @@ const btnTv = tv({
       true: "cursor-not-allowed opacity-50",
       false: "cursor-pointer",
     },
+    width: {
+      responsive: "w-full sm:w-auto",
+    },
   },
-  defaultVariants: { status: "pending", disabled: false, fixed: true },
+  defaultVariants: {
+    status: "pending",
+    disabled: false,
+    fixed: true,
+    width: "responsive",
+  },
 })
 
 const statusLabel: Record<Order["status"], string> = {
@@ -347,16 +355,16 @@ const Card: FC<{
         </div>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
         {loadingToStatus ? (
           <div className="flex w-full items-center justify-center">
             <span className="text-muted-fg text-sm">更新中…</span>
           </div>
         ) : (
           <>
-            <div className="flex-1">
+            <div className="flex w-full flex-col gap-2 sm:flex-1">
               {order.status === "completed" || order.status === "cancelled" ? (
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <ActionButton
                     toStatus={"processing"}
                     btnStatus={"processing"}
@@ -378,30 +386,34 @@ const Card: FC<{
                   </ActionButton>
                 </div>
               ) : order.status !== "pending" ? (
-                <ActionButton
-                  toStatus={prevStatus(order.status)}
-                  btnStatus={prevStatus(order.status)}
-                >
-                  {prevStatus(order.status) === "processing" ? (
-                    <span className="flex w-full items-center justify-between">
-                      <div className="h-4 w-4">
-                        <ChevronLeftIcon />
-                      </div>
-                      <span className="flex-1 text-center">処理中に移動</span>
-                    </span>
-                  ) : (
-                    <span className="flex w-full items-center justify-between">
-                      <div className="h-4 w-4">
-                        <ChevronLeftIcon />
-                      </div>
-                      <span className="flex-1 text-center">処理待ちに移動</span>
-                    </span>
-                  )}
-                </ActionButton>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <ActionButton
+                    toStatus={prevStatus(order.status)}
+                    btnStatus={prevStatus(order.status)}
+                  >
+                    {prevStatus(order.status) === "processing" ? (
+                      <span className="flex w-full items-center justify-between">
+                        <div className="h-4 w-4">
+                          <ChevronLeftIcon />
+                        </div>
+                        <span className="flex-1 text-center">処理中に移動</span>
+                      </span>
+                    ) : (
+                      <span className="flex w-full items-center justify-between">
+                        <div className="h-4 w-4">
+                          <ChevronLeftIcon />
+                        </div>
+                        <span className="flex-1 text-center">
+                          処理待ちに移動
+                        </span>
+                      </span>
+                    )}
+                  </ActionButton>
+                </div>
               ) : null}
             </div>
 
-            <div>
+            <div className="flex w-full justify-start sm:w-auto sm:justify-end">
               {order.status !== "completed" && order.status !== "cancelled" ? (
                 <ActionButton
                   toStatus={nextStatus(order.status)}
@@ -716,11 +728,11 @@ const OrderProgressManager: FC = () => {
   }, [fetchData])
 
   return (
-    <div className="flex h-[calc(100vh-14rem)] flex-col">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-semibold text-lg">注文進捗</h2>
-        <div className="flex items-center gap-2">
-          <div className="text-muted-fg text-xs">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="mb-4 flex flex-wrap items-center gap-3 sm:justify-between">
+        <h2 className="whitespace-nowrap font-semibold text-lg">注文進捗</h2>
+        <div className="flex w-full flex-wrap items-center justify-start gap-2 sm:w-auto sm:justify-end">
+          <div className="whitespace-nowrap text-muted-fg text-xs">
             自動更新まであと
             <Countdown
               refreshIntervalMs={REFRESH_INTERVAL_MS}
@@ -739,39 +751,41 @@ const OrderProgressManager: FC = () => {
             <div class="size-4">
               <RotateCwIcon />
             </div>
-            <span>注文一覧を更新する</span>
+            <span className="whitespace-nowrap">注文一覧を更新する</span>
           </Button>
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-auto rounded border border-border/50 bg-muted p-2">
-        {error ? (
-          <div className="items-center justify-center text-center text-muted-fg">
-            注文一覧の取得に失敗しました。しばらくしてから再試行してください。
-          </div>
-        ) : (
-          <div className="flex h-full min-h-0 w-max gap-4">
-            <Column
-              status="pending"
-              items={pendingOrders}
-              onOrderUpdate={fetchData}
-            />
-            <Column
-              status="processing"
-              items={processingOrders}
-              onOrderUpdate={fetchData}
-            />
-            <Column
-              status="completed"
-              items={completedOrders}
-              onOrderUpdate={fetchData}
-            />
-            <Column
-              status="cancelled"
-              items={cancelledOrders}
-              onOrderUpdate={fetchData}
-            />
-          </div>
-        )}
+      <div className="min-h-0 flex-1 overflow-hidden rounded border border-border/50 bg-muted">
+        <div className="h-full w-full overflow-x-auto p-2">
+          {error ? (
+            <div className="flex h-full items-center justify-center text-center text-muted-fg">
+              注文一覧の取得に失敗しました。しばらくしてから再試行してください。
+            </div>
+          ) : (
+            <div className="flex h-full min-h-0 w-max gap-4">
+              <Column
+                status="pending"
+                items={pendingOrders}
+                onOrderUpdate={fetchData}
+              />
+              <Column
+                status="processing"
+                items={processingOrders}
+                onOrderUpdate={fetchData}
+              />
+              <Column
+                status="completed"
+                items={completedOrders}
+                onOrderUpdate={fetchData}
+              />
+              <Column
+                status="cancelled"
+                items={cancelledOrders}
+                onOrderUpdate={fetchData}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
