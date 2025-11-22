@@ -348,15 +348,15 @@ const ProductRegistrationForm: FC<ProductFormProps> = ({
                 }
               />
             </div>
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex flex-col-reverse items-center justify-between gap-2 sm:flex-row">
               {mode === "edit" ? (
-                <div>
+                <div className="w-full sm:w-auto">
                   <LinkButton href="/staff/products" leftIcon={ChevronLeftIcon}>
                     商品管理に戻る
                   </LinkButton>
                 </div>
               ) : null}
-              <div className="ml-auto">
+              <div className="w-full sm:w-auto">
                 <Button type="submit" leftIcon={SendIcon}>
                   <span>{submitLabel}</span>
                 </Button>
