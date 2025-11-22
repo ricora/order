@@ -77,7 +77,7 @@ export default createRoute(async (c) => {
                   <div className="font-mono">
                     {formatCurrencyJPY(product.price)}
                   </div>
-                  <div className="text-sm">在庫: {product.stock}</div>
+                  <div className="text-sm">在庫 {product.stock}</div>
                 </div>
               </div>
             </div>
