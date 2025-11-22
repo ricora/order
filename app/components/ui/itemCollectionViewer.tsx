@@ -24,7 +24,7 @@ const itemCollectionTv = tv({
     cardGrid:
       "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
     tableWrapper: "w-full overflow-x-auto",
-    tableContainer: "min-w-3xl overflow-hidden rounded-md border bg-bg",
+    tableContainer: "w-max overflow-hidden rounded-md border bg-bg",
     table: "min-w-full divide-y divide-border",
     thead: "rounded-t-md bg-muted",
     tbody: "divide-y divide-border/60 bg-bg",
