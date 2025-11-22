@@ -96,7 +96,7 @@ const SidebarInternal = ({
 }) => (
   <aside
     className={twJoin(
-      "fixed top-0 left-0 flex h-screen w-64 flex-col border-sidebar-border border-r bg-sidebar text-sidebar-fg",
+      "fixed top-0 left-0 flex h-screen w-64 flex-col overflow-y-auto border-sidebar-border border-r bg-sidebar text-sidebar-fg",
       className,
     )}
   >
