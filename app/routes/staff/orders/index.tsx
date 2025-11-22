@@ -17,17 +17,20 @@ export default createRoute(async (c) => {
   const urlSearch = url.search
 
   const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10))
+  const sort = c.req.query("sort") === "desc" ? "desc" : "asc"
 
   const { orders, hasNextPage, currentPage } =
     await getOrdersManagementPageData({
       dbClient: c.get("dbClient"),
       page,
+      sort,
     })
 
   return c.render(
     <Layout title={"注文一覧"} description={"注文の一覧を表示します。"}>
       <ItemCollectionViewer
         title="注文一覧"
+        sort={sort}
         columns={[
           { header: "注文ID", align: "left" },
           { header: "登録日時", align: "left" },

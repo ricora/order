@@ -55,15 +55,19 @@ const dbClient = {} as DbClient
 
 describe("getOrdersManagementPageData", () => {
   beforeAll(() => {
-    spyOn(orderQueryRepository, "findAllOrders").mockImplementation(
+    spyOn(orderQueryRepository, "findAllOrdersOrderByIdAsc").mockImplementation(
       async () => mockOrders,
     )
+    spyOn(
+      orderQueryRepository,
+      "findAllOrdersOrderByIdDesc",
+    ).mockImplementation(async () => mockOrders)
   })
   afterAll(() => {
     mock.restore()
   })
 
-  it("注文一覧を正しく取得できる", async () => {
+  it("注文一覧をデフォルト（昇順）で取得できる", async () => {
     const result = await getOrdersManagementPageData({ dbClient })
     expect(result.orders.length).toBe(3)
     expect(result.orders[0]?.id).toBe(1)
@@ -72,6 +76,17 @@ describe("getOrdersManagementPageData", () => {
     expect(result.hasNextPage).toBe(false)
     expect(result.currentPage).toBe(1)
     expect(result.pageSize).toBe(20)
+  })
+
+  it("sort='asc'で昇順を指定できる", async () => {
+    const result = await getOrdersManagementPageData({ dbClient, sort: "asc" })
+    expect(result.orders.length).toBe(3)
+    expect(result.orders[0]?.id).toBe(1)
+  })
+
+  it("sort='desc'で降順を指定できる", async () => {
+    const result = await getOrdersManagementPageData({ dbClient, sort: "desc" })
+    expect(result.orders.length).toBe(3)
   })
 
   it("pageSize+1を取得して次ページの有無を判定できる", async () => {
@@ -88,9 +103,10 @@ describe("getOrdersManagementPageData", () => {
       totalAmount: 1000,
     }))
 
-    spyOn(orderQueryRepository, "findAllOrders").mockImplementationOnce(
-      async () => manyOrders,
-    )
+    spyOn(
+      orderQueryRepository,
+      "findAllOrdersOrderByIdAsc",
+    ).mockImplementationOnce(async () => manyOrders)
 
     const result = await getOrdersManagementPageData({ dbClient })
     expect(result.orders.length).toBe(20)
@@ -112,9 +128,10 @@ describe("getOrdersManagementPageData", () => {
       totalAmount: 1000,
     }))
 
-    spyOn(orderQueryRepository, "findAllOrders").mockImplementationOnce(
-      async () => manyOrders,
-    )
+    spyOn(
+      orderQueryRepository,
+      "findAllOrdersOrderByIdAsc",
+    ).mockImplementationOnce(async () => manyOrders)
 
     const result = await getOrdersManagementPageData({ dbClient, page: 2 })
     expect(result.currentPage).toBe(2)

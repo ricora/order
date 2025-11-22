@@ -1,10 +1,14 @@
 import type Order from "../domain/order/entities/order"
-import { findAllOrders } from "../domain/order/repositories/orderQueryRepository"
+import {
+  findAllOrdersOrderByIdAsc,
+  findAllOrdersOrderByIdDesc,
+} from "../domain/order/repositories/orderQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
 
 export type GetOrdersManagementPageDataParams = {
   dbClient: DbClient
   page?: number
+  sort?: "asc" | "desc"
 }
 
 export type OrdersManagementPageData = {
@@ -17,11 +21,14 @@ export type OrdersManagementPageData = {
 export const getOrdersManagementPageData = async ({
   dbClient,
   page = 1,
+  sort = "asc",
 }: GetOrdersManagementPageDataParams): Promise<OrdersManagementPageData> => {
   const pageSize = 20
   const offset = Math.max(0, (page - 1) * pageSize)
 
-  const ordersWithExtra = await findAllOrders({
+  const ordersWithExtra = await (sort === "asc"
+    ? findAllOrdersOrderByIdAsc
+    : findAllOrdersOrderByIdDesc)({
     dbClient,
     pagination: { offset, limit: pageSize + 1 },
   })

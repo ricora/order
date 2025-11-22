@@ -12,12 +12,15 @@ const itemCollectionTv = tv({
   slots: {
     container: "rounded-lg border bg-bg p-6",
     header: "mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row",
-    title: "font-bold text-lg",
-    toggleContainer: "flex flex-wrap items-center gap-2 sm:flex-nowrap",
+    title: "whitespace-nowrap font-bold text-lg",
+    toggleContainer:
+      "flex flex-wrap items-center gap-4 sm:flex-nowrap sm:gap-6",
     toggleLabel: "whitespace-nowrap font-medium text-muted-fg text-sm",
     toggleGroup:
       "flex w-full items-center gap-x-1 rounded-lg bg-muted p-1 sm:w-auto",
     toggleButton:
+      "flex h-8 flex-1 items-center justify-center whitespace-nowrap rounded-md px-3 font-medium text-sm transition sm:flex-none",
+    sortButton:
       "flex h-8 flex-1 items-center justify-center whitespace-nowrap rounded-md px-3 font-medium text-sm transition sm:flex-none",
     toggleIcon: "mr-2 h-4 w-4",
     emptyState: "py-12 text-center text-lg text-muted-fg",
@@ -66,9 +69,12 @@ const itemCollectionTv = tv({
       true: {
         toggleButton:
           "pointer-events-none bg-primary-subtle text-primary-subtle-fg",
+        sortButton:
+          "pointer-events-none bg-primary-subtle text-primary-subtle-fg",
       },
       false: {
         toggleButton: "hover:bg-secondary",
+        sortButton: "hover:bg-secondary",
       },
     },
   },
@@ -201,6 +207,7 @@ type ItemCollectionViewerProps = {
   emptyMessage?: string
   currentPage: number
   hasNextPage: boolean
+  sort?: "asc" | "desc"
 }
 
 const ItemCollectionViewer = ({
@@ -212,6 +219,7 @@ const ItemCollectionViewer = ({
   emptyMessage = "データがありません",
   currentPage,
   hasNextPage,
+  sort = "asc",
 }: ItemCollectionViewerProps) => {
   const styles = itemCollectionTv()
 
@@ -220,30 +228,57 @@ const ItemCollectionViewer = ({
       <div className={styles.header()}>
         <h2 className={styles.title()}>{title}</h2>
         <div className={styles.toggleContainer()}>
-          <span className={styles.toggleLabel()}>表示モード</span>
-          <div className={styles.toggleGroup()}>
-            <a
-              href={setQueryParam(urlSearch, "view", "table")}
-              className={styles.toggleButton({
-                isActive: viewMode === "table",
-              })}
-              aria-current={viewMode === "table" ? "page" : undefined}
-            >
-              <div className={styles.toggleIcon()}>
-                <TableIcon />
-              </div>
-              テーブル
-            </a>
-            <a
-              href={setQueryParam(urlSearch, "view", "card")}
-              className={styles.toggleButton({ isActive: viewMode === "card" })}
-              aria-current={viewMode === "card" ? "page" : undefined}
-            >
-              <div className={styles.toggleIcon()}>
-                <Grid3X3Icon />
-              </div>
-              カード
-            </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="whitespace-nowrap font-medium text-muted-fg text-sm">
+              順序
+            </span>
+            <div className="flex items-center gap-x-1 rounded-lg bg-muted p-1">
+              <a
+                href={setQueryParam(urlSearch, "sort", "asc")}
+                className={styles.sortButton({
+                  isActive: sort === "asc",
+                })}
+              >
+                昇順
+              </a>
+              <a
+                href={setQueryParam(urlSearch, "sort", "desc")}
+                className={styles.sortButton({
+                  isActive: sort === "desc",
+                })}
+              >
+                降順
+              </a>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={styles.toggleLabel()}>表示モード</span>
+            <div className={styles.toggleGroup()}>
+              <a
+                href={setQueryParam(urlSearch, "view", "table")}
+                className={styles.toggleButton({
+                  isActive: viewMode === "table",
+                })}
+                aria-current={viewMode === "table" ? "page" : undefined}
+              >
+                <div className={styles.toggleIcon()}>
+                  <TableIcon />
+                </div>
+                テーブル
+              </a>
+              <a
+                href={setQueryParam(urlSearch, "view", "card")}
+                className={styles.toggleButton({
+                  isActive: viewMode === "card",
+                })}
+                aria-current={viewMode === "card" ? "page" : undefined}
+              >
+                <div className={styles.toggleIcon()}>
+                  <Grid3X3Icon />
+                </div>
+                カード
+              </a>
+            </div>
           </div>
         </div>
       </div>
