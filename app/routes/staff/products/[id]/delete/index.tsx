@@ -83,13 +83,13 @@ export default createRoute(async (c) => {
             </div>
           </div>
 
-          <div className="mt-6 flex items-center justify-between">
-            <div>
+          <div className="mt-6 flex flex-col-reverse items-center justify-between gap-2 sm:flex-row">
+            <div className="w-full sm:w-auto">
               <LinkButton href="/staff/products" leftIcon={ChevronLeftIcon}>
                 商品管理に戻る
               </LinkButton>
             </div>
-            <div>
+            <div className="w-full sm:w-auto">
               <form method="post">
                 <div>
                   <Button type="submit" variant="danger" leftIcon={Trash2Icon}>

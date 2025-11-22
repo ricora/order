@@ -79,13 +79,13 @@ const OrderEditForm: FC<Props> = ({ initialValues }) => {
                 ]}
               />
             </div>
-            <div class="mt-6 flex items-center justify-between">
-              <div>
+            <div class="mt-6 flex flex-col-reverse items-center justify-between gap-2 sm:flex-row">
+              <div class="w-full sm:w-auto">
                 <LinkButton href="/staff/orders" leftIcon={ChevronLeftIcon}>
                   注文一覧に戻る
                 </LinkButton>
               </div>
-              <div>
+              <div class="w-full sm:w-auto">
                 <div>
                   <Button type="submit" leftIcon={SendIcon}>
                     更新する
