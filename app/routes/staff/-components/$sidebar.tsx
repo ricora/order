@@ -29,7 +29,7 @@ export const sidebarToggleButtonStyles = tv({
   variants: {
     device: {
       mobile: {
-        base: "fixed bottom-5 left-5 rounded-full border bg-bg p-3 transition hover:bg-muted",
+        base: "fixed bottom-5 left-5 z-50 rounded-full border bg-bg p-3 transition hover:bg-muted",
         icon: "size-6",
       },
       desktop: {
