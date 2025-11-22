@@ -77,7 +77,7 @@ describe("exportOrderHistoryCsv", () => {
       },
     ]
 
-    spyOn(orderQueryRepository, "findAllOrders").mockImplementation(
+    spyOn(orderQueryRepository, "findAllOrdersOrderByIdAsc").mockImplementation(
       async ({ pagination }) => {
         if (pagination.offset === 0) {
           return orders
@@ -110,7 +110,7 @@ describe("exportOrderHistoryCsv", () => {
 
     const findAllSpy = spyOn(
       orderQueryRepository,
-      "findAllOrders",
+      "findAllOrdersOrderByIdAsc",
     ).mockImplementation(async ({ pagination }) => {
       if (pagination.offset === 0) {
         expect(pagination.limit).toBe(ORDER_HISTORY_EXPORT_PAGE_SIZE + 1)
@@ -140,7 +140,7 @@ describe("exportOrderHistoryCsv", () => {
       totalAmount: 0,
     })
 
-    spyOn(orderQueryRepository, "findAllOrders").mockImplementation(
+    spyOn(orderQueryRepository, "findAllOrdersOrderByIdAsc").mockImplementation(
       async () => [emptyOrder],
     )
 

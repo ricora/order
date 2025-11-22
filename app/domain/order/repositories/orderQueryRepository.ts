@@ -1,7 +1,8 @@
 import {
   findAllOrdersByActiveStatusByUpdatedAtAscImpl,
   findAllOrdersByInactiveStatusByUpdatedAtDescImpl,
-  findAllOrdersImpl,
+  findAllOrdersOrderByIdAscImpl,
+  findAllOrdersOrderByIdDescImpl,
   findOrderByIdImpl,
 } from "../../../infrastructure/domain/order/orderQueryRepositoryImpl"
 import type {
@@ -15,7 +16,11 @@ export type FindOrderById = QueryRepositoryFunction<
   { order: Pick<Order, "id"> },
   Order | null
 >
-export type FindAllOrders = PaginatedQueryRepositoryFunction<
+export type FindAllOrdersOrderByIdAsc = PaginatedQueryRepositoryFunction<
+  Record<string, never>,
+  Order
+>
+export type FindAllOrdersOrderByIdDesc = PaginatedQueryRepositoryFunction<
   Record<string, never>,
   Order
 >
@@ -32,14 +37,25 @@ export const findOrderById: WithRepositoryImpl<FindOrderById> = async ({
   return repositoryImpl({ order, dbClient })
 }
 
-export const findAllOrders: WithRepositoryImpl<FindAllOrders> = async ({
-  repositoryImpl = findAllOrdersImpl,
+export const findAllOrdersOrderByIdAsc: WithRepositoryImpl<
+  FindAllOrdersOrderByIdAsc
+> = async ({
+  repositoryImpl = findAllOrdersOrderByIdAscImpl,
   dbClient,
   pagination,
 }) => {
   return repositoryImpl({ dbClient, pagination })
 }
 
+export const findAllOrdersOrderByIdDesc: WithRepositoryImpl<
+  FindAllOrdersOrderByIdDesc
+> = async ({
+  repositoryImpl = findAllOrdersOrderByIdDescImpl,
+  dbClient,
+  pagination,
+}) => {
+  return repositoryImpl({ dbClient, pagination })
+}
 export const findAllOrdersByActiveStatusOrderByUpdatedAtAsc: WithRepositoryImpl<
   FindAllOrdersByActiveStatusOrderByUpdatedAtAsc
 > = async ({

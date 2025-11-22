@@ -1,5 +1,5 @@
 import type Order from "../domain/order/entities/order"
-import { findAllOrders } from "../domain/order/repositories/orderQueryRepository"
+import { findAllOrdersOrderByIdAsc } from "../domain/order/repositories/orderQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
 import { toCsv } from "../utils/csv"
 
@@ -85,7 +85,7 @@ const fetchAllOrders = async (dbClient: DbClient): Promise<Order[]> => {
 
   // fetch in deterministic order by primary key via existing repository
   while (true) {
-    const chunk = await findAllOrders({
+    const chunk = await findAllOrdersOrderByIdAsc({
       dbClient,
       pagination: {
         offset: orders.length,
