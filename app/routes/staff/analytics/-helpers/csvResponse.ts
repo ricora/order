@@ -1,9 +1,9 @@
+import { formatDateTimeIsoJP } from "../../../../utils/date"
+
 const buildCsvFilename = (prefix: string, exportedAt: Date) => {
-  const timestamp = exportedAt
-    .toISOString()
-    .replace(/[:.]/g, "-")
-    .replace("T", "-")
-    .replace("Z", "")
+  const isoTimestamp = formatDateTimeIsoJP(exportedAt)
+  const datePart = isoTimestamp.split("+", 1)[0] ?? isoTimestamp
+  const timestamp = datePart.replace(/[T:]/g, "-")
   return `${prefix}-${timestamp}.csv`
 }
 

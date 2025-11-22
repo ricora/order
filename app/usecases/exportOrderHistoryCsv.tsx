@@ -2,6 +2,7 @@ import type Order from "../domain/order/entities/order"
 import { findAllOrdersOrderByIdAsc } from "../domain/order/repositories/orderQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
 import { toCsv } from "../utils/csv"
+import { formatDateTimeIsoJP } from "../utils/date"
 
 export const ORDER_HISTORY_EXPORT_PAGE_SIZE = 200
 
@@ -12,11 +13,11 @@ export const ORDER_HISTORY_COLUMNS = [
   },
   {
     name: "order_created_at",
-    description: "注文の作成日時（ISO 8601形式）",
+    description: "注文の作成日時（JST, ISO 8601形式）",
   },
   {
     name: "order_updated_at",
-    description: "注文の更新日時（ISO 8601形式）",
+    description: "注文の更新日時（JST, ISO 8601形式）",
   },
   {
     name: "order_status",
@@ -115,8 +116,8 @@ const buildOrderRows = (orders: Order[]) => {
     if (itemCount === 0) {
       rows.push([
         order.id,
-        order.createdAt,
-        order.updatedAt,
+        formatDateTimeIsoJP(order.createdAt),
+        formatDateTimeIsoJP(order.updatedAt),
         order.status,
         order.customerName ?? "",
         order.totalAmount,
@@ -134,8 +135,8 @@ const buildOrderRows = (orders: Order[]) => {
     order.orderItems.forEach((item, index) => {
       rows.push([
         order.id,
-        order.createdAt,
-        order.updatedAt,
+        formatDateTimeIsoJP(order.createdAt),
+        formatDateTimeIsoJP(order.updatedAt),
         order.status,
         order.customerName ?? "",
         order.totalAmount,

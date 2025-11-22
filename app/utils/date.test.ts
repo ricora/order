@@ -1,5 +1,10 @@
 import { describe, expect, it } from "bun:test"
-import { formatDateJP, formatDateTimeJP, formatTimeJP } from "./date"
+import {
+  formatDateJP,
+  formatDateTimeIsoJP,
+  formatDateTimeJP,
+  formatTimeJP,
+} from "./date"
 
 describe("formatDateTimeJP", () => {
   it("日付を日本語の日時形式でフォーマットできる", () => {
@@ -49,5 +54,18 @@ describe("formatTimeJP", () => {
 
   it("無効な日付の場合はエラーをスローする", () => {
     expect(() => formatTimeJP(new Date("invalid"))).toThrow("Invalid date")
+  })
+})
+
+describe("formatDateTimeIsoJP", () => {
+  it("JSTのISO8601形式でフォーマットできる", () => {
+    const result = formatDateTimeIsoJP("2024-01-15T05:30:45Z")
+    expect(result).toBe("2024-01-15T14:30:45+09:00")
+  })
+
+  it("無効な日付の場合はエラーをスローする", () => {
+    expect(() => formatDateTimeIsoJP(new Date("invalid"))).toThrow(
+      "Invalid date",
+    )
   })
 })
