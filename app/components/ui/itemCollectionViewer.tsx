@@ -13,11 +13,12 @@ const itemCollectionTv = tv({
     container: "rounded-lg border bg-bg p-6",
     header: "mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row",
     title: "font-bold text-lg",
-    toggleContainer: "flex items-center gap-2",
-    toggleLabel: "font-medium text-muted-fg text-sm",
-    toggleGroup: "flex gap-x-1 rounded-lg bg-muted p-1",
+    toggleContainer: "flex flex-wrap items-center gap-2 sm:flex-nowrap",
+    toggleLabel: "whitespace-nowrap font-medium text-muted-fg text-sm",
+    toggleGroup:
+      "flex w-full items-center gap-x-1 rounded-lg bg-muted p-1 sm:w-auto",
     toggleButton:
-      "flex h-8 items-center rounded-md px-3 font-medium text-sm transition",
+      "flex h-8 flex-1 items-center justify-center whitespace-nowrap rounded-md px-3 font-medium text-sm transition sm:flex-none",
     toggleIcon: "mr-2 h-4 w-4",
     emptyState: "py-12 text-center text-lg text-muted-fg",
     cardGrid:
@@ -51,11 +52,11 @@ const itemCollectionTv = tv({
     tableCellRight: "px-4 py-2 text-right align-middle",
     tableCellCenter: "px-4 py-2 text-center align-middle",
     tableHeader:
-      "px-4 py-2 text-left font-medium text-muted-fg text-xs uppercase tracking-wider",
+      "whitespace-nowrap px-4 py-2 text-left font-medium text-muted-fg text-xs uppercase tracking-wider",
     tableHeaderRight:
-      "px-4 py-2 text-right font-medium text-muted-fg text-xs uppercase tracking-wider",
+      "whitespace-nowrap px-4 py-2 text-right font-medium text-muted-fg text-xs uppercase tracking-wider",
     tableHeaderCenter:
-      "px-4 py-2 text-center font-medium text-muted-fg text-xs uppercase tracking-wider",
+      "whitespace-nowrap px-4 py-2 text-center font-medium text-muted-fg text-xs uppercase tracking-wider",
     tableImage: "h-12 min-h-12 w-12 min-w-12 rounded-md border object-cover",
     tableImageCell: "w-16 min-w-16 px-2 py-2 align-middle",
     tableActions: "flex flex-col items-center gap-2",
@@ -104,9 +105,17 @@ const FieldValueCell = ({
 
   switch (field.type) {
     case "text":
-      return <span>{field.value}</span>
+      return isCard ? (
+        <span>{field.value}</span>
+      ) : (
+        <span className="whitespace-nowrap">{field.value}</span>
+      )
     case "number":
-      return <span className="font-mono">{field.value}</span>
+      return isCard ? (
+        <span className="font-mono">{field.value}</span>
+      ) : (
+        <span className="whitespace-nowrap font-mono">{field.value}</span>
+      )
     case "image":
       if (isCard) {
         return (
@@ -211,7 +220,7 @@ const ItemCollectionViewer = ({
       <div className={styles.header()}>
         <h2 className={styles.title()}>{title}</h2>
         <div className={styles.toggleContainer()}>
-          <span className={styles.toggleLabel()}>表示モード:</span>
+          <span className={styles.toggleLabel()}>表示モード</span>
           <div className={styles.toggleGroup()}>
             <a
               href={setQueryParam(urlSearch, "view", "table")}
