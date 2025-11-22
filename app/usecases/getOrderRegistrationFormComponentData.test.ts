@@ -41,9 +41,10 @@ const dbClient = {} as DbClient
 
 describe("getOrderRegistrationFormComponentData", () => {
   beforeAll(() => {
-    spyOn(productQueryRepository, "findAllProducts").mockImplementation(
-      async () => mockProducts,
-    )
+    spyOn(
+      productQueryRepository,
+      "findAllProductsOrderByIdAsc",
+    ).mockImplementation(async () => mockProducts)
     spyOn(productTagQueryRepository, "findAllProductTags").mockImplementation(
       async () => mockTags,
     )
@@ -66,7 +67,7 @@ describe("getOrderRegistrationFormComponentData", () => {
   it("ページネーションで1000件のlimitを指定している", async () => {
     const spy = spyOn(
       productQueryRepository,
-      "findAllProducts",
+      "findAllProductsOrderByIdAsc",
     ).mockImplementation(async (params) => {
       expect(params.pagination.limit).toBe(MAX_STORE_PRODUCT_COUNT)
       expect(params.pagination.offset).toBe(0)

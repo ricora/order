@@ -47,9 +47,14 @@ const dbClient = {} as DbClient
 
 describe("getProductsManagementPageData", () => {
   beforeAll(() => {
-    spyOn(productQueryRepository, "findAllProducts").mockImplementation(
-      async () => mockProducts,
-    )
+    spyOn(
+      productQueryRepository,
+      "findAllProductsOrderByIdAsc",
+    ).mockImplementation(async () => mockProducts)
+    spyOn(
+      productQueryRepository,
+      "findAllProductsOrderByIdDesc",
+    ).mockImplementation(async () => mockProducts)
     spyOn(productQueryRepository, "findAllProductStocks").mockImplementation(
       async () => [
         { id: 1, stock: 10 },
@@ -102,9 +107,10 @@ describe("getProductsManagementPageData", () => {
       stock: i + 1,
     }))
 
-    spyOn(productQueryRepository, "findAllProducts").mockImplementationOnce(
-      async () => manyProducts,
-    )
+    spyOn(
+      productQueryRepository,
+      "findAllProductsOrderByIdAsc",
+    ).mockImplementationOnce(async () => manyProducts)
 
     const result = await getProductsManagementPageData({ dbClient })
     expect(result.products.length).toBe(20)
@@ -122,12 +128,29 @@ describe("getProductsManagementPageData", () => {
       stock: i + 1,
     }))
 
-    spyOn(productQueryRepository, "findAllProducts").mockImplementationOnce(
-      async () => manyProducts,
-    )
+    spyOn(
+      productQueryRepository,
+      "findAllProductsOrderByIdAsc",
+    ).mockImplementationOnce(async () => manyProducts)
 
     const result = await getProductsManagementPageData({ dbClient, page: 2 })
     expect(result.currentPage).toBe(2)
     expect(result.pageSize).toBe(20)
+  })
+
+  it("sort='asc'で昇順を指定できる", async () => {
+    const result = await getProductsManagementPageData({
+      dbClient,
+      sort: "asc",
+    })
+    expect(result.products.length).toBe(3)
+  })
+
+  it("sort='desc'で降順を指定できる", async () => {
+    const result = await getProductsManagementPageData({
+      dbClient,
+      sort: "desc",
+    })
+    expect(result.products.length).toBe(3)
   })
 })

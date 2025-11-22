@@ -2,7 +2,8 @@ import {
   countProductsImpl,
   findAllProductStocksImpl,
   findAllProductsByIdsImpl,
-  findAllProductsImpl,
+  findAllProductsOrderByIdAscImpl,
+  findAllProductsOrderByIdDescImpl,
   findProductByIdImpl,
   findProductByNameImpl,
 } from "../../../infrastructure/domain/product/productQueryRepositoryImpl"
@@ -21,7 +22,11 @@ export type FindProductByName = QueryRepositoryFunction<
   { product: Pick<Product, "name"> },
   Product | null
 >
-export type FindAllProducts = PaginatedQueryRepositoryFunction<
+export type FindAllProductsOrderByIdAsc = PaginatedQueryRepositoryFunction<
+  Record<string, never>,
+  Product
+>
+export type FindAllProductsOrderByIdDesc = PaginatedQueryRepositoryFunction<
   Record<string, never>,
   Product
 >
@@ -55,8 +60,20 @@ export const findProductByName: WithRepositoryImpl<FindProductByName> = async ({
   return repositoryImpl({ product, dbClient })
 }
 
-export const findAllProducts: WithRepositoryImpl<FindAllProducts> = async ({
-  repositoryImpl = findAllProductsImpl,
+export const findAllProductsOrderByIdAsc: WithRepositoryImpl<
+  FindAllProductsOrderByIdAsc
+> = async ({
+  repositoryImpl = findAllProductsOrderByIdAscImpl,
+  dbClient,
+  pagination,
+}) => {
+  return repositoryImpl({ dbClient, pagination })
+}
+
+export const findAllProductsOrderByIdDesc: WithRepositoryImpl<
+  FindAllProductsOrderByIdDesc
+> = async ({
+  repositoryImpl = findAllProductsOrderByIdDescImpl,
   dbClient,
   pagination,
 }) => {

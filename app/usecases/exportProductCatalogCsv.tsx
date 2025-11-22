@@ -1,5 +1,5 @@
 import type Product from "../domain/product/entities/product"
-import { findAllProducts } from "../domain/product/repositories/productQueryRepository"
+import { findAllProductsOrderByIdAsc } from "../domain/product/repositories/productQueryRepository"
 import { findAllProductTagsByIds } from "../domain/product/repositories/productTagQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
 import { toCsv } from "../utils/csv"
@@ -70,7 +70,7 @@ const fetchAllProducts = async (dbClient: DbClient): Promise<Product[]> => {
   const limit = pageSize + 1
 
   while (true) {
-    const chunk = await findAllProducts({
+    const chunk = await findAllProductsOrderByIdAsc({
       dbClient,
       pagination: {
         offset: products.length,
