@@ -87,7 +87,7 @@ describe("getProductsManagementPageData", () => {
     expect(result.outOfStockCount).toBe(1)
     expect(result.hasNextPage).toBe(false)
     expect(result.currentPage).toBe(1)
-    expect(result.pageSize).toBe(20)
+    expect(result.pageSize).toBe(50)
   })
 
   it("各商品のステータスが正しく計算される", async () => {
@@ -98,7 +98,7 @@ describe("getProductsManagementPageData", () => {
   })
 
   it("pageSize+1を取得して次ページの有無を判定できる", async () => {
-    const manyProducts: Product[] = Array.from({ length: 21 }, (_, i) => ({
+    const manyProducts: Product[] = Array.from({ length: 51 }, (_, i) => ({
       id: i + 1,
       name: `商品${i + 1}`,
       image: { data: `dummy${i + 1}`, mimeType: "image/png" },
@@ -113,13 +113,13 @@ describe("getProductsManagementPageData", () => {
     ).mockImplementationOnce(async () => manyProducts)
 
     const result = await getProductsManagementPageData({ dbClient })
-    expect(result.products.length).toBe(20)
+    expect(result.products.length).toBe(50)
     expect(result.hasNextPage).toBe(true)
     expect(result.currentPage).toBe(1)
   })
 
   it("ページネーション: page=2の場合、offset計算が正しい", async () => {
-    const manyProducts: Product[] = Array.from({ length: 21 }, (_, i) => ({
+    const manyProducts: Product[] = Array.from({ length: 51 }, (_, i) => ({
       id: i + 1,
       name: `商品${i + 1}`,
       image: { data: `dummy${i + 1}`, mimeType: "image/png" },
@@ -135,7 +135,7 @@ describe("getProductsManagementPageData", () => {
 
     const result = await getProductsManagementPageData({ dbClient, page: 2 })
     expect(result.currentPage).toBe(2)
-    expect(result.pageSize).toBe(20)
+    expect(result.pageSize).toBe(50)
   })
 
   it("sort='asc'で昇順を指定できる", async () => {

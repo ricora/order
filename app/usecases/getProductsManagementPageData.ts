@@ -47,7 +47,7 @@ export const getProductsManagementPageData = async ({
   page = 1,
   sort = "asc",
 }: GetProductsManagementPageDataParams): Promise<ProductsManagementPageData> => {
-  const pageSize = 20
+  const pageSize = 50
   const offset = Math.max(0, (page - 1) * pageSize)
 
   const productsWithExtra = await (sort === "asc"

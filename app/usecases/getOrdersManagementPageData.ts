@@ -23,7 +23,7 @@ export const getOrdersManagementPageData = async ({
   page = 1,
   sort = "asc",
 }: GetOrdersManagementPageDataParams): Promise<OrdersManagementPageData> => {
-  const pageSize = 20
+  const pageSize = 50
   const offset = Math.max(0, (page - 1) * pageSize)
 
   const ordersWithExtra = await (sort === "asc"
