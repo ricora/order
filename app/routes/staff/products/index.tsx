@@ -208,6 +208,7 @@ export default createRoute(async (c) => {
   const urlSearch = url.search
 
   const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10))
+  const sort = c.req.query("sort") === "desc" ? "desc" : "asc"
 
   const {
     products,
@@ -220,6 +221,7 @@ export default createRoute(async (c) => {
   } = await getProductsManagementPageData({
     dbClient: c.get("dbClient"),
     page,
+    sort,
   })
 
   return c.render(
@@ -235,6 +237,7 @@ export default createRoute(async (c) => {
       </div>
       <ItemCollectionViewer
         title="商品一覧"
+        sort={sort}
         columns={[
           { header: "画像", align: "left" },
           { header: "商品名", align: "left" },

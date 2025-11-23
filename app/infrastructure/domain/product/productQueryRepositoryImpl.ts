@@ -1,9 +1,10 @@
-import { asc, eq, inArray } from "drizzle-orm"
+import { asc, desc, eq, inArray } from "drizzle-orm"
 import type {
   CountProducts,
   FindAllProductStocks,
-  FindAllProducts,
   FindAllProductsByIds,
+  FindAllProductsOrderByIdAsc,
+  FindAllProductsOrderByIdDesc,
   FindProductById,
   FindProductByName,
 } from "../../../domain/product/repositories/productQueryRepository"
@@ -59,30 +60,51 @@ export const findProductByNameImpl: FindProductByName = async ({
   }
 }
 
-export const findAllProductsImpl: FindAllProducts = async ({
-  dbClient,
-  pagination,
-}) => {
-  const dbProducts = await dbClient.query.productTable.findMany({
-    with: {
-      productTags: {
-        columns: {
-          tagId: true,
+export const findAllProductsOrderByIdAscImpl: FindAllProductsOrderByIdAsc =
+  async ({ dbClient, pagination }) => {
+    const dbProducts = await dbClient.query.productTable.findMany({
+      with: {
+        productTags: {
+          columns: {
+            tagId: true,
+          },
         },
       },
-    },
-    orderBy: [asc(productTable.id)],
-    offset: pagination.offset,
-    limit: pagination.limit,
-  })
-  return dbProducts.map((dbProduct) => ({
-    id: dbProduct.id,
-    name: dbProduct.name,
-    tagIds: dbProduct.productTags.map((tag) => tag.tagId),
-    price: dbProduct.price,
-    stock: dbProduct.stock,
-  }))
-}
+      orderBy: [asc(productTable.id)],
+      offset: pagination.offset,
+      limit: pagination.limit,
+    })
+    return dbProducts.map((dbProduct) => ({
+      id: dbProduct.id,
+      name: dbProduct.name,
+      tagIds: dbProduct.productTags.map((tag) => tag.tagId),
+      price: dbProduct.price,
+      stock: dbProduct.stock,
+    }))
+  }
+
+export const findAllProductsOrderByIdDescImpl: FindAllProductsOrderByIdDesc =
+  async ({ dbClient, pagination }) => {
+    const dbProducts = await dbClient.query.productTable.findMany({
+      with: {
+        productTags: {
+          columns: {
+            tagId: true,
+          },
+        },
+      },
+      orderBy: [desc(productTable.id)],
+      offset: pagination.offset,
+      limit: pagination.limit,
+    })
+    return dbProducts.map((dbProduct) => ({
+      id: dbProduct.id,
+      name: dbProduct.name,
+      tagIds: dbProduct.productTags.map((tag) => tag.tagId),
+      price: dbProduct.price,
+      stock: dbProduct.stock,
+    }))
+  }
 
 export const findAllProductStocksImpl: FindAllProductStocks = async ({
   dbClient,

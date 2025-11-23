@@ -30,14 +30,15 @@ describe("exportProductCatalogCsv", () => {
       mockProduct(2, { name: "Latte", tagIds: [2], stock: 0 }),
     ]
 
-    spyOn(productQueryRepository, "findAllProducts").mockImplementation(
-      async ({ pagination }) => {
-        if (pagination.offset === 0) {
-          return products
-        }
-        return []
-      },
-    )
+    spyOn(
+      productQueryRepository,
+      "findAllProductsOrderByIdAsc",
+    ).mockImplementation(async ({ pagination }) => {
+      if (pagination.offset === 0) {
+        return products
+      }
+      return []
+    })
 
     spyOn(
       productTagQueryRepository,
@@ -75,7 +76,7 @@ describe("exportProductCatalogCsv", () => {
 
     const findProductsSpy = spyOn(
       productQueryRepository,
-      "findAllProducts",
+      "findAllProductsOrderByIdAsc",
     ).mockImplementation(async ({ pagination }) => {
       if (pagination.offset === 0) {
         expect(pagination.limit).toBe(PRODUCT_CATALOG_EXPORT_PAGE_SIZE + 1)
@@ -108,9 +109,10 @@ describe("exportProductCatalogCsv", () => {
   it("タグなしの商品ではタグ名を読み込まない", async () => {
     const products: Product[] = [mockProduct(1, { tagIds: [] })]
 
-    spyOn(productQueryRepository, "findAllProducts").mockImplementation(
-      async () => products,
-    )
+    spyOn(
+      productQueryRepository,
+      "findAllProductsOrderByIdAsc",
+    ).mockImplementation(async () => products)
 
     const findTagsSpy = spyOn(
       productTagQueryRepository,

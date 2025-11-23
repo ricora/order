@@ -4,7 +4,7 @@ import {
 } from "../domain/product/constants"
 import type Product from "../domain/product/entities/product"
 import type ProductTag from "../domain/product/entities/productTag"
-import { findAllProducts } from "../domain/product/repositories/productQueryRepository"
+import { findAllProductsOrderByIdAsc } from "../domain/product/repositories/productQueryRepository"
 import { findAllProductTags } from "../domain/product/repositories/productTagQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
 
@@ -22,7 +22,7 @@ export type OrderRegistrationFormComponentData = {
 export const getOrderRegistrationFormComponentData = async ({
   dbClient,
 }: GetOrderRegistrationFormComponentDataParams): Promise<OrderRegistrationFormComponentData> => {
-  const products = await findAllProducts({
+  const products = await findAllProductsOrderByIdAsc({
     dbClient,
     pagination: { offset: 0, limit: MAX_STORE_PRODUCT_COUNT },
   })

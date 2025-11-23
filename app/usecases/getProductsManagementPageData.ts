@@ -2,7 +2,8 @@ import { MAX_STORE_PRODUCT_COUNT } from "../domain/product/constants"
 import type Product from "../domain/product/entities/product"
 import {
   findAllProductStocks,
-  findAllProducts,
+  findAllProductsOrderByIdAsc,
+  findAllProductsOrderByIdDesc,
 } from "../domain/product/repositories/productQueryRepository"
 import { findAllProductTagsByIds } from "../domain/product/repositories/productTagQueryRepository"
 import type { DbClient } from "../infrastructure/db/client"
@@ -14,6 +15,7 @@ export const LOW_STOCK_THRESHOLD = 5
 export type GetProductsManagementPageDataParams = {
   dbClient: DbClient
   page?: number
+  sort?: "asc" | "desc"
 }
 
 export type ProductsManagementPageData = {
@@ -43,11 +45,14 @@ const calculateProductStatus = (stock: number): ProductStatus => {
 export const getProductsManagementPageData = async ({
   dbClient,
   page = 1,
+  sort = "asc",
 }: GetProductsManagementPageDataParams): Promise<ProductsManagementPageData> => {
   const pageSize = 20
   const offset = Math.max(0, (page - 1) * pageSize)
 
-  const productsWithExtra = await findAllProducts({
+  const productsWithExtra = await (sort === "asc"
+    ? findAllProductsOrderByIdAsc
+    : findAllProductsOrderByIdDesc)({
     dbClient,
     pagination: { offset, limit: pageSize + 1 },
   })
