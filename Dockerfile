@@ -3,6 +3,9 @@ FROM oven/bun:${BUN_VERSION} AS builder
 
 WORKDIR /app
 
+# Install git to embed commit hash at build time
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
