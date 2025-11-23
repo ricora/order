@@ -13,6 +13,12 @@ export type TransactionDbClient = Parameters<
 >[0]
 
 let hasWarned = false
+if (process.env.NODE_ENV === "production" && !process.env.DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL environment variable is not set. Production environment requires a valid Postgres connection string.",
+  )
+}
+
 /**
  * DrizzleのDBクライアント。
  * DBクライアントはシングルトンとして扱う。
@@ -31,11 +37,6 @@ export const createDbClient = async (): Promise<DbClient> => {
     try {
       // プロダクションビルドではPGliteを依存関係から除外する
       if (!process.env.DATABASE_URL) {
-        if (process.env.NODE_ENV === "production") {
-          throw new Error(
-            "DATABASE_URL environment variable is not set. Production environment requires a valid Postgres connection string.",
-          )
-        }
         if (!hasWarned) {
           console.warn(`DATABASE_URL environment variable is not set.
 Development environment will fall back to PGlite which provides a filesystem Postgres for development and testing.`)
