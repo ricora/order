@@ -33,21 +33,21 @@ describe("商品管理", () => {
       assertBasicHtmlResponse(res, text)
       expect(text).toMatch(/テスト商品1/)
       expect(text).toMatch(/テスト商品2/)
-      // page=1では1-20番目の商品が表示される
-      expect(text).not.toMatch(/テスト商品21/)
+      expect(text).toMatch(/テスト商品50/)
+      // page=1では1-50番目の商品が表示される（pageSize=50）
+      expect(text).not.toMatch(/テスト商品51/)
     })
 
     test("page=2で次のページの商品を取得できる", async () => {
       const res = await app.request("/staff/products?page=2")
       const text = await res.text()
       assertBasicHtmlResponse(res, text)
-      expect(text).toMatch(/テスト商品21/)
-      expect(text).toMatch(/テスト商品25/)
-      expect(text).not.toMatch(/テスト商品1/)
+      expect(text).toMatch(/テスト商品51/)
+      expect(text).not.toMatch(/テスト商品50/)
     })
 
-    test("page=3では空になる", async () => {
-      const res = await app.request("/staff/products?page=3")
+    test("範囲外のページでは空になる", async () => {
+      const res = await app.request("/staff/products?page=999")
       const text = await res.text()
       assertBasicHtmlResponse(res, text)
       expect(text).toMatch(/商品が登録されていません/)
@@ -77,12 +77,13 @@ describe("商品管理", () => {
       expect(text).toMatch(/href="[^"]*page=2/)
     })
 
-    test("page=2では「前へ」ボタンが有効で「次へ」ボタンが無効", async () => {
-      const res = await app.request("/staff/products?page=2")
+    test("page=3では「前へ」ボタンが有効で「次へ」ボタンが無効", async () => {
+      const res = await app.request("/staff/products?page=3")
       const text = await res.text()
-      expect(text).toMatch(/ページ\s*2/)
-      expect(text).toMatch(/href="[^"]*page=1/)
+      expect(text).toMatch(/ページ\s*3/)
+      expect(text).toMatch(/href="[^"]*page=2/)
       expect(text).toMatch(/aria-disabled="true"/)
+      expect(text).toMatch(/pointer-events-none/)
     })
 
     test("商品編集ページが表示される", async () => {

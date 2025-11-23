@@ -20,23 +20,23 @@ describe("注文進捗管理", () => {
       const apiJson = (await res.json()) as ApiJson
 
       expect(apiJson.pendingOrders.length).toBeGreaterThanOrEqual(2)
-      const pendingNames = apiJson.pendingOrders.map((o) => o.customerName)
-      expect(pendingNames).toContain("顧客A")
-      expect(pendingNames).toContain("顧客B")
+      expect(apiJson.pendingOrders.every((o) => o.status === "pending")).toBe(
+        true,
+      )
 
       expect(apiJson.processingOrders.length).toBeGreaterThanOrEqual(1)
       expect(
-        apiJson.processingOrders.some((o) => o.customerName === null),
+        apiJson.processingOrders.every((o) => o.status === "processing"),
       ).toBe(true)
 
       expect(apiJson.completedOrders.length).toBeGreaterThanOrEqual(1)
       expect(
-        apiJson.completedOrders.some((o) => o.customerName === "顧客C"),
+        apiJson.completedOrders.every((o) => o.status === "completed"),
       ).toBe(true)
 
       expect(apiJson.cancelledOrders.length).toBeGreaterThanOrEqual(1)
       expect(
-        apiJson.cancelledOrders.some((o) => o.customerName === "顧客D"),
+        apiJson.cancelledOrders.every((o) => o.status === "cancelled"),
       ).toBe(true)
     })
   })
@@ -49,23 +49,26 @@ describe("注文進捗管理", () => {
       })
       expect(res.status).toBe(200)
       const apiJson = (await res.json()) as ApiJson
+
       expect(apiJson.pendingOrders.length).toBeGreaterThanOrEqual(1)
-      const pendingNames = apiJson.pendingOrders.map((o) => o.customerName)
-      expect(pendingNames).toContain("顧客B")
+      expect(apiJson.pendingOrders.every((o) => o.status === "pending")).toBe(
+        true,
+      )
 
       expect(apiJson.processingOrders.length).toBeGreaterThanOrEqual(1)
       expect(
-        apiJson.processingOrders.some((o) => o.customerName === null),
+        apiJson.processingOrders.every((o) => o.status === "processing"),
       ).toBe(true)
+      expect(apiJson.processingOrders.some((o) => o.id === 1)).toBe(true)
 
       expect(apiJson.completedOrders.length).toBeGreaterThanOrEqual(1)
       expect(
-        apiJson.completedOrders.some((o) => o.customerName === "顧客C"),
+        apiJson.completedOrders.every((o) => o.status === "completed"),
       ).toBe(true)
 
       expect(apiJson.cancelledOrders.length).toBeGreaterThanOrEqual(1)
       expect(
-        apiJson.cancelledOrders.some((o) => o.customerName === "顧客D"),
+        apiJson.cancelledOrders.every((o) => o.status === "cancelled"),
       ).toBe(true)
     })
     test("存在しない注文IDのときにエラーを返す", async () => {

@@ -6,7 +6,7 @@ import { setOrderStatus } from "../app/usecases/setOrderStatus"
 const dbClient = await createDbClient()
 
 // 商品登録
-for (let i = 1; i <= 25; i++) {
+for (let i = 1; i <= 150; i++) {
   await registerProduct({
     dbClient,
     product: {
@@ -97,16 +97,17 @@ await setOrderStatus({
   order: { id: order5.id, status: "cancelled" },
 })
 
-// 追加の注文を20個登録
-for (let i = 6; i <= 25; i++) {
-  const customerNumber = ((i - 6) % 10) + 1
-  const productId = ((i - 6) % 5) + 1
+// 追加の注文登録
+const customers = ["テスト顧客A", "テスト顧客B", "テスト顧客C", "テスト顧客D"]
+for (let i = 6; i <= 155; i++) {
+  const customerName = customers[(i - 6) % customers.length] || "テスト顧客A"
+  const productId = ((i - 6) % 150) + 1
   const quantity = ((i - 6) % 5) + 1
 
   const order = await registerOrder({
     dbClient,
     order: {
-      customerName: `テスト顧客${customerNumber}`,
+      customerName,
       comment: null,
       orderItems: [{ productId, quantity }],
     },
