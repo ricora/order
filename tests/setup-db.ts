@@ -1,7 +1,7 @@
 import { createDbClient } from "../app/libs/db/client"
-import { registerOrder } from "../app/usecases/registerOrder"
-import { registerProduct } from "../app/usecases/registerProduct"
-import { setOrderStatus } from "../app/usecases/setOrderStatus"
+import { registerOrder } from "../app/usecases/commands/registerOrder"
+import { registerProduct } from "../app/usecases/commands/registerProduct"
+import { setOrderStatus } from "../app/usecases/commands/setOrderStatus"
 
 const dbClient = await createDbClient()
 
