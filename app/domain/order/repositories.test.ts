@@ -7,7 +7,7 @@ import {
   type Mock,
   mock,
 } from "bun:test"
-import type { TransactionDbClient } from "../../infrastructure/db/client"
+import type { TransactionDbClient } from "../../libs/db/client"
 import type Order from "./entities/order"
 import { createRepositories, type Repositories } from "./repositories"
 

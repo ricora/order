@@ -1,4 +1,4 @@
-import type { TransactionDbClient } from "../../infrastructure/db/client"
+import type { TransactionDbClient } from "../../libs/db/client"
 import { countStringLength } from "../../utils/text"
 import type {
   CommandRepositoryFunction,

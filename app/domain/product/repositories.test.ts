@@ -7,7 +7,7 @@ import {
   type Mock,
   mock,
 } from "bun:test"
-import type { TransactionDbClient } from "../../infrastructure/db/client"
+import type { TransactionDbClient } from "../../libs/db/client"
 import {
   MAX_PRODUCT_PRICE,
   MAX_PRODUCT_STOCK,

@@ -1,4 +1,4 @@
-import { createDbClient } from "../app/infrastructure/db/client"
+import { createDbClient } from "../app/libs/db/client"
 import { registerOrder } from "../app/usecases/registerOrder"
 import { registerProduct } from "../app/usecases/registerProduct"
 import { setOrderStatus } from "../app/usecases/setOrderStatus"
