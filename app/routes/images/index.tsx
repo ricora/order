@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises"
 import { resolve } from "node:path"
 import type { Env } from "hono"
 import { Hono } from "hono"
-import { getProductImageAssetData } from "../../usecases/getProductImageAssetData"
+import { getProductImageAssetData } from "../../usecases/queries/getProductImageAssetData"
 
 /**
  * CC0 default images obtained from "Free-Images.com".

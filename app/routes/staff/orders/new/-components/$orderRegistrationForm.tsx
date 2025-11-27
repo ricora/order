@@ -12,8 +12,8 @@ import ChipButton from "../../../../../components/ui/chipButton"
 import Input from "../../../../../components/ui/input"
 import Label from "../../../../../components/ui/label"
 import { createHonoClient } from "../../../../../helpers/api/hono-client"
-import type { OrderRegistrationFormComponentData } from "../../../../../usecases/getOrderRegistrationFormComponentData"
-import type { RegisterOrderParams } from "../../../../../usecases/registerOrder"
+import type { RegisterOrderParams } from "../../../../../usecases/commands/registerOrder"
+import type { OrderRegistrationFormComponentData } from "../../../../../usecases/queries/getOrderRegistrationFormComponentData"
 import { formatCurrencyJPY } from "../../../../../utils/money"
 
 type OrderItem = RegisterOrderParams["order"]["orderItems"][number] & {

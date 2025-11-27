@@ -1,7 +1,7 @@
 import { createRoute } from "honox/factory"
 import { tv } from "tailwind-variants"
 import ItemCollectionViewer from "../../../components/ui/itemCollectionViewer"
-import { getOrdersManagementPageData } from "../../../usecases/getOrdersManagementPageData"
+import { getOrdersManagementPageData } from "../../../usecases/queries/getOrdersManagementPageData"
 import { formatDateTimeJP } from "../../../utils/date"
 import { formatCurrencyJPY } from "../../../utils/money"
 import Layout from "../-components/layout"

@@ -10,11 +10,11 @@ import Badge from "../../../components/ui/badge"
 import Chip from "../../../components/ui/chip"
 import ItemCollectionViewer from "../../../components/ui/itemCollectionViewer"
 import { setToastCookie } from "../../../helpers/ui/toast"
+import { registerProduct } from "../../../usecases/commands/registerProduct"
 import {
   getProductsManagementPageData,
   LOW_STOCK_THRESHOLD,
-} from "../../../usecases/getProductsManagementPageData"
-import { registerProduct } from "../../../usecases/registerProduct"
+} from "../../../usecases/queries/getProductsManagementPageData"
 import { formatCurrencyJPY } from "../../../utils/money"
 import Layout from "../-components/layout"
 import ProductRegistrationForm from "./-components/$productRegistrationForm"

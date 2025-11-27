@@ -1,7 +1,7 @@
 import { validator } from "hono/validator"
 import { createRoute } from "honox/factory"
 import { setToastCookie } from "../../../../helpers/ui/toast"
-import { registerOrder } from "../../../../usecases/registerOrder"
+import { registerOrder } from "../../../../usecases/commands/registerOrder"
 import Layout from "../../-components/layout"
 import OrderRegistrationForm from "./-components/$orderRegistrationForm"
 
