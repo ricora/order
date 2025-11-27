@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
-import { ORDER_HISTORY_HEADER } from "../../app/usecases/exportOrderHistoryCsv"
-import { PRODUCT_CATALOG_HEADER } from "../../app/usecases/exportProductCatalogCsv"
+import { ORDER_HISTORY_HEADER } from "../../app/usecases/queries/exportOrderHistoryCsv"
+import { PRODUCT_CATALOG_HEADER } from "../../app/usecases/queries/exportProductCatalogCsv"
 import { app } from "./utils"
 
 const escapeForRegex = (value: string) =>
