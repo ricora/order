@@ -10,14 +10,14 @@ import {
 import type { DbClient, TransactionDbClient } from "../../libs/db/client"
 
 const orderRepository = {} satisfies Partial<
-  typeof import("../repositories").orderRepository
+  typeof import("../repositories-provider").orderRepository
 >
 
 const productRepository = {
   deleteProduct: mock(async () => undefined),
-} satisfies Partial<typeof import("../repositories").productRepository>
+} satisfies Partial<typeof import("../repositories-provider").productRepository>
 
-mock.module("../repositories", () => ({
+mock.module("../repositories-provider", () => ({
   orderRepository,
   productRepository,
 }))

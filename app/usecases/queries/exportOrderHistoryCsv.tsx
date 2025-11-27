@@ -2,7 +2,7 @@ import type Order from "../../domain/order/entities/order"
 import type { DbClient } from "../../libs/db/client"
 import { toCsv } from "../../utils/csv"
 import { formatDateTimeIsoJP } from "../../utils/date"
-import { orderRepository } from "../repositories"
+import { orderRepository } from "../repositories-provider"
 
 const { findAllOrdersOrderByIdAsc } = orderRepository
 

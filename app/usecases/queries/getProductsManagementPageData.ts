@@ -1,7 +1,7 @@
 import { MAX_STORE_PRODUCT_COUNT } from "../../domain/product/constants"
 import type Product from "../../domain/product/entities/product"
 import type { DbClient } from "../../libs/db/client"
-import { productRepository } from "../repositories"
+import { productRepository } from "../repositories-provider"
 
 const {
   findAllProductStocks,

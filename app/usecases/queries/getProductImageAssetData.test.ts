@@ -3,16 +3,16 @@ import type ProductImage from "../../domain/product/entities/productImage"
 import type { DbClient } from "../../libs/db/client"
 
 const orderRepository = {} satisfies Partial<
-  typeof import("../repositories").orderRepository
+  typeof import("../repositories-provider").orderRepository
 >
 
 const productRepository = {
   findProductImageByProductId: mock(
     async (): Promise<ProductImage | null> => null,
   ),
-} satisfies Partial<typeof import("../repositories").productRepository>
+} satisfies Partial<typeof import("../repositories-provider").productRepository>
 
-mock.module("../repositories", () => ({
+mock.module("../repositories-provider", () => ({
   orderRepository,
   productRepository,
 }))

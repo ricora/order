@@ -2,7 +2,7 @@ import { MAX_STORE_PRODUCT_TAG_COUNT } from "../../domain/product/constants"
 import type Product from "../../domain/product/entities/product"
 import type ProductImage from "../../domain/product/entities/productImage"
 import type { DbClient, TransactionDbClient } from "../../libs/db/client"
-import { productRepository } from "../repositories"
+import { productRepository } from "../repositories-provider"
 
 const {
   createProduct,

@@ -1,6 +1,6 @@
 import type ProductImage from "../../domain/product/entities/productImage"
 import type { DbClient } from "../../libs/db/client"
-import { productRepository } from "../repositories"
+import { productRepository } from "../repositories-provider"
 
 const { findProductImageByProductId } = productRepository
 

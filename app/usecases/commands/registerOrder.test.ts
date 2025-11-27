@@ -21,7 +21,7 @@ const orderRepository = {
     ...order,
     id: 123,
   })),
-} satisfies Partial<typeof import("../repositories").orderRepository>
+} satisfies Partial<typeof import("../repositories-provider").orderRepository>
 
 const productRepository = {
   findAllProductsByIds: mock(async () => mockProducts),
@@ -36,9 +36,9 @@ const productRepository = {
       stock: product.stock ?? orig.stock,
     }
   }),
-} satisfies Partial<typeof import("../repositories").productRepository>
+} satisfies Partial<typeof import("../repositories-provider").productRepository>
 
-mock.module("../repositories", () => ({
+mock.module("../repositories-provider", () => ({
   orderRepository,
   productRepository,
 }))

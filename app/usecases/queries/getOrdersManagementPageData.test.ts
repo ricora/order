@@ -44,13 +44,13 @@ const mockOrders: Order[] = [
 const orderRepository = {
   findAllOrdersOrderByIdAsc: mock(async () => mockOrders),
   findAllOrdersOrderByIdDesc: mock(async () => mockOrders),
-} satisfies Partial<typeof import("../repositories").orderRepository>
+} satisfies Partial<typeof import("../repositories-provider").orderRepository>
 
 const productRepository = {} satisfies Partial<
-  typeof import("../repositories").productRepository
+  typeof import("../repositories-provider").productRepository
 >
 
-mock.module("../repositories", () => ({
+mock.module("../repositories-provider", () => ({
   orderRepository,
   productRepository,
 }))

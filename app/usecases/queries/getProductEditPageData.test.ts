@@ -11,14 +11,14 @@ const mockProduct: Product = {
 }
 
 const orderRepository = {} satisfies Partial<
-  typeof import("../repositories").orderRepository
+  typeof import("../repositories-provider").orderRepository
 >
 
 const productRepository = {
   findProductById: mock(async (): Promise<Product | null> => mockProduct),
-} satisfies Partial<typeof import("../repositories").productRepository>
+} satisfies Partial<typeof import("../repositories-provider").productRepository>
 
-mock.module("../repositories", () => ({
+mock.module("../repositories-provider", () => ({
   orderRepository,
   productRepository,
 }))

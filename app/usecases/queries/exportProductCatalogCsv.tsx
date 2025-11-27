@@ -1,7 +1,7 @@
 import type Product from "../../domain/product/entities/product"
 import type { DbClient } from "../../libs/db/client"
 import { toCsv } from "../../utils/csv"
-import { productRepository } from "../repositories"
+import { productRepository } from "../repositories-provider"
 
 const { findAllProductsOrderByIdAsc, findAllProductTagsByIds } =
   productRepository

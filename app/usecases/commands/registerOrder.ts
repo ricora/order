@@ -1,7 +1,7 @@
 import type Order from "../../domain/order/entities/order"
 import { MAX_STORE_PRODUCT_COUNT } from "../../domain/product/constants"
 import type { DbClient } from "../../libs/db/client"
-import { orderRepository, productRepository } from "../repositories"
+import { orderRepository, productRepository } from "../repositories-provider"
 
 const { createOrder } = orderRepository
 const { findAllProductsByIds, updateProduct } = productRepository

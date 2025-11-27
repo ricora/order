@@ -1,6 +1,6 @@
 import type Order from "../../domain/order/entities/order"
 import type { DbClient } from "../../libs/db/client"
-import { orderRepository } from "../repositories"
+import { orderRepository } from "../repositories-provider"
 
 const { updateOrder: updateOrderRepo } = orderRepository
 

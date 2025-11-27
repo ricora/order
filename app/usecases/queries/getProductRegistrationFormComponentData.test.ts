@@ -10,14 +10,14 @@ const mockTags: ProductTag[] = [
 ]
 
 const orderRepository = {} satisfies Partial<
-  typeof import("../repositories").orderRepository
+  typeof import("../repositories-provider").orderRepository
 >
 
 const productRepository = {
   findAllProductTags: mock(async () => mockTags),
-} satisfies Partial<typeof import("../repositories").productRepository>
+} satisfies Partial<typeof import("../repositories-provider").productRepository>
 
-mock.module("../repositories", () => ({
+mock.module("../repositories-provider", () => ({
   orderRepository,
   productRepository,
 }))
