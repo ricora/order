@@ -2,10 +2,10 @@ import type { Env } from "hono"
 import { Hono } from "hono"
 import { validator } from "hono/validator"
 import type Order from "../../domain/order/entities/order"
-import { getOrderProgressManagerComponentData } from "../../usecases/getOrderProgressManagerComponentData"
-import { getOrderRegistrationFormComponentData } from "../../usecases/getOrderRegistrationFormComponentData"
-import { getProductRegistrationFormComponentData } from "../../usecases/getProductRegistrationFormComponentData"
-import { setOrderStatus } from "../../usecases/setOrderStatus"
+import { setOrderStatus } from "../../usecases/commands/setOrderStatus"
+import { getOrderProgressManagerComponentData } from "../../usecases/queries/getOrderProgressManagerComponentData"
+import { getOrderRegistrationFormComponentData } from "../../usecases/queries/getOrderRegistrationFormComponentData"
+import { getProductRegistrationFormComponentData } from "../../usecases/queries/getProductRegistrationFormComponentData"
 
 /**
  * Web API for island components.

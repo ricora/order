@@ -32,7 +32,7 @@ globalThis.CompressionStream ??= class CompressionStream {
 
 export default defineConfig({
   out: "./drizzle-test",
-  schema: "./app/infrastructure/db/schema.ts",
+  schema: "./app/libs/db/schema.ts",
   dialect: "postgresql",
   driver: "pglite",
   dbCredentials: {

@@ -1,3 +1,12 @@
+import { ALLOWED_PRODUCT_IMAGE_MIME_TYPES_ARRAY } from "../../../../domain/product/constants"
+import type ProductImage from "../../../../domain/product/entities/productImage"
+
+const isAllowedProductImageMimeType = (
+  v: unknown,
+): v is ProductImage["mimeType"] =>
+  typeof v === "string" &&
+  (ALLOWED_PRODUCT_IMAGE_MIME_TYPES_ARRAY as readonly string[]).includes(v)
+
 export const createInvalidRequestError = () => new Error("不正なリクエストです")
 
 export type ParsedProductRegistrationFormData = {
@@ -5,7 +14,7 @@ export type ParsedProductRegistrationFormData = {
   price: number
   stock: number
   tags: string[]
-  image: { data: string; mimeType: string } | null | undefined
+  image: Pick<ProductImage, "data" | "mimeType"> | null | undefined
 }
 
 export const parseProductRegistrationFormData = async (
@@ -47,7 +56,11 @@ const convertFileToImageData = async (
   const buffer = await file.arrayBuffer()
   const bytes = new Uint8Array(buffer)
   const base64 = Buffer.from(bytes).toString("base64")
-  return { data: base64, mimeType: file.type }
+  const mimeType = file.type
+  if (!isAllowedProductImageMimeType(mimeType)) {
+    throw createInvalidRequestError()
+  }
+  return { data: base64, mimeType: mimeType }
 }
 
 const parseCreateImage = async (

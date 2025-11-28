@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory"
-import { exportOrderHistoryCsv } from "../../../../usecases/exportOrderHistoryCsv"
+import { exportOrderHistoryCsv } from "../../../../usecases/queries/exportOrderHistoryCsv"
 import { createCsvDownloadResponse } from "../-helpers/csvResponse"
 
 export default createRoute(async (c) => {

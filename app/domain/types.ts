@@ -1,4 +1,4 @@
-import type { DbClient, TransactionDbClient } from "../infrastructure/db/client"
+import type { DbClient, TransactionDbClient } from "../libs/db/client"
 
 /**
  * リポジトリ関数の型定義に、実装関数（repositoryImpl）をparamsオブジェクトとして追加するユーティリティ型。
