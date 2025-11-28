@@ -34,7 +34,7 @@ describe("getProductImageAssetData", () => {
       mimeType: "image/png",
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    } satisfies ProductImage
 
     productRepository.findProductImageByProductId.mockImplementationOnce(
       async () => mockProductImage,

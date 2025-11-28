@@ -383,7 +383,7 @@ describe("商品管理", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("画像のMIMEタイプは"),
+        encodeURIComponent("不正なリクエストです"),
       )
     })
 
