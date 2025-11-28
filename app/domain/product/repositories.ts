@@ -6,6 +6,9 @@ import type {
   QueryRepositoryFunction,
 } from "../types"
 import {
+  ALLOWED_PRODUCT_IMAGE_MIME_TYPES,
+  ALLOWED_PRODUCT_IMAGE_MIME_TYPES_ARRAY,
+  MAX_PRODUCT_IMAGE_BASE64_SIZE,
   MAX_PRODUCT_PRICE,
   MAX_PRODUCT_STOCK,
   MAX_STORE_PRODUCT_COUNT,
@@ -15,16 +18,6 @@ import {
 import type Product from "./entities/product"
 import type ProductImage from "./entities/productImage"
 import type ProductTag from "./entities/productTag"
-
-const ALLOWED_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]
-
-// base64エンコード後のサイズは元のバイナリサイズの約133%になるため、逆算（10MB / 1.33 ≈ 7.5MB）して厳しめに設定する
-const MAX_IMAGE_SIZE = Math.floor(7.5 * 1024 * 1024)
 
 export type Repositories = {
   // Query
@@ -230,22 +223,19 @@ export const createRepositories = (adapters: Repositories) => {
     image: Partial<Pick<ProductImage, "data" | "mimeType">>,
   ): void => {
     if (image.mimeType !== undefined) {
-      if (!ALLOWED_MIME_TYPES.includes(image.mimeType)) {
+      if (!ALLOWED_PRODUCT_IMAGE_MIME_TYPES.has(image.mimeType)) {
         throw new Error(
-          `画像のMIMEタイプは${ALLOWED_MIME_TYPES.join(", ")}のいずれかである必要があります`,
+          `画像のMIMEタイプは${ALLOWED_PRODUCT_IMAGE_MIME_TYPES_ARRAY.join(", ")}のいずれかである必要があります`,
         )
-      }
-      if (countStringLength(image.mimeType) > 100) {
-        throw new Error("MIMEタイプは100文字以内である必要があります")
       }
     }
     if (image.data !== undefined) {
       if (!/^[A-Za-z0-9+/]*={0,2}$/.test(image.data)) {
         throw new Error("画像データの形式が不正です")
       }
-      if (image.data.length > MAX_IMAGE_SIZE) {
+      if (image.data.length > MAX_PRODUCT_IMAGE_BASE64_SIZE) {
         throw new Error(
-          `画像データのサイズは約${MAX_IMAGE_SIZE / 1024 / 1024}MB以内である必要があります`,
+          `画像データのサイズは約${MAX_PRODUCT_IMAGE_BASE64_SIZE / 1024 / 1024}MB以内である必要があります`,
         )
       }
     }

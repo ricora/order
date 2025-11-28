@@ -607,6 +607,7 @@ describe("Product repositories", () => {
         repositories.createProductImage({
           productImage: {
             ...validProductImage,
+            //@ts-expect-error
             mimeType: "image/bmp",
           },
           dbClient: mockDbClient,
@@ -722,6 +723,7 @@ describe("Product repositories", () => {
         repositories.updateProductImageByProductId({
           productImage: {
             productId: 1,
+            //@ts-expect-error
             mimeType: "image/tiff",
             updatedAt: new Date(),
           },

@@ -32,6 +32,13 @@ export const productTable = pgTable(
   ],
 )
 
+export const productImageMimeTypeEnum = pgEnum("product_image_mime_type", [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+])
+
 /** 商品画像 */
 export const productImageTable = pgTable(
   "product_image",
@@ -42,7 +49,7 @@ export const productImageTable = pgTable(
       .unique()
       .references(() => productTable.id, { onDelete: "cascade" }),
     data: text("data").notNull(),
-    mimeType: text("mime_type").notNull(),
+    mimeType: productImageMimeTypeEnum("mime_type").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -52,10 +59,6 @@ export const productImageTable = pgTable(
   },
   (table) => [
     index("product_image_product_id_idx").on(table.productId),
-    check(
-      "product_image_mime_type_length",
-      sql`char_length(${table.mimeType}) >= 1 AND char_length(${table.mimeType}) <= 100`,
-    ),
     check(
       "product_image_data_length",
       // Base64エンコードされたデータの最大長を10MBに設定

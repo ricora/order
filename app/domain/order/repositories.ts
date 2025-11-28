@@ -4,14 +4,8 @@ import type {
   PaginatedQueryRepositoryFunction,
   QueryRepositoryFunction,
 } from "../types"
+import { ALLOWED_ORDER_STATUSES } from "./constants"
 import type Order from "./entities/order"
-
-const ALLOWED_ORDER_STATUSES = new Set<Order["status"]>([
-  "pending",
-  "processing",
-  "completed",
-  "cancelled",
-])
 
 export type Repositories = {
   // Query
