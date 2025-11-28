@@ -113,7 +113,7 @@ export type Repositories = {
   >
 }
 
-export const createRepositories = (repositoryAdapters: Repositories) => {
+export const createRepositories = (adapters: Repositories) => {
   const validateProduct = (product: Partial<Omit<Product, "id">>) => {
     if (product.name !== undefined) {
       if (
@@ -253,44 +253,44 @@ export const createRepositories = (repositoryAdapters: Repositories) => {
 
   const repositories = {
     findProductById: async ({ dbClient, product }) => {
-      return repositoryAdapters.findProductById({ dbClient, product })
+      return adapters.findProductById({ dbClient, product })
     },
     findProductByName: async ({ dbClient, product }) => {
-      return repositoryAdapters.findProductByName({ dbClient, product })
+      return adapters.findProductByName({ dbClient, product })
     },
     findAllProductsByIds: async ({ dbClient, product, pagination }) => {
-      return repositoryAdapters.findAllProductsByIds({
+      return adapters.findAllProductsByIds({
         dbClient,
         product,
         pagination,
       })
     },
     findAllProductsOrderByIdAsc: async ({ dbClient, pagination }) => {
-      return repositoryAdapters.findAllProductsOrderByIdAsc({
+      return adapters.findAllProductsOrderByIdAsc({
         dbClient,
         pagination,
       })
     },
     findAllProductsOrderByIdDesc: async ({ dbClient, pagination }) => {
-      return repositoryAdapters.findAllProductsOrderByIdDesc({
+      return adapters.findAllProductsOrderByIdDesc({
         dbClient,
         pagination,
       })
     },
     findAllProductStocks: async ({ dbClient, pagination }) => {
-      return repositoryAdapters.findAllProductStocks({ dbClient, pagination })
+      return adapters.findAllProductStocks({ dbClient, pagination })
     },
     countProducts: async ({ dbClient }) => {
-      return repositoryAdapters.countProducts({ dbClient })
+      return adapters.countProducts({ dbClient })
     },
     findProductTagById: async ({ dbClient, productTag }) => {
-      return repositoryAdapters.findProductTagById({ dbClient, productTag })
+      return adapters.findProductTagById({ dbClient, productTag })
     },
     findAllProductTags: async ({ dbClient, pagination }) => {
-      return repositoryAdapters.findAllProductTags({ dbClient, pagination })
+      return adapters.findAllProductTags({ dbClient, pagination })
     },
     findAllProductTagsByIds: async ({ dbClient, productTag, pagination }) => {
-      return repositoryAdapters.findAllProductTagsByIds({
+      return adapters.findAllProductTagsByIds({
         dbClient,
         productTag,
         pagination,
@@ -301,17 +301,17 @@ export const createRepositories = (repositoryAdapters: Repositories) => {
       productTag,
       pagination,
     }) => {
-      return repositoryAdapters.findAllProductTagRelationCountsByTagIds({
+      return adapters.findAllProductTagRelationCountsByTagIds({
         dbClient,
         productTag,
         pagination,
       })
     },
     countProductTags: async ({ dbClient }) => {
-      return repositoryAdapters.countProductTags({ dbClient })
+      return adapters.countProductTags({ dbClient })
     },
     findProductImageByProductId: async ({ dbClient, productImage }) => {
-      return repositoryAdapters.findProductImageByProductId({
+      return adapters.findProductImageByProductId({
         dbClient,
         productImage,
       })
@@ -321,7 +321,7 @@ export const createRepositories = (repositoryAdapters: Repositories) => {
       await verifyProductCountLimit(dbClient)
       await verifyProductNameUnique(dbClient, product.name)
       await verifyAllTagIdsExist(dbClient, product.tagIds)
-      return repositoryAdapters.createProduct({ product, dbClient })
+      return adapters.createProduct({ product, dbClient })
     },
     updateProduct: async ({ dbClient, product }) => {
       const foundProduct = await repositories.findProductById({
@@ -348,7 +348,7 @@ export const createRepositories = (repositoryAdapters: Repositories) => {
         await deleteOrphanedTags(dbClient, removedTagIds)
       }
 
-      return repositoryAdapters.updateProduct({ product, dbClient })
+      return adapters.updateProduct({ product, dbClient })
     },
     deleteProduct: async ({ product, dbClient }) => {
       const foundProduct = await repositories.findProductById({
@@ -365,15 +365,15 @@ export const createRepositories = (repositoryAdapters: Repositories) => {
       })
 
       await deleteOrphanedTags(dbClient, foundProduct.tagIds)
-      await repositoryAdapters.deleteProduct({ product, dbClient })
+      await adapters.deleteProduct({ product, dbClient })
     },
     createProductTag: async ({ dbClient, productTag }) => {
       validateProductTag(productTag)
       await verifyProductTagCountLimit(dbClient)
-      return repositoryAdapters.createProductTag({ productTag, dbClient })
+      return adapters.createProductTag({ productTag, dbClient })
     },
     deleteAllProductTagsByIds: async ({ dbClient, productTag }) => {
-      return repositoryAdapters.deleteAllProductTagsByIds({
+      return adapters.deleteAllProductTagsByIds({
         dbClient,
         productTag,
       })
@@ -383,20 +383,20 @@ export const createRepositories = (repositoryAdapters: Repositories) => {
         data: productImage.data,
         mimeType: productImage.mimeType,
       })
-      return repositoryAdapters.createProductImage({ dbClient, productImage })
+      return adapters.createProductImage({ dbClient, productImage })
     },
     updateProductImageByProductId: async ({ dbClient, productImage }) => {
       validateProductImage({
         data: productImage.data,
         mimeType: productImage.mimeType,
       })
-      return repositoryAdapters.updateProductImageByProductId({
+      return adapters.updateProductImageByProductId({
         dbClient,
         productImage,
       })
     },
     deleteProductImageByProductId: async ({ dbClient, productImage }) => {
-      return repositoryAdapters.deleteProductImageByProductId({
+      return adapters.deleteProductImageByProductId({
         dbClient,
         productImage,
       })
