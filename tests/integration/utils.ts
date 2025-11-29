@@ -38,7 +38,7 @@ export const assertErrorRedirect = (res: Response, expectedMessage: string) => {
 }
 
 type CreateHonoClient =
-  typeof import("../../app/helpers/api/hono-client").createHonoClient
+  typeof import("../../app/routes/-helpers/api/hono-client").createHonoClient
 type HonoClient = ReturnType<CreateHonoClient>
 export type ApiResponse<T extends keyof HonoClient> = Awaited<
   ReturnType<Awaited<ReturnType<HonoClient[T]["$get"]>>["json"]>

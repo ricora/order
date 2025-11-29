@@ -5,7 +5,6 @@ import {
 } from "../../../../domain/product/constants"
 import type Product from "../../../../domain/product/entities/product"
 import type ProductTag from "../../../../domain/product/entities/productTag"
-import { createHonoClient } from "../../../../helpers/api/hono-client"
 import { stripString } from "../../../../utils/text"
 import ChevronLeftIcon from "../../../-components/icons/lucide/chevronLeftIcon"
 import SendIcon from "../../../-components/icons/lucide/sendIcon"
@@ -19,6 +18,7 @@ import FileInput from "../../../-components/ui/fileInput"
 import Input from "../../../-components/ui/input"
 import Label from "../../../-components/ui/label"
 import LinkButton from "../../../-components/ui/linkButton"
+import { createHonoClient } from "../../../-helpers/api/hono-client"
 
 type TagInputProps = {
   existingTags: ProductTag[]

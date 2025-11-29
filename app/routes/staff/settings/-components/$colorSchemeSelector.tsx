@@ -1,9 +1,9 @@
 import type { FC } from "hono/jsx"
-import type { ColorScheme } from "../../../../helpers/ui/color-scheme"
 import MonitorIcon from "../../../-components/icons/lucide/monitorIcon"
 import MoonIcon from "../../../-components/icons/lucide/moonIcon"
 import SunIcon from "../../../-components/icons/lucide/sunIcon"
 import ChipButton from "../../../-components/ui/chipButton"
+import type { ColorScheme } from "../../../-helpers/ui/color-scheme"
 import { useColorScheme } from "../../../-hooks/useColorScheme"
 
 const colorSchemeOptions: Array<{
