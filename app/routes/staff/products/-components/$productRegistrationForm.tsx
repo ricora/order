@@ -1,16 +1,4 @@
 import { type FC, useCallback, useEffect, useState } from "hono/jsx"
-import ChevronLeftIcon from "../../../../components/icons/lucide/chevronLeftIcon"
-import SendIcon from "../../../../components/icons/lucide/sendIcon"
-import TagIcon from "../../../../components/icons/lucide/tagIcon"
-import XIcon from "../../../../components/icons/lucide/xIcon"
-import GraphemeInput from "../../../../components/ui/$graphemeInput"
-import Button from "../../../../components/ui/button"
-import Chip from "../../../../components/ui/chip"
-import ChipButton from "../../../../components/ui/chipButton"
-import FileInput from "../../../../components/ui/fileInput"
-import Input from "../../../../components/ui/input"
-import Label from "../../../../components/ui/label"
-import LinkButton from "../../../../components/ui/linkButton"
 import {
   MAX_PRODUCT_PRICE,
   MAX_PRODUCT_STOCK,
@@ -19,6 +7,18 @@ import type Product from "../../../../domain/product/entities/product"
 import type ProductTag from "../../../../domain/product/entities/productTag"
 import { createHonoClient } from "../../../../helpers/api/hono-client"
 import { stripString } from "../../../../utils/text"
+import ChevronLeftIcon from "../../../-components/icons/lucide/chevronLeftIcon"
+import SendIcon from "../../../-components/icons/lucide/sendIcon"
+import TagIcon from "../../../-components/icons/lucide/tagIcon"
+import XIcon from "../../../-components/icons/lucide/xIcon"
+import GraphemeInput from "../../../-components/ui/$graphemeInput"
+import Button from "../../../-components/ui/button"
+import Chip from "../../../-components/ui/chip"
+import ChipButton from "../../../-components/ui/chipButton"
+import FileInput from "../../../-components/ui/fileInput"
+import Input from "../../../-components/ui/input"
+import Label from "../../../-components/ui/label"
+import LinkButton from "../../../-components/ui/linkButton"
 
 type TagInputProps = {
   existingTags: ProductTag[]

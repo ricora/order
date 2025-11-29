@@ -1,21 +1,21 @@
 import type { FC, PropsWithChildren } from "hono/jsx"
 import { twJoin } from "tailwind-merge"
 import { tv } from "tailwind-variants"
-import ChartColumnIcon from "../../../components/icons/lucide/chartColumnIcon"
-import ChefHatIcon from "../../../components/icons/lucide/chefHatIcon"
-import ClipboardListIcon from "../../../components/icons/lucide/clipboardListIcon"
-import LayoutDashboardIcon from "../../../components/icons/lucide/layoutDashboard"
-import PackageIcon from "../../../components/icons/lucide/packageIcon"
-import PanelLeftIcon from "../../../components/icons/lucide/panelLeftIcon"
-import SettingsIcon from "../../../components/icons/lucide/settingsIcon"
-import ShoppingCartIcon from "../../../components/icons/lucide/shoppingCartIcon"
+import ChartColumnIcon from "../../-components/icons/lucide/chartColumnIcon"
+import ChefHatIcon from "../../-components/icons/lucide/chefHatIcon"
+import ClipboardListIcon from "../../-components/icons/lucide/clipboardListIcon"
+import LayoutDashboardIcon from "../../-components/icons/lucide/layoutDashboard"
+import PackageIcon from "../../-components/icons/lucide/packageIcon"
+import PanelLeftIcon from "../../-components/icons/lucide/panelLeftIcon"
+import SettingsIcon from "../../-components/icons/lucide/settingsIcon"
+import ShoppingCartIcon from "../../-components/icons/lucide/shoppingCartIcon"
 import {
   DrawerContent,
   DrawerOverlay,
   DrawerRoot,
   DrawerTrigger,
-} from "../../../components/ui/$drawer"
-import { useIsMobile } from "../../../hooks/useIsMobile"
+} from "../../-components/ui/$drawer"
+import { useIsMobile } from "../../-hooks/useIsMobile"
 import {
   DESKTOP_SIDEBAR_TOGGLE_BUTTON_ID,
   toggleSidebarState,

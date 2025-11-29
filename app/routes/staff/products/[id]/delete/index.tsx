@@ -1,13 +1,13 @@
 import { createRoute } from "honox/factory"
-import ChevronLeftIcon from "../../../../../components/icons/lucide/chevronLeftIcon"
-import Trash2Icon from "../../../../../components/icons/lucide/trash2Icon"
-import Button from "../../../../../components/ui/button"
-import Chip from "../../../../../components/ui/chip"
-import LinkButton from "../../../../../components/ui/linkButton"
 import { setToastCookie } from "../../../../../helpers/ui/toast"
 import { removeProduct } from "../../../../../usecases/commands/removeProduct"
 import { getProductDeletePageData } from "../../../../../usecases/queries/getProductDeletePageData"
 import { formatCurrencyJPY } from "../../../../../utils/money"
+import ChevronLeftIcon from "../../../../-components/icons/lucide/chevronLeftIcon"
+import Trash2Icon from "../../../../-components/icons/lucide/trash2Icon"
+import Button from "../../../../-components/ui/button"
+import Chip from "../../../../-components/ui/chip"
+import LinkButton from "../../../../-components/ui/linkButton"
 import Layout from "../../../-components/layout"
 
 export const POST = createRoute(async (c) => {

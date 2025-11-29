@@ -1,12 +1,12 @@
 import type { FC } from "hono/jsx"
 import { createRoute } from "honox/factory"
 import { tv } from "tailwind-variants"
-import ChevronRightIcon from "../../../components/icons/lucide/chevronRightIcon"
-import ClipboardListIcon from "../../../components/icons/lucide/clipboardListIcon"
-import DownloadIcon from "../../../components/icons/lucide/downloadIcon"
-import InfoIcon from "../../../components/icons/lucide/infoIcon"
-import PackageIcon from "../../../components/icons/lucide/packageIcon"
-import LinkButton from "../../../components/ui/linkButton"
+import ChevronRightIcon from "../../-components/icons/lucide/chevronRightIcon"
+import ClipboardListIcon from "../../-components/icons/lucide/clipboardListIcon"
+import DownloadIcon from "../../-components/icons/lucide/downloadIcon"
+import InfoIcon from "../../-components/icons/lucide/infoIcon"
+import PackageIcon from "../../-components/icons/lucide/packageIcon"
+import LinkButton from "../../-components/ui/linkButton"
 import Layout from "../-components/layout"
 
 const csvExportItemVariants = tv({
