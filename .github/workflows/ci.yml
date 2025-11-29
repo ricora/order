@@ -36,7 +36,7 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Run TypeScript type check
         if: matrix.task == 'type-check'
-        run: bun run tsc --noEmit --pretty
+        run: bun run type-check
       - name: Run Biome
         if: matrix.task == 'biome'
         run: bun run biome ci .

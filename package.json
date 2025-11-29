@@ -7,7 +7,7 @@
     "preview": "bun run --cwd=dist index.js",
     "check": "biome check . && bun run prettier:format && bun run type-check && bun run depcruise",
     "check:write": "biome check --write . && bun run prettier:format:write",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsgo --noEmit",
     "depcruise": "depcruise app",
     "format": "biome format . && bun run prettier:format",
     "format:write": "biome format --write . && bun run prettier:format:write",
