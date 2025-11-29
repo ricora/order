@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   ci:
@@ -21,6 +22,7 @@ jobs:
             "biome",
             "build",
             "prettier",
+            "depcruise",
             "test:unit",
             "test:integration",
           ]
@@ -44,6 +46,9 @@ jobs:
       - name: Run Prettier
         if: matrix.task == 'prettier'
         run: bun run prettier:format
+      - name: Run dependency-cruiser
+        if: matrix.task == 'depcruise'
+        run: bun run depcruise
       - name: Run unit tests
         if: matrix.task == 'test:unit'
         run: bun run test:unit
