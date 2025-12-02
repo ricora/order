@@ -1,6 +1,6 @@
 import type { JSX } from "hono/jsx/jsx-runtime"
 import { tv } from "tailwind-variants"
-import { setQueryParam } from "../../utils/url"
+import { setQueryParam } from "../../../utils/url"
 import Grid3X3Icon from "../icons/lucide/grid3X3Icon"
 import SquarePenIcon from "../icons/lucide/squarePenIcon"
 import TableIcon from "../icons/lucide/tableIcon"

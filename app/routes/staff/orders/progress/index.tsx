@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory"
-import ToastProvider from "../../../../components/ui/$toastProvider"
+import ToastProvider from "../../../-components/ui/$toastProvider"
 import Layout from "../../-components/layout"
 import OrderProgressManager from "./-components/$orderProgressManager"
 
