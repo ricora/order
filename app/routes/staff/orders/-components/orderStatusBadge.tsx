@@ -1,4 +1,4 @@
-import Badge from "../../../../components/ui/badge"
+import Badge from "../../../-components/ui/badge"
 
 const statusLabel: Record<string, string> = {
   pending: "処理待ち",

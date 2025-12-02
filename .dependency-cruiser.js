@@ -497,10 +497,6 @@ export default {
           modules: [
             {
               criteria: { source: "^app/utils" },
-              attributes: { fillcolor: "#ccccff" },
-            },
-            {
-              criteria: { source: "^app/helpers" },
               attributes: { fillcolor: "#99ffff" },
             },
             {
@@ -522,10 +518,6 @@ export default {
             {
               criteria: { source: "^app/libs" },
               attributes: { fillcolor: "#ccccff" },
-            },
-            {
-              criteria: { source: "^app(?:/[^/]+)*/-components" },
-              attributes: { fillcolor: "#ffcccc" },
             },
             {
               criteria: { source: "^app" },
@@ -550,10 +542,6 @@ export default {
             },
             {
               criteria: { resolved: "^app/utils" },
-              attributes: { color: "#0000ff77" },
-            },
-            {
-              criteria: { resolved: "^app/helpers" },
               attributes: { color: "#22999977" },
             },
             {
@@ -575,10 +563,6 @@ export default {
             {
               criteria: { resolved: "^app/libs" },
               attributes: { color: "#0000ff77" },
-            },
-            {
-              criteria: { resolved: "^app(?:/[^/]+)*/-components" },
-              attributes: { color: "#77000077" },
             },
             {
               criteria: { resolved: "^app" },

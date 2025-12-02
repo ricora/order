@@ -1,6 +1,6 @@
 import type { JSX } from "hono/jsx/jsx-runtime"
 import { tv } from "tailwind-variants"
-import { setQueryParam } from "../../utils/url"
+import { setQueryParam } from "../../../utils/url"
 import ChevronLeftIcon from "../icons/lucide/chevronLeftIcon"
 import ChevronRightIcon from "../icons/lucide/chevronRightIcon"
 import LinkButton from "./linkButton"

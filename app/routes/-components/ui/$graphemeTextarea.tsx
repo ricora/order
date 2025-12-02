@@ -1,21 +1,21 @@
 import { type FC, useState } from "hono/jsx"
-import { countStringLength, stripString } from "../../utils/text"
-import Input from "./input"
+import { countStringLength, stripString } from "../../../utils/text"
+import Textarea from "./textarea"
 
-type GraphemeInputProps = {
+type GraphemeTextareaProps = {
   id?: string
   name?: string
   value: string
   onChange: (v: string) => void
   maxLength: number
   placeholder?: string
-  type?: "text" | "url" | "search" | "tel" | "email"
   showRemaining?: boolean
   required?: boolean
+  rows?: number
   onKeyDown?: (e: KeyboardEvent) => void
 }
 
-const GraphemeInput: FC<GraphemeInputProps> = ({
+const GraphemeTextarea: FC<GraphemeTextareaProps> = ({
   id,
   name,
   value,
@@ -24,8 +24,7 @@ const GraphemeInput: FC<GraphemeInputProps> = ({
   placeholder,
   onKeyDown,
   required,
-
-  type = "text",
+  rows = 3,
   showRemaining = true,
 }) => {
   const [isComposing, setIsComposing] = useState(false)
@@ -34,13 +33,13 @@ const GraphemeInput: FC<GraphemeInputProps> = ({
 
   return (
     <div>
-      <Input
+      <Textarea
         id={id}
         name={name}
-        type={type}
         value={value}
         placeholder={placeholder}
         required={required}
+        rows={rows}
         onKeyDown={onKeyDown}
         onCompositionStart={() => setIsComposing(true)}
         onCompositionEnd={() => setIsComposing(false)}
@@ -51,12 +50,12 @@ const GraphemeInput: FC<GraphemeInputProps> = ({
             e.preventDefault()
           }
         }}
-        onInput={(e) => {
-          const raw = (e.target as HTMLInputElement).value
+        onInput={(e: Event) => {
+          const raw = (e.target as HTMLTextAreaElement).value
           const stripped = stripString(raw, maxLength)
           onChange(stripped)
         }}
-        onPaste={(e) => {
+        onPaste={(e: ClipboardEvent) => {
           e.preventDefault()
           const paste = e.clipboardData?.getData("text") ?? ""
           const newVal = stripString(String(value) + paste, maxLength)
@@ -73,4 +72,4 @@ const GraphemeInput: FC<GraphemeInputProps> = ({
   )
 }
 
-export default GraphemeInput
+export default GraphemeTextarea

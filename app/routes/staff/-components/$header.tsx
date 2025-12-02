@@ -1,7 +1,7 @@
 import type { FC } from "hono/jsx"
 import { tv } from "tailwind-variants"
-import ChevronRightIcon from "../../../components/icons/lucide/chevronRightIcon"
-import HouseIcon from "../../../components/icons/lucide/house"
+import ChevronRightIcon from "../../-components/icons/lucide/chevronRightIcon"
+import HouseIcon from "../../-components/icons/lucide/house"
 import { DesktopSidebarToggleButton } from "./$sidebar"
 
 type Breadcrumb = {

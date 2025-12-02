@@ -1,6 +1,6 @@
 import { useEffect, useState } from "hono/jsx"
-import type { ToastType } from "../../helpers/ui/client-toast"
-import { offToast, onToast } from "../../helpers/ui/client-toast"
+import type { ToastType } from "../../-helpers/ui/client-toast"
+import { offToast, onToast } from "../../-helpers/ui/client-toast"
 import Toast from "./toast"
 
 type ToastItem = { id: number; type: ToastType; message: string }

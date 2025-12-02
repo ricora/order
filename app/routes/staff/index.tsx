@@ -1,11 +1,11 @@
 import type { FC } from "hono/jsx"
 import { createRoute } from "honox/factory"
-import ChartColumnIcon from "../../components/icons/lucide/chartColumnIcon"
-import ChefHatIcon from "../../components/icons/lucide/chefHatIcon"
-import ClipboardListIcon from "../../components/icons/lucide/clipboardListIcon"
-import PackageIcon from "../../components/icons/lucide/packageIcon"
-import SettingsIcon from "../../components/icons/lucide/settingsIcon"
-import ShoppingCartIcon from "../../components/icons/lucide/shoppingCartIcon"
+import ChartColumnIcon from "../-components/icons/lucide/chartColumnIcon"
+import ChefHatIcon from "../-components/icons/lucide/chefHatIcon"
+import ClipboardListIcon from "../-components/icons/lucide/clipboardListIcon"
+import PackageIcon from "../-components/icons/lucide/packageIcon"
+import SettingsIcon from "../-components/icons/lucide/settingsIcon"
+import ShoppingCartIcon from "../-components/icons/lucide/shoppingCartIcon"
 import Layout from "./-components/layout"
 
 type DashboardCard = {
