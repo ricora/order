@@ -656,7 +656,9 @@ const OrderProgressManager: FC = () => {
           ...fetchedData.cancelledOrders,
         ]
         const fetchedMap = new Map<number, Order>()
-        allFetched.forEach((o) => fetchedMap.set(o.id, o))
+        allFetched.forEach((o) => {
+          fetchedMap.set(o.id, o)
+        })
 
         if (hasInitialLoadRef.current) {
           const suppressedIds = new Set(opts?.suppressToastsForIds ?? [])

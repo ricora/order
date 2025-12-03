@@ -30,7 +30,9 @@ export const offToast = (handler: ToastHandler) => handlers.delete(handler)
 export const showToast = (type: ToastType, message: string) => {
   if (typeof window === "undefined") return
   try {
-    handlers.forEach((handler) => handler(type, message))
+    handlers.forEach((handler) => {
+      handler(type, message)
+    })
   } catch {
     // リスナー内の例外は無視する
   }
