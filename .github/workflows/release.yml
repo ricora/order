@@ -26,6 +26,8 @@ jobs:
 
       - name: Setup tools
         uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a # v3.5.0
+        with:
+          cache: false
 
       - name: Extract Bun version from mise.toml
         id: bun-version
