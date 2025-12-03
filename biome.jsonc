@@ -28,7 +28,16 @@
             "functions": ["tv", "tw", "tw.*"]
           }
         }
+      },
+      "correctness": {
+        // Hono JSX does not require keys in iterables.
+        "useJsxKeyInIterable": "off"
       }
+    },
+    "domains": {
+      "project": "recommended",
+      "react": "recommended",
+      "test": "recommended"
     }
   },
   "javascript": {
