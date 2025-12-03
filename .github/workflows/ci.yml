@@ -105,7 +105,7 @@ jobs:
           if ! pg_isready -h localhost -U postgres >/dev/null 2>&1; then
             echo "Postgres did not accept connections on localhost within timeout" && exit 1
           fi
-          echo "DATABASE_URL=postgres://postgres:mypassword@localhost:5432/postgres" >> $GITHUB_ENV
+          echo "DATABASE_URL=postgres://postgres:mypassword@localhost:5432/postgres" >> "$GITHUB_ENV"
       - name: Run e2e tests
         run: bun run test:e2e:ci
       - name: Upload Playwright report

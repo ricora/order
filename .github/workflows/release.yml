@@ -33,7 +33,7 @@ jobs:
         id: bun-version
         run: |
           BUN_VERSION=$(mise ls --local --json | jq -r '.bun[0].version')
-          echo "version=$BUN_VERSION" >> $GITHUB_OUTPUT
+          echo "version=$BUN_VERSION" >> "$GITHUB_OUTPUT"
           echo "Bun version: $BUN_VERSION"
 
       - name: Set up Docker Buildx
