@@ -115,3 +115,29 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+  ci-github-actions:
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        task: ["actionlint", "ghalint", "zizmor"]
+      fail-fast: false
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - name: Setup tools
+        uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a # v3.5.0
+      - name: Run actionlint
+        if: matrix.task == 'actionlint'
+        run: actionlint
+      - name: Run ghalint
+        if: matrix.task == 'ghalint'
+        run: ghalint run
+      - name: Run zizmor
+        if: matrix.task == 'zizmor'
+        run: zizmor .
