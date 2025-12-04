@@ -16,6 +16,11 @@ jobs:
   dependency-graph-report:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref != 'main' }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    timeout-minutes: 30
     steps:
       - name: Checkout the repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
@@ -23,7 +28,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
+          persist-credentials: false
           fetch-depth: 0
       - name: Setup tools
         uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a
@@ -34,35 +39,43 @@ jobs:
       - name: Generate dependency graph SVG
         run: bun run depcruise -- --output-type dot | dot -T svg > dependency-graph.svg
       - name: Commit dependency graph
+        env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         id: commit
         run: |
           set -eux
           git config user.name "github-actions"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add dependency-graph.svg
-          branch=${{ github.event.pull_request.head.ref }}
-          git fetch origin $branch || true
+          branch="$PR_HEAD_REF"
+          git fetch origin "$branch" || true
           if git diff --cached --quiet; then
             # no changes; use remote branch HEAD as SHA
-            remote_sha=$(git rev-parse origin/$branch)
-            echo "graph_sha=${remote_sha}" >> $GITHUB_OUTPUT
-            echo "changed=false" >> $GITHUB_OUTPUT
+            remote_sha=$(git rev-parse "origin/$branch")
+            echo "graph_sha=${remote_sha}" >> "$GITHUB_OUTPUT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "chore: update dependency graph"
           # Attempt to push; if it fails due to a race, fall back to remote
-          if git push origin HEAD:$branch; then
-            echo "graph_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-            echo "changed=true" >> $GITHUB_OUTPUT
+          if git push "https://x-access-token:$GH_TOKEN@github.com/$REPO.git" "HEAD:$branch"; then
+            echo "graph_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           else
-            remote_sha=$(git rev-parse origin/$branch)
-            echo "graph_sha=${remote_sha}" >> $GITHUB_OUTPUT
-            echo "changed=false" >> $GITHUB_OUTPUT
+            remote_sha=$(git rev-parse "origin/$branch")
+            echo "graph_sha=${remote_sha}" >> "$GITHUB_OUTPUT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Build dependency graph comment
+        env:
+          REPOSITORY: ${{ github.repository }}
+          GRAPH_SHA: ${{ steps.commit.outputs.graph_sha }}
+          CHANGED: ${{ steps.commit.outputs.changed }}
         run: |
-          if [ "${{ steps.commit.outputs.changed }}" = "true" ]; then
-            printf "%s\n" "## Dependency cruiser" "" "![dependency graph](https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.commit.outputs.graph_sha }}/dependency-graph.svg)" > dependency-graph-comment.md
+          if [ "$CHANGED" = "true" ]; then
+            printf "%s\n" "## Dependency cruiser" "" "![dependency graph](https://raw.githubusercontent.com/$REPOSITORY/$GRAPH_SHA/dependency-graph.svg)" > dependency-graph-comment.md
           fi
       - name: Post dependency graph as PR comment
         if: ${{ steps.commit.outputs.changed == 'true'}}
