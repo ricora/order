@@ -32,7 +32,7 @@
     "tailwind-variants": "^3.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.1.4",
+    "@biomejs/biome": "2.3.8",
     "@electric-sql/pglite": "0.3.14",
     "@happy-dom/global-registrator": "^20.0.10",
     "@hono/vite-build": "1.7.0",

@@ -67,7 +67,7 @@ https://intentui.com/themes
 - Primary Color: Orange
 - Radius: 0.5
 */
-@variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-border: var(--border);
@@ -308,4 +308,6 @@ https://intentui.com/themes
 
 /* see ./staff/-helpers/sidebar.ts */
 @custom-variant staff-sidebar-open (&:is([data-staff-sidebar-state="open"] *));
-@custom-variant staff-sidebar-closed (&:is([data-staff-sidebar-state="closed"] *));
+@custom-variant staff-sidebar-closed (&:is(
+    [data-staff-sidebar-state="closed"] *
+  ));

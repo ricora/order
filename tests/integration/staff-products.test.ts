@@ -297,9 +297,9 @@ describe("商品管理", () => {
       form.append("name", generateUniqueName("タグ多"))
       form.append("price", "1000")
       form.append("stock", "10")
-      Array.from({ length: 21 }, (_, i) => `タグ${i}`).forEach((tag) =>
-        form.append("tags", tag),
-      )
+      Array.from({ length: 21 }, (_, i) => `タグ${i}`).forEach((tag) => {
+        form.append("tags", tag)
+      })
       const res = await app.request(endpoint, {
         method: "POST",
         body: form,
