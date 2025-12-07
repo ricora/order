@@ -4,10 +4,10 @@ import type {
   CommandRepositoryFunction,
   PaginatedQueryRepositoryFunction,
   QueryRepositoryFunction,
+  Result,
 } from "../types"
 import {
   ALLOWED_PRODUCT_IMAGE_MIME_TYPES,
-  ALLOWED_PRODUCT_IMAGE_MIME_TYPES_ARRAY,
   MAX_PRODUCT_IMAGE_BASE64_SIZE,
   MAX_PRODUCT_PRICE,
   MAX_PRODUCT_STOCK,
@@ -19,175 +19,283 @@ import type Product from "./entities/product"
 import type ProductImage from "./entities/productImage"
 import type ProductTag from "./entities/productTag"
 
+type CommonProductValidationError =
+  | "商品名は1文字以上50文字以内である必要があります"
+  | `商品タグは${typeof MAX_TAGS_PER_PRODUCT}個以内である必要があります`
+  | "タグIDは1以上の整数の配列である必要があります"
+  | "価格は0以上の整数である必要があります"
+  | `価格は${typeof MAX_PRODUCT_PRICE}以下である必要があります`
+  | "在庫数は0以上の整数である必要があります"
+  | `在庫数は${typeof MAX_PRODUCT_STOCK}以下である必要があります`
+  | "タグIDは存在するタグのIDを参照する必要があります"
+  | "タグ名は1文字以上50文字以内である必要があります"
+  | `1店舗あたりの商品タグは${typeof MAX_STORE_PRODUCT_TAG_COUNT}個までです`
+  | "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります"
+  | "画像データの形式が不正です"
+  | "画像データのサイズは約7.5MB以内である必要があります"
+  | `1店舗あたりの商品数は${typeof MAX_STORE_PRODUCT_COUNT}件までです`
+  | "同じ名前の商品が既に存在します"
+
+type CreateProductValidationError = CommonProductValidationError
+
+type UpdateProductValidationError =
+  | CommonProductValidationError
+  | "商品が見つかりません"
+
 export type Repositories = {
   // Query
   findProductById: QueryRepositoryFunction<
     { product: Pick<Product, "id"> },
-    Product | null
+    Product,
+    "商品が見つかりません"
   >
   findProductByName: QueryRepositoryFunction<
     { product: Pick<Product, "name"> },
-    Product | null
+    Product,
+    "商品が見つかりません"
   >
   findAllProductsByIds: PaginatedQueryRepositoryFunction<
     { product: { ids: Product["id"][] } },
-    Product
+    Product,
+    never
   >
   findAllProductsOrderByIdAsc: PaginatedQueryRepositoryFunction<
     unknown,
-    Product
+    Product,
+    never
   >
   findAllProductsOrderByIdDesc: PaginatedQueryRepositoryFunction<
     unknown,
-    Product
+    Product,
+    never
   >
   findAllProductStocks: PaginatedQueryRepositoryFunction<
     unknown,
-    Pick<Product, "stock">
+    Pick<Product, "stock">,
+    never
   >
-  countProducts: QueryRepositoryFunction<unknown, number>
+  countProducts: QueryRepositoryFunction<unknown, number, never>
   findProductTagById: QueryRepositoryFunction<
     { productTag: Pick<ProductTag, "id"> },
-    ProductTag | null
+    ProductTag,
+    "商品タグが見つかりません"
   >
-  findAllProductTags: PaginatedQueryRepositoryFunction<unknown, ProductTag>
+  findAllProductTags: PaginatedQueryRepositoryFunction<
+    unknown,
+    ProductTag,
+    never
+  >
   findAllProductTagsByIds: PaginatedQueryRepositoryFunction<
     { productTag: { ids: ProductTag["id"][] } },
-    ProductTag
+    ProductTag,
+    never
   >
   findAllProductTagRelationCountsByTagIds: PaginatedQueryRepositoryFunction<
     { productTag: { ids: ProductTag["id"][] } },
-    { tagId: ProductTag["id"]; count: number }
+    { tagId: ProductTag["id"]; count: number },
+    never
   >
-  countProductTags: QueryRepositoryFunction<unknown, number>
+  countProductTags: QueryRepositoryFunction<unknown, number, never>
   findProductImageByProductId: QueryRepositoryFunction<
     { productImage: Pick<ProductImage, "productId"> },
-    ProductImage | null
+    ProductImage,
+    "商品画像が見つかりません"
   >
 
   // Command
   createProduct: CommandRepositoryFunction<
     { product: Omit<Product, "id"> },
-    Product | null
+    Product,
+    CreateProductValidationError
   >
   updateProduct: CommandRepositoryFunction<
     { product: Pick<Product, "id"> & Partial<Omit<Product, "id">> },
-    Product | null
+    Product,
+    UpdateProductValidationError
   >
   deleteProduct: CommandRepositoryFunction<
     { product: Pick<Product, "id"> },
-    void
+    void,
+    "商品が見つかりません"
   >
   createProductTag: CommandRepositoryFunction<
     { productTag: Omit<ProductTag, "id"> },
-    ProductTag
+    ProductTag,
+    CommonProductValidationError
   >
   deleteAllProductTagsByIds: CommandRepositoryFunction<
     { productTag: { ids: ProductTag["id"][] } },
-    void
+    void,
+    never
   >
   createProductImage: CommandRepositoryFunction<
     { productImage: Omit<ProductImage, "id"> },
-    ProductImage | null
+    ProductImage,
+    CommonProductValidationError
   >
   updateProductImageByProductId: CommandRepositoryFunction<
     {
       productImage: Pick<ProductImage, "productId" | "updatedAt"> &
         Partial<Pick<ProductImage, "data" | "mimeType">>
     },
-    ProductImage | null
+    ProductImage,
+    CommonProductValidationError
   >
   deleteProductImageByProductId: CommandRepositoryFunction<
     { productImage: Pick<ProductImage, "productId"> },
-    void
+    void,
+    never
   >
 }
 
 export const createRepositories = (adapters: Repositories) => {
-  const validateProduct = (product: Partial<Omit<Product, "id">>) => {
+  type CreateProductParam = Parameters<
+    Repositories["createProduct"]
+  >[0]["product"]
+  type UpdateProductParam = Parameters<
+    Repositories["updateProduct"]
+  >[0]["product"]
+  type CommonProductParam = CreateProductParam | UpdateProductParam
+
+  const validateCommonProduct = (
+    product: CommonProductParam,
+  ): Result<void, CommonProductValidationError> => {
     if (product.name !== undefined) {
       if (
         countStringLength(product.name) < 1 ||
         countStringLength(product.name) > 50
       ) {
-        throw new Error("商品名は1文字以上50文字以内である必要があります")
+        return {
+          ok: false,
+          message: "商品名は1文字以上50文字以内である必要があります",
+        }
       }
     }
     if (product.tagIds !== undefined) {
       if (product.tagIds.length > MAX_TAGS_PER_PRODUCT) {
-        throw new Error(
-          `商品タグは${MAX_TAGS_PER_PRODUCT}個以内である必要があります`,
-        )
+        return {
+          ok: false,
+          message: `商品タグは${MAX_TAGS_PER_PRODUCT}個以内である必要があります`,
+        }
       }
       if (
         product.tagIds.some((tagId) => !Number.isInteger(tagId) || tagId < 1)
       ) {
-        throw new Error("タグIDは1以上の整数の配列である必要があります")
+        return {
+          ok: false,
+          message: "タグIDは1以上の整数の配列である必要があります",
+        }
       }
     }
     if (product.price !== undefined) {
       if (product.price < 0 || !Number.isInteger(product.price)) {
-        throw new Error("価格は0以上の整数である必要があります")
+        return { ok: false, message: "価格は0以上の整数である必要があります" }
       }
       if (product.price > MAX_PRODUCT_PRICE) {
-        throw new Error(`価格は${MAX_PRODUCT_PRICE}以下である必要があります`)
+        return {
+          ok: false,
+          message: `価格は${MAX_PRODUCT_PRICE}以下である必要があります`,
+        }
       }
     }
     if (product.stock !== undefined) {
       if (product.stock < 0 || !Number.isInteger(product.stock)) {
-        throw new Error("在庫数は0以上の整数である必要があります")
+        return { ok: false, message: "在庫数は0以上の整数である必要があります" }
       }
       if (product.stock > MAX_PRODUCT_STOCK) {
-        throw new Error(`在庫数は${MAX_PRODUCT_STOCK}以下である必要があります`)
+        return {
+          ok: false,
+          message: `在庫数は${MAX_PRODUCT_STOCK}以下である必要があります`,
+        }
       }
     }
+    return { ok: true, value: undefined }
   }
   const verifyAllTagIdsExist = async (
     dbClient: TransactionDbClient,
     tagIds: Product["tagIds"],
-  ) => {
-    const tags = await repositories.findAllProductTags({
+  ): Promise<Result<void, CommonProductValidationError>> => {
+    const tagsResult = await repositories.findAllProductTags({
       dbClient,
       pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
     })
-    const tagIdSet = new Set(tags.map((tag) => tag.id))
-    if (tagIds.some((tagId) => !tagIdSet.has(tagId))) {
-      throw new Error("タグIDは存在するタグのIDを参照する必要があります")
+    if (!tagsResult.ok) {
+      return {
+        ok: false,
+        message: "タグIDは存在するタグのIDを参照する必要があります",
+      }
     }
+    const tagIdSet = new Set(tagsResult.value.map((tag) => tag.id))
+    if (tagIds.some((tagId) => !tagIdSet.has(tagId))) {
+      return {
+        ok: false,
+        message: "タグIDは存在するタグのIDを参照する必要があります",
+      }
+    }
+    return { ok: true, value: undefined }
   }
   const verifyProductNameUnique = async (
     dbClient: TransactionDbClient,
     name: Product["name"],
     excludeId?: Product["id"],
-  ) => {
-    const existingProduct = await repositories.findProductByName({
+  ): Promise<Result<void, CommonProductValidationError>> => {
+    const existingProductResult = await repositories.findProductByName({
       product: { name },
       dbClient,
     })
+    if (!existingProductResult.ok) {
+      return { ok: true, value: undefined }
+    }
+    const existingProduct = existingProductResult.value
     if (existingProduct && existingProduct.id !== excludeId) {
-      throw new Error("同じ名前の商品が既に存在します")
+      return { ok: false, message: "同じ名前の商品が既に存在します" }
     }
+    return { ok: true, value: undefined }
   }
-  const verifyProductCountLimit = async (dbClient: TransactionDbClient) => {
-    const totalProducts = await repositories.countProducts({ dbClient })
-    if (totalProducts >= MAX_STORE_PRODUCT_COUNT) {
-      throw new Error(
-        `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです`,
-      )
+  const verifyProductCountLimit = async (
+    dbClient: TransactionDbClient,
+  ): Promise<Result<void, CommonProductValidationError>> => {
+    const totalProductsResult = await repositories.countProducts({ dbClient })
+    if (!totalProductsResult.ok)
+      return {
+        ok: false,
+        message: `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです`,
+      }
+    if (totalProductsResult.value >= MAX_STORE_PRODUCT_COUNT) {
+      return {
+        ok: false,
+        message: `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです`,
+      }
     }
+    return { ok: true, value: undefined }
   }
-  const validateProductTag = (tag: Omit<ProductTag, "id">) => {
+  const validateProductTag = (
+    tag: Omit<ProductTag, "id">,
+  ): Result<void, CommonProductValidationError> => {
     if (countStringLength(tag.name) < 1 || countStringLength(tag.name) > 50) {
-      throw new Error("タグ名は1文字以上50文字以内である必要があります")
+      return {
+        ok: false,
+        message: "タグ名は1文字以上50文字以内である必要があります",
+      }
     }
+    return { ok: true, value: undefined }
   }
-  const verifyProductTagCountLimit = async (dbClient: TransactionDbClient) => {
-    const totalTags = await repositories.countProductTags({ dbClient })
-    if (totalTags >= MAX_STORE_PRODUCT_TAG_COUNT) {
-      throw new Error(
-        `1店舗あたりの商品タグは${MAX_STORE_PRODUCT_TAG_COUNT}個までです`,
-      )
+  const verifyProductTagCountLimit = async (
+    dbClient: TransactionDbClient,
+  ): Promise<Result<void, CommonProductValidationError>> => {
+    const totalTagsResult = await repositories.countProductTags({ dbClient })
+    if (!totalTagsResult.ok)
+      return {
+        ok: false,
+        message: `1店舗あたりの商品タグは${MAX_STORE_PRODUCT_TAG_COUNT}個までです`,
+      }
+    if (totalTagsResult.value >= MAX_STORE_PRODUCT_TAG_COUNT) {
+      return {
+        ok: false,
+        message: `1店舗あたりの商品タグは${MAX_STORE_PRODUCT_TAG_COUNT}個までです`,
+      }
     }
+    return { ok: true, value: undefined }
   }
   const deleteOrphanedTags = async (
     dbClient: TransactionDbClient,
@@ -197,12 +305,14 @@ export const createRepositories = (adapters: Repositories) => {
       return
     }
 
-    const tagRelationCounts =
+    const tagRelationCountsResult =
       await repositories.findAllProductTagRelationCountsByTagIds({
         dbClient,
         productTag: { ids: tagIds },
         pagination: { offset: 0, limit: tagIds.length },
       })
+    if (!tagRelationCountsResult.ok) return
+    const tagRelationCounts = tagRelationCountsResult.value
 
     const orphanedTagIds = tagRelationCounts
       .filter((tagCount) => tagCount.count <= 1)
@@ -218,24 +328,28 @@ export const createRepositories = (adapters: Repositories) => {
 
   const validateProductImage = (
     image: Partial<Pick<ProductImage, "data" | "mimeType">>,
-  ): void => {
+  ): Result<void, CommonProductValidationError> => {
     if (image.mimeType !== undefined) {
       if (!ALLOWED_PRODUCT_IMAGE_MIME_TYPES.has(image.mimeType)) {
-        throw new Error(
-          `画像のMIMEタイプは${ALLOWED_PRODUCT_IMAGE_MIME_TYPES_ARRAY.join(", ")}のいずれかである必要があります`,
-        )
+        return {
+          ok: false,
+          message:
+            "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります",
+        }
       }
     }
     if (image.data !== undefined) {
       if (!/^[A-Za-z0-9+/]*={0,2}$/.test(image.data)) {
-        throw new Error("画像データの形式が不正です")
+        return { ok: false, message: "画像データの形式が不正です" }
       }
       if (image.data.length > MAX_PRODUCT_IMAGE_BASE64_SIZE) {
-        throw new Error(
-          `画像データのサイズは約${MAX_PRODUCT_IMAGE_BASE64_SIZE / 1024 / 1024}MB以内である必要があります`,
-        )
+        return {
+          ok: false,
+          message: "画像データのサイズは約7.5MB以内である必要があります",
+        }
       }
     }
+    return { ok: true, value: undefined }
   }
 
   const repositories = {
@@ -304,27 +418,55 @@ export const createRepositories = (adapters: Repositories) => {
       })
     },
     createProduct: async ({ dbClient, product }) => {
-      validateProduct(product)
-      await verifyProductCountLimit(dbClient)
-      await verifyProductNameUnique(dbClient, product.name)
-      await verifyAllTagIdsExist(dbClient, product.tagIds)
+      const validateCommonResult = validateCommonProduct(product)
+      if (!validateCommonResult.ok) return validateCommonResult
+
+      const countLimitResult = await verifyProductCountLimit(dbClient)
+      if (!countLimitResult.ok) return countLimitResult
+
+      const nameUniqueResult = await verifyProductNameUnique(
+        dbClient,
+        product.name,
+      )
+      if (!nameUniqueResult.ok) return nameUniqueResult
+
+      if (product.tagIds) {
+        const tagExistResult = await verifyAllTagIdsExist(
+          dbClient,
+          product.tagIds,
+        )
+        if (!tagExistResult.ok) return tagExistResult
+      }
+
       return adapters.createProduct({ product, dbClient })
     },
     updateProduct: async ({ dbClient, product }) => {
-      const foundProduct = await repositories.findProductById({
+      const validateCommonResult = validateCommonProduct(product)
+      if (!validateCommonResult.ok) return validateCommonResult
+
+      const foundProductResult = await repositories.findProductById({
         dbClient,
         product: { id: product.id },
       })
-      if (!foundProduct) {
-        throw new Error("商品が見つかりません")
+      if (!foundProductResult.ok) {
+        return { ok: false, message: "商品が見つかりません" }
       }
+      const foundProduct = foundProductResult.value
 
-      validateProduct(product)
       if (product.name) {
-        await verifyProductNameUnique(dbClient, product.name, product.id)
+        const nameUniqueResult = await verifyProductNameUnique(
+          dbClient,
+          product.name,
+          product.id,
+        )
+        if (!nameUniqueResult.ok) return nameUniqueResult
       }
       if (product.tagIds) {
-        await verifyAllTagIdsExist(dbClient, product.tagIds)
+        const tagExistResult = await verifyAllTagIdsExist(
+          dbClient,
+          product.tagIds,
+        )
+        if (!tagExistResult.ok) return tagExistResult
       }
 
       if (product.tagIds !== undefined) {
@@ -338,13 +480,14 @@ export const createRepositories = (adapters: Repositories) => {
       return adapters.updateProduct({ product, dbClient })
     },
     deleteProduct: async ({ product, dbClient }) => {
-      const foundProduct = await repositories.findProductById({
+      const foundProductResult = await repositories.findProductById({
         dbClient,
         product: { id: product.id },
       })
-      if (!foundProduct) {
-        throw new Error("商品が見つかりません")
+      if (!foundProductResult.ok) {
+        return { ok: false, message: "商品が見つかりません" }
       }
+      const foundProduct = foundProductResult.value
 
       await repositories.deleteProductImageByProductId({
         productImage: { productId: product.id },
@@ -352,11 +495,15 @@ export const createRepositories = (adapters: Repositories) => {
       })
 
       await deleteOrphanedTags(dbClient, foundProduct.tagIds)
-      await adapters.deleteProduct({ product, dbClient })
+      return adapters.deleteProduct({ product, dbClient })
     },
     createProductTag: async ({ dbClient, productTag }) => {
-      validateProductTag(productTag)
-      await verifyProductTagCountLimit(dbClient)
+      const validateTagResult = validateProductTag(productTag)
+      if (!validateTagResult.ok) return validateTagResult
+
+      const tagCountLimitResult = await verifyProductTagCountLimit(dbClient)
+      if (!tagCountLimitResult.ok) return tagCountLimitResult
+
       return adapters.createProductTag({ productTag, dbClient })
     },
     deleteAllProductTagsByIds: async ({ dbClient, productTag }) => {
@@ -366,17 +513,19 @@ export const createRepositories = (adapters: Repositories) => {
       })
     },
     createProductImage: async ({ dbClient, productImage }) => {
-      validateProductImage({
+      const validateImageResult = validateProductImage({
         data: productImage.data,
         mimeType: productImage.mimeType,
       })
+      if (!validateImageResult.ok) return validateImageResult
       return adapters.createProductImage({ dbClient, productImage })
     },
     updateProductImageByProductId: async ({ dbClient, productImage }) => {
-      validateProductImage({
+      const validateImageResult = validateProductImage({
         data: productImage.data,
         mimeType: productImage.mimeType,
       })
+      if (!validateImageResult.ok) return validateImageResult
       return adapters.updateProductImageByProductId({
         dbClient,
         productImage,

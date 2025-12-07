@@ -6,12 +6,12 @@ import type { DbClient, TransactionDbClient } from "../libs/db/client"
  * @template P paramsの型
  * @template R 戻り値の型
  * @example
- * type FindById = QueryRepositoryFunction<{ id: number }, Product | null>
+ * type FindById = QueryRepositoryFunction<{ id: number }, Product | null, 'not found' | 'unauthorized'>
  * type FindAll = QueryRepositoryFunction<unknown, Product[]>
  */
-export type QueryRepositoryFunction<P, R> = (
+export type QueryRepositoryFunction<P, R, E extends string> = (
   params: P & { dbClient: DbClient | TransactionDbClient },
-) => Promise<R>
+) => Promise<Result<R, E>>
 
 /**
  * 複数の要素を取得するQuery系リポジトリ関数の型定義。
@@ -20,14 +20,14 @@ export type QueryRepositoryFunction<P, R> = (
  * @template P paramsの型
  * @template T 戻り値の型
  * @example
- * type FindAllProducts = PaginatedQueryRepositoryFunction<unknown, Product>
+ * type FindAllProducts = PaginatedQueryRepositoryFunction<unknown, Product, 'not found' | 'unauthorized'>
  */
-export type PaginatedQueryRepositoryFunction<P, T> = (
+export type PaginatedQueryRepositoryFunction<P, T, E extends string> = (
   params: P & {
     pagination: PaginationParams
     dbClient: DbClient | TransactionDbClient
   },
-) => Promise<T[]>
+) => Promise<Result<T[], E>>
 
 /**
  * Command系リポジトリ関数の型定義。
@@ -35,12 +35,12 @@ export type PaginatedQueryRepositoryFunction<P, T> = (
  * @template P paramsの型
  * @template R 戻り値の型
  * @example
- * type CreateProduct = CommandRepositoryFunction<Omit<Product, "id">, Product | null>
+ * type CreateProduct = CommandRepositoryFunction<Omit<Product, "id">, Product | null, 'validation error' | 'unauthorized'>
  * type DeleteAll = CommandRepositoryFunction<unknown, void>
  */
-export type CommandRepositoryFunction<P, R> = (
+export type CommandRepositoryFunction<P, R, E extends string> = (
   params: P & { dbClient: TransactionDbClient },
-) => Promise<R>
+) => Promise<Result<R, E>>
 
 /**
  * ページネーション用パラメータ型。
@@ -58,3 +58,28 @@ type PaginationParams = {
    */
   limit: number
 }
+
+type Success<T> = {
+  ok: true
+  value: T
+}
+
+type Failure<E extends string> = {
+  ok: false
+  message: E
+}
+
+type UnexpectedError = Failure<"エラーが発生しました。">
+
+/**
+ * 汎用的な成功・失敗の結果を表す型。
+ * 成功時には`Success<T>`型、失敗時には`Failure<E>`型を返す。
+ * @template T 成功時の値の型
+ * @template E 失敗時のエラーメッセージの型
+ * @example
+ * type FetchResult = Result<User, "not found" | "unauthorized">
+ */
+export type Result<T, E extends string> =
+  | Success<T>
+  | Failure<E>
+  | UnexpectedError
