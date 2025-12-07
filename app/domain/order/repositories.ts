@@ -13,20 +13,14 @@ export type Repositories = {
     { order: Pick<Order, "id"> },
     Order | null
   >
-  findAllOrdersOrderByIdAsc: PaginatedQueryRepositoryFunction<
-    Record<string, never>,
-    Order
-  >
-  findAllOrdersOrderByIdDesc: PaginatedQueryRepositoryFunction<
-    Record<string, never>,
-    Order
-  >
+  findAllOrdersOrderByIdAsc: PaginatedQueryRepositoryFunction<unknown, Order>
+  findAllOrdersOrderByIdDesc: PaginatedQueryRepositoryFunction<unknown, Order>
   findAllOrdersByActiveStatusOrderByUpdatedAtAsc: PaginatedQueryRepositoryFunction<
-    Record<string, never>,
+    unknown,
     Order
   >
   findAllOrdersByInactiveStatusOrderByUpdatedAtDesc: PaginatedQueryRepositoryFunction<
-    Record<string, never>,
+    unknown,
     Order
   >
 

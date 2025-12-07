@@ -34,26 +34,23 @@ export type Repositories = {
     Product
   >
   findAllProductsOrderByIdAsc: PaginatedQueryRepositoryFunction<
-    Record<string, never>,
+    unknown,
     Product
   >
   findAllProductsOrderByIdDesc: PaginatedQueryRepositoryFunction<
-    Record<string, never>,
+    unknown,
     Product
   >
   findAllProductStocks: PaginatedQueryRepositoryFunction<
-    Record<string, never>,
+    unknown,
     Pick<Product, "stock">
   >
-  countProducts: QueryRepositoryFunction<Record<string, never>, number>
+  countProducts: QueryRepositoryFunction<unknown, number>
   findProductTagById: QueryRepositoryFunction<
     { productTag: Pick<ProductTag, "id"> },
     ProductTag | null
   >
-  findAllProductTags: PaginatedQueryRepositoryFunction<
-    Record<string, never>,
-    ProductTag
-  >
+  findAllProductTags: PaginatedQueryRepositoryFunction<unknown, ProductTag>
   findAllProductTagsByIds: PaginatedQueryRepositoryFunction<
     { productTag: { ids: ProductTag["id"][] } },
     ProductTag
@@ -62,7 +59,7 @@ export type Repositories = {
     { productTag: { ids: ProductTag["id"][] } },
     { tagId: ProductTag["id"]; count: number }
   >
-  countProductTags: QueryRepositoryFunction<Record<string, never>, number>
+  countProductTags: QueryRepositoryFunction<unknown, number>
   findProductImageByProductId: QueryRepositoryFunction<
     { productImage: Pick<ProductImage, "productId"> },
     ProductImage | null
