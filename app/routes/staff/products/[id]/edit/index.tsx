@@ -1,6 +1,6 @@
 import { validator } from "hono/validator"
 import { createRoute } from "honox/factory"
-import { registerProduct } from "../../../../../usecases/commands/registerProduct"
+import { setProductDetails } from "../../../../../usecases/commands/setProductDetails"
 import { getProductEditPageData } from "../../../../../usecases/queries/getProductEditPageData"
 import { setToastCookie } from "../../../../-helpers/ui/toast"
 import Layout from "../../../-components/layout"
@@ -25,12 +25,14 @@ export const POST = createRoute(
       }
 
       const { product } = c.req.valid("form")
-
-      await registerProduct({
+      const res = await setProductDetails({
         dbClient: c.get("dbClient"),
         product: { id, ...product },
       })
-
+      if (!res.ok) {
+        setToastCookie(c, "error", res.message)
+        return c.redirect(c.req.url)
+      }
       setToastCookie(c, "success", "商品を更新しました")
       return c.redirect(`/staff/products`)
     } catch (e) {
@@ -47,10 +49,15 @@ export default createRoute(async (c) => {
     return c.notFound()
   }
 
-  const { product } = await getProductEditPageData({
+  const res = await getProductEditPageData({
     product: { id },
     dbClient: c.get("dbClient"),
   })
+  if (!res.ok) {
+    if (res.message === "商品が見つかりません。") return c.notFound()
+    throw new Error(res.message)
+  }
+  const { product } = res.value
   if (!product) return c.notFound()
 
   return c.render(

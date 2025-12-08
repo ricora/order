@@ -19,12 +19,13 @@ export default createRoute(async (c) => {
   const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10))
   const sort = c.req.query("sort") === "desc" ? "desc" : "asc"
 
-  const { orders, hasNextPage, currentPage } =
-    await getOrdersManagementPageData({
-      dbClient: c.get("dbClient"),
-      page,
-      sort,
-    })
+  const res = await getOrdersManagementPageData({
+    dbClient: c.get("dbClient"),
+    page,
+    sort,
+  })
+  if (!res.ok) throw new Error(res.message)
+  const { orders, hasNextPage, currentPage } = res.value
 
   return c.render(
     <Layout title={"注文一覧"} description={"注文の一覧を表示します。"}>

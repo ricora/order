@@ -3,12 +3,11 @@ import { exportOrderHistoryCsv } from "../../../../usecases/queries/exportOrderH
 import { createCsvDownloadResponse } from "../-helpers/csvResponse"
 
 export default createRoute(async (c) => {
-  const result = await exportOrderHistoryCsv({
-    dbClient: c.get("dbClient"),
-  })
+  const res = await exportOrderHistoryCsv({ dbClient: c.get("dbClient") })
+  if (!res.ok) throw new Error(res.message)
   return createCsvDownloadResponse(
-    result.csv,
+    res.value.csv,
     "order-history",
-    result.exportedAt,
+    res.value.exportedAt,
   )
 })
