@@ -59,7 +59,7 @@ const routes = app
       })
       if (!setRes.ok) {
         if (setRes.message === "注文が見つかりません。") {
-          return c.notFound()
+          return c.json({ message: setRes.message }, 404)
         }
         throw new Error(setRes.message)
       }
