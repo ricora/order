@@ -126,14 +126,15 @@ export const registerProduct = async ({
         return { ok: false, message: INTERNAL_ERROR }
       }
       if (createPayload.image) {
+        const now = new Date()
         const imageResult = await createProductImage({
           dbClient: tx,
           productImage: {
             productId: createdProductResult.value.id,
             data: createPayload.image.data,
             mimeType: createPayload.image.mimeType,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: now,
+            updatedAt: now,
           },
         })
         if (!imageResult.ok) {

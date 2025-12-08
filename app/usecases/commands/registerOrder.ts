@@ -101,12 +101,13 @@ export const registerOrder = async ({
         (sum, orderItem) => sum + orderItem.unitAmount * orderItem.quantity,
         0,
       )
+      const now = new Date()
       const createOrderResult = await orderRepository.createOrder({
         order: {
           customerName: order.customerName ?? null,
           comment: order.comment ?? null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: now,
+          updatedAt: now,
           status: "pending",
           orderItems,
           totalAmount,
