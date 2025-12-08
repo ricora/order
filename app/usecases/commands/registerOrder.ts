@@ -123,16 +123,19 @@ export const registerOrder = async ({
       }
       return { ok: true as const, value: createOrderResult.value }
     })
-    if (txResult && typeof txResult === "object" && "ok" in txResult) {
-      if (txResult.ok === true) {
-        if (txResult.value !== undefined) {
-          return { ok: true as const, value: txResult.value }
-        } else {
-          return { ok: false as const, message: INTERNAL_ERROR }
-        }
-      } else {
-        return { ok: false as const, message: txResult.message }
+    if (txResult.ok) {
+      if (txResult.value !== undefined) {
+        return { ok: true as const, value: txResult.value }
       }
+      return { ok: false as const, message: INTERNAL_ERROR }
+    }
+    const msg = txResult.message
+    if (
+      msg === PRODUCT_NOT_FOUND ||
+      msg === INSUFFICIENT_STOCK ||
+      isWhitelistedError(msg)
+    ) {
+      return { ok: false as const, message: msg }
     }
     return { ok: false as const, message: INTERNAL_ERROR }
   } catch {

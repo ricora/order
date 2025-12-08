@@ -36,6 +36,5 @@ export const setOrderStatus = async ({
     }
     return { ok: true, value: result.value } as const
   })
-  if (!txResult.ok) return txResult
-  return { ok: true, value: txResult.value }
+  return txResult
 }
