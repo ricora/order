@@ -124,7 +124,7 @@ describe("setOrderDetails", () => {
     expect(orderRepository.updateOrder).toHaveBeenCalledTimes(1)
   })
 
-  it("指定していないドメインのバリデーションエラーが漏洩しない", async () => {
+  it("顧客名が50文字を超える場合はエラーを返す", async () => {
     orderRepository.updateOrder?.mockImplementationOnce(async () => ({
       ok: false,
       message: "顧客名は50文字以内である必要があります。",
@@ -134,6 +134,60 @@ describe("setOrderDetails", () => {
       dbClient,
       order: { id: 30, customerName: "Taro" },
     })
+    expect(res.ok).toBe(false)
+    if (!res.ok)
+      expect(res.message).toBe("顧客名は50文字以内である必要があります。")
+
+    expect(transactionSpy).toHaveBeenCalledTimes(1)
+    expect(orderRepository.updateOrder).toHaveBeenCalledTimes(1)
+  })
+
+  it("コメントが250文字を超える場合はエラーを返す", async () => {
+    orderRepository.updateOrder?.mockImplementationOnce(async () => ({
+      ok: false,
+      message: "コメントは250文字以内である必要があります。",
+    }))
+
+    const res = await setOrderDetails({
+      dbClient,
+      order: { id: 40, comment: "a".repeat(300) },
+    })
+    expect(res.ok).toBe(false)
+    if (!res.ok)
+      expect(res.message).toBe("コメントは250文字以内である必要があります。")
+
+    expect(transactionSpy).toHaveBeenCalledTimes(1)
+    expect(orderRepository.updateOrder).toHaveBeenCalledTimes(1)
+  })
+
+  it("不正なステータスの場合はエラーを返す", async () => {
+    orderRepository.updateOrder?.mockImplementationOnce(async () => ({
+      ok: false,
+      message:
+        "注文の状態は'pending', 'processing', 'completed', 'cancelled'のいずれかである必要があります。",
+    }))
+
+    const res = await setOrderDetails({
+      dbClient,
+      order: { id: 41, status: "processing" },
+    })
+    expect(res.ok).toBe(false)
+    if (!res.ok)
+      expect(res.message).toBe(
+        "注文の状態は'pending', 'processing', 'completed', 'cancelled'のいずれかである必要があります。",
+      )
+
+    expect(transactionSpy).toHaveBeenCalledTimes(1)
+    expect(orderRepository.updateOrder).toHaveBeenCalledTimes(1)
+  })
+
+  it("ホワイトリストにないドメインエラーは汎用エラーにフォールバックする", async () => {
+    orderRepository.updateOrder?.mockImplementationOnce(async () => ({
+      ok: false,
+      message: "注文項目は1種類以上20種類以下である必要があります。",
+    }))
+
+    const res = await setOrderDetails({ dbClient, order: { id: 50 } })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
 

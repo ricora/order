@@ -65,7 +65,7 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("注文に存在しない商品が含まれています"),
+        encodeURIComponent("注文に存在しない商品が含まれています。"),
       )
     })
     test("数量が0のときにエラーを返す", async () => {
@@ -97,7 +97,7 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("注文の個数が在庫を上回っています"),
+        encodeURIComponent("注文の個数が在庫を上回っています。"),
       )
     })
     test("注文項目が空のときにエラーを返す", async () => {
@@ -127,7 +127,7 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("顧客名は50文字以内である必要があります"),
+        encodeURIComponent("顧客名は50文字以内である必要があります。"),
       )
     })
     test("FormDataでbodyが不正な場合にエラーを返す", async () => {
@@ -205,7 +205,9 @@ describe("注文登録", () => {
       expect(res.status).toBe(302)
       expect(res.headers.get("set-cookie")).toMatch(/error/)
       expect(res.headers.get("set-cookie")).toMatch(
-        encodeURIComponent("注文項目は1種類以上20種類以下である必要があります"),
+        encodeURIComponent(
+          "注文項目は1種類以上20種類以下である必要があります。",
+        ),
       )
     })
   })
