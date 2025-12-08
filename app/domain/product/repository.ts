@@ -42,7 +42,7 @@ type UpdateProductValidationError =
   | CommonProductValidationError
   | "商品が見つかりません"
 
-export type Repositories = {
+export type Repository = {
   // Query
   findProductById: QueryRepositoryFunction<
     { product: Pick<Product, "id"> },
@@ -148,12 +148,12 @@ export type Repositories = {
   >
 }
 
-export const createRepositories = (adapters: Repositories) => {
+export const createRepository = (adapters: Repository) => {
   type CreateProductParam = Parameters<
-    Repositories["createProduct"]
+    Repository["createProduct"]
   >[0]["product"]
   type UpdateProductParam = Parameters<
-    Repositories["updateProduct"]
+    Repository["updateProduct"]
   >[0]["product"]
   type CommonProductParam = CreateProductParam | UpdateProductParam
 
@@ -215,7 +215,7 @@ export const createRepositories = (adapters: Repositories) => {
     dbClient: TransactionDbClient,
     tagIds: Product["tagIds"],
   ): Promise<Result<void, CommonProductValidationError>> => {
-    const tagsResult = await repositories.findAllProductTags({
+    const tagsResult = await repository.findAllProductTags({
       dbClient,
       pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
     })
@@ -239,7 +239,7 @@ export const createRepositories = (adapters: Repositories) => {
     name: Product["name"],
     excludeId?: Product["id"],
   ): Promise<Result<void, CommonProductValidationError>> => {
-    const existingProductResult = await repositories.findProductByName({
+    const existingProductResult = await repository.findProductByName({
       product: { name },
       dbClient,
     })
@@ -255,7 +255,7 @@ export const createRepositories = (adapters: Repositories) => {
   const verifyProductCountLimit = async (
     dbClient: TransactionDbClient,
   ): Promise<Result<void, CommonProductValidationError>> => {
-    const totalProductsResult = await repositories.countProducts({ dbClient })
+    const totalProductsResult = await repository.countProducts({ dbClient })
     if (!totalProductsResult.ok)
       return {
         ok: false,
@@ -283,7 +283,7 @@ export const createRepositories = (adapters: Repositories) => {
   const verifyProductTagCountLimit = async (
     dbClient: TransactionDbClient,
   ): Promise<Result<void, CommonProductValidationError>> => {
-    const totalTagsResult = await repositories.countProductTags({ dbClient })
+    const totalTagsResult = await repository.countProductTags({ dbClient })
     if (!totalTagsResult.ok)
       return {
         ok: false,
@@ -306,7 +306,7 @@ export const createRepositories = (adapters: Repositories) => {
     }
 
     const tagRelationCountsResult =
-      await repositories.findAllProductTagRelationCountsByTagIds({
+      await repository.findAllProductTagRelationCountsByTagIds({
         dbClient,
         productTag: { ids: tagIds },
         pagination: { offset: 0, limit: tagIds.length },
@@ -319,7 +319,7 @@ export const createRepositories = (adapters: Repositories) => {
       .map((tagCount) => tagCount.tagId)
 
     if (orphanedTagIds.length > 0) {
-      await repositories.deleteAllProductTagsByIds({
+      await repository.deleteAllProductTagsByIds({
         productTag: { ids: orphanedTagIds },
         dbClient,
       })
@@ -352,7 +352,7 @@ export const createRepositories = (adapters: Repositories) => {
     return { ok: true, value: undefined }
   }
 
-  const repositories = {
+  const repository = {
     findProductById: async ({ dbClient, product }) => {
       return adapters.findProductById({ dbClient, product })
     },
@@ -444,7 +444,7 @@ export const createRepositories = (adapters: Repositories) => {
       const validateCommonResult = validateCommonProduct(product)
       if (!validateCommonResult.ok) return validateCommonResult
 
-      const foundProductResult = await repositories.findProductById({
+      const foundProductResult = await repository.findProductById({
         dbClient,
         product: { id: product.id },
       })
@@ -480,7 +480,7 @@ export const createRepositories = (adapters: Repositories) => {
       return adapters.updateProduct({ product, dbClient })
     },
     deleteProduct: async ({ product, dbClient }) => {
-      const foundProductResult = await repositories.findProductById({
+      const foundProductResult = await repository.findProductById({
         dbClient,
         product: { id: product.id },
       })
@@ -489,7 +489,7 @@ export const createRepositories = (adapters: Repositories) => {
       }
       const foundProduct = foundProductResult.value
 
-      await repositories.deleteProductImageByProductId({
+      await repository.deleteProductImageByProductId({
         productImage: { productId: product.id },
         dbClient,
       })
@@ -537,7 +537,7 @@ export const createRepositories = (adapters: Repositories) => {
         productImage,
       })
     },
-  } satisfies Repositories
+  } satisfies Repository
 
-  return repositories
+  return repository
 }

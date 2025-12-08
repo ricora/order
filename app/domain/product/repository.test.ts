@@ -18,7 +18,7 @@ import {
 import type Product from "./entities/product"
 import type ProductImage from "./entities/productImage"
 import type ProductTag from "./entities/productTag"
-import { createRepositories, type Repositories } from "./repositories"
+import { createRepository, type Repository } from "./repository"
 
 const mockTags = [
   { id: 1, name: "人気" },
@@ -44,14 +44,14 @@ const applyPartialToDefaultProduct = (
   partialProduct: Pick<Product, "id"> & Partial<Omit<Product, "id">>,
 ) => Object.assign({}, defaultProduct, partialProduct)
 
-type MockRepositories = {
-  [K in keyof Repositories]: Mock<Repositories[K]>
+type MockRepository = {
+  [K in keyof Repository]: Mock<Repository[K]>
 }
 
-describe("Product repositories", () => {
+describe("Product repository", () => {
   const mockDbClient = {} as TransactionDbClient
-  let adapters: MockRepositories
-  let repositories: Repositories
+  let adapters: MockRepository
+  let repository: Repository
 
   beforeEach(() => {
     adapters = {
@@ -127,7 +127,7 @@ describe("Product repositories", () => {
         value: undefined,
       })),
     }
-    repositories = createRepositories(adapters)
+    repository = createRepository(adapters)
   })
 
   afterEach(() => {
@@ -135,7 +135,7 @@ describe("Product repositories", () => {
   })
   describe("createProduct", () => {
     it("バリデーションを通過した商品を作成できる", async () => {
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: validProduct,
         dbClient: mockDbClient,
       })
@@ -157,7 +157,7 @@ describe("Product repositories", () => {
         },
       }))
 
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: validProduct,
         dbClient: mockDbClient,
       })
@@ -169,7 +169,7 @@ describe("Product repositories", () => {
     })
 
     it("商品名が空ならエラーを返す", async () => {
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: { ...validProduct, name: "" },
         dbClient: mockDbClient,
       })
@@ -183,7 +183,7 @@ describe("Product repositories", () => {
     })
 
     it("タグIDが存在しない場合はエラーを返す", async () => {
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: { ...validProduct, tagIds: [999] },
         dbClient: mockDbClient,
       })
@@ -198,7 +198,7 @@ describe("Product repositories", () => {
 
     it("タグが20個を超える場合はエラーを返す", async () => {
       const tagIds = Array.from({ length: 21 }, (_, i) => i + 1)
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: { ...validProduct, tagIds },
         dbClient: mockDbClient,
       })
@@ -226,7 +226,7 @@ describe("Product repositories", () => {
         ok: true,
         value: { ...product, id: 99 },
       }))
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: { ...validProduct, tagIds },
         dbClient: mockDbClient,
       })
@@ -241,7 +241,7 @@ describe("Product repositories", () => {
         ok: true,
         value: MAX_STORE_PRODUCT_COUNT,
       }))
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: validProduct,
         dbClient: mockDbClient,
       })
@@ -257,7 +257,7 @@ describe("Product repositories", () => {
     })
 
     it("価格が上限を超える場合はエラーを返す", async () => {
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: { ...validProduct, price: MAX_PRODUCT_PRICE + 1 },
         dbClient: mockDbClient,
       })
@@ -273,7 +273,7 @@ describe("Product repositories", () => {
         ok: true,
         value: { ...product, id: 99 },
       }))
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: { ...validProduct, price: MAX_PRODUCT_PRICE },
         dbClient: mockDbClient,
       })
@@ -282,7 +282,7 @@ describe("Product repositories", () => {
     })
 
     it("在庫数が上限を超える場合はエラーを返す", async () => {
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: { ...validProduct, stock: MAX_PRODUCT_STOCK + 1 },
         dbClient: mockDbClient,
       })
@@ -299,7 +299,7 @@ describe("Product repositories", () => {
         value: { ...product, id: 99 },
       }))
 
-      const result = await repositories.createProduct({
+      const result = await repository.createProduct({
         product: { ...validProduct, stock: MAX_PRODUCT_STOCK },
         dbClient: mockDbClient,
       })
@@ -340,7 +340,7 @@ describe("Product repositories", () => {
         value: applyPartialToDefaultProduct(product),
       }))
 
-      const result = await repositories.updateProduct({
+      const result = await repository.updateProduct({
         product: { ...validProduct, id: 1 },
         dbClient: mockDbClient,
       })
@@ -372,7 +372,7 @@ describe("Product repositories", () => {
         },
       }))
 
-      const result = await repositories.updateProduct({
+      const result = await repository.updateProduct({
         product: { ...validProduct, id: 1 },
         dbClient: mockDbClient,
       })
@@ -424,7 +424,7 @@ describe("Product repositories", () => {
         value: applyPartialToDefaultProduct(product),
       }))
 
-      const result = await repositories.updateProduct({
+      const result = await repository.updateProduct({
         product: { ...validProduct, id: 1 },
         dbClient: mockDbClient,
       })
@@ -468,7 +468,7 @@ describe("Product repositories", () => {
         value: applyPartialToDefaultProduct(product),
       }))
 
-      await repositories.updateProduct({
+      await repository.updateProduct({
         product: { id: 1, tagIds: [1] },
         dbClient: mockDbClient,
       })
@@ -509,7 +509,7 @@ describe("Product repositories", () => {
         value: applyPartialToDefaultProduct(product),
       }))
 
-      await repositories.updateProduct({
+      await repository.updateProduct({
         product: { id: 1, tagIds: [1] },
         dbClient: mockDbClient,
       })
@@ -529,7 +529,7 @@ describe("Product repositories", () => {
         },
       }))
 
-      const result = await repositories.updateProduct({
+      const result = await repository.updateProduct({
         product: { id: 1, price: MAX_PRODUCT_PRICE + 1 },
         dbClient: mockDbClient,
       })
@@ -552,7 +552,7 @@ describe("Product repositories", () => {
         },
       }))
 
-      const result = await repositories.updateProduct({
+      const result = await repository.updateProduct({
         product: { id: 1, stock: MAX_PRODUCT_STOCK + 1 },
         dbClient: mockDbClient,
       })
@@ -570,7 +570,7 @@ describe("Product repositories", () => {
         ok: false,
         message: "商品が見つかりません",
       }))
-      const result = await repositories.deleteProduct({
+      const result = await repository.deleteProduct({
         product: { id: 999 },
         dbClient: mockDbClient,
       })
@@ -605,7 +605,7 @@ describe("Product repositories", () => {
         }),
       )
 
-      await repositories.deleteProduct({
+      await repository.deleteProduct({
         product: { id: 1 },
         dbClient: mockDbClient,
       })
@@ -643,7 +643,7 @@ describe("Product repositories", () => {
         }),
       )
 
-      await repositories.deleteProduct({
+      await repository.deleteProduct({
         product: { id: 1 },
         dbClient: mockDbClient,
       })
@@ -664,7 +664,7 @@ describe("Product repositories", () => {
         value: { ...productTag, id: 123 },
       }))
 
-      const result = await repositories.createProductTag({
+      const result = await repository.createProductTag({
         productTag: validTag,
         dbClient: mockDbClient,
       })
@@ -676,7 +676,7 @@ describe("Product repositories", () => {
     })
 
     it("タグ名が空ならエラーを返す", async () => {
-      const result = await repositories.createProductTag({
+      const result = await repository.createProductTag({
         productTag: { name: "" },
         dbClient: mockDbClient,
       })
@@ -692,7 +692,7 @@ describe("Product repositories", () => {
         ok: true,
         value: MAX_STORE_PRODUCT_TAG_COUNT,
       }))
-      const result = await repositories.createProductTag({
+      const result = await repository.createProductTag({
         productTag: validTag,
         dbClient: mockDbClient,
       })
@@ -705,7 +705,7 @@ describe("Product repositories", () => {
     })
 
     it("タグ名が51文字以上ならエラーを返す", async () => {
-      const result = await repositories.createProductTag({
+      const result = await repository.createProductTag({
         productTag: { name: "あ".repeat(51) },
         dbClient: mockDbClient,
       })
@@ -734,7 +734,7 @@ describe("Product repositories", () => {
         }),
       )
 
-      const result = await repositories.createProductImage({
+      const result = await repository.createProductImage({
         productImage: validProductImage,
         dbClient: mockDbClient,
       })
@@ -747,7 +747,7 @@ describe("Product repositories", () => {
     })
 
     it("画像のMIMEタイプが許可されていない場合はエラーを返す", async () => {
-      const result = await repositories.createProductImage({
+      const result = await repository.createProductImage({
         productImage: {
           ...validProductImage,
           // @ts-expect-error
@@ -763,7 +763,7 @@ describe("Product repositories", () => {
     })
 
     it("画像データの形式が不正な場合はエラーを返す", async () => {
-      const result = await repositories.createProductImage({
+      const result = await repository.createProductImage({
         productImage: {
           ...validProductImage,
           data: "!!!invalid base64!!!",
@@ -799,7 +799,7 @@ describe("Product repositories", () => {
         }),
       )
 
-      const result = await repositories.updateProductImageByProductId({
+      const result = await repository.updateProductImageByProductId({
         productImage: {
           productId: 1,
           data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
@@ -820,7 +820,7 @@ describe("Product repositories", () => {
         }),
       )
 
-      const result = await repositories.updateProductImageByProductId({
+      const result = await repository.updateProductImageByProductId({
         productImage: {
           productId: 1,
           data: "anotherBase64EncodedImageData",
@@ -841,7 +841,7 @@ describe("Product repositories", () => {
         }),
       )
 
-      const result = await repositories.updateProductImageByProductId({
+      const result = await repository.updateProductImageByProductId({
         productImage: {
           productId: 1,
           mimeType: "image/webp",
@@ -854,7 +854,7 @@ describe("Product repositories", () => {
     })
 
     it("更新時に画像のMIMEタイプが許可されていない場合はエラーを返す", async () => {
-      const result = await repositories.updateProductImageByProductId({
+      const result = await repository.updateProductImageByProductId({
         productImage: {
           productId: 1,
           // @ts-expect-error
@@ -871,7 +871,7 @@ describe("Product repositories", () => {
     })
 
     it("更新時に画像データの形式が不正な場合はエラーを返す", async () => {
-      const result = await repositories.updateProductImageByProductId({
+      const result = await repository.updateProductImageByProductId({
         productImage: {
           productId: 1,
           data: "not base64 at all!!!",
@@ -886,7 +886,7 @@ describe("Product repositories", () => {
 
     it("更新時に画像データのサイズが7.5MBを超える場合はエラーを返す", async () => {
       const oversizedData = "A".repeat(7.5 * 1024 * 1024 + 1)
-      const result = await repositories.updateProductImageByProductId({
+      const result = await repository.updateProductImageByProductId({
         productImage: {
           productId: 1,
           data: oversizedData,
@@ -909,7 +909,7 @@ describe("Product repositories", () => {
         value: undefined,
       }))
 
-      await repositories.deleteProductImageByProductId({
+      await repository.deleteProductImageByProductId({
         productImage: {
           productId: 1,
         },

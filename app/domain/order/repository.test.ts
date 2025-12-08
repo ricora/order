@@ -9,10 +9,10 @@ import {
 } from "bun:test"
 import type { TransactionDbClient } from "../../libs/db/client"
 import type Order from "./entities/order"
-import { createRepositories, type Repositories } from "./repositories"
+import { createRepository, type Repository } from "./repository"
 
-type MockRepositories = {
-  [K in keyof Repositories]: Mock<Repositories[K]>
+type MockRepository = {
+  [K in keyof Repository]: Mock<Repository[K]>
 }
 
 const now = new Date()
@@ -31,10 +31,10 @@ const baseOrder: Omit<Order, "id"> = {
 
 const mockOrder: Order = { ...baseOrder, id: 1 }
 
-describe("Order repositories", () => {
+describe("Order repository", () => {
   const mockDbClient = {} as TransactionDbClient
-  let adapters: MockRepositories
-  let repositories: Repositories
+  let adapters: MockRepository
+  let repository: Repository
 
   beforeEach(() => {
     adapters = {
@@ -68,7 +68,7 @@ describe("Order repositories", () => {
       })),
       deleteOrder: mock(async () => ({ ok: true, value: undefined })),
     }
-    repositories = createRepositories(adapters)
+    repository = createRepository(adapters)
   })
 
   afterEach(() => {
@@ -77,7 +77,7 @@ describe("Order repositories", () => {
 
   describe("createOrder", () => {
     it("バリデーションを通過した注文を作成できる", async () => {
-      const result = await repositories.createOrder({
+      const result = await repository.createOrder({
         order: baseOrder,
         dbClient: mockDbClient,
       })
@@ -90,7 +90,7 @@ describe("Order repositories", () => {
     })
 
     it("合計金額が一致しない場合はエラーを返す", async () => {
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, totalAmount: 999 },
         dbClient: mockDbClient,
       })
@@ -103,7 +103,7 @@ describe("Order repositories", () => {
 
     it("顧客名が長すぎる場合はエラーを返す", async () => {
       const longName = "あ".repeat(51)
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, customerName: longName },
         dbClient: mockDbClient,
       })
@@ -115,7 +115,7 @@ describe("Order repositories", () => {
     })
 
     it("注文項目が0件の場合はエラーを返す", async () => {
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, orderItems: [], totalAmount: 0 },
         dbClient: mockDbClient,
       })
@@ -132,7 +132,7 @@ describe("Order repositories", () => {
       const badItems = [
         { productId: 1, productName: "A", unitAmount: 100, quantity: 0 },
       ]
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, orderItems: badItems, totalAmount: 0 },
         dbClient: mockDbClient,
       })
@@ -155,7 +155,7 @@ describe("Order repositories", () => {
           quantity: 1,
         },
       ]
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, orderItems: badItems, totalAmount: 100 },
         dbClient: mockDbClient,
       })
@@ -172,7 +172,7 @@ describe("Order repositories", () => {
       const badItems = [
         { productId: 1, productName: "", unitAmount: 100, quantity: 1 },
       ]
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, orderItems: badItems, totalAmount: 100 },
         dbClient: mockDbClient,
       })
@@ -189,7 +189,7 @@ describe("Order repositories", () => {
       const badItems = [
         { productId: 1, productName: "A", unitAmount: -10, quantity: 1 },
       ]
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, orderItems: badItems, totalAmount: -10 },
         dbClient: mockDbClient,
       })
@@ -209,7 +209,7 @@ describe("Order repositories", () => {
         unitAmount: 1,
         quantity: 1,
       }))
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, orderItems: manyItems, totalAmount: 21 },
         dbClient: mockDbClient,
       })
@@ -228,7 +228,7 @@ describe("Order repositories", () => {
         value: { ...order, id: 99 },
       }))
 
-      const result = await repositories.createOrder({
+      const result = await repository.createOrder({
         order: { ...baseOrder, customerName: null },
         dbClient: mockDbClient,
       })
@@ -240,7 +240,7 @@ describe("Order repositories", () => {
 
     it("コメントが長すぎる場合はエラーを返す", async () => {
       const longComment = "あ".repeat(251)
-      const res = await repositories.createOrder({
+      const res = await repository.createOrder({
         order: { ...baseOrder, comment: longComment },
         dbClient: mockDbClient,
       })
@@ -259,7 +259,7 @@ describe("Order repositories", () => {
         value: { ...order, id: 100 },
       }))
 
-      const result = await repositories.createOrder({
+      const result = await repository.createOrder({
         order: { ...baseOrder, comment: null },
         dbClient: mockDbClient,
       })
@@ -276,7 +276,7 @@ describe("Order repositories", () => {
         value: { ...order, id: 101 },
       }))
 
-      const result = await repositories.createOrder({
+      const result = await repository.createOrder({
         order: { ...baseOrder, comment: comment250 },
         dbClient: mockDbClient,
       })
@@ -290,7 +290,7 @@ describe("Order repositories", () => {
         throw new Error("orm error")
       })
       await expect(
-        repositories.createOrder({ order: baseOrder, dbClient: mockDbClient }),
+        repository.createOrder({ order: baseOrder, dbClient: mockDbClient }),
       ).rejects.toThrow("orm error")
     })
   })
@@ -311,7 +311,7 @@ describe("Order repositories", () => {
         },
       }))
 
-      const result = await repositories.updateOrder({
+      const result = await repository.updateOrder({
         order: { id: 42, customerName: "Jiro", updatedAt: new Date() },
         dbClient: mockDbClient,
       })
@@ -325,7 +325,7 @@ describe("Order repositories", () => {
 
     it("顧客名が長すぎる場合はエラーを返す", async () => {
       const longName = "あ".repeat(51)
-      const res = await repositories.updateOrder({
+      const res = await repository.updateOrder({
         order: { id: 1, customerName: longName, updatedAt: new Date() },
         dbClient: mockDbClient,
       })
@@ -337,7 +337,7 @@ describe("Order repositories", () => {
     })
 
     it("不正な状態の場合はエラーを返す", async () => {
-      const res = await repositories.updateOrder({
+      const res = await repository.updateOrder({
         // @ts-expect-error invalid status
         order: { id: 1, status: "todo", updatedAt: new Date() },
         dbClient: mockDbClient,
@@ -366,7 +366,7 @@ describe("Order repositories", () => {
         },
       }))
 
-      const result = await repositories.updateOrder({
+      const result = await repository.updateOrder({
         order: { id: 7, status: "processing", updatedAt: new Date() },
         dbClient: mockDbClient,
       })
@@ -378,7 +378,7 @@ describe("Order repositories", () => {
 
     it("コメントが長すぎる場合はエラーを返す", async () => {
       const longComment = "あ".repeat(251)
-      const res = await repositories.updateOrder({
+      const res = await repository.updateOrder({
         order: { id: 1, comment: longComment, updatedAt: new Date() },
         dbClient: mockDbClient,
       })
@@ -407,7 +407,7 @@ describe("Order repositories", () => {
         },
       }))
 
-      const result = await repositories.updateOrder({
+      const result = await repository.updateOrder({
         order: { id: 8, comment: testComment, updatedAt: new Date() },
         dbClient: mockDbClient,
       })
@@ -421,7 +421,7 @@ describe("Order repositories", () => {
         throw new Error("orm error")
       })
       await expect(
-        repositories.updateOrder({
+        repository.updateOrder({
           order: { id: 8, updatedAt: new Date() },
           dbClient: mockDbClient,
         }),
@@ -431,7 +431,7 @@ describe("Order repositories", () => {
 
   describe("deleteOrder", () => {
     it("注文を削除できる", async () => {
-      const res = await repositories.deleteOrder({
+      const res = await repository.deleteOrder({
         order: { id: 1 },
         dbClient: mockDbClient,
       })

@@ -6,7 +6,7 @@ import {
   productTagTable,
 } from "../../libs/db/schema"
 import type ProductTag from "./entities/productTag"
-import type { Repositories } from "./repositories"
+import type { Repository } from "./repository"
 
 export const adapters = {
   findProductById: async ({ dbClient, product }) => {
@@ -435,4 +435,4 @@ export const adapters = {
       .where(eq(productImageTable.productId, productImage.productId))
     return { ok: true, value: undefined }
   },
-} satisfies Repositories
+} satisfies Repository

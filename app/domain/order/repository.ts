@@ -27,7 +27,7 @@ type UpdateOrderValidationError =
   | CommonOrderValidationError
   | "注文が見つかりません。"
 
-export type Repositories = {
+export type Repository = {
   // Query
   findOrderById: QueryRepositoryFunction<
     { order: Pick<Order, "id"> },
@@ -76,9 +76,9 @@ export type Repositories = {
   >
 }
 
-export const createRepositories = (adapters: Repositories) => {
-  type CreateOrderParam = Parameters<Repositories["createOrder"]>[0]["order"]
-  type UpdateOrderParam = Parameters<Repositories["updateOrder"]>[0]["order"]
+export const createRepository = (adapters: Repository) => {
+  type CreateOrderParam = Parameters<Repository["createOrder"]>[0]["order"]
+  type UpdateOrderParam = Parameters<Repository["updateOrder"]>[0]["order"]
   type CommonOrderParam = CreateOrderParam | UpdateOrderParam
 
   const validateCommonOrder = (
@@ -115,7 +115,7 @@ export const createRepositories = (adapters: Repositories) => {
     return { ok: true, value: undefined }
   }
 
-  const repositories = {
+  const repository = {
     findOrderById: async ({ dbClient, order }) => {
       return adapters.findOrderById({ dbClient, order })
     },
@@ -209,7 +209,7 @@ export const createRepositories = (adapters: Repositories) => {
       const validateCommonResult = validateCommonOrder(order)
       if (!validateCommonResult.ok) return validateCommonResult
 
-      const foundOrder = await repositories.findOrderById({
+      const foundOrder = await repository.findOrderById({
         dbClient,
         order: { id: order.id },
       })
@@ -225,7 +225,7 @@ export const createRepositories = (adapters: Repositories) => {
     deleteOrder: async ({ dbClient, order }) => {
       return adapters.deleteOrder({ dbClient, order })
     },
-  } satisfies Repositories
+  } satisfies Repository
 
-  return repositories
+  return repository
 }

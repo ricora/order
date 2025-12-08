@@ -1,7 +1,7 @@
 import { asc, desc, eq, inArray } from "drizzle-orm"
 import { orderItemTable, orderTable } from "../../libs/db/schema"
 import type Order from "./entities/order"
-import type { Repositories } from "./repositories"
+import type { Repository } from "./repository"
 
 export const adapters = {
   findOrderById: async ({ dbClient, order }) => {
@@ -269,4 +269,4 @@ export const adapters = {
       value: undefined,
     }
   },
-} satisfies Repositories
+} satisfies Repository
