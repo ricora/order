@@ -20,7 +20,7 @@ export const adapters = {
         },
       },
     })
-    if (!dbProduct) return { ok: false, message: "商品が見つかりません" }
+    if (!dbProduct) return { ok: false, message: "商品が見つかりません。" }
 
     return {
       ok: true,
@@ -45,7 +45,7 @@ export const adapters = {
         },
       },
     })
-    if (!dbProduct) return { ok: false, message: "商品が見つかりません" }
+    if (!dbProduct) return { ok: false, message: "商品が見つかりません。" }
 
     return {
       ok: true,
@@ -160,7 +160,8 @@ export const adapters = {
     const dbProductTag = await dbClient.query.productTagTable.findFirst({
       where: eq(productTagTable.id, productTag.id),
     })
-    if (!dbProductTag) return { ok: false, message: "商品タグが見つかりません" }
+    if (!dbProductTag)
+      return { ok: false, message: "商品タグが見つかりません。" }
     return { ok: true, value: { id: dbProductTag.id, name: dbProductTag.name } }
   },
 
@@ -230,7 +231,7 @@ export const adapters = {
       where: eq(productImageTable.productId, productImage.productId),
     })
     if (!dbProductImage)
-      return { ok: false, message: "商品画像が見つかりません" }
+      return { ok: false, message: "商品画像が見つかりません。" }
 
     return {
       ok: true,

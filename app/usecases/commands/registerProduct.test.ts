@@ -4,11 +4,10 @@ import {
   describe,
   expect,
   it,
+  type Mock,
   mock,
   spyOn,
 } from "bun:test"
-import { MAX_STORE_PRODUCT_TAG_COUNT } from "../../domain/product/constants"
-import type ProductImage from "../../domain/product/entities/productImage"
 import type ProductTag from "../../domain/product/entities/productTag"
 import type { DbClient, TransactionDbClient } from "../../libs/db/client"
 
@@ -21,44 +20,77 @@ const orderRepository = {} satisfies Partial<
   typeof import("../repositories-provider").orderRepository
 >
 
+type ProductRepository =
+  typeof import("../repositories-provider").productRepository
+type MockProductRepository = {
+  [K in keyof ProductRepository]: Mock<ProductRepository[K]>
+}
+
 const productRepository = {
-  findAllProductTags: mock(async () => mockTags),
+  findAllProductTags: mock(async () => ({
+    ok: true as const,
+    value: mockTags,
+  })),
   createProductTag: mock(async ({ productTag }) => ({
-    id: 3,
-    name: productTag.name,
+    ok: true as const,
+    value: { id: 3, name: productTag.name },
   })),
-  findProductImageByProductId: mock(
-    async (): Promise<ProductImage | null> => null,
+  findProductImageByProductId: mock(async () => ({
+    ok: true,
+    value: {
+      id: 1,
+      productId: 1,
+      data: "image-data",
+      mimeType: "image/png",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  })),
+  createProductImage: mock<ProductRepository["createProductImage"]>(
+    async ({ productImage }) => ({
+      ok: true as const,
+      value: {
+        id: 999,
+        productId: productImage.productId,
+        data: productImage.data,
+        mimeType: productImage.mimeType,
+        createdAt: productImage.createdAt,
+        updatedAt: productImage.updatedAt,
+      },
+    }),
   ),
-  createProductImage: mock(async ({ productImage }) => ({
-    id: 999,
-    productId: productImage.productId,
-    data: productImage.data,
-    mimeType: productImage.mimeType,
-    createdAt: productImage.createdAt,
-    updatedAt: productImage.updatedAt,
-  })),
   updateProductImageByProductId: mock(async ({ productImage }) => ({
-    id: productImage.productId,
-    productId: productImage.productId,
-    data: productImage.data ?? "updated-data",
-    mimeType: productImage.mimeType ?? "image/png",
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    ok: true,
+    value: {
+      id: productImage.productId,
+      productId: productImage.productId,
+      data: productImage.data ?? "updated-data",
+      mimeType: productImage.mimeType ?? "image/png",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
   })),
-  deleteProductImageByProductId: mock(async () => undefined),
-  createProduct: mock(async ({ product }) => ({
-    ...product,
-    id: 99,
+  deleteProductImageByProductId: mock(async () => ({
+    ok: true as const,
+    value: undefined,
   })),
+  createProduct: mock<ProductRepository["createProduct"]>(
+    async ({ product }) => ({
+      ok: true as const,
+      value: { ...product, id: 99 },
+    }),
+  ),
   updateProduct: mock(async ({ product }) => ({
-    id: product.id,
-    name: product.name ?? "name",
-    tagIds: product.tagIds ?? [1, 2],
-    price: product.price ?? 100,
-    stock: product.stock ?? 1,
+    ok: true as const,
+    value: {
+      id: product.id,
+      name: product.name ?? "name",
+      tagIds: product.tagIds ?? [1, 2],
+      price: product.price ?? 100,
+      stock: product.stock ?? 1,
+    },
   })),
-} satisfies Partial<typeof import("../repositories-provider").productRepository>
+} satisfies Partial<MockProductRepository>
 
 mock.module("../repositories-provider", () => ({
   orderRepository,
@@ -82,12 +114,10 @@ describe("registerProduct", () => {
     productRepository.createProduct.mockClear()
     productRepository.updateProduct.mockClear()
 
-    productRepository.findAllProductTags.mockImplementation(
-      async () => mockTags,
-    )
-    productRepository.findProductImageByProductId.mockImplementation(
-      async () => null,
-    )
+    productRepository.findAllProductTags.mockImplementation(async () => ({
+      ok: true,
+      value: mockTags,
+    }))
 
     txMock = {} as TransactionDbClient
     const transactionHolder = {
@@ -109,7 +139,7 @@ describe("registerProduct", () => {
   })
 
   it("既存タグのみで商品を登録できる", async () => {
-    await registerProduct({
+    const res = await registerProduct({
       dbClient,
       product: {
         name: "新商品",
@@ -144,10 +174,12 @@ describe("registerProduct", () => {
       productRepository.updateProductImageByProductId,
     ).not.toHaveBeenCalled()
     expect(productRepository.findProductImageByProductId).not.toHaveBeenCalled()
+    expect(res.ok).toBe(true)
+    if (res.ok) expect(res.value).not.toBeNull()
   })
 
   it("新規タグを含めて商品を登録できる", async () => {
-    await registerProduct({
+    const res = await registerProduct({
       dbClient,
       product: {
         name: "新商品2",
@@ -161,6 +193,8 @@ describe("registerProduct", () => {
       },
     })
     expect(productRepository.findAllProductTags).toHaveBeenCalledTimes(1)
+    expect(res.ok).toBe(true)
+    if (res.ok) expect(res.value).not.toBeNull()
     expect(productRepository.createProductTag).toHaveBeenCalledWith(
       expect.objectContaining({ productTag: { name: "新規タグ" } }),
     )
@@ -172,8 +206,110 @@ describe("registerProduct", () => {
     )
   })
 
+  it("createProductでホワイトリストのバリデーションエラーが伝播する", async () => {
+    productRepository.createProduct.mockImplementationOnce(async () => ({
+      ok: false as const,
+      message: "同じ名前の商品が既に存在します。",
+    }))
+    const res = await registerProduct({
+      dbClient,
+      product: {
+        name: "重複商品",
+        tags: ["人気"],
+        price: 100,
+        stock: 1,
+      },
+    })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("同じ名前の商品が既に存在します。")
+  })
+
+  it("createProductで非公開の内部エラーは汎用エラーにフォールバックする", async () => {
+    productRepository.createProduct.mockImplementationOnce(async () => ({
+      ok: false as const,
+      message: "タグIDは1以上の整数の配列である必要があります。",
+    }))
+    const res = await registerProduct({
+      dbClient,
+      product: {
+        name: "DBエラー商品",
+        tags: ["人気"],
+        price: 100,
+        stock: 1,
+      },
+    })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+  })
+
+  it("createProductImageでホワイトリストのバリデーションエラーが伝播する", async () => {
+    productRepository.createProductImage.mockImplementationOnce(async () => ({
+      ok: false as const,
+      message: "画像データの形式が不正です。",
+    }))
+    const res = await registerProduct({
+      dbClient,
+      product: {
+        name: "画像エラー商品",
+        image: {
+          data: "data",
+          mimeType: "image/png",
+        },
+        tags: ["人気"],
+        price: 100,
+        stock: 1,
+      },
+    })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("画像データの形式が不正です。")
+  })
+
+  it("createProductImageで非公開の内部エラーは汎用エラーにフォールバックする", async () => {
+    // @ts-expect-error
+    productRepository.createProductImage.mockImplementationOnce(async () => ({
+      ok: false as const,
+      message: "secret error",
+    }))
+    const res = await registerProduct({
+      dbClient,
+      product: {
+        name: "画像DBエラー商品",
+        image: {
+          data: "data",
+          mimeType: "image/png",
+        },
+        tags: ["人気"],
+        price: 100,
+        stock: 1,
+      },
+    })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+  })
+
+  it("createProductImageが例外を投げた場合は汎用エラーにフォールバックする", async () => {
+    productRepository.createProductImage.mockImplementationOnce(async () => {
+      throw new Error("unexpected internal error")
+    })
+    const res = await registerProduct({
+      dbClient,
+      product: {
+        name: "画像例外商品",
+        image: {
+          data: "data",
+          mimeType: "image/png",
+        },
+        tags: ["人気"],
+        price: 100,
+        stock: 1,
+      },
+    })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+  })
+
   it("タグが空や空白のみの場合は無視される", async () => {
-    await registerProduct({
+    const res = await registerProduct({
       dbClient,
       product: {
         name: "空タグ商品",
@@ -187,6 +323,8 @@ describe("registerProduct", () => {
       },
     })
     expect(productRepository.findAllProductTags).toHaveBeenCalledTimes(1)
+    expect(res.ok).toBe(true)
+    if (res.ok) expect(res.value).not.toBeNull()
     expect(productRepository.createProductTag).toHaveBeenCalledTimes(0)
     expect(productRepository.createProduct).toHaveBeenCalledTimes(1)
     expect(productRepository.createProduct).toHaveBeenCalledWith(
@@ -200,256 +338,21 @@ describe("registerProduct", () => {
     productRepository.createProduct.mockImplementationOnce(async () => {
       throw new Error("DBで商品の作成に失敗しました")
     })
-    await expect(
-      registerProduct({
-        dbClient,
-        product: {
-          name: "失敗商品",
-          image: {
-            data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-            mimeType: "image/png",
-          },
-          tags: ["人気"],
-          price: 100,
-          stock: 1,
-        },
-      }),
-    ).rejects.toThrow("DBで商品の作成に失敗しました")
-    expect(productRepository.createProductImage).not.toHaveBeenCalled()
-  })
-
-  it("既存タグのみで商品を更新できる", async () => {
-    const mockExistingImage = {
-      id: 1,
-      productId: 10,
-      data: "old",
-      mimeType: "image/png",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } satisfies ProductImage
-    productRepository.findProductImageByProductId.mockImplementationOnce(
-      async () => mockExistingImage,
-    )
-    const result = await registerProduct({
+    const res = await registerProduct({
       dbClient,
       product: {
-        id: 10,
-        name: " 更新後商品 ",
-        image: {
-          data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-          mimeType: "image/png",
-        },
-        tags: ["人気", "メイン"],
-        price: 600,
-        stock: 10,
-      },
-    })
-    expect(transactionSpy).toHaveBeenCalledTimes(1)
-    expect(productRepository.findAllProductTags).toHaveBeenCalledTimes(1)
-    expect(productRepository.createProductTag).not.toHaveBeenCalled()
-    expect(productRepository.updateProduct).toHaveBeenCalledTimes(1)
-    expect(result).not.toBeNull()
-    expect(result?.id).toBe(10)
-    expect(result?.name).toBe("更新後商品")
-    expect(result?.tagIds).toEqual([1, 2])
-    expect(result?.price).toBe(600)
-    expect(result?.stock).toBe(10)
-    expect(productRepository.findProductImageByProductId).toHaveBeenCalledTimes(
-      1,
-    )
-    expect(
-      productRepository.updateProductImageByProductId,
-    ).toHaveBeenCalledTimes(1)
-    expect(productRepository.createProductImage).not.toHaveBeenCalled()
-    expect(
-      productRepository.deleteProductImageByProductId,
-    ).not.toHaveBeenCalled()
-  })
-
-  it("商品を部分更新できる", async () => {
-    const result = await registerProduct({
-      dbClient,
-      product: {
-        id: 12,
-        name: "部分更新商品",
-        price: 750,
-      },
-    })
-    expect(transactionSpy).toHaveBeenCalledTimes(1)
-    expect(productRepository.findAllProductTags).toHaveBeenCalledTimes(0)
-    expect(productRepository.createProductTag).not.toHaveBeenCalled()
-    expect(productRepository.updateProduct).toHaveBeenCalledTimes(1)
-    expect(result).not.toBeNull()
-    expect(result?.id).toBe(12)
-    expect(result?.name).toBe("部分更新商品")
-    expect(result?.tagIds).toEqual([1, 2])
-    expect(result?.price).toBe(750)
-    expect(result?.stock).toBe(1)
-    expect(productRepository.findProductImageByProductId).not.toHaveBeenCalled()
-    expect(productRepository.createProductImage).not.toHaveBeenCalled()
-    expect(
-      productRepository.updateProductImageByProductId,
-    ).not.toHaveBeenCalled()
-    expect(
-      productRepository.deleteProductImageByProductId,
-    ).not.toHaveBeenCalled()
-  })
-
-  it("タグが未指定の場合はtagIdsを更新しない", async () => {
-    const result = await registerProduct({
-      dbClient,
-      product: {
-        id: 11,
-        name: "部分更新",
-      },
-    })
-    expect(result).not.toBeNull()
-    expect(result?.id).toBe(11)
-    expect(result?.tagIds).toEqual([1, 2])
-  })
-
-  it("imageが空文字列の場合はnullとして更新される", async () => {
-    await registerProduct({
-      dbClient,
-      product: {
-        id: 13,
-        image: null,
-      },
-    })
-    expect(productRepository.updateProduct).toHaveBeenCalledTimes(1)
-    expect(
-      productRepository.deleteProductImageByProductId,
-    ).toHaveBeenCalledTimes(1)
-    expect(
-      productRepository.deleteProductImageByProductId,
-    ).toHaveBeenCalledWith(
-      expect.objectContaining({
-        productImage: expect.objectContaining({ productId: 13 }),
-      }),
-    )
-    expect(productRepository.createProductImage).not.toHaveBeenCalled()
-    expect(
-      productRepository.updateProductImageByProductId,
-    ).not.toHaveBeenCalled()
-  })
-
-  it("tagsが空配列の場合はtagIdsが空配列で更新される", async () => {
-    const result = await registerProduct({
-      dbClient,
-      product: {
-        id: 14,
-        tags: [],
-      },
-    })
-    expect(productRepository.updateProduct).toHaveBeenCalledTimes(1)
-    expect(productRepository.updateProduct).toHaveBeenCalledWith(
-      expect.objectContaining({
-        product: expect.objectContaining({ tagIds: [] }),
-      }),
-    )
-    expect(result?.tagIds).toEqual([])
-  })
-
-  it("tagsが空白のみの配列の場合はtagIdsが空配列で更新される", async () => {
-    const result = await registerProduct({
-      dbClient,
-      product: {
-        id: 15,
-        tags: ["", "   "],
-      },
-    })
-    expect(productRepository.findAllProductTags).toHaveBeenCalledTimes(1)
-    expect(productRepository.updateProduct).toHaveBeenCalledTimes(1)
-    expect(productRepository.updateProduct).toHaveBeenCalledWith(
-      expect.objectContaining({
-        product: expect.objectContaining({ tagIds: [] }),
-      }),
-    )
-    expect(result?.tagIds).toEqual([])
-  })
-
-  it("新規タグを含めて商品を更新できる", async () => {
-    const result = await registerProduct({
-      dbClient,
-      product: {
-        id: 20,
-        name: "更新商品2",
-        image: {
-          data: "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2P4//8/AyMDIwMhwOgAAI9/Bv6zbsz/AAAAAElFTkSuQmCC",
-          mimeType: "image/jpeg",
-        },
-        tags: ["人気", "新規タグ2"],
-        price: 900,
-        stock: 15,
-      },
-    })
-    expect(productRepository.findAllProductTags).toHaveBeenCalledTimes(1)
-    expect(productRepository.createProductTag).toHaveBeenCalledWith(
-      expect.objectContaining({ productTag: { name: "新規タグ2" } }),
-    )
-    expect(result).not.toBeNull()
-    expect(result?.id).toBe(20)
-    expect(result?.tagIds).toEqual([1, 3])
-    expect(productRepository.createProductImage).toHaveBeenCalledTimes(1)
-    expect(
-      productRepository.updateProductImageByProductId,
-    ).not.toHaveBeenCalled()
-  })
-
-  it("商品更新で例外が発生した場合はエラーを投げる", async () => {
-    productRepository.updateProduct.mockImplementationOnce(async () => {
-      throw new Error("DBで商品の更新に失敗しました")
-    })
-    await expect(
-      registerProduct({
-        dbClient,
-        product: {
-          id: 21,
-          name: "失敗更新商品",
-          price: 100,
-        },
-      }),
-    ).rejects.toThrow("DBで商品の更新に失敗しました")
-  })
-
-  it("findAllProductTagsに正しいページネーションパラメータを渡している", async () => {
-    await registerProduct({
-      dbClient,
-      product: {
-        name: "新商品",
+        name: "失敗商品",
         image: {
           data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
           mimeType: "image/png",
         },
         tags: ["人気"],
-        price: 500,
-        stock: 20,
+        price: 100,
+        stock: 1,
       },
     })
-
-    expect(productRepository.findAllProductTags).toHaveBeenCalledTimes(1)
-    expect(productRepository.findAllProductTags).toHaveBeenCalledWith(
-      expect.objectContaining({
-        pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
-      }),
-    )
-  })
-
-  it("商品更新時もfindAllProductTagsに正しいページネーションパラメータを渡している", async () => {
-    await registerProduct({
-      dbClient,
-      product: {
-        id: 10,
-        name: "更新商品",
-        tags: ["メイン"],
-      },
-    })
-
-    expect(productRepository.findAllProductTags).toHaveBeenCalledTimes(1)
-    expect(productRepository.findAllProductTags).toHaveBeenCalledWith(
-      expect.objectContaining({
-        pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
-      }),
-    )
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+    expect(productRepository.createProductImage).not.toHaveBeenCalled()
   })
 })

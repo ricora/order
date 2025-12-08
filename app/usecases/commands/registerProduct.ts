@@ -1,19 +1,43 @@
 import { MAX_STORE_PRODUCT_TAG_COUNT } from "../../domain/product/constants"
 import type Product from "../../domain/product/entities/product"
 import type ProductImage from "../../domain/product/entities/productImage"
+import type { Result } from "../../domain/types"
 import type { DbClient, TransactionDbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"
 
 const {
   createProduct,
-  updateProduct,
   createProductImage,
-  deleteProductImageByProductId,
-  updateProductImageByProductId,
-  findProductImageByProductId,
   createProductTag,
   findAllProductTags,
 } = productRepository
+
+const INTERNAL_ERROR = "エラーが発生しました。"
+
+const WHITELISTED_ERRORS_ARRAY = [
+  "商品名は1文字以上50文字以内である必要があります。",
+  "商品タグは20個以内である必要があります。",
+  "価格は0以上の整数である必要があります。",
+  "価格は1000000000以下である必要があります。",
+  "在庫数は0以上の整数である必要があります。",
+  "在庫数は1000000000以下である必要があります。",
+  "タグ名は1文字以上50文字以内である必要があります。",
+  "1店舗あたりの商品数は1000件までです。",
+  "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります。",
+  "画像データの形式が不正です。",
+  "画像データのサイズは約7.5MB以内である必要があります。",
+  "同じ名前の商品が既に存在します。",
+] as const
+
+type WhitelistedError = (typeof WHITELISTED_ERRORS_ARRAY)[number]
+
+export type RegisterProductError = typeof INTERNAL_ERROR | WhitelistedError
+const WHITELISTED_ERRORS = new Set<string>(
+  WHITELISTED_ERRORS_ARRAY as readonly string[],
+)
+
+const isWhitelistedError = (v: unknown): v is WhitelistedError =>
+  typeof v === "string" && WHITELISTED_ERRORS.has(v)
 
 const resolveTagNamesToIds = async ({
   dbClient,
@@ -21,14 +45,14 @@ const resolveTagNamesToIds = async ({
 }: {
   dbClient: TransactionDbClient
   tagNames: string[]
-}): Promise<number[]> => {
-  if (!tagNames || tagNames.length === 0) return []
-
-  const tags = await findAllProductTags({
+}): Promise<Result<number[], RegisterProductError>> => {
+  if (!tagNames || tagNames.length === 0) return { ok: true, value: [] }
+  const tagsResult = await findAllProductTags({
     dbClient,
     pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
   })
-  const tagNameToId = new Map(tags.map((tag) => [tag.name, tag.id]))
+  if (!tagsResult.ok) return { ok: false, message: INTERNAL_ERROR }
+  const tagNameToId = new Map(tagsResult.value.map((tag) => [tag.name, tag.id]))
   const tagIds: number[] = []
   for (const tagName of tagNames) {
     const trimmed = tagName.trim()
@@ -37,15 +61,22 @@ const resolveTagNamesToIds = async ({
     if (id !== undefined) {
       tagIds.push(id)
     } else {
-      const newTag = await createProductTag({
+      const newTagResult = await createProductTag({
         productTag: { name: trimmed },
         dbClient,
       })
-      tagIds.push(newTag.id)
-      tagNameToId.set(trimmed, newTag.id)
+      if (!newTagResult.ok) {
+        const msg = newTagResult.message
+        if (isWhitelistedError(msg)) {
+          return { ok: false, message: msg }
+        }
+        return { ok: false, message: INTERNAL_ERROR }
+      }
+      tagIds.push(newTagResult.value.id)
+      tagNameToId.set(trimmed, newTagResult.value.id)
     }
   }
-  return tagIds
+  return { ok: true, value: tagIds }
 }
 
 type ProductImageInput =
@@ -58,124 +89,65 @@ export type CreateProductPayload = Omit<Product, "tagIds" | "id"> & {
   image?: ProductImageInput
 }
 
-export type UpdateProductPayload = { id: number } & Partial<
-  Omit<Product, "tagIds" | "id">
-> & {
-    tags?: string[]
-    image?: ProductImageInput
-  }
-
-export type RegisterProductPayload = CreateProductPayload | UpdateProductPayload
-
-const isUpdatePayload = (
-  p: RegisterProductPayload,
-): p is UpdateProductPayload =>
-  typeof (p as UpdateProductPayload).id === "number"
-
 export type RegisterProductParams = {
   dbClient: DbClient
-  product: RegisterProductPayload
+  product: CreateProductPayload
 }
 
 export const registerProduct = async ({
   dbClient,
   product,
-}: RegisterProductParams): Promise<Product | null> => {
-  if (isUpdatePayload(product)) {
-    const updatePayload = product
-    let updatedProduct: Product | null = null
-    await dbClient.transaction(async (tx) => {
-      let tagIds: number[] | undefined
-      if (updatePayload.tags !== undefined) {
-        tagIds = await resolveTagNamesToIds({
-          dbClient: tx,
-          tagNames: updatePayload.tags,
-        })
-      }
-
-      updatedProduct = await updateProduct({
+}: RegisterProductParams): Promise<Result<Product, RegisterProductError>> => {
+  try {
+    const createPayload = product
+    const txResult = await dbClient.transaction<
+      Result<Product, RegisterProductError>
+    >(async (tx) => {
+      const tagResult = await resolveTagNamesToIds({
+        dbClient: tx,
+        tagNames: createPayload.tags,
+      })
+      if (!tagResult.ok) return tagResult
+      const tagIds = tagResult.value
+      const createdProductResult = await createProduct({
         product: {
-          id: updatePayload.id,
-          name:
-            updatePayload.name !== undefined
-              ? updatePayload.name.trim()
-              : undefined,
-          tagIds: tagIds ?? undefined,
-          price: updatePayload.price ?? undefined,
-          stock: updatePayload.stock ?? undefined,
+          name: createPayload.name.trim(),
+          tagIds,
+          price: createPayload.price,
+          stock: createPayload.stock,
         },
         dbClient: tx,
       })
-
-      if (updatedProduct && updatePayload.image !== undefined) {
-        if (updatePayload.image === null) {
-          await deleteProductImageByProductId({
-            dbClient: tx,
-            productImage: { productId: updatePayload.id },
-          })
-        } else {
-          const existingImage = await findProductImageByProductId({
-            dbClient: tx,
-            productImage: { productId: updatePayload.id },
-          })
-          if (existingImage) {
-            await updateProductImageByProductId({
-              dbClient: tx,
-              productImage: {
-                productId: updatePayload.id,
-                data: updatePayload.image.data,
-                mimeType: updatePayload.image.mimeType,
-                updatedAt: new Date(),
-              },
-            })
-          } else {
-            await createProductImage({
-              dbClient: tx,
-              productImage: {
-                productId: updatePayload.id,
-                data: updatePayload.image.data,
-                mimeType: updatePayload.image.mimeType,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              },
-            })
+      if (!createdProductResult.ok) {
+        const msg = createdProductResult.message
+        if (isWhitelistedError(msg)) {
+          return { ok: false, message: msg }
+        }
+        return { ok: false, message: INTERNAL_ERROR }
+      }
+      if (createPayload.image) {
+        const imageResult = await createProductImage({
+          dbClient: tx,
+          productImage: {
+            productId: createdProductResult.value.id,
+            data: createPayload.image.data,
+            mimeType: createPayload.image.mimeType,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        })
+        if (!imageResult.ok) {
+          const msg = imageResult.message
+          if (isWhitelistedError(msg)) {
+            return { ok: false, message: msg }
           }
+          return { ok: false, message: INTERNAL_ERROR }
         }
       }
+      return { ok: true, value: createdProductResult.value }
     })
-    return updatedProduct
+    return txResult
+  } catch {
+    return { ok: false, message: INTERNAL_ERROR }
   }
-
-  const createPayload = product
-  let createdProduct: Product | null = null
-  await dbClient.transaction(async (tx) => {
-    const tagIds = await resolveTagNamesToIds({
-      dbClient: tx,
-      tagNames: createPayload.tags,
-    })
-
-    createdProduct = await createProduct({
-      product: {
-        name: createPayload.name.trim(),
-        tagIds,
-        price: createPayload.price,
-        stock: createPayload.stock,
-      },
-      dbClient: tx,
-    })
-
-    if (createdProduct && createPayload.image) {
-      await createProductImage({
-        dbClient: tx,
-        productImage: {
-          productId: createdProduct.id,
-          data: createPayload.image.data,
-          mimeType: createPayload.image.mimeType,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      })
-    }
-  })
-  return createdProduct
 }

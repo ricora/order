@@ -57,11 +57,11 @@ describe("Product repository", () => {
     adapters = {
       findProductById: mock(async () => ({
         ok: false,
-        message: "商品が見つかりません",
+        message: "商品が見つかりません。",
       })),
       findProductByName: mock(async () => ({
         ok: false,
-        message: "商品が見つかりません",
+        message: "商品が見つかりません。",
       })),
       findAllProductsByIds: mock(async () => ({ ok: true, value: [] })),
       findAllProductsOrderByIdAsc: mock(async () => ({ ok: true, value: [] })),
@@ -69,7 +69,7 @@ describe("Product repository", () => {
       findAllProductStocks: mock(async () => ({ ok: true, value: [] })),
       findProductTagById: mock(async () => ({
         ok: false,
-        message: "商品タグが見つかりません",
+        message: "商品タグが見つかりません。",
       })),
       findAllProductTags: mock(async () => ({ ok: true, value: mockTags })),
       findAllProductTagsByIds: mock(async () => ({ ok: true, value: [] })),
@@ -81,7 +81,7 @@ describe("Product repository", () => {
       countProductTags: mock(async () => ({ ok: true, value: 0 })),
       findProductImageByProductId: mock(async () => ({
         ok: false,
-        message: "商品画像が見つかりません",
+        message: "商品画像が見つかりません。",
       })),
       createProduct: mock(async ({ product }) => ({
         ok: true,
@@ -305,6 +305,96 @@ describe("Product repository", () => {
       })
       expect(result.ok).toBe(true)
       if (result.ok) expect(result.value.stock).toBe(MAX_PRODUCT_STOCK)
+    })
+
+    it("商品名が50文字を超える場合はエラーを返す", async () => {
+      const result = await repository.createProduct({
+        product: { ...validProduct, name: "あ".repeat(51) },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "商品名は1文字以上50文字以内である必要があります",
+        )
+      expect(adapters.findAllProductTags).not.toHaveBeenCalled()
+      expect(adapters.findProductByName).not.toHaveBeenCalled()
+    })
+
+    it("タグIDに整数以外が含まれる場合はエラーを返す", async () => {
+      const result = await repository.createProduct({
+        product: { ...validProduct, tagIds: [1.5, 2] },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "タグIDは1以上の整数の配列である必要があります",
+        )
+      expect(adapters.findAllProductTags).not.toHaveBeenCalled()
+      expect(adapters.findProductByName).not.toHaveBeenCalled()
+    })
+
+    it("タグIDに1未満の値が含まれる場合はエラーを返す", async () => {
+      const result = await repository.createProduct({
+        product: { ...validProduct, tagIds: [0, 2] },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "タグIDは1以上の整数の配列である必要があります",
+        )
+      expect(adapters.findAllProductTags).not.toHaveBeenCalled()
+      expect(adapters.findProductByName).not.toHaveBeenCalled()
+    })
+
+    it("価格が負の値の場合はエラーを返す", async () => {
+      const result = await repository.createProduct({
+        product: { ...validProduct, price: -1 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "価格は0以上の整数である必要があります",
+        )
+    })
+
+    it("価格が整数でない場合はエラーを返す", async () => {
+      const result = await repository.createProduct({
+        product: { ...validProduct, price: 100.5 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "価格は0以上の整数である必要があります",
+        )
+    })
+
+    it("在庫数が負の値の場合はエラーを返す", async () => {
+      const result = await repository.createProduct({
+        product: { ...validProduct, stock: -1 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "在庫数は0以上の整数である必要があります",
+        )
+    })
+
+    it("在庫数が整数でない場合はエラーを返す", async () => {
+      const result = await repository.createProduct({
+        product: { ...validProduct, stock: 1.2 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "在庫数は0以上の整数である必要があります",
+        )
     })
   })
 
@@ -562,20 +652,84 @@ describe("Product repository", () => {
           `在庫数は${MAX_PRODUCT_STOCK}以下である必要があります`,
         )
     })
+
+    it("更新時に商品名が50文字を超える場合はエラーを返す", async () => {
+      const result = await repository.updateProduct({
+        product: { id: 1, name: "あ".repeat(51) },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "商品名は1文字以上50文字以内である必要があります",
+        )
+      expect(adapters.findProductById).not.toHaveBeenCalled()
+    })
+
+    it("更新時に価格が負の値の場合はエラーを返す", async () => {
+      const result = await repository.updateProduct({
+        product: { id: 1, price: -5 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "価格は0以上の整数である必要があります",
+        )
+    })
+
+    it("更新時に価格が整数でない場合はエラーを返す", async () => {
+      const result = await repository.updateProduct({
+        product: { id: 1, price: 12.34 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "価格は0以上の整数である必要があります",
+        )
+    })
+
+    it("更新時に在庫数が負の値の場合はエラーを返す", async () => {
+      const result = await repository.updateProduct({
+        product: { id: 1, stock: -2 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "在庫数は0以上の整数である必要があります",
+        )
+    })
+
+    it("更新時に在庫数が整数でない場合はエラーを返す", async () => {
+      const result = await repository.updateProduct({
+        product: { id: 1, stock: 3.14 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "在庫数は0以上の整数である必要があります",
+        )
+    })
   })
 
   describe("deleteProduct", () => {
-    it("商品が見つからない場合はエラーを返す", async () => {
+    it("商品が見つからない場合は正常終了する", async () => {
       adapters.findProductById.mockImplementation(async () => ({
         ok: false,
-        message: "商品が見つかりません",
+        message: "商品が見つかりません。",
       }))
       const result = await repository.deleteProduct({
         product: { id: 999 },
         dbClient: mockDbClient,
       })
-      expect(result.ok).toBe(false)
-      if (!result.ok) expect(result.message).toBe("商品が見つかりません")
+      expect(result.ok).toBe(true)
+      if (result.ok) expect(result.value).toBe(undefined)
+      expect(adapters.deleteProductImageByProductId).not.toHaveBeenCalled()
+      expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
+      expect(adapters.deleteProduct).not.toHaveBeenCalled()
     })
 
     it("商品削除時に孤立したタグが削除される", async () => {
@@ -773,6 +927,22 @@ describe("Product repository", () => {
       expect(result.ok).toBe(false)
       if (!result.ok)
         expect(result.message).toContain("画像データの形式が不正です")
+    })
+
+    it("作成時に画像データのサイズが7.5MBを超える場合はエラーを返す", async () => {
+      const oversizedData = "A".repeat(7.5 * 1024 * 1024 + 1)
+      const result = await repository.createProductImage({
+        productImage: {
+          ...validProductImage,
+          data: oversizedData,
+        },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      if (!result.ok)
+        expect(result.message).toContain(
+          "画像データのサイズは約7.5MB以内である必要があります",
+        )
     })
 
     const defaultProductImage: ProductImage = {

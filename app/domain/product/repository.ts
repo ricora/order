@@ -20,39 +20,54 @@ import type ProductImage from "./entities/productImage"
 import type ProductTag from "./entities/productTag"
 
 type CommonProductValidationError =
-  | "商品名は1文字以上50文字以内である必要があります"
-  | `商品タグは${typeof MAX_TAGS_PER_PRODUCT}個以内である必要があります`
-  | "タグIDは1以上の整数の配列である必要があります"
-  | "価格は0以上の整数である必要があります"
-  | `価格は${typeof MAX_PRODUCT_PRICE}以下である必要があります`
-  | "在庫数は0以上の整数である必要があります"
-  | `在庫数は${typeof MAX_PRODUCT_STOCK}以下である必要があります`
-  | "タグIDは存在するタグのIDを参照する必要があります"
-  | "タグ名は1文字以上50文字以内である必要があります"
-  | `1店舗あたりの商品タグは${typeof MAX_STORE_PRODUCT_TAG_COUNT}個までです`
-  | "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります"
-  | "画像データの形式が不正です"
-  | "画像データのサイズは約7.5MB以内である必要があります"
-  | `1店舗あたりの商品数は${typeof MAX_STORE_PRODUCT_COUNT}件までです`
-  | "同じ名前の商品が既に存在します"
+  | "商品名は1文字以上50文字以内である必要があります。"
+  | `商品タグは${typeof MAX_TAGS_PER_PRODUCT}個以内である必要があります。`
+  | "タグIDは1以上の整数の配列である必要があります。"
+  | "価格は0以上の整数である必要があります。"
+  | `価格は${typeof MAX_PRODUCT_PRICE}以下である必要があります。`
+  | "在庫数は0以上の整数である必要があります。"
+  | `在庫数は${typeof MAX_PRODUCT_STOCK}以下である必要があります。`
+  | `1店舗あたりの商品数は${typeof MAX_STORE_PRODUCT_COUNT}件までです。`
+  | "同じ名前の商品が既に存在します。"
 
-type CreateProductValidationError = CommonProductValidationError
+type CommonProductTagValidationError =
+  | "タグIDは1以上の整数の配列である必要があります。"
+  | "タグIDは存在するタグのIDを参照する必要があります。"
+  | "タグ名は1文字以上50文字以内である必要があります。"
+  | `1店舗あたりの商品タグは${typeof MAX_STORE_PRODUCT_TAG_COUNT}個までです。`
+
+type CommonProductImageValidationError =
+  | "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります。"
+  | "画像データの形式が不正です。"
+  | "画像データのサイズは約7.5MB以内である必要があります。"
+
+type CreateProductTagValidationError = CommonProductTagValidationError
+
+type CreateProductImageValidationError = CommonProductImageValidationError
+type UpdateProductImageValidationError =
+  | CommonProductImageValidationError
+  | "商品画像が見つかりません。"
+
+type CreateProductValidationError =
+  | CommonProductValidationError
+  | CreateProductTagValidationError
 
 type UpdateProductValidationError =
   | CommonProductValidationError
-  | "商品が見つかりません"
+  | CreateProductTagValidationError
+  | "商品が見つかりません。"
 
 export type Repository = {
   // Query
   findProductById: QueryRepositoryFunction<
     { product: Pick<Product, "id"> },
     Product,
-    "商品が見つかりません"
+    "商品が見つかりません。"
   >
   findProductByName: QueryRepositoryFunction<
     { product: Pick<Product, "name"> },
     Product,
-    "商品が見つかりません"
+    "商品が見つかりません。"
   >
   findAllProductsByIds: PaginatedQueryRepositoryFunction<
     { product: { ids: Product["id"][] } },
@@ -78,7 +93,7 @@ export type Repository = {
   findProductTagById: QueryRepositoryFunction<
     { productTag: Pick<ProductTag, "id"> },
     ProductTag,
-    "商品タグが見つかりません"
+    "商品タグが見つかりません。"
   >
   findAllProductTags: PaginatedQueryRepositoryFunction<
     unknown,
@@ -99,7 +114,7 @@ export type Repository = {
   findProductImageByProductId: QueryRepositoryFunction<
     { productImage: Pick<ProductImage, "productId"> },
     ProductImage,
-    "商品画像が見つかりません"
+    "商品画像が見つかりません。"
   >
 
   // Command
@@ -116,12 +131,12 @@ export type Repository = {
   deleteProduct: CommandRepositoryFunction<
     { product: Pick<Product, "id"> },
     void,
-    "商品が見つかりません"
+    never
   >
   createProductTag: CommandRepositoryFunction<
     { productTag: Omit<ProductTag, "id"> },
     ProductTag,
-    CommonProductValidationError
+    CreateProductTagValidationError
   >
   deleteAllProductTagsByIds: CommandRepositoryFunction<
     { productTag: { ids: ProductTag["id"][] } },
@@ -131,7 +146,7 @@ export type Repository = {
   createProductImage: CommandRepositoryFunction<
     { productImage: Omit<ProductImage, "id"> },
     ProductImage,
-    CommonProductValidationError
+    CreateProductImageValidationError
   >
   updateProductImageByProductId: CommandRepositoryFunction<
     {
@@ -139,7 +154,7 @@ export type Repository = {
         Partial<Pick<ProductImage, "data" | "mimeType">>
     },
     ProductImage,
-    CommonProductValidationError
+    UpdateProductImageValidationError
   >
   deleteProductImageByProductId: CommandRepositoryFunction<
     { productImage: Pick<ProductImage, "productId"> },
@@ -167,7 +182,7 @@ export const createRepository = (adapters: Repository) => {
       ) {
         return {
           ok: false,
-          message: "商品名は1文字以上50文字以内である必要があります",
+          message: "商品名は1文字以上50文字以内である必要があります。",
         }
       }
     }
@@ -175,7 +190,7 @@ export const createRepository = (adapters: Repository) => {
       if (product.tagIds.length > MAX_TAGS_PER_PRODUCT) {
         return {
           ok: false,
-          message: `商品タグは${MAX_TAGS_PER_PRODUCT}個以内である必要があります`,
+          message: `商品タグは${MAX_TAGS_PER_PRODUCT}個以内である必要があります。`,
         }
       }
       if (
@@ -183,29 +198,32 @@ export const createRepository = (adapters: Repository) => {
       ) {
         return {
           ok: false,
-          message: "タグIDは1以上の整数の配列である必要があります",
+          message: "タグIDは1以上の整数の配列である必要があります。",
         }
       }
     }
     if (product.price !== undefined) {
       if (product.price < 0 || !Number.isInteger(product.price)) {
-        return { ok: false, message: "価格は0以上の整数である必要があります" }
+        return { ok: false, message: "価格は0以上の整数である必要があります。" }
       }
       if (product.price > MAX_PRODUCT_PRICE) {
         return {
           ok: false,
-          message: `価格は${MAX_PRODUCT_PRICE}以下である必要があります`,
+          message: `価格は${MAX_PRODUCT_PRICE}以下である必要があります。`,
         }
       }
     }
     if (product.stock !== undefined) {
       if (product.stock < 0 || !Number.isInteger(product.stock)) {
-        return { ok: false, message: "在庫数は0以上の整数である必要があります" }
+        return {
+          ok: false,
+          message: "在庫数は0以上の整数である必要があります。",
+        }
       }
       if (product.stock > MAX_PRODUCT_STOCK) {
         return {
           ok: false,
-          message: `在庫数は${MAX_PRODUCT_STOCK}以下である必要があります`,
+          message: `在庫数は${MAX_PRODUCT_STOCK}以下である必要があります。`,
         }
       }
     }
@@ -214,7 +232,7 @@ export const createRepository = (adapters: Repository) => {
   const verifyAllTagIdsExist = async (
     dbClient: TransactionDbClient,
     tagIds: Product["tagIds"],
-  ): Promise<Result<void, CommonProductValidationError>> => {
+  ): Promise<Result<void, CreateProductTagValidationError>> => {
     const tagsResult = await repository.findAllProductTags({
       dbClient,
       pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
@@ -222,14 +240,14 @@ export const createRepository = (adapters: Repository) => {
     if (!tagsResult.ok) {
       return {
         ok: false,
-        message: "タグIDは存在するタグのIDを参照する必要があります",
+        message: "タグIDは存在するタグのIDを参照する必要があります。",
       }
     }
     const tagIdSet = new Set(tagsResult.value.map((tag) => tag.id))
     if (tagIds.some((tagId) => !tagIdSet.has(tagId))) {
       return {
         ok: false,
-        message: "タグIDは存在するタグのIDを参照する必要があります",
+        message: "タグIDは存在するタグのIDを参照する必要があります。",
       }
     }
     return { ok: true, value: undefined }
@@ -248,7 +266,7 @@ export const createRepository = (adapters: Repository) => {
     }
     const existingProduct = existingProductResult.value
     if (existingProduct && existingProduct.id !== excludeId) {
-      return { ok: false, message: "同じ名前の商品が既に存在します" }
+      return { ok: false, message: "同じ名前の商品が既に存在します。" }
     }
     return { ok: true, value: undefined }
   }
@@ -259,40 +277,40 @@ export const createRepository = (adapters: Repository) => {
     if (!totalProductsResult.ok)
       return {
         ok: false,
-        message: `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです`,
+        message: `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです。`,
       }
     if (totalProductsResult.value >= MAX_STORE_PRODUCT_COUNT) {
       return {
         ok: false,
-        message: `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです`,
+        message: `1店舗あたりの商品数は${MAX_STORE_PRODUCT_COUNT}件までです。`,
       }
     }
     return { ok: true, value: undefined }
   }
   const validateProductTag = (
     tag: Omit<ProductTag, "id">,
-  ): Result<void, CommonProductValidationError> => {
+  ): Result<void, CommonProductTagValidationError> => {
     if (countStringLength(tag.name) < 1 || countStringLength(tag.name) > 50) {
       return {
         ok: false,
-        message: "タグ名は1文字以上50文字以内である必要があります",
+        message: "タグ名は1文字以上50文字以内である必要があります。",
       }
     }
     return { ok: true, value: undefined }
   }
   const verifyProductTagCountLimit = async (
     dbClient: TransactionDbClient,
-  ): Promise<Result<void, CommonProductValidationError>> => {
+  ): Promise<Result<void, CommonProductTagValidationError>> => {
     const totalTagsResult = await repository.countProductTags({ dbClient })
     if (!totalTagsResult.ok)
       return {
         ok: false,
-        message: `1店舗あたりの商品タグは${MAX_STORE_PRODUCT_TAG_COUNT}個までです`,
+        message: `1店舗あたりの商品タグは${MAX_STORE_PRODUCT_TAG_COUNT}個までです。`,
       }
     if (totalTagsResult.value >= MAX_STORE_PRODUCT_TAG_COUNT) {
       return {
         ok: false,
-        message: `1店舗あたりの商品タグは${MAX_STORE_PRODUCT_TAG_COUNT}個までです`,
+        message: `1店舗あたりの商品タグは${MAX_STORE_PRODUCT_TAG_COUNT}個までです。`,
       }
     }
     return { ok: true, value: undefined }
@@ -328,24 +346,24 @@ export const createRepository = (adapters: Repository) => {
 
   const validateProductImage = (
     image: Partial<Pick<ProductImage, "data" | "mimeType">>,
-  ): Result<void, CommonProductValidationError> => {
+  ): Result<void, CommonProductImageValidationError> => {
     if (image.mimeType !== undefined) {
       if (!ALLOWED_PRODUCT_IMAGE_MIME_TYPES.has(image.mimeType)) {
         return {
           ok: false,
           message:
-            "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります",
+            "画像のMIMEタイプはimage/jpeg, image/png, image/webp, image/gifのいずれかである必要があります。",
         }
       }
     }
     if (image.data !== undefined) {
       if (!/^[A-Za-z0-9+/]*={0,2}$/.test(image.data)) {
-        return { ok: false, message: "画像データの形式が不正です" }
+        return { ok: false, message: "画像データの形式が不正です。" }
       }
       if (image.data.length > MAX_PRODUCT_IMAGE_BASE64_SIZE) {
         return {
           ok: false,
-          message: "画像データのサイズは約7.5MB以内である必要があります",
+          message: "画像データのサイズは約7.5MB以内である必要があります。",
         }
       }
     }
@@ -449,7 +467,7 @@ export const createRepository = (adapters: Repository) => {
         product: { id: product.id },
       })
       if (!foundProductResult.ok) {
-        return { ok: false, message: "商品が見つかりません" }
+        return { ok: false, message: "商品が見つかりません。" }
       }
       const foundProduct = foundProductResult.value
 
@@ -485,7 +503,7 @@ export const createRepository = (adapters: Repository) => {
         product: { id: product.id },
       })
       if (!foundProductResult.ok) {
-        return { ok: false, message: "商品が見つかりません" }
+        return { ok: true, value: undefined }
       }
       const foundProduct = foundProductResult.value
 
