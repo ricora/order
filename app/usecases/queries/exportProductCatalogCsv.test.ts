@@ -20,8 +20,14 @@ const orderRepository = {} satisfies Partial<
 >
 
 const productRepository = {
-  findAllProductsOrderByIdAsc: mock(async (_) => mockProducts),
-  findAllProductTagsByIds: mock(async (_) => mockTags),
+  findAllProductsOrderByIdAsc: mock(async (_) => ({
+    ok: true as const,
+    value: mockProducts,
+  })),
+  findAllProductTagsByIds: mock(async (_) => ({
+    ok: true as const,
+    value: mockTags,
+  })),
 } satisfies Partial<typeof import("../repositories-provider").productRepository>
 
 mock.module("../repositories-provider", () => ({
@@ -50,26 +56,35 @@ describe("exportProductCatalogCsv", () => {
     productRepository.findAllProductsOrderByIdAsc.mockImplementation(
       async ({ pagination }) => {
         if (pagination.offset === 0) {
-          return products
+          return { ok: true as const, value: products }
         }
-        return []
+        return { ok: true as const, value: [] }
       },
     )
 
-    productRepository.findAllProductTagsByIds.mockResolvedValue([
-      { id: 1, name: "Blend" },
-      { id: 2, name: "Seasonal" },
-    ])
+    productRepository.findAllProductTagsByIds.mockResolvedValue({
+      ok: true as const,
+      value: [
+        { id: 1, name: "Blend" },
+        { id: 2, name: "Seasonal" },
+      ],
+    })
 
     const result = await exportProductCatalogCsv({
       dbClient,
       imageBaseUrl: "https://example.com",
     })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.productCount).toBe(2)
+    expect(result.value.exportedAt).toBeInstanceOf(Date)
 
-    expect(result.productCount).toBe(2)
-    expect(result.exportedAt).toBeInstanceOf(Date)
-
-    expect(result.csv).toBe(
+    const calledIds =
+      productRepository.findAllProductTagsByIds.mock.calls.flatMap(
+        (c) => c?.[0]?.productTag?.ids ?? [],
+      )
+    expect(new Set(calledIds)).toEqual(new Set([1, 2]))
+    expect(result.value.csv).toBe(
       `${[
         "product_id,product_name,price,stock,image_url,tag_ids,tag_names,tag_count",
         "1,Blend,450,10,https://example.com/images/products/1,1|2,Blend|Seasonal,2",
@@ -91,30 +106,32 @@ describe("exportProductCatalogCsv", () => {
       async ({ pagination }) => {
         if (pagination.offset === 0) {
           expect(pagination.limit).toBe(PRODUCT_CATALOG_EXPORT_PAGE_SIZE + 1)
-          return firstPage
+          return { ok: true as const, value: firstPage }
         }
         if (pagination.offset === PRODUCT_CATALOG_EXPORT_PAGE_SIZE) {
           expect(pagination.limit).toBe(PRODUCT_CATALOG_EXPORT_PAGE_SIZE + 1)
-          return secondPage
+          return { ok: true as const, value: secondPage }
         }
-        return []
+        return { ok: true as const, value: [] }
       },
     )
 
-    productRepository.findAllProductTagsByIds.mockResolvedValue([
-      { id: 1, name: "Tag1" },
-    ])
+    productRepository.findAllProductTagsByIds.mockResolvedValue({
+      ok: true as const,
+      value: [{ id: 1, name: "Tag1" }],
+    })
 
     const result = await exportProductCatalogCsv({
       dbClient,
       imageBaseUrl: "https://example.com",
     })
-
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
     expect(productRepository.findAllProductsOrderByIdAsc).toHaveBeenCalledTimes(
       2,
     )
     expect(productRepository.findAllProductTagsByIds).toHaveBeenCalledTimes(1)
-    expect(result.productCount).toBe(
+    expect(result.value.productCount).toBe(
       PRODUCT_CATALOG_EXPORT_PAGE_SIZE + secondPage.length,
     )
   })
@@ -123,18 +140,22 @@ describe("exportProductCatalogCsv", () => {
     const products: Product[] = [mockProduct(1, { tagIds: [] })]
 
     productRepository.findAllProductsOrderByIdAsc.mockImplementation(
-      async () => products,
+      async () => ({ ok: true as const, value: products }),
     )
 
-    productRepository.findAllProductTagsByIds.mockResolvedValue([])
+    productRepository.findAllProductTagsByIds.mockResolvedValue({
+      ok: true as const,
+      value: [],
+    })
 
     const result = await exportProductCatalogCsv({
       dbClient,
       imageBaseUrl: "https://example.com",
     })
-
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
     expect(productRepository.findAllProductTagsByIds).not.toHaveBeenCalled()
-    const [, row] = result.csv.split("\n")
+    const [, row] = result.value.csv.split("\n")
     if (!row) throw new Error("expected one data row")
     const columns = row.split(",")
     expect(columns[5]).toBe("") // tag_ids

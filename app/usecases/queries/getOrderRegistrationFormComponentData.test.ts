@@ -1,4 +1,12 @@
-import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test"
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  type Mock,
+  mock,
+} from "bun:test"
 import { MAX_STORE_PRODUCT_COUNT } from "../../domain/product/constants"
 import type Product from "../../domain/product/entities/product"
 import type ProductTag from "../../domain/product/entities/productTag"
@@ -30,10 +38,19 @@ const orderRepository = {} satisfies Partial<
   typeof import("../repositories-provider").orderRepository
 >
 
+type ProductRepository =
+  typeof import("../repositories-provider").productRepository
+type MockProductRepository = {
+  [K in keyof ProductRepository]: Mock<ProductRepository[K]>
+}
 const productRepository = {
-  findAllProductsOrderByIdAsc: mock(async () => mockProducts),
-  findAllProductTags: mock(async () => mockTags),
-} satisfies Partial<typeof import("../repositories-provider").productRepository>
+  findAllProductsOrderByIdAsc: mock<
+    ProductRepository["findAllProductsOrderByIdAsc"]
+  >(async () => ({ ok: true as const, value: mockProducts })),
+  findAllProductTags: mock<ProductRepository["findAllProductTags"]>(
+    async () => ({ ok: true as const, value: mockTags }),
+  ),
+} satisfies Partial<MockProductRepository>
 
 mock.module("../repositories-provider", () => ({
   orderRepository,
@@ -51,11 +68,12 @@ describe("getOrderRegistrationFormComponentData", () => {
     productRepository.findAllProductsOrderByIdAsc.mockClear()
     productRepository.findAllProductTags.mockClear()
     productRepository.findAllProductsOrderByIdAsc.mockImplementation(
-      async () => mockProducts,
+      async () => ({ ok: true as const, value: mockProducts }),
     )
-    productRepository.findAllProductTags.mockImplementation(
-      async () => mockTags,
-    )
+    productRepository.findAllProductTags.mockImplementation(async () => ({
+      ok: true as const,
+      value: mockTags,
+    }))
   })
   afterAll(() => {
     mock.restore()
@@ -63,13 +81,15 @@ describe("getOrderRegistrationFormComponentData", () => {
 
   it("商品とタグを正しく取得できる", async () => {
     const result = await getOrderRegistrationFormComponentData({ dbClient })
-    expect(result.products.length).toBe(2)
-    expect(result.tags.length).toBe(2)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.products.length).toBe(2)
+    expect(result.value.tags.length).toBe(2)
 
-    expect(result.products[0]?.name).toBe("テスト商品A")
-    expect(result.products[0]?.tags).toEqual(["人気", "メイン"])
+    expect(result.value.products[0]?.name).toBe("テスト商品A")
+    expect(result.value.products[0]?.tags).toEqual(["人気", "メイン"])
 
-    expect(result.tags).toEqual(mockTags)
+    expect(result.value.tags).toEqual(mockTags)
   })
 
   it("ページネーションで1000件のlimitを指定している", async () => {
@@ -79,5 +99,27 @@ describe("getOrderRegistrationFormComponentData", () => {
         pagination: { limit: MAX_STORE_PRODUCT_COUNT, offset: 0 },
       }),
     )
+  })
+
+  it("findAllProductsOrderByIdAscがドメインエラーを返す場合は汎用エラーを返す", async () => {
+    productRepository.findAllProductsOrderByIdAsc.mockImplementationOnce(
+      async () => {
+        return { ok: false as const, message: "エラーが発生しました。" }
+      },
+    )
+    const res = await getOrderRegistrationFormComponentData({ dbClient })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+  })
+
+  it("findAllProductsOrderByIdAscが例外を投げる場合は汎用エラーを返す", async () => {
+    productRepository.findAllProductsOrderByIdAsc.mockImplementationOnce(
+      async () => {
+        throw new Error("unexpected")
+      },
+    )
+    const res = await getOrderRegistrationFormComponentData({ dbClient })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
   })
 })

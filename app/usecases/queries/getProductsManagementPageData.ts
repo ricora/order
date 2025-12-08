@@ -1,5 +1,6 @@
 import { MAX_STORE_PRODUCT_COUNT } from "../../domain/product/constants"
 import type Product from "../../domain/product/entities/product"
+import type { Result } from "../../domain/types"
 import type { DbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"
 
@@ -48,64 +49,87 @@ export const getProductsManagementPageData = async ({
   dbClient,
   page = 1,
   sort = "asc",
-}: GetProductsManagementPageDataParams): Promise<ProductsManagementPageData> => {
+}: GetProductsManagementPageDataParams): Promise<
+  Result<ProductsManagementPageData, "エラーが発生しました。">
+> => {
   const pageSize = 50
   const offset = Math.max(0, (page - 1) * pageSize)
 
-  const productsWithExtra = await (sort === "asc"
-    ? findAllProductsOrderByIdAsc
-    : findAllProductsOrderByIdDesc)({
-    dbClient,
-    pagination: { offset, limit: pageSize + 1 },
-  })
-  const hasNextPage = productsWithExtra.length > pageSize
-  const products = productsWithExtra.slice(0, pageSize)
-
-  const tags = await findAllProductTagsByIds({
-    dbClient,
-    pagination: {
-      offset: 0,
-      limit: MAX_STORE_PRODUCT_COUNT,
-    },
-    productTag: { ids: products.flatMap((p) => p.tagIds) },
-  })
-  const tagMap = new Map<number, string>(tags.map((tag) => [tag.id, tag.name]))
-
-  const managementProducts = products.map((product) => {
-    const status = calculateProductStatus(product.stock)
-    return {
-      ...product,
-      tags: product.tagIds
-        .map((tagId) => tagMap.get(tagId))
-        .filter((name): name is string => !!name),
-      status,
+  try {
+    const productsWithExtraResult = await (sort === "asc"
+      ? findAllProductsOrderByIdAsc
+      : findAllProductsOrderByIdDesc)({
+      dbClient,
+      pagination: { offset, limit: pageSize + 1 },
+    })
+    if (!productsWithExtraResult.ok) {
+      return { ok: false, message: "エラーが発生しました。" }
     }
-  })
+    const productsWithExtra = productsWithExtraResult.value
+    const hasNextPage = productsWithExtra.length > pageSize
+    const products = productsWithExtra.slice(0, pageSize)
 
-  const productStocks = await findAllProductStocks({
-    dbClient,
-    pagination: {
-      offset: 0,
-      limit: MAX_STORE_PRODUCT_COUNT,
-    },
-  })
-  const totalProducts = productStocks.length
-  const inStockCount = productStocks.filter(
-    (p) => p.stock > LOW_STOCK_THRESHOLD,
-  ).length
-  const lowStockCount = productStocks.filter(
-    (p) => p.stock <= LOW_STOCK_THRESHOLD && p.stock > 0,
-  ).length
-  const outOfStockCount = productStocks.filter((p) => p.stock === 0).length
+    const tagsResult = await findAllProductTagsByIds({
+      dbClient,
+      pagination: {
+        offset: 0,
+        limit: MAX_STORE_PRODUCT_COUNT,
+      },
+      productTag: { ids: products.flatMap((p) => p.tagIds) },
+    })
+    if (!tagsResult.ok) {
+      return { ok: false, message: "エラーが発生しました。" }
+    }
+    const tags = tagsResult.value
+    const tagMap = new Map<number, string>(
+      tags.map((tag) => [tag.id, tag.name]),
+    )
 
-  return {
-    products: managementProducts,
-    totalProducts,
-    inStockCount,
-    lowStockCount,
-    outOfStockCount,
-    hasNextPage,
-    currentPage: page,
-    pageSize,
+    const managementProducts = products.map((product) => {
+      const status = calculateProductStatus(product.stock)
+      return {
+        ...product,
+        tags: product.tagIds
+          .map((tagId) => tagMap.get(tagId))
+          .filter((name): name is string => !!name),
+        status,
+      }
+    })
+
+    const productStocksResult = await findAllProductStocks({
+      dbClient,
+      pagination: {
+        offset: 0,
+        limit: MAX_STORE_PRODUCT_COUNT,
+      },
+    })
+    if (!productStocksResult.ok) {
+      return { ok: false, message: "エラーが発生しました。" }
+    }
+    const productStocks = productStocksResult.value
+    const totalProducts = productStocks.length
+    const inStockCount = productStocks.filter(
+      (p) => p.stock > LOW_STOCK_THRESHOLD,
+    ).length
+    const lowStockCount = productStocks.filter(
+      (p) => p.stock <= LOW_STOCK_THRESHOLD && p.stock > 0,
+    ).length
+    const outOfStockCount = productStocks.filter((p) => p.stock === 0).length
+
+    return {
+      ok: true,
+      value: {
+        products: managementProducts,
+        totalProducts,
+        inStockCount,
+        lowStockCount,
+        outOfStockCount,
+        hasNextPage,
+        currentPage: page,
+        pageSize,
+      },
+    }
+  } catch {
+    return { ok: false, message: "エラーが発生しました。" }
   }
 }
