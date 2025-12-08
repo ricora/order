@@ -1,32 +1,17 @@
 import type { DbClient, TransactionDbClient } from "../libs/db/client"
 
 /**
- * リポジトリ関数の型定義に、実装関数（repositoryImpl）をparamsオブジェクトとして追加するユーティリティ型。
- * ドメイン層でリポジトリ関数のDI（依存性注入）を行う際に利用する。
- * 引数がない関数の場合は空オブジェクト型（Record<string, never>）となる。
- * @template T リポジトリ関数の型
- * @example
- * type FindById = (params: { id: number }) => Promise<Product | null>
- * const findById: WithRepositoryImpl<FindById> = async ({ id, repositoryImpl }) => repositoryImpl({ id })
- */
-// biome-ignore lint/suspicious/noExplicitAny: For flexible generic types.
-export type WithRepositoryImpl<T extends (...args: any) => any> =
-  Parameters<T> extends [infer P]
-    ? (params: P & { repositoryImpl?: T }) => ReturnType<T>
-    : (params: { repositoryImpl?: T }) => ReturnType<T>
-
-/**
  * 単数の要素を取得するQuery系リポジトリ関数の型定義。
  * DB参照系のRepository関数はこの型を継承して定義する。
  * @template P paramsの型
  * @template R 戻り値の型
  * @example
- * type FindById = QueryRepositoryFunction<{ id: number }, Product | null>
- * type FindAll = QueryRepositoryFunction<Record<string, never>, Product[]>
+ * type FindById = QueryRepositoryFunction<{ id: number }, Product | null, 'not found' | 'unauthorized'>
+ * type FindAll = QueryRepositoryFunction<unknown, Product[]>
  */
-export type QueryRepositoryFunction<P, R> = [P] extends [Record<string, never>]
-  ? (params: { dbClient: DbClient | TransactionDbClient }) => Promise<R>
-  : (params: P & { dbClient: DbClient | TransactionDbClient }) => Promise<R>
+export type QueryRepositoryFunction<P, R, E extends string> = (
+  params: P & { dbClient: DbClient | TransactionDbClient },
+) => Promise<Result<R, E>>
 
 /**
  * 複数の要素を取得するQuery系リポジトリ関数の型定義。
@@ -35,21 +20,14 @@ export type QueryRepositoryFunction<P, R> = [P] extends [Record<string, never>]
  * @template P paramsの型
  * @template T 戻り値の型
  * @example
- * type FindAllProducts = PaginatedQueryRepositoryFunction<Record<string, never>, Product>
+ * type FindAllProducts = PaginatedQueryRepositoryFunction<unknown, Product, 'not found' | 'unauthorized'>
  */
-export type PaginatedQueryRepositoryFunction<P, T> = [P] extends [
-  Record<string, never>,
-]
-  ? (params: {
-      pagination: PaginationParams
-      dbClient: DbClient | TransactionDbClient
-    }) => Promise<T[]>
-  : (
-      params: P & {
-        pagination: PaginationParams
-        dbClient: DbClient | TransactionDbClient
-      },
-    ) => Promise<T[]>
+export type PaginatedQueryRepositoryFunction<P, T, E extends string> = (
+  params: P & {
+    pagination: PaginationParams
+    dbClient: DbClient | TransactionDbClient
+  },
+) => Promise<Result<T[], E>>
 
 /**
  * Command系リポジトリ関数の型定義。
@@ -57,14 +35,12 @@ export type PaginatedQueryRepositoryFunction<P, T> = [P] extends [
  * @template P paramsの型
  * @template R 戻り値の型
  * @example
- * type CreateProduct = CommandRepositoryFunction<Omit<Product, "id">, Product | null>
- * type DeleteAll = CommandRepositoryFunction<Record<string, never>, void>
+ * type CreateProduct = CommandRepositoryFunction<Omit<Product, "id">, Product | null, 'validation error' | 'unauthorized'>
+ * type DeleteAll = CommandRepositoryFunction<unknown, void>
  */
-export type CommandRepositoryFunction<P, R> = [P] extends [
-  Record<string, never>,
-]
-  ? (params: { dbClient: TransactionDbClient }) => Promise<R>
-  : (params: P & { dbClient: TransactionDbClient }) => Promise<R>
+export type CommandRepositoryFunction<P, R, E extends string> = (
+  params: P & { dbClient: TransactionDbClient },
+) => Promise<Result<R, E>>
 
 /**
  * ページネーション用パラメータ型。
@@ -82,3 +58,28 @@ type PaginationParams = {
    */
   limit: number
 }
+
+type Success<T> = {
+  ok: true
+  value: T
+}
+
+type Failure<E extends string> = {
+  ok: false
+  message: E
+}
+
+type UnexpectedError = Failure<"エラーが発生しました。">
+
+/**
+ * 汎用的な成功・失敗の結果を表す型。
+ * 成功時には`Success<T>`型、失敗時には`Failure<E>`型を返す。
+ * @template T 成功時の値の型
+ * @template E 失敗時のエラーメッセージの型
+ * @example
+ * type FetchResult = Result<User, "not found" | "unauthorized">
+ */
+export type Result<T, E extends string> =
+  | Success<T>
+  | Failure<E>
+  | UnexpectedError

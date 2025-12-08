@@ -7,7 +7,7 @@ const dbClient = await createDbClient()
 
 // 商品登録
 for (let i = 1; i <= 150; i++) {
-  await registerProduct({
+  const productRes = await registerProduct({
     dbClient,
     product: {
       name: `テスト商品${i}`,
@@ -28,10 +28,11 @@ for (let i = 1; i <= 150; i++) {
             : ["タグA", "タグC"],
     },
   })
+  if (!productRes.ok) throw new Error(productRes.message)
 }
 
 // 注文登録
-await registerOrder({
+const orderRes1 = await registerOrder({
   dbClient,
   order: {
     customerName: "顧客A",
@@ -42,7 +43,9 @@ await registerOrder({
     ],
   },
 })
-await registerOrder({
+if (!orderRes1.ok) throw new Error(orderRes1.message)
+
+const orderRes2 = await registerOrder({
   dbClient,
   order: {
     customerName: "顧客B",
@@ -53,7 +56,9 @@ await registerOrder({
     ],
   },
 })
-const order3 = await registerOrder({
+if (!orderRes2.ok) throw new Error(orderRes2.message)
+
+const order3Res = await registerOrder({
   dbClient,
   order: {
     customerName: null,
@@ -65,12 +70,15 @@ const order3 = await registerOrder({
     ],
   },
 })
-if (order3 == null) throw new Error("Failed to create order")
-await setOrderStatus({
+if (!order3Res.ok) throw new Error(order3Res.message)
+const order3 = order3Res.value
+const setRes3 = await setOrderStatus({
   dbClient: dbClient,
   order: { id: order3.id, status: "processing" },
 })
-const order4 = await registerOrder({
+if (!setRes3.ok) throw new Error(setRes3.message)
+
+const order4Res = await registerOrder({
   dbClient,
   order: {
     customerName: "顧客C",
@@ -78,12 +86,15 @@ const order4 = await registerOrder({
     orderItems: [{ productId: 4, quantity: 5 }],
   },
 })
-if (order4 == null) throw new Error("Failed to create order")
-await setOrderStatus({
+if (!order4Res.ok) throw new Error(order4Res.message)
+const order4 = order4Res.value
+const setRes4 = await setOrderStatus({
   dbClient: dbClient,
   order: { id: order4.id, status: "completed" },
 })
-const order5 = await registerOrder({
+if (!setRes4.ok) throw new Error(setRes4.message)
+
+const order5Res = await registerOrder({
   dbClient,
   order: {
     customerName: "顧客D",
@@ -91,11 +102,13 @@ const order5 = await registerOrder({
     orderItems: [{ productId: 1, quantity: 5 }],
   },
 })
-if (order5 == null) throw new Error("Failed to create order")
-await setOrderStatus({
+if (!order5Res.ok) throw new Error(order5Res.message)
+const order5 = order5Res.value
+const setRes5 = await setOrderStatus({
   dbClient: dbClient,
   order: { id: order5.id, status: "cancelled" },
 })
+if (!setRes5.ok) throw new Error(setRes5.message)
 
 // 追加の注文登録
 const customers = ["テスト顧客A", "テスト顧客B", "テスト顧客C", "テスト顧客D"]
@@ -104,7 +117,7 @@ for (let i = 6; i <= 155; i++) {
   const productId = ((i - 6) % 150) + 1
   const quantity = ((i - 6) % 5) + 1
 
-  const order = await registerOrder({
+  const orderRes = await registerOrder({
     dbClient,
     order: {
       customerName,
@@ -113,24 +126,29 @@ for (let i = 6; i <= 155; i++) {
     },
   })
 
-  if (order == null) throw new Error(`Failed to create order ${i}`)
+  if (!orderRes.ok)
+    throw new Error(`Failed to create order ${i}: ${orderRes.message}`)
+  const order = orderRes.value
 
   // 一部の注文のステータスを変更
   if (i % 4 === 0) {
-    await setOrderStatus({
+    const setRes = await setOrderStatus({
       dbClient,
       order: { id: order.id, status: "processing" },
     })
+    if (!setRes.ok) throw new Error(setRes.message)
   } else if (i % 4 === 1) {
-    await setOrderStatus({
+    const setRes = await setOrderStatus({
       dbClient,
       order: { id: order.id, status: "completed" },
     })
+    if (!setRes.ok) throw new Error(setRes.message)
   } else if (i % 4 === 2) {
-    await setOrderStatus({
+    const setRes = await setOrderStatus({
       dbClient,
       order: { id: order.id, status: "cancelled" },
     })
+    if (!setRes.ok) throw new Error(setRes.message)
   }
 }
 

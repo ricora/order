@@ -4,6 +4,7 @@ import {
 } from "../../domain/product/constants"
 import type Product from "../../domain/product/entities/product"
 import type ProductTag from "../../domain/product/entities/productTag"
+import type { Result } from "../../domain/types"
 import type { DbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"
 
@@ -22,24 +23,41 @@ export type OrderRegistrationFormComponentData = {
 
 export const getOrderRegistrationFormComponentData = async ({
   dbClient,
-}: GetOrderRegistrationFormComponentDataParams): Promise<OrderRegistrationFormComponentData> => {
-  const products = await findAllProductsOrderByIdAsc({
-    dbClient,
-    pagination: { offset: 0, limit: MAX_STORE_PRODUCT_COUNT },
-  })
-  const tags = await findAllProductTags({
-    dbClient,
-    pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
-  })
-  const tagMap = new Map<number, string>(tags.map((tag) => [tag.id, tag.name]))
+}: GetOrderRegistrationFormComponentDataParams): Promise<
+  Result<OrderRegistrationFormComponentData, "エラーが発生しました。">
+> => {
+  try {
+    const productsResult = await findAllProductsOrderByIdAsc({
+      dbClient,
+      pagination: { offset: 0, limit: MAX_STORE_PRODUCT_COUNT },
+    })
+    if (!productsResult.ok)
+      return { ok: false, message: "エラーが発生しました。" }
+    const products = productsResult.value
 
-  return {
-    products: products.map((product) => ({
-      ...product,
-      tags: product.tagIds
-        .map((tagId) => tagMap.get(tagId))
-        .filter((name): name is string => !!name),
-    })),
-    tags,
+    const tagsResult = await findAllProductTags({
+      dbClient,
+      pagination: { offset: 0, limit: MAX_STORE_PRODUCT_TAG_COUNT },
+    })
+    if (!tagsResult.ok) return { ok: false, message: "エラーが発生しました。" }
+    const tags = tagsResult.value
+    const tagMap = new Map<number, string>(
+      tags.map((tag) => [tag.id, tag.name]),
+    )
+
+    return {
+      ok: true,
+      value: {
+        products: products.map((product) => ({
+          ...product,
+          tags: product.tagIds
+            .map((tagId) => tagMap.get(tagId))
+            .filter((name): name is string => !!name),
+        })),
+        tags,
+      },
+    }
+  } catch {
+    return { ok: false, message: "エラーが発生しました。" }
   }
 }

@@ -1,4 +1,12 @@
-import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test"
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  type Mock,
+  mock,
+} from "bun:test"
 import type Order from "../../domain/order/entities/order"
 import type { DbClient } from "../../libs/db/client"
 
@@ -41,10 +49,18 @@ const mockOrders: Order[] = [
   },
 ]
 
+type OrderRepository = typeof import("../repositories-provider").orderRepository
+type MockOrderRepository = {
+  [K in keyof OrderRepository]: Mock<OrderRepository[K]>
+}
 const orderRepository = {
-  findAllOrdersOrderByIdAsc: mock(async () => mockOrders),
-  findAllOrdersOrderByIdDesc: mock(async () => mockOrders),
-} satisfies Partial<typeof import("../repositories-provider").orderRepository>
+  findAllOrdersOrderByIdAsc: mock<OrderRepository["findAllOrdersOrderByIdAsc"]>(
+    async () => ({ ok: true as const, value: mockOrders }),
+  ),
+  findAllOrdersOrderByIdDesc: mock<
+    OrderRepository["findAllOrdersOrderByIdDesc"]
+  >(async () => ({ ok: true as const, value: mockOrders })),
+} satisfies Partial<MockOrderRepository>
 
 const productRepository = {} satisfies Partial<
   typeof import("../repositories-provider").productRepository
@@ -63,12 +79,14 @@ const dbClient = {} as DbClient
 
 describe("getOrdersManagementPageData", () => {
   beforeAll(() => {
-    orderRepository.findAllOrdersOrderByIdAsc.mockImplementation(
-      async () => mockOrders,
-    )
-    orderRepository.findAllOrdersOrderByIdDesc.mockImplementation(
-      async () => mockOrders,
-    )
+    orderRepository.findAllOrdersOrderByIdAsc.mockImplementation(async () => ({
+      ok: true as const,
+      value: mockOrders,
+    }))
+    orderRepository.findAllOrdersOrderByIdDesc.mockImplementation(async () => ({
+      ok: true as const,
+      value: mockOrders,
+    }))
   })
   afterAll(() => {
     mock.restore()
@@ -76,24 +94,30 @@ describe("getOrdersManagementPageData", () => {
 
   it("注文一覧をデフォルト（昇順）で取得できる", async () => {
     const result = await getOrdersManagementPageData({ dbClient })
-    expect(result.orders.length).toBe(3)
-    expect(result.orders[0]?.id).toBe(1)
-    expect(result.orders[1]?.customerName).toBe("鈴木花子")
-    expect(result.orders[2]?.status).toBe("pending")
-    expect(result.hasNextPage).toBe(false)
-    expect(result.currentPage).toBe(1)
-    expect(result.pageSize).toBe(50)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.orders.length).toBe(3)
+    expect(result.value.orders[0]?.id).toBe(1)
+    expect(result.value.orders[1]?.customerName).toBe("鈴木花子")
+    expect(result.value.orders[2]?.status).toBe("pending")
+    expect(result.value.hasNextPage).toBe(false)
+    expect(result.value.currentPage).toBe(1)
+    expect(result.value.pageSize).toBe(50)
   })
 
   it("sort='asc'で昇順を指定できる", async () => {
     const result = await getOrdersManagementPageData({ dbClient, sort: "asc" })
-    expect(result.orders.length).toBe(3)
-    expect(result.orders[0]?.id).toBe(1)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.orders.length).toBe(3)
+    expect(result.value.orders[0]?.id).toBe(1)
   })
 
   it("sort='desc'で降順を指定できる", async () => {
     const result = await getOrdersManagementPageData({ dbClient, sort: "desc" })
-    expect(result.orders.length).toBe(3)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.orders.length).toBe(3)
   })
 
   it("pageSize+1を取得して次ページの有無を判定できる", async () => {
@@ -111,13 +135,15 @@ describe("getOrdersManagementPageData", () => {
     }))
 
     orderRepository.findAllOrdersOrderByIdAsc.mockImplementationOnce(
-      async () => manyOrders,
+      async () => ({ ok: true as const, value: manyOrders }),
     )
 
     const result = await getOrdersManagementPageData({ dbClient })
-    expect(result.orders.length).toBe(50)
-    expect(result.hasNextPage).toBe(true)
-    expect(result.currentPage).toBe(1)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.orders.length).toBe(50)
+    expect(result.value.hasNextPage).toBe(true)
+    expect(result.value.currentPage).toBe(1)
   })
 
   it("ページネーション: page=2の場合、currentPageが正しい", async () => {
@@ -135,19 +161,45 @@ describe("getOrdersManagementPageData", () => {
     }))
 
     orderRepository.findAllOrdersOrderByIdAsc.mockImplementationOnce(
-      async () => manyOrders,
+      async () => ({ ok: true as const, value: manyOrders }),
     )
 
     const result = await getOrdersManagementPageData({ dbClient, page: 2 })
-    expect(result.currentPage).toBe(2)
-    expect(result.pageSize).toBe(50)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.currentPage).toBe(2)
+    expect(result.value.pageSize).toBe(50)
   })
 
   it("customerNameがnullの場合も正しく処理できる", async () => {
     const result = await getOrdersManagementPageData({ dbClient })
-    const thirdOrder = result.orders[2]
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const thirdOrder = result.value.orders[2]
     if (!thirdOrder) throw new Error("no orders returned")
     expect(thirdOrder.customerName).toBeNull()
     expect(thirdOrder.totalAmount).toBe(2000)
+  })
+
+  it("findAllOrdersOrderByIdAscがドメインエラーを返す場合は汎用エラーを返す", async () => {
+    orderRepository.findAllOrdersOrderByIdAsc.mockImplementationOnce(
+      async () => {
+        return { ok: false as const, message: "エラーが発生しました。" }
+      },
+    )
+    const res = await getOrdersManagementPageData({ dbClient })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+  })
+
+  it("findAllOrdersOrderByIdAscが例外を投げる場合は汎用エラーを返す", async () => {
+    orderRepository.findAllOrdersOrderByIdAsc.mockImplementationOnce(
+      async () => {
+        throw new Error("unexpected")
+      },
+    )
+    const res = await getOrdersManagementPageData({ dbClient })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
   })
 })

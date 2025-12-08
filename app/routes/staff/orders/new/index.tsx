@@ -88,9 +88,12 @@ export const POST = createRoute(
   async (c) => {
     try {
       const { order } = c.req.valid("form")
-      await registerOrder({ dbClient: c.get("dbClient"), order })
-
-      setToastCookie(c, "success", "注文を登録しました")
+      const res = await registerOrder({ dbClient: c.get("dbClient"), order })
+      if (!res.ok) {
+        setToastCookie(c, "error", res.message)
+      } else {
+        setToastCookie(c, "success", "注文を登録しました")
+      }
     } catch (e) {
       setToastCookie(c, "error", String(e))
     }

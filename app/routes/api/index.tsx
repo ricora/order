@@ -13,16 +13,20 @@ import { getProductRegistrationFormComponentData } from "../../usecases/queries/
 const app = new Hono<Env>()
 const routes = app
   .get("/order-registration-form", async (c) => {
-    const { products, tags } = await getOrderRegistrationFormComponentData({
+    const res = await getOrderRegistrationFormComponentData({
       dbClient: c.get("dbClient"),
     })
-    return c.json({ products, tags })
+    if (!res.ok) {
+      throw new Error(res.message)
+    }
+    return c.json(res.value)
   })
   .get("/order-progress-manager", async (c) => {
-    const payload = await getOrderProgressManagerComponentData({
+    const res = await getOrderProgressManagerComponentData({
       dbClient: c.get("dbClient"),
     })
-    return c.json(payload)
+    if (!res.ok) throw new Error(res.message)
+    return c.json(res.value)
   })
   .post(
     "/order-progress-manager/set-status",
@@ -48,26 +52,30 @@ const routes = app
       return { orderId, status }
     }),
     async (c) => {
-      try {
-        const { orderId, status } = await c.req.valid("json")
-        await setOrderStatus({
-          dbClient: c.get("dbClient"),
-          order: { id: orderId, status },
-        })
-        const payload = await getOrderProgressManagerComponentData({
-          dbClient: c.get("dbClient"),
-        })
-        return c.json(payload, 200)
-      } catch (_e) {
-        return c.text("Conflict", 409)
+      const { orderId, status } = await c.req.valid("json")
+      const setRes = await setOrderStatus({
+        dbClient: c.get("dbClient"),
+        order: { id: orderId, status },
+      })
+      if (!setRes.ok) {
+        if (setRes.message === "注文が見つかりません。") {
+          return c.json({ message: setRes.message }, 404)
+        }
+        throw new Error(setRes.message)
       }
+      const payloadRes = await getOrderProgressManagerComponentData({
+        dbClient: c.get("dbClient"),
+      })
+      if (!payloadRes.ok) throw new Error(payloadRes.message)
+      return c.json(payloadRes.value, 200)
     },
   )
   .get("/product-registration-form", async (c) => {
-    const { tags } = await getProductRegistrationFormComponentData({
+    const res = await getProductRegistrationFormComponentData({
       dbClient: c.get("dbClient"),
     })
-    return c.json({ tags })
+    if (!res.ok) throw new Error(res.message)
+    return c.json(res.value, 200)
   })
 
 export default app

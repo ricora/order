@@ -1,4 +1,5 @@
 import type Order from "../../domain/order/entities/order"
+import type { Result } from "../../domain/types"
 import type { DbClient } from "../../libs/db/client"
 import { toCsv } from "../../utils/csv"
 import { formatDateTimeIsoJP } from "../../utils/date"
@@ -81,20 +82,26 @@ export type ExportOrderHistoryCsvResult = {
   rowCount: number
 }
 
-const fetchAllOrders = async (dbClient: DbClient): Promise<Order[]> => {
+const fetchAllOrders = async (
+  dbClient: DbClient,
+): Promise<Result<Order[], "エラーが発生しました。">> => {
   const orders: Order[] = []
   const pageSize = ORDER_HISTORY_EXPORT_PAGE_SIZE
   const limit = pageSize + 1
 
   // fetch in deterministic order by primary key via existing repository
   while (true) {
-    const chunk = await findAllOrdersOrderByIdAsc({
+    const chunkResult = await findAllOrdersOrderByIdAsc({
       dbClient,
       pagination: {
         offset: orders.length,
         limit,
       },
     })
+    if (!chunkResult.ok) {
+      return { ok: false, message: "エラーが発生しました。" }
+    }
+    const chunk = chunkResult.value
     if (chunk.length === 0) {
       break
     }
@@ -107,7 +114,7 @@ const fetchAllOrders = async (dbClient: DbClient): Promise<Order[]> => {
       break
     }
   }
-  return orders
+  return { ok: true, value: orders }
 }
 
 const buildOrderRows = (orders: Order[]) => {
@@ -158,16 +165,23 @@ const buildOrderRows = (orders: Order[]) => {
 
 export const exportOrderHistoryCsv = async ({
   dbClient,
-}: ExportOrderHistoryCsvParams): Promise<ExportOrderHistoryCsvResult> => {
-  const orders = await fetchAllOrders(dbClient)
+}: ExportOrderHistoryCsvParams): Promise<
+  Result<ExportOrderHistoryCsvResult, "エラーが発生しました。">
+> => {
+  const ordersResult = await fetchAllOrders(dbClient)
+  if (!ordersResult.ok) return { ok: false, message: "エラーが発生しました。" }
+  const orders = ordersResult.value
   const rows = buildOrderRows(orders)
   const csvRows =
     rows.length > 0 ? [ORDER_HISTORY_HEADER, ...rows] : [ORDER_HISTORY_HEADER]
   const csv = toCsv(csvRows)
   return {
-    csv,
-    exportedAt: new Date(),
-    orderCount: orders.length,
-    rowCount: rows.length,
+    ok: true,
+    value: {
+      csv,
+      exportedAt: new Date(),
+      orderCount: orders.length,
+      rowCount: rows.length,
+    },
   }
 }

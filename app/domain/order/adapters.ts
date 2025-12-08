@@ -1,7 +1,7 @@
 import { asc, desc, eq, inArray } from "drizzle-orm"
 import { orderItemTable, orderTable } from "../../libs/db/schema"
 import type Order from "./entities/order"
-import type { Repositories } from "./repositories"
+import type { Repository } from "./repository"
 
 export const adapters = {
   findOrderById: async ({ dbClient, order }) => {
@@ -11,22 +11,29 @@ export const adapters = {
         orderItems: true,
       },
     })
-    if (!dbOrder) return null
+    if (!dbOrder)
+      return {
+        ok: false,
+        message: "注文が見つかりません。",
+      }
 
     return {
-      id: dbOrder.id,
-      customerName: dbOrder.customerName,
-      comment: dbOrder.comment,
-      createdAt: dbOrder.createdAt,
-      status: dbOrder.status,
-      updatedAt: dbOrder.updatedAt,
-      orderItems: dbOrder.orderItems.map((item) => ({
-        productId: item.productId,
-        productName: item.productName,
-        unitAmount: item.unitAmount,
-        quantity: item.quantity,
-      })),
-      totalAmount: dbOrder.totalAmount,
+      ok: true,
+      value: {
+        id: dbOrder.id,
+        customerName: dbOrder.customerName,
+        comment: dbOrder.comment,
+        createdAt: dbOrder.createdAt,
+        status: dbOrder.status,
+        updatedAt: dbOrder.updatedAt,
+        orderItems: dbOrder.orderItems.map((item) => ({
+          productId: item.productId,
+          productName: item.productName,
+          unitAmount: item.unitAmount,
+          quantity: item.quantity,
+        })),
+        totalAmount: dbOrder.totalAmount,
+      },
     }
   },
 
@@ -39,21 +46,24 @@ export const adapters = {
       offset: pagination.offset,
       limit: pagination.limit,
     })
-    return dbOrders.map((dbOrder) => ({
-      id: dbOrder.id,
-      customerName: dbOrder.customerName,
-      comment: dbOrder.comment,
-      createdAt: dbOrder.createdAt,
-      status: dbOrder.status,
-      updatedAt: dbOrder.updatedAt,
-      orderItems: dbOrder.orderItems.map((item) => ({
-        productId: item.productId,
-        productName: item.productName,
-        unitAmount: item.unitAmount,
-        quantity: item.quantity,
+    return {
+      ok: true,
+      value: dbOrders.map((dbOrder) => ({
+        id: dbOrder.id,
+        customerName: dbOrder.customerName,
+        comment: dbOrder.comment,
+        createdAt: dbOrder.createdAt,
+        status: dbOrder.status,
+        updatedAt: dbOrder.updatedAt,
+        orderItems: dbOrder.orderItems.map((item) => ({
+          productId: item.productId,
+          productName: item.productName,
+          unitAmount: item.unitAmount,
+          quantity: item.quantity,
+        })),
+        totalAmount: dbOrder.totalAmount,
       })),
-      totalAmount: dbOrder.totalAmount,
-    }))
+    }
   },
 
   findAllOrdersOrderByIdDesc: async ({ dbClient, pagination }) => {
@@ -65,21 +75,24 @@ export const adapters = {
       offset: pagination.offset,
       limit: pagination.limit,
     })
-    return dbOrders.map((dbOrder) => ({
-      id: dbOrder.id,
-      customerName: dbOrder.customerName,
-      comment: dbOrder.comment,
-      createdAt: dbOrder.createdAt,
-      status: dbOrder.status,
-      updatedAt: dbOrder.updatedAt,
-      orderItems: dbOrder.orderItems.map((item) => ({
-        productId: item.productId,
-        productName: item.productName,
-        unitAmount: item.unitAmount,
-        quantity: item.quantity,
+    return {
+      ok: true,
+      value: dbOrders.map((dbOrder) => ({
+        id: dbOrder.id,
+        customerName: dbOrder.customerName,
+        comment: dbOrder.comment,
+        createdAt: dbOrder.createdAt,
+        status: dbOrder.status,
+        updatedAt: dbOrder.updatedAt,
+        orderItems: dbOrder.orderItems.map((item) => ({
+          productId: item.productId,
+          productName: item.productName,
+          unitAmount: item.unitAmount,
+          quantity: item.quantity,
+        })),
+        totalAmount: dbOrder.totalAmount,
       })),
-      totalAmount: dbOrder.totalAmount,
-    }))
+    }
   },
 
   findAllOrdersByActiveStatusOrderByUpdatedAtAsc: async ({
@@ -95,21 +108,24 @@ export const adapters = {
       offset: pagination.offset,
       limit: pagination.limit,
     })
-    return dbOrders.map((dbOrder) => ({
-      id: dbOrder.id,
-      customerName: dbOrder.customerName,
-      comment: dbOrder.comment,
-      createdAt: dbOrder.createdAt,
-      status: dbOrder.status,
-      updatedAt: dbOrder.updatedAt,
-      orderItems: dbOrder.orderItems.map((item) => ({
-        productId: item.productId,
-        productName: item.productName,
-        unitAmount: item.unitAmount,
-        quantity: item.quantity,
+    return {
+      ok: true,
+      value: dbOrders.map((dbOrder) => ({
+        id: dbOrder.id,
+        customerName: dbOrder.customerName,
+        comment: dbOrder.comment,
+        createdAt: dbOrder.createdAt,
+        status: dbOrder.status,
+        updatedAt: dbOrder.updatedAt,
+        orderItems: dbOrder.orderItems.map((item) => ({
+          productId: item.productId,
+          productName: item.productName,
+          unitAmount: item.unitAmount,
+          quantity: item.quantity,
+        })),
+        totalAmount: dbOrder.totalAmount,
       })),
-      totalAmount: dbOrder.totalAmount,
-    }))
+    }
   },
 
   findAllOrdersByInactiveStatusOrderByUpdatedAtDesc: async ({
@@ -125,124 +141,132 @@ export const adapters = {
       offset: pagination.offset,
       limit: pagination.limit,
     })
-    return dbOrders.map((dbOrder) => ({
-      id: dbOrder.id,
-      customerName: dbOrder.customerName,
-      comment: dbOrder.comment,
-      createdAt: dbOrder.createdAt,
-      status: dbOrder.status,
-      updatedAt: dbOrder.updatedAt,
-      orderItems: dbOrder.orderItems.map((item) => ({
-        productId: item.productId,
-        productName: item.productName,
-        unitAmount: item.unitAmount,
-        quantity: item.quantity,
-      })),
-      totalAmount: dbOrder.totalAmount,
-    }))
-  },
-
-  createOrder: async ({ dbClient, order }) => {
-    try {
-      const dbOrder = (
-        await dbClient
-          .insert(orderTable)
-          .values({
-            customerName: order.customerName,
-            comment: order.comment,
-            createdAt: order.createdAt,
-            status: order.status,
-            totalAmount: order.totalAmount,
-            updatedAt: order.createdAt,
-          })
-          .returning()
-      )[0]
-      if (!dbOrder) throw new Error("DBへの挿入に失敗しました")
-
-      const dbOrderItems = await dbClient
-        .insert(orderItemTable)
-        .values(
-          order.orderItems.map((item) => ({
-            orderId: dbOrder.id,
-            productId: item.productId,
-            quantity: item.quantity,
-            unitAmount: item.unitAmount,
-            productName: item.productName,
-          })),
-        )
-        .returning()
-
-      const newOrder: Order = {
+    return {
+      ok: true,
+      value: dbOrders.map((dbOrder) => ({
         id: dbOrder.id,
         customerName: dbOrder.customerName,
         comment: dbOrder.comment,
         createdAt: dbOrder.createdAt,
         status: dbOrder.status,
         updatedAt: dbOrder.updatedAt,
-        orderItems: dbOrderItems.map((item) => ({
+        orderItems: dbOrder.orderItems.map((item) => ({
           productId: item.productId,
           productName: item.productName,
           unitAmount: item.unitAmount,
           quantity: item.quantity,
         })),
         totalAmount: dbOrder.totalAmount,
-      }
-      return newOrder
-    } catch {
-      throw new Error("注文の作成に失敗しました")
+      })),
     }
   },
 
-  updateOrder: async ({ dbClient, order }) => {
-    try {
-      const updatedOrder = (
-        await dbClient
-          .update(orderTable)
-          .set({
-            customerName: order.customerName,
-            comment: order.comment,
-            status: order.status,
-            updatedAt: order.updatedAt,
-          })
-          .where(eq(orderTable.id, order.id))
-          .returning()
-      )[0]
-      if (!updatedOrder) return null
-
-      const dbOrderItems = await dbClient
-        .select()
-        .from(orderItemTable)
-        .where(eq(orderItemTable.orderId, updatedOrder.id))
-
-      const newOrder: Order = {
-        id: updatedOrder.id,
-        customerName: updatedOrder.customerName,
-        comment: updatedOrder.comment,
-        createdAt: updatedOrder.createdAt,
-        status: updatedOrder.status,
-        updatedAt: updatedOrder.updatedAt,
-        orderItems: dbOrderItems.map((item) => ({
-          productId: item.productId,
-          productName: item.productName,
-          unitAmount: item.unitAmount,
-          quantity: item.quantity,
-        })),
-        totalAmount: updatedOrder.totalAmount,
+  createOrder: async ({ dbClient, order }) => {
+    const dbOrder = (
+      await dbClient
+        .insert(orderTable)
+        .values({
+          customerName: order.customerName,
+          comment: order.comment,
+          createdAt: order.createdAt,
+          status: order.status,
+          totalAmount: order.totalAmount,
+          updatedAt: order.createdAt,
+        })
+        .returning()
+    )[0]
+    if (!dbOrder) {
+      return {
+        ok: false,
+        message: "エラーが発生しました。",
       }
-      return newOrder
-    } catch {
-      throw new Error("注文の更新に失敗しました")
+    }
+
+    const dbOrderItems = await dbClient
+      .insert(orderItemTable)
+      .values(
+        order.orderItems.map((item) => ({
+          orderId: dbOrder.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          unitAmount: item.unitAmount,
+          productName: item.productName,
+        })),
+      )
+      .returning()
+
+    const newOrder: Order = {
+      id: dbOrder.id,
+      customerName: dbOrder.customerName,
+      comment: dbOrder.comment,
+      createdAt: dbOrder.createdAt,
+      status: dbOrder.status,
+      updatedAt: dbOrder.updatedAt,
+      orderItems: dbOrderItems.map((item) => ({
+        productId: item.productId,
+        productName: item.productName,
+        unitAmount: item.unitAmount,
+        quantity: item.quantity,
+      })),
+      totalAmount: dbOrder.totalAmount,
+    }
+    return { ok: true, value: newOrder }
+  },
+
+  updateOrder: async ({ dbClient, order }) => {
+    const updatedOrder = (
+      await dbClient
+        .update(orderTable)
+        .set({
+          customerName: order.customerName,
+          comment: order.comment,
+          status: order.status,
+          updatedAt: order.updatedAt,
+        })
+        .where(eq(orderTable.id, order.id))
+        .returning()
+    )[0]
+    if (!updatedOrder) {
+      return {
+        ok: false,
+        message: "注文が見つかりません。",
+      }
+    }
+
+    const dbOrderItems = await dbClient
+      .select()
+      .from(orderItemTable)
+      .where(eq(orderItemTable.orderId, updatedOrder.id))
+
+    const newOrder: Order = {
+      id: updatedOrder.id,
+      customerName: updatedOrder.customerName,
+      comment: updatedOrder.comment,
+      createdAt: updatedOrder.createdAt,
+      status: updatedOrder.status,
+      updatedAt: updatedOrder.updatedAt,
+      orderItems: dbOrderItems.map((item) => ({
+        productId: item.productId,
+        productName: item.productName,
+        unitAmount: item.unitAmount,
+        quantity: item.quantity,
+      })),
+      totalAmount: updatedOrder.totalAmount,
+    }
+    return {
+      ok: true,
+      value: newOrder,
     }
   },
 
   deleteOrder: async ({ dbClient, order }) => {
-    try {
-      await dbClient
-        .delete(orderItemTable)
-        .where(eq(orderItemTable.orderId, order.id))
-      await dbClient.delete(orderTable).where(eq(orderTable.id, order.id))
-    } catch {
-      throw new Error("注文の削除に失敗しました")
+    await dbClient
+      .delete(orderItemTable)
+      .where(eq(orderItemTable.orderId, order.id))
+    await dbClient.delete(orderTable).where(eq(orderTable.id, order.id))
+    return {
+      ok: true,
+      value: undefined,
     }
   },
-} satisfies Repositories
+} satisfies Repository

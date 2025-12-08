@@ -17,10 +17,14 @@ export const POST = createRoute(async (c) => {
       return c.notFound()
     }
 
-    await removeOrder({
+    const res = await removeOrder({
       dbClient: c.get("dbClient"),
       order: { id },
     })
+    if (!res.ok) {
+      setToastCookie(c, "error", res.message)
+      return c.redirect(c.req.url)
+    }
 
     setToastCookie(c, "success", "注文を削除しました")
     return c.redirect("/staff/orders")
@@ -37,10 +41,15 @@ export default createRoute(async (c) => {
     return c.notFound()
   }
 
-  const { order } = await getOrderDeletePageData({
+  const res = await getOrderDeletePageData({
     order: { id },
     dbClient: c.get("dbClient"),
   })
+  if (!res.ok) {
+    if (res.message === "注文が見つかりません。") return c.notFound()
+    throw new Error(res.message)
+  }
+  const { order } = res.value
   if (!order) return c.notFound()
   return c.render(
     <Layout title={"注文削除"} description={"注文情報の削除を行います。"}>

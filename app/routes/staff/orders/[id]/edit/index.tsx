@@ -56,11 +56,14 @@ export const POST = createRoute(
       }
 
       const { order } = c.req.valid("form")
-      await setOrderDetails({
+      const res = await setOrderDetails({
         dbClient: c.get("dbClient"),
         order: { id, ...order },
       })
-
+      if (!res.ok) {
+        setToastCookie(c, "error", res.message)
+        return c.redirect(c.req.url)
+      }
       setToastCookie(c, "success", "注文を更新しました")
       return c.redirect(`/staff/orders`)
     } catch (e) {
@@ -77,10 +80,15 @@ export default createRoute(async (c) => {
     return c.notFound()
   }
 
-  const { order } = await getOrderEditPageData({
+  const res = await getOrderEditPageData({
     order: { id },
     dbClient: c.get("dbClient"),
   })
+  if (!res.ok) {
+    if (res.message === "注文が見つかりません。") return c.notFound()
+    throw new Error(res.message)
+  }
+  const { order } = res.value
   if (!order) return c.notFound()
 
   return c.render(

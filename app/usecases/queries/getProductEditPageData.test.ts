@@ -1,4 +1,12 @@
-import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test"
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  type Mock,
+  mock,
+} from "bun:test"
 import type Product from "../../domain/product/entities/product"
 import type { DbClient } from "../../libs/db/client"
 
@@ -14,9 +22,17 @@ const orderRepository = {} satisfies Partial<
   typeof import("../repositories-provider").orderRepository
 >
 
+type ProductRepository =
+  typeof import("../repositories-provider").productRepository
+type MockProductRepository = {
+  [K in keyof ProductRepository]: Mock<ProductRepository[K]>
+}
 const productRepository = {
-  findProductById: mock(async (): Promise<Product | null> => mockProduct),
-} satisfies Partial<typeof import("../repositories-provider").productRepository>
+  findProductById: mock<ProductRepository["findProductById"]>(async () => ({
+    ok: true as const,
+    value: mockProduct,
+  })),
+} satisfies Partial<MockProductRepository>
 
 mock.module("../repositories-provider", () => ({
   orderRepository,
@@ -30,9 +46,10 @@ const dbClient = {} as DbClient
 describe("getProductEditPageData", () => {
   beforeAll(() => {
     productRepository.findProductById.mockClear()
-    productRepository.findProductById.mockImplementation(
-      async () => mockProduct,
-    )
+    productRepository.findProductById.mockImplementation(async () => ({
+      ok: true as const,
+      value: mockProduct,
+    }))
   })
   afterAll(() => {
     mock.restore()
@@ -43,19 +60,37 @@ describe("getProductEditPageData", () => {
       dbClient,
       product: { id: 1 },
     })
-    expect(result.product).toEqual(mockProduct)
-    expect(result.product?.id).toBe(1)
-    expect(result.product?.name).toBe("編集テスト商品")
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.product).toEqual(mockProduct)
+    expect(result.value.product?.id).toBe(1)
+    expect(result.value.product?.name).toBe("編集テスト商品")
   })
 
-  it("商品が見つからない場合はnullを返す", async () => {
-    productRepository.findProductById.mockImplementationOnce(async () => null)
+  it("商品が見つからない場合はエラーを返す", async () => {
+    productRepository.findProductById.mockImplementationOnce(async () => ({
+      ok: false as const,
+      message: "商品が見つかりません。",
+    }))
 
     const result = await getProductEditPageData({
       dbClient,
       product: { id: 999 },
     })
-    expect(result.product).toBeNull()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.message).toBe("商品が見つかりません。")
+  })
+
+  it("リポジトリが例外を投げる場合は汎用エラーを返す", async () => {
+    productRepository.findProductById.mockImplementationOnce(async () => {
+      throw new Error("unexpected")
+    })
+    const result = await getProductEditPageData({
+      dbClient,
+      product: { id: 999 },
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.message).toBe("エラーが発生しました。")
   })
 
   it("findProductByIdに正しいパラメータを渡している", async () => {

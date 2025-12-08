@@ -24,7 +24,10 @@ const mockOrder = (id: number, overrides?: Partial<Order>): Order => ({
 const mockOrders: Order[] = []
 
 const orderRepository = {
-  findAllOrdersOrderByIdAsc: mock(async (_) => mockOrders),
+  findAllOrdersOrderByIdAsc: mock(async (_) => ({
+    ok: true as const,
+    value: mockOrders,
+  })),
 } satisfies Partial<typeof import("../repositories-provider").orderRepository>
 
 const productRepository = {} satisfies Partial<
@@ -95,18 +98,20 @@ describe("exportOrderHistoryCsv", () => {
     orderRepository.findAllOrdersOrderByIdAsc.mockImplementation(
       async ({ pagination }) => {
         if (pagination.offset === 0) {
-          return orders
+          return { ok: true as const, value: orders }
         }
-        return []
+        return { ok: true as const, value: [] }
       },
     )
 
     const result = await exportOrderHistoryCsv({ dbClient })
-    expect(result.orderCount).toBe(2)
-    expect(result.rowCount).toBe(3)
-    expect(result.exportedAt).toBeInstanceOf(Date)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.orderCount).toBe(2)
+    expect(result.value.rowCount).toBe(3)
+    expect(result.value.exportedAt).toBeInstanceOf(Date)
 
-    expect(result.csv).toBe(
+    expect(result.value.csv).toBe(
       `${[
         "order_id,order_created_at,order_updated_at,order_status,customer_name,order_total_amount,order_item_count,line_index,product_id,product_name,unit_amount,quantity,line_total_amount",
         "1,2024-01-01T18:00:00+09:00,2024-01-01T19:00:00+09:00,completed,Alice,1500,2,1,10,Coffee,500,2,1000",
@@ -127,23 +132,24 @@ describe("exportOrderHistoryCsv", () => {
       async ({ pagination }) => {
         if (pagination.offset === 0) {
           expect(pagination.limit).toBe(ORDER_HISTORY_EXPORT_PAGE_SIZE + 1)
-          return firstPage
+          return { ok: true as const, value: firstPage }
         }
         if (pagination.offset === ORDER_HISTORY_EXPORT_PAGE_SIZE) {
           expect(pagination.limit).toBe(ORDER_HISTORY_EXPORT_PAGE_SIZE + 1)
-          return secondPage
+          return { ok: true as const, value: secondPage }
         }
-        return []
+        return { ok: true as const, value: [] }
       },
     )
 
     const result = await exportOrderHistoryCsv({ dbClient })
-
     expect(orderRepository.findAllOrdersOrderByIdAsc).toHaveBeenCalledTimes(2)
-    expect(result.orderCount).toBe(
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.orderCount).toBe(
       ORDER_HISTORY_EXPORT_PAGE_SIZE + secondPage.length,
     )
-    expect(result.rowCount).toBe(
+    expect(result.value.rowCount).toBe(
       ORDER_HISTORY_EXPORT_PAGE_SIZE + secondPage.length,
     )
   })
@@ -154,13 +160,16 @@ describe("exportOrderHistoryCsv", () => {
       totalAmount: 0,
     })
 
-    orderRepository.findAllOrdersOrderByIdAsc.mockImplementation(async () => [
-      emptyOrder,
-    ])
+    orderRepository.findAllOrdersOrderByIdAsc.mockImplementation(async () => ({
+      ok: true as const,
+      value: [emptyOrder],
+    }))
 
     const result = await exportOrderHistoryCsv({ dbClient })
-    expect(result.rowCount).toBe(1)
-    const [, row] = result.csv.split("\n")
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.rowCount).toBe(1)
+    const [, row] = result.value.csv.split("\n")
     if (!row) throw new Error("expected one data row")
     const columns = row.split(",")
     expect(columns[6]).toBe("0") // order_item_count

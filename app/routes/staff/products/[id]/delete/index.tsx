@@ -17,11 +17,14 @@ export const POST = createRoute(async (c) => {
       return c.notFound()
     }
 
-    await removeProduct({
+    const res = await removeProduct({
       dbClient: c.get("dbClient"),
       product: { id },
     })
-
+    if (!res.ok) {
+      setToastCookie(c, "error", res.message)
+      return c.redirect(c.req.url)
+    }
     setToastCookie(c, "success", "商品を削除しました")
     return c.redirect("/staff/products")
   } catch (e) {
@@ -37,10 +40,15 @@ export default createRoute(async (c) => {
     return c.notFound()
   }
 
-  const { product } = await getProductDeletePageData({
+  const res = await getProductDeletePageData({
     product: { id },
     dbClient: c.get("dbClient"),
   })
+  if (!res.ok) {
+    if (res.message === "商品が見つかりません。") return c.notFound()
+    throw new Error(res.message)
+  }
+  const { product } = res.value
   if (!product) return c.notFound()
 
   return c.render(

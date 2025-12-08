@@ -270,6 +270,7 @@ export default {
         pathNot: [
           "^app/domain/[^/]+/entities",
           "^app/domain/[^/]+/constants\\.ts$",
+          "^app/domain/types\\.ts$",
         ],
       },
     },

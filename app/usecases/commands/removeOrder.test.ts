@@ -10,7 +10,7 @@ import {
 import type { DbClient, TransactionDbClient } from "../../libs/db/client"
 
 const orderRepository = {
-  deleteOrder: mock(async () => undefined),
+  deleteOrder: mock(async () => ({ ok: true as const, value: undefined })),
 } satisfies Partial<typeof import("../repositories-provider").orderRepository>
 
 const productRepository = {} satisfies Partial<
@@ -50,7 +50,7 @@ describe("removeOrder", () => {
   })
 
   it("注文を削除できる", async () => {
-    await removeOrder({ dbClient, order: { id: 1 } })
+    const res = await removeOrder({ dbClient, order: { id: 1 } })
 
     expect(transactionSpy).toHaveBeenCalledTimes(1)
     expect(orderRepository.deleteOrder).toHaveBeenCalledTimes(1)
@@ -60,17 +60,19 @@ describe("removeOrder", () => {
         dbClient: txMock,
       }),
     )
+    expect(res.ok).toBe(true)
+    if (res.ok) expect(res.value).toBe(undefined)
   })
 
-  it("注文の削除に失敗した場合はエラーを投げる", async () => {
-    const expected = new Error("delete failed")
+  it("内部エラーが発生してもResultでエラーを返し内部のメッセージが漏洩しない", async () => {
     orderRepository.deleteOrder.mockImplementationOnce(async () => {
-      throw expected
+      throw new Error("unexpected internal error")
     })
 
-    await expect(removeOrder({ dbClient, order: { id: 2 } })).rejects.toThrow(
-      expected,
-    )
+    const res = await removeOrder({ dbClient, order: { id: 2 } })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+
     expect(transactionSpy).toHaveBeenCalledTimes(1)
   })
 })

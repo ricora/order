@@ -55,14 +55,18 @@ app.get("/products/:id", async (c) => {
     return c.text("Invalid product ID", 400)
   }
   const id = Number.parseInt(paramId, 10)
-  const { productImage } = await getProductImageAssetData({
+  const res = await getProductImageAssetData({
     dbClient: c.get("dbClient"),
     productImage: { productId: id },
   })
+  const productImage = res.ok ? res.value.productImage : null
+  if (!res.ok && res.message !== "商品画像が見つかりません。") {
+    throw new Error(res.message)
+  }
+
   let imageBuffer: Buffer<ArrayBuffer>
   let mimeType: string
-
-  if (productImage == null) {
+  if (!productImage) {
     try {
       const defaultPath = getDefaultImagePath(id)
       const imagePath = getImageFilePath(defaultPath)

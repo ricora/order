@@ -1,4 +1,12 @@
-import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test"
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  type Mock,
+  mock,
+} from "bun:test"
 import { MAX_TAGS_PER_PRODUCT } from "../../domain/product/constants"
 import type Product from "../../domain/product/entities/product"
 import type ProductTag from "../../domain/product/entities/productTag"
@@ -21,10 +29,24 @@ const orderRepository = {} satisfies Partial<
   typeof import("../repositories-provider").orderRepository
 >
 
+type ProductRepository =
+  typeof import("../repositories-provider").productRepository
+type MockProductRepository = {
+  [K in keyof ProductRepository]: Mock<ProductRepository[K]>
+}
+
 const productRepository = {
-  findProductById: mock(async (): Promise<Product | null> => mockProduct),
-  findAllProductTagsByIds: mock(async () => mockTags),
-} satisfies Partial<typeof import("../repositories-provider").productRepository>
+  findProductById: mock<ProductRepository["findProductById"]>(async () => ({
+    ok: true as const,
+    value: mockProduct,
+  })),
+  findAllProductTagsByIds: mock<ProductRepository["findAllProductTagsByIds"]>(
+    async () => ({
+      ok: true as const,
+      value: mockTags,
+    }),
+  ),
+} satisfies Partial<MockProductRepository>
 
 mock.module("../repositories-provider", () => ({
   orderRepository,
@@ -39,12 +61,14 @@ describe("getProductDeletePageData", () => {
   beforeAll(() => {
     productRepository.findProductById.mockClear()
     productRepository.findAllProductTagsByIds.mockClear()
-    productRepository.findProductById.mockImplementation(
-      async () => mockProduct,
-    )
-    productRepository.findAllProductTagsByIds.mockImplementation(
-      async () => mockTags,
-    )
+    productRepository.findProductById.mockImplementation(async () => ({
+      ok: true as const,
+      value: mockProduct,
+    }))
+    productRepository.findAllProductTagsByIds.mockImplementation(async () => ({
+      ok: true as const,
+      value: mockTags,
+    }))
   })
 
   afterAll(() => {
@@ -56,21 +80,54 @@ describe("getProductDeletePageData", () => {
       dbClient,
       product: { id: 1 },
     })
-
-    expect(result.product).not.toBeNull()
-    expect(result.product?.id).toBe(1)
-    expect(result.product?.name).toBe("削除テスト商品")
-    expect(result.product?.tags).toEqual(["タグA", "タグB"])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.product).not.toBeNull()
+    expect(result.value.product?.id).toBe(1)
+    expect(result.value.product?.name).toBe("削除テスト商品")
+    expect(result.value.product?.tags).toEqual(["タグA", "タグB"])
   })
 
-  it("商品が見つからない場合はnullを返す", async () => {
-    productRepository.findProductById.mockImplementationOnce(async () => null)
+  it("商品が見つからない場合は'商品が見つかりません。'エラーを返す", async () => {
+    productRepository.findProductById.mockImplementationOnce(async () => ({
+      ok: false as const,
+      message: "商品が見つかりません。",
+    }))
 
     const result = await getProductDeletePageData({
       dbClient,
       product: { id: 999 },
     })
-    expect(result.product).toBeNull()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.message).toBe("商品が見つかりません。")
+  })
+
+  it("findProductByIdがドメインエラーを返す場合は汎用エラーを返す", async () => {
+    productRepository.findProductById.mockImplementationOnce(async () => ({
+      ok: false as const,
+      message: "エラーが発生しました。",
+    }))
+    const res = await getProductDeletePageData({ dbClient, product: { id: 1 } })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+  })
+
+  it("findProductByIdが例外を投げる場合は汎用エラーを返す", async () => {
+    productRepository.findProductById.mockImplementationOnce(async () => {
+      throw new Error("unexpected")
+    })
+    const res = await getProductDeletePageData({ dbClient, product: { id: 1 } })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+  })
+
+  it("findAllProductTagsByIdsがドメインエラーを返す場合は汎用エラーを返す", async () => {
+    productRepository.findAllProductTagsByIds.mockImplementationOnce(
+      async () => ({ ok: false as const, message: "エラーが発生しました。" }),
+    )
+    const res = await getProductDeletePageData({ dbClient, product: { id: 1 } })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
   })
 
   it("タグの取得に正しいパラメータを渡している", async () => {

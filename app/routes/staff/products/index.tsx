@@ -188,12 +188,13 @@ export const POST = createRoute(
   async (c) => {
     try {
       const { product } = c.req.valid("form")
-
-      await registerProduct({
+      const res = await registerProduct({
         dbClient: c.get("dbClient"),
         product,
       })
-
+      if (!res.ok) {
+        throw new Error(res.message)
+      }
       setToastCookie(c, "success", "商品を登録しました")
     } catch (e) {
       setToastCookie(c, "error", String(e))
@@ -210,6 +211,12 @@ export default createRoute(async (c) => {
   const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10))
   const sort = c.req.query("sort") === "desc" ? "desc" : "asc"
 
+  const res = await getProductsManagementPageData({
+    dbClient: c.get("dbClient"),
+    page,
+    sort,
+  })
+  if (!res.ok) throw new Error(res.message)
   const {
     products,
     totalProducts,
@@ -218,11 +225,7 @@ export default createRoute(async (c) => {
     lowStockCount,
     hasNextPage,
     currentPage,
-  } = await getProductsManagementPageData({
-    dbClient: c.get("dbClient"),
-    page,
-    sort,
-  })
+  } = res.value
 
   return c.render(
     <Layout title={"商品管理"} description={"商品情報の登録や編集を行います。"}>

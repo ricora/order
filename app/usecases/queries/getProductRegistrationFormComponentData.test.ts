@@ -14,7 +14,10 @@ const orderRepository = {} satisfies Partial<
 >
 
 const productRepository = {
-  findAllProductTags: mock(async () => mockTags),
+  findAllProductTags: mock(async () => ({
+    ok: true as const,
+    value: mockTags,
+  })),
 } satisfies Partial<typeof import("../repositories-provider").productRepository>
 
 mock.module("../repositories-provider", () => ({
@@ -31,9 +34,10 @@ const dbClient = {} as DbClient
 describe("getProductRegistrationFormComponentData", () => {
   beforeAll(() => {
     productRepository.findAllProductTags.mockClear()
-    productRepository.findAllProductTags.mockImplementation(
-      async () => mockTags,
-    )
+    productRepository.findAllProductTags.mockImplementation(async () => ({
+      ok: true as const,
+      value: mockTags,
+    }))
   })
   afterAll(() => {
     mock.restore()
@@ -41,8 +45,10 @@ describe("getProductRegistrationFormComponentData", () => {
 
   it("すべてのタグを取得できる", async () => {
     const result = await getProductRegistrationFormComponentData({ dbClient })
-    expect(result.tags.length).toBe(3)
-    expect(result.tags).toEqual(mockTags)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.tags.length).toBe(3)
+    expect(result.value.tags).toEqual(mockTags)
   })
 
   it("ページネーションで1000件のlimitを指定している", async () => {
@@ -55,9 +61,34 @@ describe("getProductRegistrationFormComponentData", () => {
   })
 
   it("タグが空の場合も正しく返す", async () => {
-    productRepository.findAllProductTags.mockImplementationOnce(async () => [])
+    productRepository.findAllProductTags.mockImplementationOnce(async () => ({
+      ok: true as const,
+      value: [],
+    }))
 
     const result = await getProductRegistrationFormComponentData({ dbClient })
-    expect(result.tags).toEqual([])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.tags).toEqual([])
+  })
+
+  it("findAllProductTagsがドメインエラーを返す場合は汎用エラーを返す", async () => {
+    // @ts-expect-error
+    productRepository.findAllProductTags.mockImplementationOnce(async () => ({
+      ok: false as const,
+      message: "secret error",
+    }))
+    const res = await getProductRegistrationFormComponentData({ dbClient })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+  })
+
+  it("findAllProductTagsが例外を投げる場合は汎用エラーを返す", async () => {
+    productRepository.findAllProductTags.mockImplementationOnce(async () => {
+      throw new Error("unexpected")
+    })
+    const res = await getProductRegistrationFormComponentData({ dbClient })
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
   })
 })

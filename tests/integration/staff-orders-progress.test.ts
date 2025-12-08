@@ -77,9 +77,7 @@ describe("注文進捗管理", () => {
         body: JSON.stringify({ orderId: 9999, status: "processing" }),
         headers: { "content-type": "application/json" },
       })
-      expect(res.status).toBe(409)
-      const text = await res.text()
-      expect(text).toBe("Conflict")
+      expect(res.status).toBe(404)
     })
     test("注文IDが整数でない場合にエラーを返す", async () => {
       const res = await app.request("/api/order-progress-manager/set-status", {
