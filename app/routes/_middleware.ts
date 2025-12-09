@@ -1,5 +1,6 @@
 import { etag } from "hono/etag"
 import { createMiddleware } from "hono/factory"
+import { logger } from "hono/logger"
 import { createRoute } from "honox/factory"
 import { createDbClient } from "../libs/db/client"
 
@@ -18,4 +19,5 @@ export default createRoute(
     const eTagHandler = etag()
     await eTagHandler(c, async () => {})
   }),
+  logger(),
 )
