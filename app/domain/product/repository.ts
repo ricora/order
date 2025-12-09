@@ -519,12 +519,14 @@ export const createRepository = (adapters: Repository) => {
         dbClient,
         store: { id: 1 },
       })
-      if (productCountRes.ok) {
-        await repository.setProductCountByStoreId({
-          dbClient,
-          store: { id: 1, value: productCountRes.value + 1 },
-        })
+      if (!productCountRes.ok) {
+        return { ok: false, message: "エラーが発生しました。" }
       }
+      const setRes = await repository.setProductCountByStoreId({
+        dbClient,
+        store: { id: 1, value: productCountRes.value + 1 },
+      })
+      if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
 
       if (createResult.value.tagIds && createResult.value.tagIds.length > 0) {
         const adjustRes = await adjustTagRelationCounts(
@@ -621,13 +623,15 @@ export const createRepository = (adapters: Repository) => {
         dbClient,
         store: { id: 1 },
       })
-      if (productCountRes.ok) {
-        const newCount = productCountRes.value - 1
-        await repository.setProductCountByStoreId({
-          dbClient,
-          store: { id: 1, value: newCount < 0 ? 0 : newCount },
-        })
-      }
+      if (!productCountRes.ok)
+        return { ok: false, message: "エラーが発生しました。" }
+
+      const newCount = productCountRes.value - 1
+      const setRes = await repository.setProductCountByStoreId({
+        dbClient,
+        store: { id: 1, value: newCount < 0 ? 0 : newCount },
+      })
+      if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
 
       if (foundProduct.tagIds && foundProduct.tagIds.length > 0) {
         const tagIds = foundProduct.tagIds

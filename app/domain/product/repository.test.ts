@@ -190,6 +190,134 @@ describe("Product repository", () => {
       )
     })
 
+    it("商品の作成時に商品数取得エラーが発生したら処理を中止する", async () => {
+      adapters.getProductCountByStoreId.mockImplementation(async () => {
+        throw new Error("db error")
+      })
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ tagId: id, count: 0 })),
+        }),
+      )
+      adapters.createProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: { ...product, id: 99 },
+      }))
+
+      let threw = false
+      try {
+        await repository.createProduct({
+          product: validProduct,
+          dbClient: mockDbClient,
+        })
+      } catch {
+        threw = true
+      }
+      expect(threw).toBe(true)
+      expect(adapters.setProductCountByStoreId).not.toHaveBeenCalled()
+      expect(
+        adapters.setAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
+    })
+
+    it("商品の作成時に商品数更新エラーが発生したら処理を中止する", async () => {
+      adapters.getProductCountByStoreId.mockImplementation(async () => ({
+        ok: true,
+        value: 2,
+      }))
+      adapters.setProductCountByStoreId.mockImplementation(async () => {
+        throw new Error("db error")
+      })
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ tagId: id, count: 0 })),
+        }),
+      )
+      adapters.createProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: { ...product, id: 99 },
+      }))
+
+      let threw2 = false
+      try {
+        await repository.createProduct({
+          product: validProduct,
+          dbClient: mockDbClient,
+        })
+      } catch {
+        threw2 = true
+      }
+      expect(threw2).toBe(true)
+      expect(
+        adapters.setAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
+    })
+
+    it("商品の作成時に商品数取得に失敗したら処理を中止する", async () => {
+      adapters.getProductCountByStoreId.mockImplementation(async () => {
+        throw new Error("db error")
+      })
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ tagId: id, count: 0 })),
+        }),
+      )
+      adapters.createProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: { ...product, id: 99 },
+      }))
+
+      let threw3 = false
+      try {
+        await repository.createProduct({
+          product: validProduct,
+          dbClient: mockDbClient,
+        })
+      } catch {
+        threw3 = true
+      }
+      expect(threw3).toBe(true)
+      expect(adapters.setProductCountByStoreId).not.toHaveBeenCalled()
+    })
+
+    it("商品の作成時に商品数更新に失敗したら処理を中止する", async () => {
+      adapters.getProductCountByStoreId.mockImplementation(async () => ({
+        ok: true,
+        value: 2,
+      }))
+      adapters.setProductCountByStoreId.mockImplementation(async () => {
+        throw new Error("db error")
+      })
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ tagId: id, count: 0 })),
+        }),
+      )
+      adapters.createProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: { ...product, id: 99 },
+      }))
+
+      let threw4 = false
+      try {
+        await repository.createProduct({
+          product: validProduct,
+          dbClient: mockDbClient,
+        })
+      } catch {
+        threw4 = true
+      }
+      expect(threw4).toBe(true)
+      // adjustTagRelationCounts should not be called because set failed
+      expect(
+        adapters.setAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
+    })
+
     it("タグカウント取得が失敗した場合は作成を失敗させカウント更新は行われない", async () => {
       adapters.getProductCountByStoreId.mockImplementation(async () => ({
         ok: true,
@@ -1025,6 +1153,64 @@ describe("Product repository", () => {
       expect(adapters.deleteProductImageByProductId).toHaveBeenCalledTimes(1)
     })
 
+    it("商品の削除時に商品数取得エラーが発生したら処理を中止する", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "削除対象商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.getProductCountByStoreId.mockImplementation(async () => {
+        throw new Error("db error")
+      })
+      let threw2 = false
+      try {
+        await repository.deleteProduct({
+          product: { id: 1 },
+          dbClient: mockDbClient,
+        })
+      } catch {
+        threw2 = true
+      }
+      expect(threw2).toBe(true)
+      expect(adapters.deleteProduct).not.toHaveBeenCalled()
+    })
+
+    it("商品の削除時に商品数更新エラーが発生したら処理を中止する", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "削除対象商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.getProductCountByStoreId.mockImplementation(async () => ({
+        ok: true,
+        value: 1,
+      }))
+      adapters.setProductCountByStoreId.mockImplementation(async () => {
+        throw new Error("db error")
+      })
+      let threw3 = false
+      try {
+        await repository.deleteProduct({
+          product: { id: 1 },
+          dbClient: mockDbClient,
+        })
+      } catch {
+        threw3 = true
+      }
+      expect(threw3).toBe(true)
+      expect(adapters.deleteProduct).not.toHaveBeenCalled()
+    })
+
     it("商品削除時に店舗の商品数が0以下なら商品数のカウントを0とする", async () => {
       adapters.findProductById.mockImplementation(async () => ({
         ok: true,
@@ -1095,6 +1281,66 @@ describe("Product repository", () => {
         { id: 1, value: 1 },
         { id: 2, value: 1 },
       ])
+    })
+
+    it("商品の削除時に商品数取得に失敗したら処理を中止する", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "削除対象商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 1,
+        },
+      }))
+      adapters.getProductCountByStoreId.mockImplementation(async () => ({
+        ok: false,
+        message: "エラーが発生しました。",
+      }))
+      const res = await repository.deleteProduct({
+        product: { id: 1 },
+        dbClient: mockDbClient,
+      })
+      expect(res.ok).toBe(false)
+      expect(adapters.deleteProduct).not.toHaveBeenCalled()
+    })
+
+    it("商品の削除時に商品数更新に失敗したら処理を中止する", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "削除対象商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 1,
+        },
+      }))
+      adapters.getProductCountByStoreId.mockImplementation(async () => ({
+        ok: true,
+        value: 2,
+      }))
+      adapters.setProductCountByStoreId.mockImplementation(async () => {
+        throw new Error("db error")
+      })
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ tagId: id, count: 2 })),
+        }),
+      )
+      let threw2 = false
+      try {
+        await repository.deleteProduct({
+          product: { id: 1 },
+          dbClient: mockDbClient,
+        })
+      } catch {
+        threw2 = true
+      }
+      expect(threw2).toBe(true)
+      expect(adapters.deleteProduct).not.toHaveBeenCalled()
     })
   })
 
