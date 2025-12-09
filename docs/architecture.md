@@ -134,6 +134,11 @@ flowchart LR
     Usecase -. Receives adapters .-> Infrastructure
 ```
 
+## RDBのテーブル設計
+
+- 原則としてB-treeを使用する。
+- カウント値の管理など、等価比較のみが必要な場合はHashインデックスを使用する。
+
 ## バリデーション
 
 - バリデーションの違い
