@@ -188,6 +188,7 @@ export const productCountPerProductTagTable = pgTable(
   {
     tagId: integer("tag_id")
       .notNull()
+      .primaryKey()
       .references(() => productTagTable.id, { onDelete: "cascade" }),
     productCount: integer("product_count").notNull().default(0),
     updatedAt: timestamp("updated_at", { withTimezone: true })
