@@ -8,8 +8,7 @@ import {
   mock,
 } from "bun:test"
 import { MAX_TAGS_PER_PRODUCT } from "../../domain/product/constants"
-import type Product from "../../domain/product/entities/product"
-import type ProductTag from "../../domain/product/entities/productTag"
+import type { Product, ProductTag } from "../../domain/product/entities"
 import type { DbClient } from "../../libs/db/client"
 
 const mockProduct: Product = {

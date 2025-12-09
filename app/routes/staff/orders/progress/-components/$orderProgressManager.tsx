@@ -7,7 +7,7 @@ import {
   useState,
 } from "hono/jsx"
 import { tv } from "tailwind-variants"
-import type Order from "../../../../../domain/order/entities/order"
+import type { Order } from "../../../../../domain/order/entities"
 import { formatDateTimeJP } from "../../../../../utils/date"
 import ChefHatIcon from "../../../../-components/icons/lucide/chefHatIcon"
 import ChevronLeftIcon from "../../../../-components/icons/lucide/chevronLeftIcon"

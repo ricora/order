@@ -9,8 +9,7 @@ import {
   spyOn,
 } from "bun:test"
 import { MAX_STORE_PRODUCT_TAG_COUNT } from "../../domain/product/constants"
-import type ProductImage from "../../domain/product/entities/productImage"
-import type ProductTag from "../../domain/product/entities/productTag"
+import type { ProductImage, ProductTag } from "../../domain/product/entities"
 import type { DbClient, TransactionDbClient } from "../../libs/db/client"
 
 const mockTags: ProductTag[] = [

@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, it, mock } from "bun:test"
-import type ProductImage from "../../domain/product/entities/productImage"
+import type { ProductImage } from "../../domain/product/entities"
 import type { DbClient } from "../../libs/db/client"
 
 const orderRepository = {} satisfies Partial<

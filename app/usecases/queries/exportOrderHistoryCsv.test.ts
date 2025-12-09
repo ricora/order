@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, mock } from "bun:test"
-import type Order from "../../domain/order/entities/order"
+import type { Order } from "../../domain/order/entities"
 import type { DbClient } from "../../libs/db/client"
 
 const mockOrder = (id: number, overrides?: Partial<Order>): Order => ({

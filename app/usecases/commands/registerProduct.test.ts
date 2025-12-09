@@ -8,7 +8,7 @@ import {
   mock,
   spyOn,
 } from "bun:test"
-import type ProductTag from "../../domain/product/entities/productTag"
+import type { ProductTag } from "../../domain/product/entities"
 import type { DbClient, TransactionDbClient } from "../../libs/db/client"
 
 const mockTags: ProductTag[] = [

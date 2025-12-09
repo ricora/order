@@ -1,5 +1,5 @@
 import { ALLOWED_PRODUCT_IMAGE_MIME_TYPES_ARRAY } from "../../../../domain/product/constants"
-import type ProductImage from "../../../../domain/product/entities/productImage"
+import type { ProductImage } from "../../../../domain/product/entities"
 
 const isAllowedProductImageMimeType = (
   v: unknown,

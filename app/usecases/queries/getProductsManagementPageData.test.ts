@@ -1,6 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test"
-import type Product from "../../domain/product/entities/product"
-import type ProductTag from "../../domain/product/entities/productTag"
+import type { Product, ProductTag } from "../../domain/product/entities"
 import type { DbClient } from "../../libs/db/client"
 
 const mockTags: ProductTag[] = [

@@ -7,7 +7,7 @@ import {
   type Mock,
   mock,
 } from "bun:test"
-import type Order from "../../domain/order/entities/order"
+import type { Order } from "../../domain/order/entities"
 import type { DbClient } from "../../libs/db/client"
 
 const mockOrder: Order = {

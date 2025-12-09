@@ -268,7 +268,7 @@ export default {
         path: "^app/domain",
         // Allow only domain entities or constants.
         pathNot: [
-          "^app/domain/[^/]+/entities",
+          "^app/domain/[^/]+/entities\\.ts$",
           "^app/domain/[^/]+/constants\\.ts$",
           "^app/domain/types\\.ts$",
         ],

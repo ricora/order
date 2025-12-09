@@ -15,9 +15,7 @@ import {
   MAX_STORE_PRODUCT_TAG_COUNT,
   MAX_TAGS_PER_PRODUCT,
 } from "./constants"
-import type Product from "./entities/product"
-import type ProductImage from "./entities/productImage"
-import type ProductTag from "./entities/productTag"
+import type { Product, ProductImage, ProductTag } from "./entities"
 import { createRepository, type Repository } from "./repository"
 
 const mockTags = [

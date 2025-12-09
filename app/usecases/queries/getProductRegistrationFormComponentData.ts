@@ -1,5 +1,5 @@
 import { MAX_STORE_PRODUCT_TAG_COUNT } from "../../domain/product/constants"
-import type ProductTag from "../../domain/product/entities/productTag"
+import type { ProductTag } from "../../domain/product/entities"
 import type { Result } from "../../domain/types"
 import type { DbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"

@@ -1,4 +1,4 @@
-import type ProductImage from "./entities/productImage"
+import type { ProductImage } from "./entities"
 
 /** 商品画像として許可されているMIMEタイプの配列 */
 export const ALLOWED_PRODUCT_IMAGE_MIME_TYPES_ARRAY = [

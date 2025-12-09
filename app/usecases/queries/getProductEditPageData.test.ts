@@ -7,7 +7,7 @@ import {
   type Mock,
   mock,
 } from "bun:test"
-import type Product from "../../domain/product/entities/product"
+import type { Product } from "../../domain/product/entities"
 import type { DbClient } from "../../libs/db/client"
 
 const mockProduct: Product = {

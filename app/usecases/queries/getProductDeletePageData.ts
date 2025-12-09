@@ -1,6 +1,5 @@
 import { MAX_TAGS_PER_PRODUCT } from "../../domain/product/constants"
-import type Product from "../../domain/product/entities/product"
-import type ProductTag from "../../domain/product/entities/productTag"
+import type { Product, ProductTag } from "../../domain/product/entities"
 import type { Result } from "../../domain/types"
 import type { DbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"

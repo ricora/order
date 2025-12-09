@@ -1,5 +1,5 @@
 import type { FC } from "hono/jsx"
-import type Order from "../../../../../domain/order/entities/order"
+import type { Order } from "../../../../../domain/order/entities"
 import { formatDateTimeJP } from "../../../../../utils/date"
 import { formatCurrencyJPY } from "../../../../../utils/money"
 import OrderStatusBadge from "../../-components/orderStatusBadge"

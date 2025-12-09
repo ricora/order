@@ -1,4 +1,4 @@
-import type Order from "../../domain/order/entities/order"
+import type { Order } from "../../domain/order/entities"
 import type { Result } from "../../domain/types"
 import type { DbClient } from "../../libs/db/client"
 import { toCsv } from "../../utils/csv"

@@ -5,7 +5,7 @@ import {
   productTagRelationTable,
   productTagTable,
 } from "../../libs/db/schema"
-import type ProductTag from "./entities/productTag"
+import type { ProductTag } from "./entities"
 import type { Repository } from "./repository"
 
 export const adapters = {
