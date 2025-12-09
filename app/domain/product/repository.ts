@@ -87,7 +87,6 @@ export type Repository = {
     Pick<Product, "stock">,
     never
   >
-  countProducts: QueryRepositoryFunction<unknown, number, never>
   findProductTagById: QueryRepositoryFunction<
     { productTag: Pick<ProductTag, "id"> },
     ProductTag,
@@ -103,12 +102,21 @@ export type Repository = {
     ProductTag,
     never
   >
-  findAllProductTagRelationCountsByTagIds: PaginatedQueryRepositoryFunction<
+  getProductCountByStoreId: QueryRepositoryFunction<
+    { store: { id: 1 } },
+    number,
+    never
+  >
+  getProductTagCountByStoreId: QueryRepositoryFunction<
+    { store: { id: 1 } },
+    number,
+    never
+  >
+  getAllProductTagRelationCountsByTagIds: PaginatedQueryRepositoryFunction<
     { productTag: { ids: ProductTag["id"][] } },
     { tagId: ProductTag["id"]; count: number },
     never
   >
-  countProductTags: QueryRepositoryFunction<unknown, number, never>
   findProductImageByProductId: QueryRepositoryFunction<
     { productImage: Pick<ProductImage, "productId"> },
     ProductImage,
@@ -156,6 +164,22 @@ export type Repository = {
   >
   deleteProductImageByProductId: CommandRepositoryFunction<
     { productImage: Pick<ProductImage, "productId"> },
+    void,
+    never
+  >
+  setProductCountByStoreId: CommandRepositoryFunction<
+    { store: { id: 1; value: number } },
+    void,
+    never
+  >
+
+  setProductTagCountByStoreId: CommandRepositoryFunction<
+    { store: { id: 1; value: number } },
+    void,
+    never
+  >
+  setAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
+    { productTags: { id: ProductTag["id"]; value: number }[] },
     void,
     never
   >
@@ -271,7 +295,10 @@ export const createRepository = (adapters: Repository) => {
   const verifyProductCountLimit = async (
     dbClient: TransactionDbClient,
   ): Promise<Result<void, CommonProductValidationError>> => {
-    const totalProductsResult = await repository.countProducts({ dbClient })
+    const totalProductsResult = await repository.getProductCountByStoreId({
+      dbClient,
+      store: { id: 1 },
+    })
     if (!totalProductsResult.ok)
       return {
         ok: false,
@@ -299,7 +326,10 @@ export const createRepository = (adapters: Repository) => {
   const verifyProductTagCountLimit = async (
     dbClient: TransactionDbClient,
   ): Promise<Result<void, CommonProductTagValidationError>> => {
-    const totalTagsResult = await repository.countProductTags({ dbClient })
+    const totalTagsResult = await repository.getProductTagCountByStoreId({
+      dbClient,
+      store: { id: 1 },
+    })
     if (!totalTagsResult.ok)
       return {
         ok: false,
@@ -322,7 +352,7 @@ export const createRepository = (adapters: Repository) => {
     }
 
     const tagRelationCountsResult =
-      await repository.findAllProductTagRelationCountsByTagIds({
+      await repository.getAllProductTagRelationCountsByTagIds({
         dbClient,
         productTag: { ids: tagIds },
         pagination: { offset: 0, limit: tagIds.length },
@@ -340,6 +370,31 @@ export const createRepository = (adapters: Repository) => {
         dbClient,
       })
     }
+  }
+
+  const adjustTagRelationCounts = async (
+    dbClient: TransactionDbClient,
+    tagIds: number[],
+    delta: number,
+  ) => {
+    if (!tagIds || tagIds.length === 0) return
+    const tagCountsRes =
+      await repository.getAllProductTagRelationCountsByTagIds({
+        dbClient,
+        productTag: { ids: tagIds },
+        pagination: { offset: 0, limit: tagIds.length },
+      })
+    if (!tagCountsRes.ok) return
+    const curr = new Map<number, number>()
+    for (const t of tagCountsRes.value) curr.set(t.tagId, t.count)
+    const updates = tagIds.map((id) => ({
+      id,
+      value: Math.max(0, (curr.get(id) ?? 0) + delta),
+    }))
+    await repository.setAllProductTagRelationCountsByTagIds({
+      dbClient,
+      productTags: updates,
+    })
   }
 
   const validateProductImage = (
@@ -397,9 +452,6 @@ export const createRepository = (adapters: Repository) => {
     findAllProductStocks: async ({ dbClient, pagination }) => {
       return adapters.findAllProductStocks({ dbClient, pagination })
     },
-    countProducts: async ({ dbClient }) => {
-      return adapters.countProducts({ dbClient })
-    },
     findProductTagById: async ({ dbClient, productTag }) => {
       return adapters.findProductTagById({ dbClient, productTag })
     },
@@ -413,24 +465,27 @@ export const createRepository = (adapters: Repository) => {
         pagination,
       })
     },
-    findAllProductTagRelationCountsByTagIds: async ({
-      dbClient,
-      productTag,
-      pagination,
-    }) => {
-      return adapters.findAllProductTagRelationCountsByTagIds({
-        dbClient,
-        productTag,
-        pagination,
-      })
-    },
-    countProductTags: async ({ dbClient }) => {
-      return adapters.countProductTags({ dbClient })
-    },
     findProductImageByProductId: async ({ dbClient, productImage }) => {
       return adapters.findProductImageByProductId({
         dbClient,
         productImage,
+      })
+    },
+    getProductCountByStoreId: async ({ dbClient, store }) => {
+      return adapters.getProductCountByStoreId({ dbClient, store })
+    },
+    getProductTagCountByStoreId: async ({ dbClient, store }) => {
+      return adapters.getProductTagCountByStoreId({ dbClient, store })
+    },
+    getAllProductTagRelationCountsByTagIds: async ({
+      dbClient,
+      productTag,
+      pagination,
+    }) => {
+      return adapters.getAllProductTagRelationCountsByTagIds({
+        dbClient,
+        productTag,
+        pagination,
       })
     },
     createProduct: async ({ dbClient, product }) => {
@@ -454,7 +509,24 @@ export const createRepository = (adapters: Repository) => {
         if (!tagExistResult.ok) return tagExistResult
       }
 
-      return adapters.createProduct({ product, dbClient })
+      const createResult = await adapters.createProduct({ product, dbClient })
+      if (!createResult.ok) return createResult
+
+      const productCountRes = await repository.getProductCountByStoreId({
+        dbClient,
+        store: { id: 1 },
+      })
+      if (productCountRes.ok) {
+        await repository.setProductCountByStoreId({
+          dbClient,
+          store: { id: 1, value: productCountRes.value + 1 },
+        })
+      }
+
+      if (createResult.value.tagIds && createResult.value.tagIds.length > 0) {
+        await adjustTagRelationCounts(dbClient, createResult.value.tagIds, 1)
+      }
+      return createResult
     },
     updateProduct: async ({ dbClient, product }) => {
       const validateCommonResult = validateCommonProduct(product)
@@ -490,6 +562,20 @@ export const createRepository = (adapters: Repository) => {
         const removedTagIds = oldTagIds.filter(
           (tagId) => !product.tagIds?.includes(tagId),
         )
+        const addedTagIds = (product.tagIds || []).filter(
+          (tagId) => !oldTagIds.includes(tagId),
+        )
+        const allChangedTagIds = Array.from(
+          new Set([...removedTagIds, ...addedTagIds]),
+        )
+        if (allChangedTagIds.length > 0) {
+          if (addedTagIds.length > 0) {
+            await adjustTagRelationCounts(dbClient, addedTagIds, 1)
+          }
+          if (removedTagIds.length > 0) {
+            await adjustTagRelationCounts(dbClient, removedTagIds, -1)
+          }
+        }
         await deleteOrphanedTags(dbClient, removedTagIds)
       }
 
@@ -510,6 +596,23 @@ export const createRepository = (adapters: Repository) => {
         dbClient,
       })
 
+      const productCountRes = await repository.getProductCountByStoreId({
+        dbClient,
+        store: { id: 1 },
+      })
+      if (productCountRes.ok) {
+        const newCount = productCountRes.value - 1
+        await repository.setProductCountByStoreId({
+          dbClient,
+          store: { id: 1, value: newCount < 0 ? 0 : newCount },
+        })
+      }
+
+      if (foundProduct.tagIds && foundProduct.tagIds.length > 0) {
+        const tagIds = foundProduct.tagIds
+        await adjustTagRelationCounts(dbClient, tagIds, -1)
+      }
+
       await deleteOrphanedTags(dbClient, foundProduct.tagIds)
       return adapters.deleteProduct({ product, dbClient })
     },
@@ -520,13 +623,43 @@ export const createRepository = (adapters: Repository) => {
       const tagCountLimitResult = await verifyProductTagCountLimit(dbClient)
       if (!tagCountLimitResult.ok) return tagCountLimitResult
 
-      return adapters.createProductTag({ productTag, dbClient })
+      const createTagResult = await adapters.createProductTag({
+        productTag,
+        dbClient,
+      })
+      if (!createTagResult.ok) return createTagResult
+
+      const tagCountRes = await repository.getProductTagCountByStoreId({
+        dbClient,
+        store: { id: 1 },
+      })
+      if (tagCountRes.ok) {
+        await repository.setProductTagCountByStoreId({
+          dbClient,
+          store: { id: 1, value: tagCountRes.value + 1 },
+        })
+      }
+      return createTagResult
     },
     deleteAllProductTagsByIds: async ({ dbClient, productTag }) => {
-      return adapters.deleteAllProductTagsByIds({
+      const deleteResult = await adapters.deleteAllProductTagsByIds({
         dbClient,
         productTag,
       })
+      if (!deleteResult.ok) return deleteResult
+
+      const tagCountRes = await repository.getProductTagCountByStoreId({
+        dbClient,
+        store: { id: 1 },
+      })
+      if (tagCountRes.ok) {
+        const newVal = Math.max(0, tagCountRes.value - productTag.ids.length)
+        await repository.setProductTagCountByStoreId({
+          dbClient,
+          store: { id: 1, value: newVal },
+        })
+      }
+      return deleteResult
     },
     createProductImage: async ({ dbClient, productImage }) => {
       const validateImageResult = validateProductImage({
@@ -551,6 +684,24 @@ export const createRepository = (adapters: Repository) => {
       return adapters.deleteProductImageByProductId({
         dbClient,
         productImage,
+      })
+    },
+    setProductCountByStoreId: async ({ dbClient, store }) => {
+      return adapters.setProductCountByStoreId({ dbClient, store })
+    },
+    setProductTagCountByStoreId: async ({ dbClient, store }) => {
+      return adapters.setProductTagCountByStoreId({
+        dbClient,
+        store,
+      })
+    },
+    setAllProductTagRelationCountsByTagIds: async ({
+      dbClient,
+      productTags,
+    }) => {
+      return adapters.setAllProductTagRelationCountsByTagIds({
+        dbClient,
+        productTags,
       })
     },
   } satisfies Repository

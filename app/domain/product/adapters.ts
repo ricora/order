@@ -1,7 +1,10 @@
-import { asc, count, desc, eq, inArray } from "drizzle-orm"
+import { asc, desc, eq, inArray } from "drizzle-orm"
 import {
+  productCountPerProductTagTable,
+  productCountPerStoreTable,
   productImageTable,
   productTable,
+  productTagCountPerStoreTable,
   productTagRelationTable,
   productTagTable,
 } from "../../libs/db/schema"
@@ -151,11 +154,6 @@ export const adapters = {
     }
   },
 
-  countProducts: async ({ dbClient }) => {
-    const c = await dbClient.$count(productTable)
-    return { ok: true, value: c }
-  },
-
   findProductTagById: async ({ dbClient, productTag }) => {
     const dbProductTag = await dbClient.query.productTagTable.findFirst({
       where: eq(productTagTable.id, productTag.id),
@@ -196,33 +194,34 @@ export const adapters = {
     }
   },
 
-  countProductTags: async ({ dbClient }) => {
-    const c = await dbClient.$count(productTagTable)
-    return { ok: true, value: c }
+  getProductCountByStoreId: async ({ dbClient, store }) => {
+    const row = await dbClient.query.productCountPerStoreTable.findFirst({
+      where: eq(productCountPerStoreTable.storeId, store.id),
+    })
+    return { ok: true, value: row ? row.productCount : 0 }
   },
 
-  findAllProductTagRelationCountsByTagIds: async ({
+  getProductTagCountByStoreId: async ({ dbClient, store }) => {
+    const row = await dbClient.query.productTagCountPerStoreTable.findFirst({
+      where: eq(productTagCountPerStoreTable.storeId, store.id),
+    })
+    return { ok: true, value: row ? row.productTagCount : 0 }
+  },
+
+  getAllProductTagRelationCountsByTagIds: async ({
     dbClient,
     productTag,
     pagination,
   }) => {
-    const results = await dbClient
-      .select({
-        tagId: productTagRelationTable.tagId,
-        count: count(),
-      })
-      .from(productTagRelationTable)
-      .where(inArray(productTagRelationTable.tagId, productTag.ids))
-      .groupBy(productTagRelationTable.tagId)
-      .offset(pagination.offset)
-      .limit(pagination.limit)
-
+    const rows = await dbClient.query.productCountPerProductTagTable.findMany({
+      where: inArray(productCountPerProductTagTable.tagId, productTag.ids),
+      orderBy: [asc(productCountPerProductTagTable.tagId)],
+      offset: pagination.offset,
+      limit: pagination.limit,
+    })
     return {
       ok: true,
-      value: results.map((result) => ({
-        tagId: result.tagId,
-        count: result.count,
-      })),
+      value: rows.map((r) => ({ tagId: r.tagId, count: r.productCount })),
     }
   },
 
@@ -434,6 +433,53 @@ export const adapters = {
     await dbClient
       .delete(productImageTable)
       .where(eq(productImageTable.productId, productImage.productId))
+    return { ok: true, value: undefined }
+  },
+
+  setProductCountByStoreId: async ({ dbClient, store }) => {
+    await dbClient
+      .insert(productCountPerStoreTable)
+      .values({ storeId: store.id, productCount: store.value })
+      .onConflictDoUpdate({
+        target: [productCountPerStoreTable.storeId],
+        set: { productCount: store.value },
+      })
+    return { ok: true, value: undefined }
+  },
+
+  setProductTagCountByStoreId: async ({ dbClient, store }) => {
+    await dbClient
+      .insert(productTagCountPerStoreTable)
+      .values({ storeId: store.id, productTagCount: store.value })
+      .onConflictDoUpdate({
+        target: [productTagCountPerStoreTable.storeId],
+        set: { productTagCount: store.value },
+      })
+    return { ok: true, value: undefined }
+  },
+
+  setAllProductTagRelationCountsByTagIds: async ({ dbClient, productTags }) => {
+    if (!productTags || productTags.length === 0) {
+      return { ok: true, value: undefined }
+    }
+    const positiveRows = productTags
+      .filter((p) => p.value > 0)
+      .map((p) => ({ tagId: p.id, productCount: p.value }))
+    const zeroIds = productTags.filter((p) => p.value === 0).map((p) => p.id)
+
+    if (zeroIds.length > 0) {
+      await dbClient
+        .delete(productCountPerProductTagTable)
+        .where(inArray(productCountPerProductTagTable.tagId, zeroIds))
+    }
+
+    if (positiveRows.length > 0) {
+      const positiveIds = positiveRows.map((r) => r.tagId)
+      await dbClient
+        .delete(productCountPerProductTagTable)
+        .where(inArray(productCountPerProductTagTable.tagId, positiveIds))
+      await dbClient.insert(productCountPerProductTagTable).values(positiveRows)
+    }
     return { ok: true, value: undefined }
   },
 } satisfies Repository
