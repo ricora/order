@@ -138,6 +138,7 @@ export const productToProductTagRelations = relations(
 export const productCountPerStoreTable = pgTable(
   "product_count_per_store",
   {
+    // NOTE: マルチテナント化を見据えてstoreIdカラムを設けているが、現状は単一店舗運用のため常に1が入る。
     storeId: integer("store_id").notNull().unique().default(1),
     productCount: integer("product_count").notNull().default(0),
     updatedAt: timestamp("updated_at", { withTimezone: true })
@@ -158,6 +159,7 @@ export const productCountPerStoreTable = pgTable(
 export const productTagCountPerStoreTable = pgTable(
   "product_tag_count_per_store",
   {
+    // NOTE: マルチテナント化を見据えてstoreIdカラムを設けているが、現状は単一店舗運用のため常に1が入る。
     storeId: integer("store_id").notNull().unique().default(1),
     productTagCount: integer("product_tag_count").notNull().default(0),
     updatedAt: timestamp("updated_at", { withTimezone: true })
