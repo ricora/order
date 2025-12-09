@@ -75,9 +75,7 @@ const CsvFormatSection: FC<CsvFormatSectionProps> = ({
           class="grid grid-cols-subgrid gap-3 rounded border border-border bg-muted p-3 sm:col-span-2"
         >
           <code class="font-mono text-primary text-sm">{column}</code>
-          <span class="text-fg text-sm">
-            {descriptionMap?.[column]}
-          </span>
+          <span class="text-fg text-sm">{descriptionMap?.[column]}</span>
         </div>
       ))}
     </div>
