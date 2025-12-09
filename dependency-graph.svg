@@ -324,14 +324,14 @@
 <!-- app/domain/order/adapters.ts&#45;&gt;app/domain/order/repository.ts -->
 <g id="edge3" class="edge">
 <title>app/domain/order/adapters.ts&#45;&gt;app/domain/order/repository.ts</title>
-<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M685.5,-3437.12C685.5,-3440.71 685.5,-3444 685.5,-3444 685.5,-3444 855.75,-3444 855.75,-3444"/>
-<polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="855.75,-3446.1 861.75,-3444 855.75,-3441.9 855.75,-3446.1"/>
+<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M685.5,-3437.17C685.5,-3441.75 685.5,-3446.33 685.5,-3446.33 685.5,-3446.33 855.75,-3446.33 855.75,-3446.33"/>
+<polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="855.75,-3448.43 861.75,-3446.33 855.75,-3444.23 855.75,-3448.43"/>
 </g>
 <!-- app/domain/order/repository.ts&#45;&gt;app/domain/order/entities.ts -->
 <g id="edge8" class="edge">
 <title>app/domain/order/repository.ts&#45;&gt;app/domain/order/entities.ts</title>
-<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M955.09,-3437.67C1059.77,-3437.67 1304.5,-3437.67 1304.5,-3437.67 1304.5,-3437.67 1304.5,-3437.89 1304.5,-3437.89"/>
-<polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="1302.4,-3433.85 1304.5,-3439.85 1306.6,-3433.85 1302.4,-3433.85"/>
+<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M955.09,-3436.5C1059.77,-3436.5 1304.5,-3436.5 1304.5,-3436.5 1304.5,-3436.5 1304.5,-3436.84 1304.5,-3436.84"/>
+<polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="1302.4,-3433.92 1304.5,-3439.92 1306.6,-3433.92 1302.4,-3433.92"/>
 </g>
 <!-- app/domain/order/constants.ts -->
 <g id="node6" class="node">
@@ -362,8 +362,8 @@
 <!-- app/domain/order/repository.ts&#45;&gt;app/utils/text.ts -->
 <g id="edge5" class="edge">
 <title>app/domain/order/repository.ts&#45;&gt;app/utils/text.ts</title>
-<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M955.07,-3435.33C968.45,-3435.33 979.5,-3435.33 979.5,-3435.33 979.5,-3435.33 979.5,-129 979.5,-129 979.5,-129 1092.82,-129 1092.82,-129"/>
-<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1092.82,-131.1 1098.82,-129 1092.82,-126.9 1092.82,-131.1"/>
+<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M861.75,-3441.67C843.34,-3441.67 826.5,-3441.67 826.5,-3441.67 826.5,-3441.67 826.5,-129 826.5,-129 826.5,-129 1092.95,-129 1092.95,-129"/>
+<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1092.95,-131.1 1098.95,-129 1092.95,-126.9 1092.95,-131.1"/>
 </g>
 <!-- app/domain/types.ts -->
 <g id="node8" class="node">
@@ -454,8 +454,8 @@
 <!-- app/domain/product/repository.ts&#45;&gt;app/utils/text.ts -->
 <g id="edge14" class="edge">
 <title>app/domain/product/repository.ts&#45;&gt;app/utils/text.ts</title>
-<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M861.93,-3517.67C848.55,-3517.67 837.5,-3517.67 837.5,-3517.67 837.5,-3517.67 837.5,-126 837.5,-126 837.5,-126 1092.97,-126 1092.97,-126"/>
-<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1092.97,-128.1 1098.97,-126 1092.97,-123.9 1092.97,-128.1"/>
+<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M861.98,-3517.67C841.71,-3517.67 822.5,-3517.67 822.5,-3517.67 822.5,-3517.67 822.5,-126 822.5,-126 822.5,-126 1092.82,-126 1092.82,-126"/>
+<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1092.82,-128.1 1098.82,-126 1092.82,-123.9 1092.82,-128.1"/>
 </g>
 <!-- app/domain/product/repository.ts&#45;&gt;app/domain/types.ts -->
 <g id="edge15" class="edge">
@@ -832,8 +832,8 @@
 <!-- app/routes/&#45;components/ui/$graphemeInput.tsx&#45;&gt;app/utils/text.ts -->
 <g id="edge21" class="edge">
 <title>app/routes/&#45;components/ui/$graphemeInput.tsx&#45;&gt;app/utils/text.ts</title>
-<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M751.67,-439C787.09,-439 823.5,-439 823.5,-439 823.5,-439 823.5,-123 823.5,-123 823.5,-123 1092.92,-123 1092.92,-123"/>
-<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1092.92,-125.1 1098.92,-123 1092.92,-120.9 1092.92,-125.1"/>
+<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M751.71,-439C785.47,-439 819.5,-439 819.5,-439 819.5,-439 819.5,-123 819.5,-123 819.5,-123 1092.81,-123 1092.81,-123"/>
+<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1092.81,-125.1 1098.81,-123 1092.81,-120.9 1092.81,-125.1"/>
 </g>
 <!-- app/routes/&#45;components/ui/input.tsx -->
 <g id="node46" class="node">
@@ -906,8 +906,8 @@
 <!-- app/routes/&#45;components/ui/$toastProvider.tsx&#45;&gt;app/routes/&#45;helpers/ui/client&#45;toast.ts -->
 <g id="edge25" class="edge">
 <title>app/routes/&#45;components/ui/$toastProvider.tsx&#45;&gt;app/routes/&#45;helpers/ui/client&#45;toast.ts</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M745.55,-322C778,-322 811.5,-322 811.5,-322 811.5,-322 811.5,-2982 811.5,-2982 811.5,-2982 855.42,-2982 855.42,-2982"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="855.42,-2984.1 861.42,-2982 855.42,-2979.9 855.42,-2984.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M745.56,-322C776.78,-322 808.5,-322 808.5,-322 808.5,-322 808.5,-2982 808.5,-2982 808.5,-2982 855.43,-2982 855.43,-2982"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="855.43,-2984.1 861.43,-2982 855.43,-2979.9 855.43,-2984.1"/>
 </g>
 <!-- app/routes/&#45;components/ui/toast.tsx -->
 <g id="node51" class="node">
@@ -922,8 +922,8 @@
 <!-- app/routes/&#45;components/ui/$toastProvider.tsx&#45;&gt;app/routes/&#45;components/ui/toast.tsx -->
 <g id="edge26" class="edge">
 <title>app/routes/&#45;components/ui/$toastProvider.tsx&#45;&gt;app/routes/&#45;components/ui/toast.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M745.72,-316C784.42,-316 827.5,-316 827.5,-316 827.5,-316 827.5,-586 827.5,-586 827.5,-586 863.42,-586 863.42,-586"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="863.42,-588.1 869.42,-586 863.42,-583.9 863.42,-588.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M745.73,-316C785.19,-316 829.5,-316 829.5,-316 829.5,-316 829.5,-586 829.5,-586 829.5,-586 863.46,-586 863.46,-586"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="863.46,-588.1 869.46,-586 863.46,-583.9 863.46,-588.1"/>
 </g>
 <!-- app/routes/&#45;components/ui/toast.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/circleCheckIcon.tsx -->
 <g id="edge44" class="edge">
@@ -976,26 +976,26 @@
 <!-- app/routes/&#45;components/ui/callout.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/circleCheckIcon.tsx -->
 <g id="edge27" class="edge">
 <title>app/routes/&#45;components/ui/callout.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/circleCheckIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M728.06,-350.8C815.77,-350.8 1008.5,-350.8 1008.5,-350.8 1008.5,-350.8 1008.5,-861.6 1008.5,-861.6 1008.5,-861.6 1063.96,-861.6 1063.96,-861.6"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1063.96,-863.7 1069.96,-861.6 1063.96,-859.5 1063.96,-863.7"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M728.26,-350.8C815.85,-350.8 1007.5,-350.8 1007.5,-350.8 1007.5,-350.8 1007.5,-861.6 1007.5,-861.6 1007.5,-861.6 1063.83,-861.6 1063.83,-861.6"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1063.83,-863.7 1069.83,-861.6 1063.83,-859.5 1063.83,-863.7"/>
 </g>
 <!-- app/routes/&#45;components/ui/callout.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/circleXIcon.tsx -->
 <g id="edge28" class="edge">
 <title>app/routes/&#45;components/ui/callout.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/circleXIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M728.3,-343.6C817.59,-343.6 1015.5,-343.6 1015.5,-343.6 1015.5,-343.6 1015.5,-802.5 1015.5,-802.5 1015.5,-802.5 1074.44,-802.5 1074.44,-802.5"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1074.44,-804.6 1080.44,-802.5 1074.44,-800.4 1074.44,-804.6"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M728.17,-343.6C817.19,-343.6 1014.5,-343.6 1014.5,-343.6 1014.5,-343.6 1014.5,-802.5 1014.5,-802.5 1014.5,-802.5 1074.35,-802.5 1074.35,-802.5"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1074.35,-804.6 1080.35,-802.5 1074.35,-800.4 1074.35,-804.6"/>
 </g>
 <!-- app/routes/&#45;components/ui/callout.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/infoIcon.tsx -->
 <g id="edge29" class="edge">
 <title>app/routes/&#45;components/ui/callout.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/infoIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M728.32,-354.4C815.52,-354.4 1005.5,-354.4 1005.5,-354.4 1005.5,-354.4 1005.5,-1194 1005.5,-1194 1005.5,-1194 1081.15,-1194 1081.15,-1194"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1081.15,-1196.1 1087.15,-1194 1081.15,-1191.9 1081.15,-1196.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M728.06,-354.4C814.71,-354.4 1003.5,-354.4 1003.5,-354.4 1003.5,-354.4 1003.5,-1194 1003.5,-1194 1003.5,-1194 1081.17,-1194 1081.17,-1194"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1081.17,-1196.1 1087.17,-1194 1081.17,-1191.9 1081.17,-1196.1"/>
 </g>
 <!-- app/routes/&#45;components/ui/callout.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/triangleAlertIcon.tsx -->
 <g id="edge30" class="edge">
 <title>app/routes/&#45;components/ui/callout.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/triangleAlertIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M728.25,-347.2C816.89,-347.2 1012.5,-347.2 1012.5,-347.2 1012.5,-347.2 1012.5,-832.5 1012.5,-832.5 1012.5,-832.5 1061.81,-832.5 1061.81,-832.5"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1061.81,-834.6 1067.81,-832.5 1061.81,-830.4 1061.81,-834.6"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M728.12,-347.2C816.48,-347.2 1011.5,-347.2 1011.5,-347.2 1011.5,-347.2 1011.5,-832.5 1011.5,-832.5 1011.5,-832.5 1061.97,-832.5 1061.97,-832.5"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1061.97,-834.6 1067.97,-832.5 1061.97,-830.4 1061.97,-834.6"/>
 </g>
 <!-- app/routes/&#45;components/ui/chip.tsx -->
 <g id="node55" class="node">
@@ -1124,8 +1124,8 @@
 <!-- app/routes/&#45;components/ui/pagination.tsx&#45;&gt;app/utils/url.ts -->
 <g id="edge40" class="edge">
 <title>app/routes/&#45;components/ui/pagination.tsx&#45;&gt;app/utils/url.ts</title>
-<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M960.16,-556C965.2,-556 968.5,-556 968.5,-556 968.5,-556 968.5,-155.33 968.5,-155.33 968.5,-155.33 1095.87,-155.33 1095.87,-155.33"/>
-<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1095.87,-157.43 1101.87,-155.33 1095.87,-153.23 1095.87,-157.43"/>
+<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M960.24,-556C965.81,-556 969.5,-556 969.5,-556 969.5,-556 969.5,-155.33 969.5,-155.33 969.5,-155.33 1095.68,-155.33 1095.68,-155.33"/>
+<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1095.68,-157.43 1101.68,-155.33 1095.68,-153.23 1095.68,-157.43"/>
 </g>
 <!-- app/routes/&#45;components/ui/pagination.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx -->
 <g id="edge43" class="edge">
@@ -1268,8 +1268,8 @@
 <!-- app/routes/api/index.tsx&#45;&gt;app/usecases/queries/getProductRegistrationFormComponentData.ts -->
 <g id="edge59" class="edge">
 <title>app/routes/api/index.tsx&#45;&gt;app/usecases/queries/getProductRegistrationFormComponentData.ts</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M1089.79,-3221C1058.2,-3221 1019.5,-3221 1019.5,-3221 1019.5,-3221 1019.5,-3687.8 1019.5,-3687.8"/>
-<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1017.4,-3687.8 1019.5,-3693.8 1021.6,-3687.8 1017.4,-3687.8"/>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M1089.75,-3221C1057.81,-3221 1018.5,-3221 1018.5,-3221 1018.5,-3221 1018.5,-3687.8 1018.5,-3687.8"/>
+<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1016.4,-3687.8 1018.5,-3693.8 1020.6,-3687.8 1016.4,-3687.8"/>
 </g>
 <!-- app/routes/&#45;helpers/ui/color&#45;scheme&#45;entry.ts -->
 <g id="node67" class="node">
@@ -1388,8 +1388,8 @@
 <!-- app/routes/_renderer.tsx&#45;&gt;app/routes/&#45;components/ui/toast.tsx -->
 <g id="edge52" class="edge">
 <title>app/routes/_renderer.tsx&#45;&gt;app/routes/&#45;components/ui/toast.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M737.28,-2964C765.81,-2964 795.5,-2964 795.5,-2964 795.5,-2964 795.5,-592 795.5,-592 795.5,-592 863.3,-592 863.3,-592"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="863.3,-594.1 869.3,-592 863.3,-589.9 863.3,-594.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M737.13,-2964C765.3,-2964 794.5,-2964 794.5,-2964 794.5,-2964 794.5,-592 794.5,-592 794.5,-592 863.27,-592 863.27,-592"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="863.27,-594.1 869.27,-592 863.27,-589.9 863.27,-594.1"/>
 </g>
 <!-- app/routes/_renderer.tsx&#45;&gt;app/routes/&#45;helpers/ui/color&#45;scheme&#45;entry.ts -->
 <g id="edge53" class="edge">
@@ -1468,8 +1468,8 @@
 <!-- app/usecases/queries/getOrderProgressManagerComponentData.ts&#45;&gt;app/usecases/repositories&#45;provider.ts -->
 <g id="edge287" class="edge">
 <title>app/usecases/queries/getOrderProgressManagerComponentData.ts&#45;&gt;app/usecases/repositories&#45;provider.ts</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M1029.2,-3739C1052.85,-3739 1070.5,-3739 1070.5,-3739 1070.5,-3739 1070.5,-3807.69 1070.5,-3807.69"/>
-<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1068.4,-3807.69 1070.5,-3813.69 1072.6,-3807.69 1068.4,-3807.69"/>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M1029.29,-3739C1052.37,-3739 1069.5,-3739 1069.5,-3739 1069.5,-3739 1069.5,-3807.69 1069.5,-3807.69"/>
+<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1067.4,-3807.69 1069.5,-3813.69 1071.6,-3807.69 1067.4,-3807.69"/>
 </g>
 <!-- app/usecases/queries/getOrderRegistrationFormComponentData.ts&#45;&gt;app/domain/types.ts -->
 <g id="edge290" class="edge">
@@ -1522,14 +1522,14 @@
 <!-- app/usecases/queries/getProductRegistrationFormComponentData.ts&#45;&gt;app/libs/db/client.ts -->
 <g id="edge313" class="edge">
 <title>app/usecases/queries/getProductRegistrationFormComponentData.ts&#45;&gt;app/libs/db/client.ts</title>
-<path fill="none" stroke="#0000ff" stroke-opacity="0.466667" d="M1023.5,-3693.74C1023.5,-3636.03 1023.5,-3328.27 1023.5,-3328.27 1023.5,-3328.27 1086.45,-3328.27 1086.45,-3328.27"/>
-<polygon fill="none" stroke="#0000ff" stroke-opacity="0.466667" points="1086.45,-3330.37 1092.45,-3328.27 1086.45,-3326.17 1086.45,-3330.37"/>
+<path fill="none" stroke="#0000ff" stroke-opacity="0.466667" d="M1022.5,-3693.74C1022.5,-3636.03 1022.5,-3328.27 1022.5,-3328.27 1022.5,-3328.27 1086.4,-3328.27 1086.4,-3328.27"/>
+<polygon fill="none" stroke="#0000ff" stroke-opacity="0.466667" points="1086.4,-3330.37 1092.4,-3328.27 1086.4,-3326.17 1086.4,-3330.37"/>
 </g>
 <!-- app/usecases/queries/getProductRegistrationFormComponentData.ts&#45;&gt;app/usecases/repositories&#45;provider.ts -->
 <g id="edge314" class="edge">
 <title>app/usecases/queries/getProductRegistrationFormComponentData.ts&#45;&gt;app/usecases/repositories&#45;provider.ts</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M1033.69,-3707.5C1055.58,-3707.5 1071.5,-3707.5 1071.5,-3707.5 1071.5,-3707.5 1071.5,-3807.94 1071.5,-3807.94"/>
-<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1069.4,-3807.94 1071.5,-3813.94 1073.6,-3807.94 1069.4,-3807.94"/>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M1033.74,-3707.5C1055.07,-3707.5 1070.5,-3707.5 1070.5,-3707.5 1070.5,-3707.5 1070.5,-3807.94 1070.5,-3807.94"/>
+<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1068.4,-3807.94 1070.5,-3813.94 1072.6,-3807.94 1068.4,-3807.94"/>
 </g>
 <!-- app/routes/healthz/&#45;components/$counter.tsx -->
 <g id="node81" class="node">
@@ -1630,14 +1630,14 @@
 <!-- app/routes/staff/&#45;components/$header.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/chevronRightIcon.tsx -->
 <g id="edge62" class="edge">
 <title>app/routes/staff/&#45;components/$header.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/chevronRightIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M731.58,-2493.2C739.64,-2493.2 745.5,-2493.2 745.5,-2493.2 745.5,-2493.2 745.5,-1172.4 745.5,-1172.4 745.5,-1172.4 1059.21,-1172.4 1059.21,-1172.4"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M731.58,-2492C739.64,-2492 745.5,-2492 745.5,-2492 745.5,-2492 745.5,-1172.4 745.5,-1172.4 745.5,-1172.4 1059.21,-1172.4 1059.21,-1172.4"/>
 <polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1059.21,-1174.5 1065.21,-1172.4 1059.21,-1170.3 1059.21,-1174.5"/>
 </g>
 <!-- app/routes/staff/&#45;components/$header.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/house.tsx -->
 <g id="edge63" class="edge">
 <title>app/routes/staff/&#45;components/$header.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/house.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M731.62,-2496.8C770.38,-2496.8 819.5,-2496.8 819.5,-2496.8 819.5,-2496.8 819.5,-720 819.5,-720 819.5,-720 1085.93,-720 1085.93,-720"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1085.93,-722.1 1091.93,-720 1085.93,-717.9 1085.93,-722.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M731.7,-2495C769.06,-2495 815.5,-2495 815.5,-2495 815.5,-2495 815.5,-720 815.5,-720 815.5,-720 1085.75,-720 1085.75,-720"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1085.75,-722.1 1091.75,-720 1085.75,-717.9 1085.75,-722.1"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx -->
 <g id="node87" class="node">
@@ -1652,68 +1652,68 @@
 <!-- app/routes/staff/&#45;components/$header.tsx&#45;&gt;app/routes/staff/&#45;components/$sidebar.tsx -->
 <g id="edge64" class="edge">
 <title>app/routes/staff/&#45;components/$header.tsx&#45;&gt;app/routes/staff/&#45;components/$sidebar.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M731.71,-2500.4C731.71,-2500.4 855.97,-2500.4 855.97,-2500.4"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="855.97,-2502.5 861.97,-2500.4 855.97,-2498.3 855.97,-2502.5"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M731.71,-2498C731.71,-2498 855.97,-2498 855.97,-2498"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="855.97,-2500.1 861.97,-2498 855.97,-2495.9 855.97,-2500.1"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/chartColumnIcon.tsx -->
 <g id="edge66" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/chartColumnIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M955.21,-2490.5C1002.43,-2490.5 1068.5,-2490.5 1068.5,-2490.5 1068.5,-2490.5 1068.5,-1512.2 1068.5,-1512.2"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1070.6,-1512.2 1068.5,-1506.2 1066.4,-1512.2 1070.6,-1512.2"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M951.5,-2485.76C951.5,-2385.15 951.5,-1497 951.5,-1497 951.5,-1497 1060.31,-1497 1060.31,-1497"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1060.31,-1499.1 1066.31,-1497 1060.31,-1494.9 1060.31,-1499.1"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/chefHatIcon.tsx -->
 <g id="edge67" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/chefHatIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M950.5,-2485.89C950.5,-2382.92 950.5,-1441.5 950.5,-1441.5 950.5,-1441.5 1071.6,-1441.5 1071.6,-1441.5"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1071.6,-1443.6 1077.6,-1441.5 1071.6,-1439.4 1071.6,-1443.6"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M949.5,-2485.89C949.5,-2382.92 949.5,-1441.5 949.5,-1441.5 949.5,-1441.5 1071.79,-1441.5 1071.79,-1441.5"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1071.79,-1443.6 1077.79,-1441.5 1071.79,-1439.4 1071.79,-1443.6"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/clipboardListIcon.tsx -->
 <g id="edge68" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/clipboardListIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M925.5,-2485.8C925.5,-2377.58 925.5,-1351.5 925.5,-1351.5 925.5,-1351.5 1060.97,-1351.5 1060.97,-1351.5"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1060.97,-1353.6 1066.97,-1351.5 1060.97,-1349.4 1060.97,-1353.6"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M918.5,-2485.8C918.5,-2377.58 918.5,-1351.5 918.5,-1351.5 918.5,-1351.5 1060.83,-1351.5 1060.83,-1351.5"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1060.83,-1353.6 1066.83,-1351.5 1060.83,-1349.4 1060.83,-1353.6"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/layoutDashboard.tsx -->
 <g id="edge69" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/layoutDashboard.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M949.5,-2485.92C949.5,-2381.26 949.5,-1407 949.5,-1407 949.5,-1407 1060.87,-1407 1060.87,-1407"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1060.87,-1409.1 1066.87,-1407 1060.87,-1404.9 1060.87,-1409.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M938.5,-2485.92C938.5,-2381.26 938.5,-1407 938.5,-1407 938.5,-1407 1060.77,-1407 1060.77,-1407"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1060.77,-1409.1 1066.77,-1407 1060.76,-1404.9 1060.77,-1409.1"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/packageIcon.tsx -->
 <g id="edge70" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/packageIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M937.5,-2485.72C937.5,-2378.69 937.5,-1382.4 937.5,-1382.4 937.5,-1382.4 1070.38,-1382.4 1070.38,-1382.4"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1070.38,-1384.5 1076.38,-1382.4 1070.38,-1380.3 1070.38,-1384.5"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M928.5,-2485.72C928.5,-2378.69 928.5,-1382.4 928.5,-1382.4 928.5,-1382.4 1070.27,-1382.4 1070.27,-1382.4"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1070.27,-1384.5 1076.27,-1382.4 1070.27,-1380.3 1070.27,-1384.5"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/panelLeftIcon.tsx -->
 <g id="edge71" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/panelLeftIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M951.5,-2485.8C951.5,-2383.74 951.5,-1467 951.5,-1467 951.5,-1467 1068.99,-1467 1068.99,-1467"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1068.99,-1469.1 1074.99,-1467 1068.99,-1464.9 1068.99,-1469.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M950.5,-2485.8C950.5,-2383.74 950.5,-1467 950.5,-1467 950.5,-1467 1068.68,-1467 1068.68,-1467"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1068.68,-1469.1 1074.68,-1467 1068.68,-1464.9 1068.68,-1469.1"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/settingsIcon.tsx -->
 <g id="edge72" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/settingsIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M914.5,-2485.96C914.5,-2365.45 914.5,-1080 914.5,-1080 914.5,-1080 1071.28,-1080 1071.28,-1080"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1071.28,-1082.1 1077.28,-1080 1071.28,-1077.9 1071.28,-1082.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M908.5,-2485.96C908.5,-2365.45 908.5,-1080 908.5,-1080 908.5,-1080 1071.23,-1080 1071.23,-1080"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1071.23,-1082.1 1077.23,-1080 1071.23,-1077.9 1071.23,-1082.1"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/shoppingCartIcon.tsx -->
 <g id="edge73" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/shoppingCartIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M903.5,-2485.82C903.5,-2357.68 903.5,-931.5 903.5,-931.5 903.5,-931.5 1059.4,-931.5 1059.4,-931.5"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1059.4,-933.6 1065.4,-931.5 1059.4,-929.4 1059.4,-933.6"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M899.5,-2485.82C899.5,-2357.68 899.5,-931.5 899.5,-931.5 899.5,-931.5 1059.49,-931.5 1059.49,-931.5"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1059.49,-933.6 1065.49,-931.5 1059.49,-929.4 1059.49,-933.6"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/ui/$drawer.tsx -->
 <g id="edge74" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;components/ui/$drawer.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M862,-2489.6C838.75,-2489.6 815.5,-2489.6 815.5,-2489.6 815.5,-2489.6 815.5,-622 815.5,-622 815.5,-622 737.7,-622 737.7,-622"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="737.7,-619.9 731.7,-622 737.7,-624.1 737.7,-619.9"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M861.91,-2489C837.45,-2489 812.5,-2489 812.5,-2489 812.5,-2489 812.5,-622 812.5,-622 812.5,-622 737.71,-622 737.71,-622"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="737.71,-619.9 731.71,-622 737.71,-624.1 737.71,-619.9"/>
 </g>
 <!-- app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;hooks/useIsMobile.ts -->
 <g id="edge75" class="edge">
 <title>app/routes/staff/&#45;components/$sidebar.tsx&#45;&gt;app/routes/&#45;hooks/useIsMobile.ts</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M955.04,-2499.5C963.39,-2499.5 969.5,-2499.5 969.5,-2499.5 969.5,-2499.5 969.5,-2835 969.5,-2835 969.5,-2835 965.7,-2835 965.7,-2835"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="965.7,-2832.9 959.7,-2835 965.7,-2837.1 965.7,-2832.9"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M862,-2501C856.34,-2501 852.5,-2501 852.5,-2501 852.5,-2501 852.5,-2835 852.5,-2835 852.5,-2835 852.98,-2835 852.98,-2835"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="851.27,-2837.1 857.27,-2835 851.27,-2832.9 851.27,-2837.1"/>
 </g>
 <!-- app/routes/staff/&#45;helpers/sidebar.ts -->
 <g id="node88" class="node">
@@ -1858,8 +1858,8 @@
 <!-- app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx -->
 <g id="edge86" class="edge">
 <title>app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.23,-2580C448.05,-2580 964.5,-2580 964.5,-2580 964.5,-2580 964.5,-613 964.5,-613 964.5,-613 1072.99,-613 1072.99,-613"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.99,-615.1 1078.99,-613 1072.99,-610.9 1072.99,-615.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.03,-2580C447.74,-2580 965.5,-2580 965.5,-2580 965.5,-2580 965.5,-613 965.5,-613 965.5,-613 1072.85,-613 1072.85,-613"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.85,-615.1 1078.85,-613 1072.85,-610.9 1072.85,-615.1"/>
 </g>
 <!-- app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/routes/staff/&#45;components/layout.tsx -->
 <g id="edge83" class="edge">
@@ -1867,66 +1867,66 @@
 <path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.11,-2570.5C357.31,-2570.5 468.5,-2570.5 468.5,-2570.5 468.5,-2570.5 468.5,-2510.26 468.5,-2510.26"/>
 <polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="470.6,-2510.26 468.5,-2504.26 466.4,-2510.26 470.6,-2510.26"/>
 </g>
-<!-- app/usecases/queries/exportOrderHistoryCsv.tsx -->
+<!-- app/usecases/queries/exportOrderHistoryCsv.ts -->
 <g id="node96" class="node">
-<title>app/usecases/queries/exportOrderHistoryCsv.tsx</title>
-<g id="a_node96"><a xlink:href="app/usecases/queries/exportOrderHistoryCsv.tsx" xlink:title="exportOrderHistoryCsv.tsx">
-<path fill="#ffcccc" stroke="black" d="M980.5,-3682C980.5,-3682 836.5,-3682 836.5,-3682 833.5,-3682 830.5,-3679 830.5,-3676 830.5,-3676 830.5,-3670 830.5,-3670 830.5,-3667 833.5,-3664 836.5,-3664 836.5,-3664 980.5,-3664 980.5,-3664 983.5,-3664 986.5,-3667 986.5,-3670 986.5,-3670 986.5,-3676 986.5,-3676 986.5,-3679 983.5,-3682 980.5,-3682"/>
-<text text-anchor="start" x="838.5" y="-3671.8" font-family="Helvetica,sans-Serif" font-size="9.00">exportOrderHistoryCsv.tsx </text>
-<text text-anchor="start" x="959.5" y="-3671.8" font-family="Helvetica,sans-Serif" font-size="8.00" fill="#808080">67%</text>
+<title>app/usecases/queries/exportOrderHistoryCsv.ts</title>
+<g id="a_node96"><a xlink:href="app/usecases/queries/exportOrderHistoryCsv.ts" xlink:title="exportOrderHistoryCsv.ts">
+<path fill="#ffcccc" stroke="black" d="M978,-3682C978,-3682 839,-3682 839,-3682 836,-3682 833,-3679 833,-3676 833,-3676 833,-3670 833,-3670 833,-3667 836,-3664 839,-3664 839,-3664 978,-3664 978,-3664 981,-3664 984,-3667 984,-3670 984,-3670 984,-3676 984,-3676 984,-3679 981,-3682 978,-3682"/>
+<text text-anchor="start" x="841" y="-3671.8" font-family="Helvetica,sans-Serif" font-size="9.00">exportOrderHistoryCsv.ts </text>
+<text text-anchor="start" x="957" y="-3671.8" font-family="Helvetica,sans-Serif" font-size="8.00" fill="#808080">67%</text>
 </a>
 </g>
 </g>
-<!-- app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/usecases/queries/exportOrderHistoryCsv.tsx -->
+<!-- app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/usecases/queries/exportOrderHistoryCsv.ts -->
 <g id="edge87" class="edge">
-<title>app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/usecases/queries/exportOrderHistoryCsv.tsx</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M294.37,-2582C429.01,-2582 834.5,-2582 834.5,-2582 834.5,-2582 834.5,-3657.9 834.5,-3657.9"/>
-<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="832.4,-3657.9 834.5,-3663.9 836.6,-3657.9 832.4,-3657.9"/>
+<title>app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/usecases/queries/exportOrderHistoryCsv.ts</title>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M294.04,-2582C428.66,-2582 836.5,-2582 836.5,-2582 836.5,-2582 836.5,-3657.9 836.5,-3657.9"/>
+<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="834.4,-3657.9 836.5,-3663.9 838.6,-3657.9 834.4,-3657.9"/>
 </g>
-<!-- app/usecases/queries/exportProductCatalogCsv.tsx -->
+<!-- app/usecases/queries/exportProductCatalogCsv.ts -->
 <g id="node97" class="node">
-<title>app/usecases/queries/exportProductCatalogCsv.tsx</title>
-<g id="a_node97"><a xlink:href="app/usecases/queries/exportProductCatalogCsv.tsx" xlink:title="exportProductCatalogCsv.tsx">
-<path fill="#ffcccc" stroke="black" d="M986.5,-3922C986.5,-3922 830.5,-3922 830.5,-3922 827.5,-3922 824.5,-3919 824.5,-3916 824.5,-3916 824.5,-3910 824.5,-3910 824.5,-3907 827.5,-3904 830.5,-3904 830.5,-3904 986.5,-3904 986.5,-3904 989.5,-3904 992.5,-3907 992.5,-3910 992.5,-3910 992.5,-3916 992.5,-3916 992.5,-3919 989.5,-3922 986.5,-3922"/>
-<text text-anchor="start" x="832.5" y="-3911.8" font-family="Helvetica,sans-Serif" font-size="9.00">exportProductCatalogCsv.tsx </text>
-<text text-anchor="start" x="965.5" y="-3911.8" font-family="Helvetica,sans-Serif" font-size="8.00" fill="#808080">63%</text>
+<title>app/usecases/queries/exportProductCatalogCsv.ts</title>
+<g id="a_node97"><a xlink:href="app/usecases/queries/exportProductCatalogCsv.ts" xlink:title="exportProductCatalogCsv.ts">
+<path fill="#ffcccc" stroke="black" d="M984,-3922C984,-3922 833,-3922 833,-3922 830,-3922 827,-3919 827,-3916 827,-3916 827,-3910 827,-3910 827,-3907 830,-3904 833,-3904 833,-3904 984,-3904 984,-3904 987,-3904 990,-3907 990,-3910 990,-3910 990,-3916 990,-3916 990,-3919 987,-3922 984,-3922"/>
+<text text-anchor="start" x="835" y="-3911.8" font-family="Helvetica,sans-Serif" font-size="9.00">exportProductCatalogCsv.ts </text>
+<text text-anchor="start" x="963" y="-3911.8" font-family="Helvetica,sans-Serif" font-size="8.00" fill="#808080">63%</text>
 </a>
 </g>
 </g>
-<!-- app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/usecases/queries/exportProductCatalogCsv.tsx -->
+<!-- app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/usecases/queries/exportProductCatalogCsv.ts -->
 <g id="edge88" class="edge">
-<title>app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/usecases/queries/exportProductCatalogCsv.tsx</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M294.31,-2584C391.7,-2584 621.5,-2584 621.5,-2584 621.5,-2584 621.5,-3910 621.5,-3910 621.5,-3910 818.33,-3910 818.33,-3910"/>
-<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="818.33,-3912.1 824.33,-3910 818.33,-3907.9 818.33,-3912.1"/>
+<title>app/routes/staff/analytics/csv&#45;format/index.tsx&#45;&gt;app/usecases/queries/exportProductCatalogCsv.ts</title>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M294.31,-2584C391.7,-2584 621.5,-2584 621.5,-2584 621.5,-2584 621.5,-3910 621.5,-3910 621.5,-3910 820.64,-3910 820.64,-3910"/>
+<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="820.64,-3912.1 826.64,-3910 820.64,-3907.9 820.64,-3912.1"/>
 </g>
-<!-- app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/domain/order/entities.ts -->
+<!-- app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/domain/order/entities.ts -->
 <g id="edge265" class="edge">
-<title>app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/domain/order/entities.ts</title>
-<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M986.53,-3670C1076.31,-3670 1211.5,-3670 1211.5,-3670 1211.5,-3670 1211.5,-3450.8 1211.5,-3450.8 1211.5,-3450.8 1232.14,-3450.8 1232.14,-3450.8"/>
+<title>app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/domain/order/entities.ts</title>
+<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M984.18,-3670C1073.92,-3670 1211.5,-3670 1211.5,-3670 1211.5,-3670 1211.5,-3450.8 1211.5,-3450.8 1211.5,-3450.8 1232.14,-3450.8 1232.14,-3450.8"/>
 <polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="1232.14,-3452.9 1238.14,-3450.8 1232.14,-3448.7 1232.14,-3452.9"/>
 </g>
-<!-- app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/domain/types.ts -->
+<!-- app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/domain/types.ts -->
 <g id="edge266" class="edge">
-<title>app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/domain/types.ts</title>
-<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M985.5,-3663.97C985.5,-3642.77 985.5,-3591.57 985.5,-3591.57 985.5,-3591.57 1089.39,-3591.57 1089.39,-3591.57"/>
-<polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="1089.39,-3593.67 1095.39,-3591.57 1089.39,-3589.47 1089.39,-3593.67"/>
+<title>app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/domain/types.ts</title>
+<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M982.5,-3663.97C982.5,-3642.77 982.5,-3591.57 982.5,-3591.57 982.5,-3591.57 1089.42,-3591.57 1089.42,-3591.57"/>
+<polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="1089.42,-3593.67 1095.42,-3591.57 1089.42,-3589.47 1089.42,-3593.67"/>
 </g>
-<!-- app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/libs/db/client.ts -->
+<!-- app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/libs/db/client.ts -->
 <g id="edge267" class="edge">
-<title>app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/libs/db/client.ts</title>
-<path fill="none" stroke="#0000ff" stroke-opacity="0.466667" d="M983.5,-3663.75C983.5,-3608.78 983.5,-3327.33 983.5,-3327.33 983.5,-3327.33 1086.27,-3327.33 1086.27,-3327.33"/>
-<polygon fill="none" stroke="#0000ff" stroke-opacity="0.466667" points="1086.27,-3329.43 1092.27,-3327.33 1086.27,-3325.23 1086.27,-3329.43"/>
+<title>app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/libs/db/client.ts</title>
+<path fill="none" stroke="#0000ff" stroke-opacity="0.466667" d="M981.5,-3663.75C981.5,-3608.78 981.5,-3327.33 981.5,-3327.33 981.5,-3327.33 1086.14,-3327.33 1086.14,-3327.33"/>
+<polygon fill="none" stroke="#0000ff" stroke-opacity="0.466667" points="1086.14,-3329.43 1092.14,-3327.33 1086.14,-3325.23 1086.14,-3329.43"/>
 </g>
-<!-- app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/utils/date.ts -->
+<!-- app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/utils/date.ts -->
 <g id="edge269" class="edge">
-<title>app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/utils/date.ts</title>
-<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M977.5,-3663.95C977.5,-3466.05 977.5,-88.5 977.5,-88.5 977.5,-88.5 1091.66,-88.5 1091.66,-88.5"/>
-<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1091.66,-90.6 1097.66,-88.5 1091.66,-86.4 1091.66,-90.6"/>
+<title>app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/utils/date.ts</title>
+<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M838.5,-3663.95C838.5,-3466.05 838.5,-88.5 838.5,-88.5 838.5,-88.5 1091.97,-88.5 1091.97,-88.5"/>
+<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1091.97,-90.6 1097.97,-88.5 1091.97,-86.4 1091.97,-90.6"/>
 </g>
-<!-- app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/usecases/repositories&#45;provider.ts -->
+<!-- app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/usecases/repositories&#45;provider.ts -->
 <g id="edge270" class="edge">
-<title>app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/usecases/repositories&#45;provider.ts</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M986.66,-3676C1028.49,-3676 1071.5,-3676 1071.5,-3676 1071.5,-3676 1071.5,-3807.8 1071.5,-3807.8"/>
+<title>app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/usecases/repositories&#45;provider.ts</title>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M984.27,-3676C1026.84,-3676 1071.5,-3676 1071.5,-3676 1071.5,-3676 1071.5,-3807.8 1071.5,-3807.8"/>
 <polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1069.4,-3807.8 1071.5,-3813.8 1073.6,-3807.8 1069.4,-3807.8"/>
 </g>
 <!-- app/utils/csv.ts -->
@@ -1939,40 +1939,40 @@
 </a>
 </g>
 </g>
-<!-- app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/utils/csv.ts -->
+<!-- app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/utils/csv.ts -->
 <g id="edge268" class="edge">
-<title>app/usecases/queries/exportOrderHistoryCsv.tsx&#45;&gt;app/utils/csv.ts</title>
-<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M980.5,-3663.9C980.5,-3468.22 980.5,-183.33 980.5,-183.33 980.5,-183.33 1094.82,-183.33 1094.82,-183.33"/>
-<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1094.82,-185.43 1100.82,-183.33 1094.82,-181.23 1094.82,-185.43"/>
+<title>app/usecases/queries/exportOrderHistoryCsv.ts&#45;&gt;app/utils/csv.ts</title>
+<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M978.5,-3663.9C978.5,-3468.22 978.5,-183.33 978.5,-183.33 978.5,-183.33 1094.79,-183.33 1094.79,-183.33"/>
+<polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1094.79,-185.43 1100.79,-183.33 1094.79,-181.23 1094.79,-185.43"/>
 </g>
-<!-- app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/domain/types.ts -->
+<!-- app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/domain/types.ts -->
 <g id="edge272" class="edge">
-<title>app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/domain/types.ts</title>
-<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M992.8,-3913C1083.68,-3913 1215.5,-3913 1215.5,-3913 1215.5,-3913 1215.5,-3595.43 1215.5,-3595.43 1215.5,-3595.43 1170.78,-3595.43 1170.78,-3595.43"/>
+<title>app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/domain/types.ts</title>
+<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M990.37,-3913C1081.31,-3913 1215.5,-3913 1215.5,-3913 1215.5,-3913 1215.5,-3595.43 1215.5,-3595.43 1215.5,-3595.43 1170.78,-3595.43 1170.78,-3595.43"/>
 <polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="1170.78,-3593.33 1164.78,-3595.43 1170.78,-3597.53 1170.78,-3593.33"/>
 </g>
-<!-- app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/domain/product/entities.ts -->
+<!-- app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/domain/product/entities.ts -->
 <g id="edge271" class="edge">
-<title>app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/domain/product/entities.ts</title>
-<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M992.91,-3919C1102.67,-3919 1280.5,-3919 1280.5,-3919 1280.5,-3919 1280.5,-3552.07 1280.5,-3552.07"/>
+<title>app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/domain/product/entities.ts</title>
+<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M990.14,-3919C1099.64,-3919 1280.5,-3919 1280.5,-3919 1280.5,-3919 1280.5,-3552.07 1280.5,-3552.07"/>
 <polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="1282.6,-3552.07 1280.5,-3546.07 1278.4,-3552.07 1282.6,-3552.07"/>
 </g>
-<!-- app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/libs/db/client.ts -->
+<!-- app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/libs/db/client.ts -->
 <g id="edge273" class="edge">
-<title>app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/libs/db/client.ts</title>
-<path fill="none" stroke="#0000ff" stroke-opacity="0.466667" d="M992.53,-3916C1084.03,-3916 1217.5,-3916 1217.5,-3916 1217.5,-3916 1217.5,-3327 1217.5,-3327 1217.5,-3327 1173.62,-3327 1173.62,-3327"/>
+<title>app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/libs/db/client.ts</title>
+<path fill="none" stroke="#0000ff" stroke-opacity="0.466667" d="M990.09,-3916C1081.64,-3916 1217.5,-3916 1217.5,-3916 1217.5,-3916 1217.5,-3327 1217.5,-3327 1217.5,-3327 1173.62,-3327 1173.62,-3327"/>
 <polygon fill="none" stroke="#0000ff" stroke-opacity="0.466667" points="1173.62,-3324.9 1167.62,-3327 1173.62,-3329.1 1173.62,-3324.9"/>
 </g>
-<!-- app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/usecases/repositories&#45;provider.ts -->
+<!-- app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/usecases/repositories&#45;provider.ts -->
 <g id="edge275" class="edge">
-<title>app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/usecases/repositories&#45;provider.ts</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M992.57,-3910C1040.26,-3910 1090.5,-3910 1090.5,-3910 1090.5,-3910 1090.5,-3838.31 1090.5,-3838.31"/>
+<title>app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/usecases/repositories&#45;provider.ts</title>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M990.18,-3910C1038.57,-3910 1090.5,-3910 1090.5,-3910 1090.5,-3910 1090.5,-3838.31 1090.5,-3838.31"/>
 <polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1092.6,-3838.31 1090.5,-3832.31 1088.4,-3838.31 1092.6,-3838.31"/>
 </g>
-<!-- app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/utils/csv.ts -->
+<!-- app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/utils/csv.ts -->
 <g id="edge274" class="edge">
-<title>app/usecases/queries/exportProductCatalogCsv.tsx&#45;&gt;app/utils/csv.ts</title>
-<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M992.81,-3907C1016.77,-3907 1036.5,-3907 1036.5,-3907 1036.5,-3907 1036.5,-187.67 1036.5,-187.67 1036.5,-187.67 1094.93,-187.67 1094.93,-187.67"/>
+<title>app/usecases/queries/exportProductCatalogCsv.ts&#45;&gt;app/utils/csv.ts</title>
+<path fill="none" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" d="M990.29,-3907C1015.38,-3907 1036.5,-3907 1036.5,-3907 1036.5,-3907 1036.5,-187.67 1036.5,-187.67 1036.5,-187.67 1094.93,-187.67 1094.93,-187.67"/>
 <polygon fill="#229999" fill-opacity="0.466667" stroke="#229999" stroke-width="2" stroke-opacity="0.466667" points="1094.93,-189.77 1100.93,-187.67 1094.93,-185.57 1094.93,-189.77"/>
 </g>
 <!-- app/routes/staff/analytics/index.tsx -->
@@ -2018,8 +2018,8 @@
 <!-- app/routes/staff/analytics/index.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx -->
 <g id="edge95" class="edge">
 <title>app/routes/staff/analytics/index.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.09,-2633.5C448.01,-2633.5 966.5,-2633.5 966.5,-2633.5 966.5,-2633.5 966.5,-616 966.5,-616 966.5,-616 1072.72,-616 1072.72,-616"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.72,-618.1 1078.72,-616 1072.72,-613.9 1072.72,-618.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.14,-2633.5C448.29,-2633.5 967.5,-2633.5 967.5,-2633.5 967.5,-2633.5 967.5,-616 967.5,-616 967.5,-616 1072.58,-616 1072.58,-616"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.58,-618.1 1078.58,-616 1072.58,-613.9 1072.58,-618.1"/>
 </g>
 <!-- app/routes/staff/analytics/index.tsx&#45;&gt;app/routes/staff/&#45;components/layout.tsx -->
 <g id="edge89" class="edge">
@@ -2043,11 +2043,11 @@
 <path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M286.28,-2660C286.28,-2660 407.86,-2660 407.86,-2660"/>
 <polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="407.86,-2662.1 413.86,-2660 407.86,-2657.9 407.86,-2662.1"/>
 </g>
-<!-- app/routes/staff/analytics/orders/csv.ts&#45;&gt;app/usecases/queries/exportOrderHistoryCsv.tsx -->
+<!-- app/routes/staff/analytics/orders/csv.ts&#45;&gt;app/usecases/queries/exportOrderHistoryCsv.ts -->
 <g id="edge97" class="edge">
-<title>app/routes/staff/analytics/orders/csv.ts&#45;&gt;app/usecases/queries/exportOrderHistoryCsv.tsx</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M286.18,-2666C295.72,-2666 303.5,-2666 303.5,-2666 303.5,-2666 303.5,-3673 303.5,-3673 303.5,-3673 824.34,-3673 824.34,-3673"/>
-<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="824.34,-3675.1 830.34,-3673 824.34,-3670.9 824.34,-3675.1"/>
+<title>app/routes/staff/analytics/orders/csv.ts&#45;&gt;app/usecases/queries/exportOrderHistoryCsv.ts</title>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M286.18,-2666C295.72,-2666 303.5,-2666 303.5,-2666 303.5,-2666 303.5,-3673 303.5,-3673 303.5,-3673 826.79,-3673 826.79,-3673"/>
+<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="826.79,-3675.1 832.79,-3673 826.79,-3670.9 826.79,-3675.1"/>
 </g>
 <!-- app/routes/staff/analytics/products/csv.ts -->
 <g id="node100" class="node">
@@ -2065,11 +2065,11 @@
 <path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M286.36,-2720C347.71,-2720 468.5,-2720 468.5,-2720 468.5,-2720 468.5,-2678.16 468.5,-2678.16"/>
 <polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="470.6,-2678.16 468.5,-2672.16 466.4,-2678.16 470.6,-2678.16"/>
 </g>
-<!-- app/routes/staff/analytics/products/csv.ts&#45;&gt;app/usecases/queries/exportProductCatalogCsv.tsx -->
+<!-- app/routes/staff/analytics/products/csv.ts&#45;&gt;app/usecases/queries/exportProductCatalogCsv.ts -->
 <g id="edge99" class="edge">
-<title>app/routes/staff/analytics/products/csv.ts&#45;&gt;app/usecases/queries/exportProductCatalogCsv.tsx</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M286.23,-2726C294.76,-2726 301.5,-2726 301.5,-2726 301.5,-2726 301.5,-3916 301.5,-3916 301.5,-3916 818.42,-3916 818.42,-3916"/>
-<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="818.42,-3918.1 824.42,-3916 818.42,-3913.9 818.42,-3918.1"/>
+<title>app/routes/staff/analytics/products/csv.ts&#45;&gt;app/usecases/queries/exportProductCatalogCsv.ts</title>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M286.23,-2726C294.76,-2726 301.5,-2726 301.5,-2726 301.5,-2726 301.5,-3916 301.5,-3916 301.5,-3916 820.95,-3916 820.95,-3916"/>
+<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="820.95,-3918.1 826.95,-3916 820.95,-3913.9 820.95,-3918.1"/>
 </g>
 <!-- app/routes/staff/index.tsx -->
 <g id="node101" class="node">
@@ -2370,8 +2370,8 @@
 <!-- app/routes/staff/orders/[id]/edit/&#45;components/$orderEditForm.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx -->
 <g id="edge128" class="edge">
 <title>app/routes/staff/orders/[id]/edit/&#45;components/$orderEditForm.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M314.51,-1970C493.22,-1970 990.5,-1970 990.5,-1970 990.5,-1970 990.5,-619 990.5,-619 990.5,-619 1072.85,-619 1072.85,-619"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.85,-621.1 1078.85,-619 1072.85,-616.9 1072.85,-621.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M314.65,-1970C493.15,-1970 988.5,-1970 988.5,-1970 988.5,-1970 988.5,-619 988.5,-619 988.5,-619 1072.92,-619 1072.92,-619"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.92,-621.1 1078.92,-619 1072.92,-616.9 1072.92,-621.1"/>
 </g>
 <!-- app/routes/staff/orders/[id]/edit/&#45;components/$orderEditForm.tsx&#45;&gt;app/routes/&#45;components/ui/label.tsx -->
 <g id="edge127" class="edge">
@@ -2398,8 +2398,8 @@
 <!-- app/routes/staff/orders/[id]/edit/index.tsx&#45;&gt;app/routes/&#45;helpers/ui/toast.ts -->
 <g id="edge133" class="edge">
 <title>app/routes/staff/orders/[id]/edit/index.tsx&#45;&gt;app/routes/&#45;helpers/ui/toast.ts</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M141.01,-1983C293.44,-1983 803.5,-1983 803.5,-1983 803.5,-1983 803.5,-3040.5 803.5,-3040.5 803.5,-3040.5 866.36,-3040.5 866.36,-3040.5"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="866.36,-3042.6 872.36,-3040.5 866.36,-3038.4 866.36,-3042.6"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M141.15,-1983C293.47,-1983 801.5,-1983 801.5,-1983 801.5,-1983 801.5,-3040.5 801.5,-3040.5 801.5,-3040.5 866.27,-3040.5 866.27,-3040.5"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="866.27,-3042.6 872.27,-3040.5 866.27,-3038.4 866.27,-3042.6"/>
 </g>
 <!-- app/routes/staff/orders/[id]/edit/index.tsx&#45;&gt;app/routes/staff/&#45;components/layout.tsx -->
 <g id="edge132" class="edge">
@@ -2626,8 +2626,8 @@
 <!-- app/routes/staff/orders/new/&#45;components/$orderRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/input.tsx -->
 <g id="edge151" class="edge">
 <title>app/routes/staff/orders/new/&#45;components/$orderRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/input.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M332.76,-1842C502.8,-1842 880.5,-1842 880.5,-1842 880.5,-1842 880.5,-634.14 880.5,-634.14"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="882.6,-634.14 880.5,-628.14 878.4,-634.14 882.6,-634.14"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M332.64,-1842C502.4,-1842 879.5,-1842 879.5,-1842 879.5,-1842 879.5,-634.14 879.5,-634.14"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="881.6,-634.14 879.5,-628.14 877.4,-634.14 881.6,-634.14"/>
 </g>
 <!-- app/routes/staff/orders/new/&#45;components/$orderRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/$graphemeTextarea.tsx -->
 <g id="edge147" class="edge">
@@ -2736,8 +2736,8 @@
 <!-- app/routes/staff/orders/new/index.tsx&#45;&gt;app/routes/&#45;helpers/ui/toast.ts -->
 <g id="edge158" class="edge">
 <title>app/routes/staff/orders/new/index.tsx&#45;&gt;app/routes/&#45;helpers/ui/toast.ts</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M141.25,-1859.2C294.54,-1859.2 807.5,-1859.2 807.5,-1859.2 807.5,-1859.2 807.5,-3038.25 807.5,-3038.25 807.5,-3038.25 866.32,-3038.25 866.32,-3038.25"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="866.32,-3040.35 872.32,-3038.25 866.32,-3036.15 866.32,-3040.35"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M141.13,-1859.2C293.99,-1859.2 805.5,-1859.2 805.5,-1859.2 805.5,-1859.2 805.5,-3038.25 805.5,-3038.25 805.5,-3038.25 866.48,-3038.25 866.48,-3038.25"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="866.48,-3040.35 872.48,-3038.25 866.48,-3036.15 866.48,-3040.35"/>
 </g>
 <!-- app/routes/staff/orders/new/index.tsx&#45;&gt;app/routes/staff/&#45;components/layout.tsx -->
 <g id="edge157" class="edge">
@@ -2770,7 +2770,7 @@
 <!-- app/routes/staff/orders/progress/&#45;components/$orderProgressManager.tsx&#45;&gt;app/domain/order/entities.ts -->
 <g id="edge173" class="edge">
 <title>app/routes/staff/orders/progress/&#45;components/$orderProgressManager.tsx&#45;&gt;app/domain/order/entities.ts</title>
-<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M332.52,-1737.25C522.85,-1737.25 982.5,-1737.25 982.5,-1737.25 982.5,-1737.25 982.5,-3340.67 982.5,-3340.67 982.5,-3340.67 1293.5,-3340.67 1293.5,-3340.67 1293.5,-3340.67 1293.5,-3433.76 1293.5,-3433.76"/>
+<path fill="none" stroke="#ff00ff" stroke-opacity="0.466667" d="M332.54,-1737.25C522.3,-1737.25 979.5,-1737.25 979.5,-1737.25 979.5,-1737.25 979.5,-3340.67 979.5,-3340.67 979.5,-3340.67 1293.5,-3340.67 1293.5,-3340.67 1293.5,-3340.67 1293.5,-3433.76 1293.5,-3433.76"/>
 <polygon fill="none" stroke="#ff00ff" stroke-opacity="0.466667" points="1291.4,-3433.76 1293.5,-3439.76 1295.6,-3433.76 1291.4,-3433.76"/>
 </g>
 <!-- app/routes/staff/orders/progress/&#45;components/$orderProgressManager.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/chefHatIcon.tsx -->
@@ -2904,8 +2904,8 @@
 <!-- app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/domain/product/constants.ts -->
 <g id="edge191" class="edge">
 <title>app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/domain/product/constants.ts</title>
-<path fill="none" stroke="#ff00ff" stroke-width="2" stroke-opacity="0.466667" d="M555.2,-2172C706.46,-2172 1001.5,-2172 1001.5,-2172 1001.5,-2172 1001.5,-3534 1001.5,-3534 1001.5,-3534 1079.78,-3534 1079.78,-3534"/>
-<polygon fill="#ff00ff" fill-opacity="0.466667" stroke="#ff00ff" stroke-width="2" stroke-opacity="0.466667" points="1079.78,-3536.1 1085.78,-3534 1079.78,-3531.9 1079.78,-3536.1"/>
+<path fill="none" stroke="#ff00ff" stroke-width="2" stroke-opacity="0.466667" d="M555.17,-2172C705.96,-2172 999.5,-2172 999.5,-2172 999.5,-2172 999.5,-3534 999.5,-3534 999.5,-3534 1079.82,-3534 1079.82,-3534"/>
+<polygon fill="#ff00ff" fill-opacity="0.466667" stroke="#ff00ff" stroke-width="2" stroke-opacity="0.466667" points="1079.82,-3536.1 1085.82,-3534 1079.82,-3531.9 1079.82,-3536.1"/>
 </g>
 <!-- app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/chevronLeftIcon.tsx -->
 <g id="edge178" class="edge">
@@ -2940,8 +2940,8 @@
 <!-- app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/input.tsx -->
 <g id="edge187" class="edge">
 <title>app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/input.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M555.18,-2163C679.42,-2163 892.5,-2163 892.5,-2163 892.5,-2163 892.5,-634.07 892.5,-634.07"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="894.6,-634.07 892.5,-628.07 890.4,-634.07 894.6,-634.07"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M555.08,-2163C678.5,-2163 889.5,-2163 889.5,-2163 889.5,-2163 889.5,-634.07 889.5,-634.07"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="891.6,-634.07 889.5,-628.07 887.4,-634.07 891.6,-634.07"/>
 </g>
 <!-- app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/button.tsx -->
 <g id="edge183" class="edge">
@@ -2970,8 +2970,8 @@
 <!-- app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx -->
 <g id="edge189" class="edge">
 <title>app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M555.24,-2166C704.86,-2166 994.5,-2166 994.5,-2166 994.5,-2166 994.5,-622 994.5,-622 994.5,-622 1072.77,-622 1072.77,-622"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.77,-624.1 1078.77,-622 1072.77,-619.9 1072.77,-624.1"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M555.2,-2166C704.34,-2166 992.5,-2166 992.5,-2166 992.5,-2166 992.5,-622 992.5,-622 992.5,-622 1072.8,-622 1072.8,-622"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.8,-624.1 1078.8,-622 1072.8,-619.9 1072.8,-624.1"/>
 </g>
 <!-- app/routes/staff/products/&#45;components/$productRegistrationForm.tsx&#45;&gt;app/routes/&#45;components/ui/label.tsx -->
 <g id="edge188" class="edge">
@@ -3044,7 +3044,7 @@
 <!-- app/routes/staff/products/[id]/delete/index.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx -->
 <g id="edge201" class="edge">
 <title>app/routes/staff/products/[id]/delete/index.tsx&#45;&gt;app/routes/&#45;components/ui/linkButton.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.02,-2230C452.18,-2230 997.5,-2230 997.5,-2230 997.5,-2230 997.5,-625 997.5,-625 997.5,-625 1072.77,-625 1072.77,-625"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.17,-2230C452.26,-2230 995.5,-2230 995.5,-2230 995.5,-2230 995.5,-625 995.5,-625 995.5,-625 1072.77,-625 1072.77,-625"/>
 <polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1072.77,-627.1 1078.77,-625 1072.77,-622.9 1072.77,-627.1"/>
 </g>
 <!-- app/routes/staff/products/[id]/delete/index.tsx&#45;&gt;app/routes/&#45;helpers/ui/toast.ts -->
@@ -3294,8 +3294,8 @@
 <!-- app/routes/staff/products/index.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/circleCheckIcon.tsx -->
 <g id="edge213" class="edge">
 <title>app/routes/staff/products/index.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/circleCheckIcon.tsx</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.04,-2158C422.8,-2158 799.5,-2158 799.5,-2158 799.5,-2158 799.5,-872.4 799.5,-872.4 799.5,-872.4 1063.77,-872.4 1063.77,-872.4"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1063.77,-874.5 1069.77,-872.4 1063.77,-870.3 1063.77,-874.5"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M294.42,-2158C423.37,-2158 798.5,-2158 798.5,-2158 798.5,-2158 798.5,-872.4 798.5,-872.4 798.5,-872.4 1063.97,-872.4 1063.97,-872.4"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="1063.97,-874.5 1069.97,-872.4 1063.97,-870.3 1063.97,-874.5"/>
 </g>
 <!-- app/routes/staff/products/index.tsx&#45;&gt;app/routes/&#45;components/icons/lucide/packageIcon.tsx -->
 <g id="edge214" class="edge">
@@ -3452,8 +3452,8 @@
 <!-- app/usecases/queries/getProductsManagementPageData.ts&#45;&gt;app/usecases/repositories&#45;provider.ts -->
 <g id="edge319" class="edge">
 <title>app/usecases/queries/getProductsManagementPageData.ts&#45;&gt;app/usecases/repositories&#45;provider.ts</title>
-<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M1012.28,-3799C1043.44,-3799 1069.5,-3799 1069.5,-3799 1069.5,-3799 1069.5,-3807.79 1069.5,-3807.79"/>
-<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1067.4,-3807.79 1069.5,-3813.79 1071.6,-3807.79 1067.4,-3807.79"/>
+<path fill="none" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" d="M1012.09,-3799C1042.85,-3799 1068.5,-3799 1068.5,-3799 1068.5,-3799 1068.5,-3807.79 1068.5,-3807.79"/>
+<polygon fill="#770000" fill-opacity="0.466667" stroke="#770000" stroke-width="2" stroke-opacity="0.466667" points="1066.4,-3807.79 1068.5,-3813.79 1070.6,-3807.79 1066.4,-3807.79"/>
 </g>
 <!-- app/routes/staff/settings/&#45;components/$colorSchemeSelector.tsx -->
 <g id="node132" class="node">
@@ -3498,8 +3498,8 @@
 <!-- app/routes/staff/settings/&#45;components/$colorSchemeSelector.tsx&#45;&gt;app/routes/&#45;hooks/useColorScheme.ts -->
 <g id="edge231" class="edge">
 <title>app/routes/staff/settings/&#45;components/$colorSchemeSelector.tsx&#45;&gt;app/routes/&#45;hooks/useColorScheme.ts</title>
-<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M546.33,-2415.43C658.23,-2415.43 850.5,-2415.43 850.5,-2415.43 850.5,-2415.43 850.5,-2849.61 850.5,-2849.61"/>
-<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="848.4,-2849.61 850.5,-2855.61 852.6,-2849.61 848.4,-2849.61"/>
+<path fill="none" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" d="M546.12,-2415.43C657.74,-2415.43 849.5,-2415.43 849.5,-2415.43 849.5,-2415.43 849.5,-2849.61 849.5,-2849.61"/>
+<polygon fill="#007700" fill-opacity="0.466667" stroke="#007700" stroke-width="2" stroke-opacity="0.466667" points="847.4,-2849.61 849.5,-2855.61 851.6,-2849.61 847.4,-2849.61"/>
 </g>
 <!-- app/routes/staff/settings/index.tsx -->
 <g id="node133" class="node">
