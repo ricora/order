@@ -20,7 +20,7 @@ export const PRODUCT_CATALOG_COLUMNS = [
   "tag_count",
 ] as const
 
-export const PRODUCT_CATALOG_HEADER = PRODUCT_CATALOG_COLUMNS
+export const PRODUCT_CATALOG_HEADER = [...PRODUCT_CATALOG_COLUMNS]
 
 export type ExportProductCatalogCsvParams = {
   dbClient: DbClient

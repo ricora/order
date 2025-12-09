@@ -25,7 +25,7 @@ export const ORDER_HISTORY_COLUMNS = [
   "line_total_amount",
 ] as const
 
-export const ORDER_HISTORY_HEADER = ORDER_HISTORY_COLUMNS
+export const ORDER_HISTORY_HEADER = [...ORDER_HISTORY_COLUMNS]
 
 export type ExportOrderHistoryCsvParams = {
   dbClient: DbClient
