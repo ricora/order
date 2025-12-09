@@ -472,7 +472,11 @@ export const adapters = {
     }
     const positiveRows = productTags
       .filter((p) => p.value > 0)
-      .map((p) => ({ tagId: p.id, productCount: p.value }))
+      .map((p) => ({
+        tagId: p.id,
+        productCount: p.value,
+        updatedAt: p.updatedAt,
+      }))
     const zeroIds = productTags.filter((p) => p.value === 0).map((p) => p.id)
 
     if (zeroIds.length > 0) {

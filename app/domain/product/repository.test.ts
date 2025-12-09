@@ -186,9 +186,12 @@ describe("Product repository", () => {
       ).toHaveBeenCalledTimes(1)
       const tagsCall =
         adapters.setAllProductTagRelationCountsByTagIds.mock.calls[0]?.[0]
-      expect(tagsCall?.productTags).toEqual(
-        validProduct.tagIds.map((id) => ({ id, value: 1 })),
-      )
+      expect(
+        tagsCall?.productTags.map(({ id, value }) => ({ id, value })),
+      ).toEqual(validProduct.tagIds.map((id) => ({ id, value: 1 })))
+      for (const t of tagsCall?.productTags ?? []) {
+        expect(t.updatedAt).toBeInstanceOf(Date)
+      }
     })
 
     it("商品の作成時に商品数取得エラーが発生したら処理を中止する", async () => {
@@ -832,7 +835,12 @@ describe("Product repository", () => {
       ).toHaveBeenCalledTimes(1)
       const calls = adapters.setAllProductTagRelationCountsByTagIds.mock.calls
       const arg = calls[0]?.[0]
-      expect(arg?.productTags).toEqual([{ id: 1, value: 0 }])
+      expect(arg?.productTags.map(({ id, value }) => ({ id, value }))).toEqual([
+        { id: 1, value: 0 },
+      ])
+      for (const t of arg?.productTags ?? []) {
+        expect(t.updatedAt).toBeInstanceOf(Date)
+      }
     })
 
     it("タグ更新時、削除されたタグが他の商品と紐づいていれば削除しない", async () => {
@@ -1029,7 +1037,9 @@ describe("Product repository", () => {
       const second = calls[1]?.[0]
       // check that one call includes id 3 incremented
       expect(
-        (first?.productTags ?? []).concat(second?.productTags ?? []),
+        (first?.productTags ?? [])
+          .concat(second?.productTags ?? [])
+          .map(({ id, value }) => ({ id, value })),
       ).toEqual(
         expect.arrayContaining([
           { id: 3, value: 1 },
@@ -1280,10 +1290,15 @@ describe("Product repository", () => {
       ).toHaveBeenCalledTimes(1)
       const tagsCall =
         adapters.setAllProductTagRelationCountsByTagIds.mock.calls[0]?.[0]
-      expect(tagsCall?.productTags).toEqual([
+      expect(
+        tagsCall?.productTags.map(({ id, value }) => ({ id, value })),
+      ).toEqual([
         { id: 1, value: 1 },
         { id: 2, value: 1 },
       ])
+      for (const t of tagsCall?.productTags ?? []) {
+        expect(t.updatedAt).toBeInstanceOf(Date)
+      }
     })
 
     it("商品の削除時に商品数取得に失敗したら処理を中止する", async () => {

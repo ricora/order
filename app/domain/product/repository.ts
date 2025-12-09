@@ -179,7 +179,7 @@ export type Repository = {
     never
   >
   setAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
-    { productTags: { id: ProductTag["id"]; value: number }[] },
+    { productTags: { id: ProductTag["id"]; value: number; updatedAt: Date }[] },
     void,
     never
   >
@@ -391,6 +391,7 @@ export const createRepository = (adapters: Repository) => {
     const updates = tagIds.map((id) => ({
       id,
       value: Math.max(0, (curr.get(id) ?? 0) + delta),
+      updatedAt: new Date(),
     }))
     const setRes = await repository.setAllProductTagRelationCountsByTagIds({
       dbClient,
