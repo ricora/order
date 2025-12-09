@@ -146,7 +146,6 @@ export const productCountPerStoreTable = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("ix_product_count_per_store_store_id").using("hash", table.storeId),
     check(
       "product_count_per_store_product_count_positive",
       sql`${table.productCount} >= 0`,
@@ -167,10 +166,6 @@ export const productTagCountPerStoreTable = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("ix_product_tag_count_per_store_store_id").using(
-      "hash",
-      table.storeId,
-    ),
     check(
       "product_tag_count_per_store_product_tag_count_positive",
       sql`${table.productTagCount} >= 0`,
@@ -196,7 +191,6 @@ export const productCountPerProductTagTable = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("ix_product_count_per_tag_tag_store").using("hash", table.tagId),
     check(
       "product_count_per_tag_product_count_positive",
       sql`${table.productCount} >= 0`,
