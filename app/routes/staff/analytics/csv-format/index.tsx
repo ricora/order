@@ -76,7 +76,7 @@ const CsvFormatSection: FC<CsvFormatSectionProps> = ({
         >
           <code class="font-mono text-primary text-sm">{column}</code>
           <span class="text-fg text-sm">
-            {(() => descriptionMap?.[column])()}
+            {descriptionMap?.[column]}
           </span>
         </div>
       ))}
