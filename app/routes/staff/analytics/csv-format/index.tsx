@@ -7,20 +7,61 @@ import Callout from "../../../-components/ui/callout"
 import LinkButton from "../../../-components/ui/linkButton"
 import Layout from "../../-components/layout"
 
-type ColumnDescriptionProps = {
-  name: string
-  description: Child
+type ColumnName = string
+
+type ColumnDescriptionMap = Record<string, Child>
+
+const ORDER_HISTORY_COLUMN_DESCRIPTIONS: ColumnDescriptionMap = {
+  order_id: <>注文ID（一意の識別子）</>,
+  order_created_at: <>注文の作成日時（JST, ISO 8601形式）</>,
+  order_updated_at: <>注文の更新日時（JST, ISO 8601形式）</>,
+  order_status: (
+    <>
+      注文のステータス（<code>pending</code> / <code>confirmed</code> /{" "}
+      <code>completed</code>）
+    </>
+  ),
+  customer_name: <>注文の顧客名</>,
+  order_total_amount: <>注文全体の合計金額（円）</>,
+  order_item_count: <>注文に含まれる注文明細の総数</>,
+  line_index: <>注文明細の行番号（1から始まる連番）</>,
+  product_id: <>注文明細の商品ID</>,
+  product_name: <>注文明細の商品名</>,
+  unit_amount: <>注文明細の単価（円）</>,
+  quantity: <>注文明細の数量</>,
+  line_total_amount: <>注文明細の合計金額（単価×数量、円）</>,
+}
+
+const PRODUCT_CATALOG_COLUMN_DESCRIPTIONS: ColumnDescriptionMap = {
+  product_id: <>商品ID（一意の識別子）</>,
+  product_name: <>商品名</>,
+  price: <>価格（円）</>,
+  stock: <>在庫数</>,
+  image_url: <>商品画像URL（絶対URL）</>,
+  tag_ids: (
+    <>
+      タグID（パイプ区切り、例: <code>1|3|5</code>）
+    </>
+  ),
+  tag_names: (
+    <>
+      タグ名（パイプ区切り、例: <code>飲料|冷凍</code>）
+    </>
+  ),
+  tag_count: <>タグ数</>,
 }
 
 type CsvFormatSectionProps = PropsWithChildren<{
   title: string
-  columns: ReadonlyArray<ColumnDescriptionProps>
+  columns: ReadonlyArray<ColumnName>
+  descriptionMap?: ColumnDescriptionMap
 }>
 
 const CsvFormatSection: FC<CsvFormatSectionProps> = ({
   title,
   children,
   columns,
+  descriptionMap,
 }) => (
   <div class="rounded-lg border bg-bg p-6">
     <div class="mb-6">
@@ -30,11 +71,11 @@ const CsvFormatSection: FC<CsvFormatSectionProps> = ({
     <div class="grid grid-cols-1 gap-2 sm:grid-cols-[auto_1fr]">
       {columns.map((column) => (
         <div
-          key={column.name}
+          key={column}
           class="grid grid-cols-subgrid gap-3 rounded border border-border bg-muted p-3 sm:col-span-2"
         >
-          <code class="font-mono text-primary text-sm">{column.name}</code>
-          <span class="text-fg text-sm">{column.description}</span>
+          <code class="font-mono text-primary text-sm">{column}</code>
+          <span class="text-fg text-sm">{descriptionMap?.[column]}</span>
         </div>
       ))}
     </div>
@@ -70,7 +111,11 @@ export default createRoute(async (c) => {
           </div>
         </div>
 
-        <CsvFormatSection title="注文履歴CSV" columns={ORDER_HISTORY_COLUMNS}>
+        <CsvFormatSection
+          title="注文履歴CSV"
+          columns={ORDER_HISTORY_COLUMNS}
+          descriptionMap={ORDER_HISTORY_COLUMN_DESCRIPTIONS}
+        >
           <p>
             注文とその注文明細のネスト構造をフラット化した形式で出力されます。
           </p>
@@ -91,6 +136,7 @@ export default createRoute(async (c) => {
         <CsvFormatSection
           title="商品カタログCSV"
           columns={PRODUCT_CATALOG_COLUMNS}
+          descriptionMap={PRODUCT_CATALOG_COLUMN_DESCRIPTIONS}
         >
           <p>すべての商品情報が1商品につき1行で出力されます。</p>
         </CsvFormatSection>

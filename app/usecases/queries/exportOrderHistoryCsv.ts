@@ -10,66 +10,22 @@ const { findAllOrdersOrderByIdAsc } = orderRepository
 export const ORDER_HISTORY_EXPORT_PAGE_SIZE = 200
 
 export const ORDER_HISTORY_COLUMNS = [
-  {
-    name: "order_id",
-    description: "注文ID（一意の識別子）",
-  },
-  {
-    name: "order_created_at",
-    description: "注文の作成日時（JST, ISO 8601形式）",
-  },
-  {
-    name: "order_updated_at",
-    description: "注文の更新日時（JST, ISO 8601形式）",
-  },
-  {
-    name: "order_status",
-    description: (
-      <>
-        注文のステータス（<code>pending</code> / <code>confirmed</code> /{" "}
-        <code>completed</code>）
-      </>
-    ),
-  },
-  {
-    name: "customer_name",
-    description: "注文の顧客名",
-  },
-  {
-    name: "order_total_amount",
-    description: "注文全体の合計金額（円）",
-  },
-  {
-    name: "order_item_count",
-    description: "注文に含まれる注文明細の総数",
-  },
-  {
-    name: "line_index",
-    description: "注文明細の行番号（1から始まる連番）",
-  },
-  {
-    name: "product_id",
-    description: "注文明細の商品ID",
-  },
-  {
-    name: "product_name",
-    description: "注文明細の商品名",
-  },
-  {
-    name: "unit_amount",
-    description: "注文明細の単価（円）",
-  },
-  {
-    name: "quantity",
-    description: "注文明細の数量",
-  },
-  {
-    name: "line_total_amount",
-    description: "注文明細の合計金額（単価×数量、円）",
-  },
+  "order_id",
+  "order_created_at",
+  "order_updated_at",
+  "order_status",
+  "customer_name",
+  "order_total_amount",
+  "order_item_count",
+  "line_index",
+  "product_id",
+  "product_name",
+  "unit_amount",
+  "quantity",
+  "line_total_amount",
 ] as const
 
-export const ORDER_HISTORY_HEADER = ORDER_HISTORY_COLUMNS.map((col) => col.name)
+export const ORDER_HISTORY_HEADER = [...ORDER_HISTORY_COLUMNS]
 
 export type ExportOrderHistoryCsvParams = {
   dbClient: DbClient
