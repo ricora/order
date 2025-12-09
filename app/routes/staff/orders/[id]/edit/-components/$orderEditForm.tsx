@@ -1,6 +1,6 @@
 import type { FC } from "hono/jsx"
 import { useState } from "hono/jsx"
-import type Order from "../../../../../../domain/order/entities/order"
+import type { Order } from "../../../../../../domain/order/entities"
 import ChevronLeftIcon from "../../../../../-components/icons/lucide/chevronLeftIcon"
 import SendIcon from "../../../../../-components/icons/lucide/sendIcon"
 import GraphemeInput from "../../../../../-components/ui/$graphemeInput"

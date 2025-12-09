@@ -1,4 +1,4 @@
-import type Product from "../../domain/product/entities/product"
+import type { Product } from "../../domain/product/entities"
 import type { Result } from "../../domain/types"
 import type { DbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"

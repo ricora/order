@@ -6,7 +6,7 @@ import type {
   Result,
 } from "../types"
 import { ALLOWED_ORDER_STATUSES } from "./constants"
-import type Order from "./entities/order"
+import type { Order } from "./entities"
 
 type CommonOrderValidationError =
   | "顧客名は50文字以内である必要があります。"

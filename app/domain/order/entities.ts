@@ -1,4 +1,4 @@
-type Order = {
+export type Order = {
   id: number
   customerName: string | null
   comment: string | null
@@ -13,4 +13,3 @@ type Order = {
   }[]
   totalAmount: number
 }
-export default Order

@@ -3,8 +3,7 @@ import {
   MAX_PRODUCT_PRICE,
   MAX_PRODUCT_STOCK,
 } from "../../../../domain/product/constants"
-import type Product from "../../../../domain/product/entities/product"
-import type ProductTag from "../../../../domain/product/entities/productTag"
+import type { Product, ProductTag } from "../../../../domain/product/entities"
 import { stripString } from "../../../../utils/text"
 import ChevronLeftIcon from "../../../-components/icons/lucide/chevronLeftIcon"
 import SendIcon from "../../../-components/icons/lucide/sendIcon"

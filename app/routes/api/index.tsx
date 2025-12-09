@@ -1,7 +1,7 @@
 import type { Env } from "hono"
 import { Hono } from "hono"
 import { validator } from "hono/validator"
-import type Order from "../../domain/order/entities/order"
+import type { Order } from "../../domain/order/entities"
 import { setOrderStatus } from "../../usecases/commands/setOrderStatus"
 import { getOrderProgressManagerComponentData } from "../../usecases/queries/getOrderProgressManagerComponentData"
 import { getOrderRegistrationFormComponentData } from "../../usecases/queries/getOrderRegistrationFormComponentData"
