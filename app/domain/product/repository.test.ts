@@ -190,6 +190,29 @@ describe("Product repository", () => {
       )
     })
 
+    it("タグカウント取得が失敗した場合は作成を失敗させカウント更新は行われない", async () => {
+      adapters.getProductCountByStoreId.mockImplementation(async () => ({
+        ok: true,
+        value: 2,
+      }))
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async () => ({ ok: false, message: "エラーが発生しました。" }),
+      )
+      adapters.createProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: { ...product, id: 99 },
+      }))
+
+      const result = await repository.createProduct({
+        product: validProduct,
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      expect(
+        adapters.setAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
+    })
+
     it("商品名が既に存在する場合はエラーを返す", async () => {
       adapters.findProductByName.mockImplementation(async () => ({
         ok: true,
@@ -483,6 +506,35 @@ describe("Product repository", () => {
       if (result.ok) expect(result.value.id).toBe(1)
       expect(adapters.findAllProductTags).toHaveBeenCalledTimes(1)
       expect(adapters.findProductByName).toHaveBeenCalledTimes(1)
+    })
+
+    it("タグカウント取得が失敗した場合は更新を失敗させる", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "既存商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async () => ({ ok: false, message: "エラーが発生しました。" }),
+      )
+      adapters.updateProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: applyPartialToDefaultProduct(product),
+      }))
+
+      const result = await repository.updateProduct({
+        product: { id: 1, tagIds: [2, 3] },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      expect(
+        adapters.setAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
     })
 
     it("他の商品と名前が重複している場合はエラーを返す", async () => {
@@ -872,6 +924,30 @@ describe("Product repository", () => {
       if (result.ok) expect(result.value).toBe(undefined)
       expect(adapters.deleteProductImageByProductId).not.toHaveBeenCalled()
       expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
+      expect(adapters.deleteProduct).not.toHaveBeenCalled()
+    })
+
+    it("タグカウントの取得が失敗した場合は削除を中止する", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "削除対象商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async () => ({ ok: false, message: "エラーが発生しました。" }),
+      )
+
+      const result = await repository.deleteProduct({
+        product: { id: 1 },
+        dbClient: mockDbClient,
+      })
+      expect(result.ok).toBe(false)
+      // delete should not be called since adjust failed
       expect(adapters.deleteProduct).not.toHaveBeenCalled()
     })
 

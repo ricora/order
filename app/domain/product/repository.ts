@@ -376,25 +376,28 @@ export const createRepository = (adapters: Repository) => {
     dbClient: TransactionDbClient,
     tagIds: number[],
     delta: number,
-  ) => {
-    if (!tagIds || tagIds.length === 0) return
+  ): Promise<Result<void, "エラーが発生しました。">> => {
+    if (!tagIds || tagIds.length === 0) return { ok: true, value: undefined }
     const tagCountsRes =
       await repository.getAllProductTagRelationCountsByTagIds({
         dbClient,
         productTag: { ids: tagIds },
         pagination: { offset: 0, limit: tagIds.length },
       })
-    if (!tagCountsRes.ok) return
+    if (!tagCountsRes.ok)
+      return { ok: false, message: "エラーが発生しました。" }
     const curr = new Map<number, number>()
     for (const t of tagCountsRes.value) curr.set(t.tagId, t.count)
     const updates = tagIds.map((id) => ({
       id,
       value: Math.max(0, (curr.get(id) ?? 0) + delta),
     }))
-    await repository.setAllProductTagRelationCountsByTagIds({
+    const setRes = await repository.setAllProductTagRelationCountsByTagIds({
       dbClient,
       productTags: updates,
     })
+    if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
+    return { ok: true, value: undefined }
   }
 
   const validateProductImage = (
@@ -524,7 +527,13 @@ export const createRepository = (adapters: Repository) => {
       }
 
       if (createResult.value.tagIds && createResult.value.tagIds.length > 0) {
-        await adjustTagRelationCounts(dbClient, createResult.value.tagIds, 1)
+        const adjustRes = await adjustTagRelationCounts(
+          dbClient,
+          createResult.value.tagIds,
+          1,
+        )
+        if (!adjustRes.ok)
+          return { ok: false, message: "エラーが発生しました。" }
       }
       return createResult
     },
@@ -570,10 +579,22 @@ export const createRepository = (adapters: Repository) => {
         )
         if (allChangedTagIds.length > 0) {
           if (addedTagIds.length > 0) {
-            await adjustTagRelationCounts(dbClient, addedTagIds, 1)
+            const addedRes = await adjustTagRelationCounts(
+              dbClient,
+              addedTagIds,
+              1,
+            )
+            if (!addedRes.ok)
+              return { ok: false, message: "エラーが発生しました。" }
           }
           if (removedTagIds.length > 0) {
-            await adjustTagRelationCounts(dbClient, removedTagIds, -1)
+            const removedRes = await adjustTagRelationCounts(
+              dbClient,
+              removedTagIds,
+              -1,
+            )
+            if (!removedRes.ok)
+              return { ok: false, message: "エラーが発生しました。" }
           }
         }
         await deleteOrphanedTags(dbClient, removedTagIds)
@@ -610,7 +631,9 @@ export const createRepository = (adapters: Repository) => {
 
       if (foundProduct.tagIds && foundProduct.tagIds.length > 0) {
         const tagIds = foundProduct.tagIds
-        await adjustTagRelationCounts(dbClient, tagIds, -1)
+        const adjustRes = await adjustTagRelationCounts(dbClient, tagIds, -1)
+        if (!adjustRes.ok)
+          return { ok: false, message: "エラーが発生しました。" }
       }
 
       await deleteOrphanedTags(dbClient, foundProduct.tagIds)
