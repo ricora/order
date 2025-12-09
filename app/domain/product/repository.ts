@@ -168,13 +168,13 @@ export type Repository = {
     never
   >
   setProductCountByStoreId: CommandRepositoryFunction<
-    { store: { id: 1; value: number } },
+    { store: { id: 1; value: number; updatedAt: Date } },
     void,
     never
   >
 
   setProductTagCountByStoreId: CommandRepositoryFunction<
-    { store: { id: 1; value: number } },
+    { store: { id: 1; value: number; updatedAt: Date } },
     void,
     never
   >
@@ -524,7 +524,11 @@ export const createRepository = (adapters: Repository) => {
       }
       const setRes = await repository.setProductCountByStoreId({
         dbClient,
-        store: { id: 1, value: productCountRes.value + 1 },
+        store: {
+          id: 1,
+          value: productCountRes.value + 1,
+          updatedAt: new Date(),
+        },
       })
       if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
 
@@ -629,7 +633,11 @@ export const createRepository = (adapters: Repository) => {
       const newCount = productCountRes.value - 1
       const setRes = await repository.setProductCountByStoreId({
         dbClient,
-        store: { id: 1, value: newCount < 0 ? 0 : newCount },
+        store: {
+          id: 1,
+          value: newCount < 0 ? 0 : newCount,
+          updatedAt: new Date(),
+        },
       })
       if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
 
@@ -663,7 +671,11 @@ export const createRepository = (adapters: Repository) => {
       if (tagCountRes.ok) {
         await repository.setProductTagCountByStoreId({
           dbClient,
-          store: { id: 1, value: tagCountRes.value + 1 },
+          store: {
+            id: 1,
+            value: tagCountRes.value + 1,
+            updatedAt: new Date(),
+          },
         })
       }
       return createTagResult
@@ -683,7 +695,7 @@ export const createRepository = (adapters: Repository) => {
         const newVal = Math.max(0, tagCountRes.value - productTag.ids.length)
         await repository.setProductTagCountByStoreId({
           dbClient,
-          store: { id: 1, value: newVal },
+          store: { id: 1, value: newVal, updatedAt: new Date() },
         })
       }
       return deleteResult

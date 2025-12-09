@@ -179,6 +179,7 @@ describe("Product repository", () => {
       expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
       const setCall = adapters.setProductCountByStoreId.mock.calls[0]?.[0]
       expect(setCall?.store.value).toBe(3)
+      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
 
       expect(
         adapters.setAllProductTagRelationCountsByTagIds,
@@ -1240,6 +1241,7 @@ describe("Product repository", () => {
       expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
       const setCall = adapters.setProductCountByStoreId.mock.calls[0]?.[0]
       expect(setCall?.store.value).toBe(0)
+      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
     })
 
     it("商品削除時に店舗の商品数とタグごとの商品数が更新される", async () => {
@@ -1271,6 +1273,7 @@ describe("Product repository", () => {
       expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
       const setCall = adapters.setProductCountByStoreId.mock.calls[0]?.[0]
       expect(setCall?.store.value).toBe(4)
+      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
 
       expect(
         adapters.setAllProductTagRelationCountsByTagIds,
@@ -1383,6 +1386,7 @@ describe("Product repository", () => {
       expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
       const setCall = adapters.setProductTagCountByStoreId.mock.calls[0]?.[0]
       expect(setCall?.store.value).toBe(3)
+      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
     })
 
     it("タグ名が空ならエラーを返す", async () => {
@@ -1660,6 +1664,7 @@ describe("Product repository", () => {
       expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
       const setCall2 = adapters.setProductTagCountByStoreId.mock.calls[0]?.[0]
       expect(setCall2?.store.value).toBe(3)
+      expect(setCall2?.store.updatedAt).toBeInstanceOf(Date)
     })
   })
 })

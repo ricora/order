@@ -439,10 +439,14 @@ export const adapters = {
   setProductCountByStoreId: async ({ dbClient, store }) => {
     await dbClient
       .insert(productCountPerStoreTable)
-      .values({ storeId: store.id, productCount: store.value })
+      .values({
+        storeId: store.id,
+        productCount: store.value,
+        updatedAt: store.updatedAt,
+      })
       .onConflictDoUpdate({
         target: [productCountPerStoreTable.storeId],
-        set: { productCount: store.value },
+        set: { productCount: store.value, updatedAt: store.updatedAt },
       })
     return { ok: true, value: undefined }
   },
@@ -450,10 +454,14 @@ export const adapters = {
   setProductTagCountByStoreId: async ({ dbClient, store }) => {
     await dbClient
       .insert(productTagCountPerStoreTable)
-      .values({ storeId: store.id, productTagCount: store.value })
+      .values({
+        storeId: store.id,
+        productTagCount: store.value,
+        updatedAt: store.updatedAt,
+      })
       .onConflictDoUpdate({
         target: [productTagCountPerStoreTable.storeId],
-        set: { productTagCount: store.value },
+        set: { productTagCount: store.value, updatedAt: store.updatedAt },
       })
     return { ok: true, value: undefined }
   },
