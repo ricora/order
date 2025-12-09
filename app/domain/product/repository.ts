@@ -670,7 +670,7 @@ export const createRepository = (adapters: Repository) => {
         store: { id: 1 },
       })
       if (tagCountRes.ok) {
-        await repository.setProductTagCountByStoreId({
+        const setRes = await repository.setProductTagCountByStoreId({
           dbClient,
           store: {
             id: 1,
@@ -678,6 +678,7 @@ export const createRepository = (adapters: Repository) => {
             updatedAt: new Date(),
           },
         })
+        if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
       }
       return createTagResult
     },
@@ -694,10 +695,11 @@ export const createRepository = (adapters: Repository) => {
       })
       if (tagCountRes.ok) {
         const newVal = Math.max(0, tagCountRes.value - productTag.ids.length)
-        await repository.setProductTagCountByStoreId({
+        const setRes = await repository.setProductTagCountByStoreId({
           dbClient,
           store: { id: 1, value: newVal, updatedAt: new Date() },
         })
+        if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
       }
       return deleteResult
     },
