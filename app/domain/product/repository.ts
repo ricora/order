@@ -669,17 +669,18 @@ export const createRepository = (adapters: Repository) => {
         dbClient,
         store: { id: 1 },
       })
-      if (tagCountRes.ok) {
-        const setRes = await repository.setProductTagCountByStoreId({
-          dbClient,
-          store: {
-            id: 1,
-            value: tagCountRes.value + 1,
-            updatedAt: new Date(),
-          },
-        })
-        if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
+      if (!tagCountRes.ok) {
+        return { ok: false, message: "エラーが発生しました。" }
       }
+      const setRes = await repository.setProductTagCountByStoreId({
+        dbClient,
+        store: {
+          id: 1,
+          value: tagCountRes.value + 1,
+          updatedAt: new Date(),
+        },
+      })
+      if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
       return createTagResult
     },
     deleteAllProductTagsByIds: async ({ dbClient, productTag }) => {
@@ -693,14 +694,15 @@ export const createRepository = (adapters: Repository) => {
         dbClient,
         store: { id: 1 },
       })
-      if (tagCountRes.ok) {
-        const newVal = Math.max(0, tagCountRes.value - productTag.ids.length)
-        const setRes = await repository.setProductTagCountByStoreId({
-          dbClient,
-          store: { id: 1, value: newVal, updatedAt: new Date() },
-        })
-        if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
+      if (!tagCountRes.ok) {
+        return { ok: false, message: "エラーが発生しました。" }
       }
+      const newVal = Math.max(0, tagCountRes.value - productTag.ids.length)
+      const setRes = await repository.setProductTagCountByStoreId({
+        dbClient,
+        store: { id: 1, value: newVal, updatedAt: new Date() },
+      })
+      if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
       return deleteResult
     },
     createProductImage: async ({ dbClient, productImage }) => {
