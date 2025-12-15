@@ -655,8 +655,11 @@ export const createRepository = (adapters: Repository) => {
           return { ok: false, message: "エラーが発生しました。" }
       }
 
+      const deleteResult = await adapters.deleteProduct({ product, dbClient })
+      if (!deleteResult.ok) return deleteResult
+
       await deleteOrphanedTags(dbClient, foundProduct.tagIds)
-      return adapters.deleteProduct({ product, dbClient })
+      return deleteResult
     },
     createProductTag: async ({ dbClient, productTag }) => {
       const validateTagResult = validateProductTag(productTag)

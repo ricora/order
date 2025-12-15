@@ -1,4 +1,4 @@
-import { asc, desc, eq, inArray, sql } from "drizzle-orm"
+import { and, asc, desc, eq, inArray, lte, sql } from "drizzle-orm"
 import {
   productCountPerProductTagTable,
   productCountPerStoreTable,
@@ -590,13 +590,17 @@ export const adapters = {
         })
     }
 
-    await dbClient
-      .delete(productCountPerProductTagTable)
-      .where(
-        sql.raw(
-          `product_count_per_product_tag.${productCountPerProductTagTable.productCount.name} <= 0`,
-        ),
-      )
+    const negativeTagIds = negatives.map((p) => p.id)
+    if (negativeTagIds.length > 0) {
+      await dbClient
+        .delete(productCountPerProductTagTable)
+        .where(
+          and(
+            inArray(productCountPerProductTagTable.tagId, negativeTagIds),
+            lte(productCountPerProductTagTable.productCount, 0),
+          ),
+        )
+    }
 
     return { ok: true, value: undefined }
   },

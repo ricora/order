@@ -1161,6 +1161,23 @@ describe("Product repository", () => {
       expect(adapters.deleteAllProductTagsByIds).toHaveBeenCalledTimes(1)
       const calls = adapters.deleteAllProductTagsByIds.mock.calls
       expect(calls[0]?.[0]?.productTag?.ids).toEqual([1, 2])
+
+      expect(adapters.deleteProduct).toHaveBeenCalledTimes(1)
+      const callOrder: string[] = []
+      adapters.deleteProduct.mockImplementation(async () => {
+        callOrder.push("deleteProduct")
+        return { ok: true, value: undefined }
+      })
+      adapters.deleteAllProductTagsByIds.mockImplementation(async () => {
+        callOrder.push("deleteAllProductTagsByIds")
+        return { ok: true, value: undefined }
+      })
+
+      await repository.deleteProduct({
+        product: { id: 1 },
+        dbClient: mockDbClient,
+      })
+      expect(callOrder).toEqual(["deleteProduct", "deleteAllProductTagsByIds"])
     })
 
     it("商品削除時に孤立していないタグは削除されない", async () => {
