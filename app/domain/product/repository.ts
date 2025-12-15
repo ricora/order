@@ -596,10 +596,7 @@ export const createRepository = (adapters: Repository) => {
         const addedTagIds = (product.tagIds || []).filter(
           (tagId) => !oldTagIds.includes(tagId),
         )
-        const allChangedTagIds = Array.from(
-          new Set([...removedTagIds, ...addedTagIds]),
-        )
-        if (allChangedTagIds.length > 0) {
+        if (addedTagIds.length > 0 || removedTagIds.length > 0) {
           if (addedTagIds.length > 0) {
             const addedRes = await adjustTagRelationCounts(
               dbClient,
