@@ -466,34 +466,29 @@ export const adapters = {
     return { ok: true, value: undefined }
   },
 
-  setAllProductTagRelationCountsByTagIds: async ({ dbClient, productTags }) => {
+  incrementAllProductTagRelationCountsByTagIds: async ({
+    dbClient,
+    productTags,
+  }) => {
     if (!productTags || productTags.length === 0) {
       return { ok: true, value: undefined }
     }
-    const positiveRows = productTags
-      .filter((p) => p.value > 0)
-      .map((p) => ({
+
+    const positives = productTags.filter((p) => p.delta > 0)
+    if (positives.length > 0) {
+      const rows = positives.map((p) => ({
         tagId: p.id,
-        productCount: p.value,
+        productCount: p.delta,
         updatedAt: p.updatedAt,
       }))
-    const zeroIds = productTags.filter((p) => p.value === 0).map((p) => p.id)
-
-    if (zeroIds.length > 0) {
-      await dbClient
-        .delete(productCountPerProductTagTable)
-        .where(inArray(productCountPerProductTagTable.tagId, zeroIds))
-    }
-
-    if (positiveRows.length > 0) {
       await dbClient
         .insert(productCountPerProductTagTable)
-        .values(positiveRows)
+        .values(rows)
         .onConflictDoUpdate({
           target: [productCountPerProductTagTable.tagId],
           set: {
             productCount: sql.raw(
-              `excluded.${productCountPerProductTagTable.productCount.name}`,
+              `product_count_per_product_tag.${productCountPerProductTagTable.productCount.name} + excluded.${productCountPerProductTagTable.productCount.name}`,
             ),
             updatedAt: sql.raw(
               `excluded.${productCountPerProductTagTable.updatedAt.name}`,
@@ -501,6 +496,48 @@ export const adapters = {
           },
         })
     }
+    return { ok: true, value: undefined }
+  },
+
+  decrementAllProductTagRelationCountsByTagIds: async ({
+    dbClient,
+    productTags,
+  }) => {
+    if (!productTags || productTags.length === 0) {
+      return { ok: true, value: undefined }
+    }
+
+    const negatives = productTags.filter((p) => p.delta < 0)
+    if (negatives.length > 0) {
+      const rows = negatives.map((p) => ({
+        tagId: p.id,
+        productCount: Math.abs(p.delta),
+        updatedAt: p.updatedAt,
+      }))
+      await dbClient
+        .insert(productCountPerProductTagTable)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: [productCountPerProductTagTable.tagId],
+          set: {
+            productCount: sql.raw(
+              `GREATEST(0, product_count_per_product_tag.${productCountPerProductTagTable.productCount.name} - excluded.${productCountPerProductTagTable.productCount.name})`,
+            ),
+            updatedAt: sql.raw(
+              `excluded.${productCountPerProductTagTable.updatedAt.name}`,
+            ),
+          },
+        })
+    }
+
+    await dbClient
+      .delete(productCountPerProductTagTable)
+      .where(
+        sql.raw(
+          `product_count_per_product_tag.${productCountPerProductTagTable.productCount.name} <= 0`,
+        ),
+      )
+
     return { ok: true, value: undefined }
   },
 } satisfies Repository

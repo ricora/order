@@ -132,7 +132,11 @@ describe("Product repository", () => {
         ok: true,
         value: undefined,
       })),
-      setAllProductTagRelationCountsByTagIds: mock(async () => ({
+      incrementAllProductTagRelationCountsByTagIds: mock(async () => ({
+        ok: true,
+        value: undefined,
+      })),
+      decrementAllProductTagRelationCountsByTagIds: mock(async () => ({
         ok: true,
         value: undefined,
       })),
@@ -182,13 +186,13 @@ describe("Product repository", () => {
       expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
 
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
+        adapters.incrementAllProductTagRelationCountsByTagIds,
       ).toHaveBeenCalledTimes(1)
       const tagsCall =
-        adapters.setAllProductTagRelationCountsByTagIds.mock.calls[0]?.[0]
+        adapters.incrementAllProductTagRelationCountsByTagIds.mock.calls[0]?.[0]
       expect(
-        tagsCall?.productTags.map(({ id, value }) => ({ id, value })),
-      ).toEqual(validProduct.tagIds.map((id) => ({ id, value: 1 })))
+        tagsCall?.productTags.map(({ id, delta }) => ({ id, delta })),
+      ).toEqual(validProduct.tagIds.map((id) => ({ id, delta: 1 })))
       for (const t of tagsCall?.productTags ?? []) {
         expect(t.updatedAt).toBeInstanceOf(Date)
       }
@@ -211,7 +215,7 @@ describe("Product repository", () => {
 
       expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
+        adapters.incrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
     })
 
@@ -242,7 +246,7 @@ describe("Product repository", () => {
       expect(threw).toBe(true)
       expect(adapters.setProductCountByStoreId).not.toHaveBeenCalled()
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
+        adapters.incrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
     })
 
@@ -276,7 +280,7 @@ describe("Product repository", () => {
       }
       expect(threw2).toBe(true)
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
+        adapters.incrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
     })
 
@@ -301,7 +305,10 @@ describe("Product repository", () => {
       })
       expect(result.ok).toBe(false)
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
+        adapters.incrementAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
+      expect(
+        adapters.decrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
     })
 
@@ -625,7 +632,10 @@ describe("Product repository", () => {
       })
       expect(result.ok).toBe(false)
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
+        adapters.incrementAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
+      expect(
+        adapters.decrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
     })
 
@@ -838,12 +848,13 @@ describe("Product repository", () => {
       })
 
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
+        adapters.decrementAllProductTagRelationCountsByTagIds,
       ).toHaveBeenCalledTimes(1)
-      const calls = adapters.setAllProductTagRelationCountsByTagIds.mock.calls
+      const calls =
+        adapters.decrementAllProductTagRelationCountsByTagIds.mock.calls
       const arg = calls[0]?.[0]
-      expect(arg?.productTags.map(({ id, value }) => ({ id, value }))).toEqual([
-        { id: 1, value: 0 },
+      expect(arg?.productTags.map(({ id, delta }) => ({ id, delta }))).toEqual([
+        { id: 1, delta: -1 },
       ])
       for (const t of arg?.productTags ?? []) {
         expect(t.updatedAt).toBeInstanceOf(Date)
@@ -1037,20 +1048,26 @@ describe("Product repository", () => {
 
       // added: 3 -> +1, removed: 1 -> -1
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
-      ).toHaveBeenCalledTimes(2)
-      const calls = adapters.setAllProductTagRelationCountsByTagIds.mock.calls
-      const first = calls[0]?.[0]
-      const second = calls[1]?.[0]
-      // check that one call includes id 3 incremented
+        adapters.incrementAllProductTagRelationCountsByTagIds,
+      ).toHaveBeenCalledTimes(1)
+      expect(
+        adapters.decrementAllProductTagRelationCountsByTagIds,
+      ).toHaveBeenCalledTimes(1)
+      const incCalls =
+        adapters.incrementAllProductTagRelationCountsByTagIds.mock.calls
+      const decCalls =
+        adapters.decrementAllProductTagRelationCountsByTagIds.mock.calls
+      const first = incCalls[0]?.[0]
+      const second = decCalls[0]?.[0]
+      // check that calls include both increments and decrements
       expect(
         (first?.productTags ?? [])
           .concat(second?.productTags ?? [])
-          .map(({ id, value }) => ({ id, value })),
+          .map(({ id, delta }) => ({ id, delta })),
       ).toEqual(
         expect.arrayContaining([
-          { id: 3, value: 1 },
-          { id: 1, value: 1 },
+          { id: 3, delta: 1 },
+          { id: 1, delta: -1 },
         ]),
       )
     })
@@ -1293,15 +1310,15 @@ describe("Product repository", () => {
       expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
 
       expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
+        adapters.decrementAllProductTagRelationCountsByTagIds,
       ).toHaveBeenCalledTimes(1)
       const tagsCall =
-        adapters.setAllProductTagRelationCountsByTagIds.mock.calls[0]?.[0]
+        adapters.decrementAllProductTagRelationCountsByTagIds.mock.calls[0]?.[0]
       expect(
-        tagsCall?.productTags.map(({ id, value }) => ({ id, value })),
+        tagsCall?.productTags.map(({ id, delta }) => ({ id, delta })),
       ).toEqual([
-        { id: 1, value: 1 },
-        { id: 2, value: 1 },
+        { id: 1, delta: -1 },
+        { id: 2, delta: -1 },
       ])
       for (const t of tagsCall?.productTags ?? []) {
         expect(t.updatedAt).toBeInstanceOf(Date)
@@ -1330,9 +1347,6 @@ describe("Product repository", () => {
       })
 
       expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
-      expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
-      ).not.toHaveBeenCalled()
       expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
     })
 

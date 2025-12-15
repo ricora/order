@@ -178,8 +178,13 @@ export type Repository = {
     void,
     never
   >
-  setAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
-    { productTags: { id: ProductTag["id"]; value: number; updatedAt: Date }[] },
+  incrementAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
+    { productTags: { id: ProductTag["id"]; delta: number; updatedAt: Date }[] },
+    void,
+    never
+  >
+  decrementAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
+    { productTags: { id: ProductTag["id"]; delta: number; updatedAt: Date }[] },
     void,
     never
   >
@@ -384,20 +389,25 @@ export const createRepository = (adapters: Repository) => {
         productTag: { ids: tagIds },
         pagination: { offset: 0, limit: tagIds.length },
       })
-    if (!tagCountsRes.ok)
+    if (!tagCountsRes.ok) {
       return { ok: false, message: "エラーが発生しました。" }
-    const curr = new Map<number, number>()
-    for (const t of tagCountsRes.value) curr.set(t.tagId, t.count)
+    }
     const updates = tagIds.map((id) => ({
       id,
-      value: Math.max(0, (curr.get(id) ?? 0) + delta),
+      delta,
       updatedAt: new Date(),
     }))
-    const setRes = await repository.setAllProductTagRelationCountsByTagIds({
-      dbClient,
-      productTags: updates,
-    })
-    if (!setRes.ok) return { ok: false, message: "エラーが発生しました。" }
+    const adjustRes =
+      delta > 0
+        ? await repository.incrementAllProductTagRelationCountsByTagIds({
+            dbClient,
+            productTags: updates,
+          })
+        : await repository.decrementAllProductTagRelationCountsByTagIds({
+            dbClient,
+            productTags: updates,
+          })
+    if (!adjustRes.ok) return { ok: false, message: "エラーが発生しました。" }
     return { ok: true, value: undefined }
   }
 
@@ -739,11 +749,20 @@ export const createRepository = (adapters: Repository) => {
         store,
       })
     },
-    setAllProductTagRelationCountsByTagIds: async ({
+    incrementAllProductTagRelationCountsByTagIds: async ({
       dbClient,
       productTags,
     }) => {
-      return adapters.setAllProductTagRelationCountsByTagIds({
+      return adapters.incrementAllProductTagRelationCountsByTagIds({
+        dbClient,
+        productTags,
+      })
+    },
+    decrementAllProductTagRelationCountsByTagIds: async ({
+      dbClient,
+      productTags,
+    }) => {
+      return adapters.decrementAllProductTagRelationCountsByTagIds({
         dbClient,
         productTags,
       })
