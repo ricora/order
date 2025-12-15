@@ -1330,7 +1330,9 @@ describe("Product repository", () => {
       })
 
       expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
-      expect(adapters.setAllProductTagRelationCountsByTagIds).not.toHaveBeenCalled()
+      expect(
+        adapters.setAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
       expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
     })
 
