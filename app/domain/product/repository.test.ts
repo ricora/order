@@ -124,11 +124,19 @@ describe("Product repository", () => {
         ok: true,
         value: undefined,
       })),
-      setProductCountByStoreId: mock(async () => ({
+      incrementProductCountByStoreId: mock(async () => ({
         ok: true,
         value: undefined,
       })),
-      setProductTagCountByStoreId: mock(async () => ({
+      decrementProductCountByStoreId: mock(async () => ({
+        ok: true,
+        value: undefined,
+      })),
+      incrementProductTagCountByStoreId: mock(async () => ({
+        ok: true,
+        value: undefined,
+      })),
+      decrementProductTagCountByStoreId: mock(async () => ({
         ok: true,
         value: undefined,
       })),
@@ -180,10 +188,10 @@ describe("Product repository", () => {
         dbClient: mockDbClient,
       })
 
-      expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
-      const setCall = adapters.setProductCountByStoreId.mock.calls[0]?.[0]
-      expect(setCall?.store.value).toBe(3)
-      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
+      expect(adapters.incrementProductCountByStoreId).toHaveBeenCalledTimes(1)
+      const incCall = adapters.incrementProductCountByStoreId.mock.calls[0]?.[0]
+      expect(incCall?.store.delta).toBe(1)
+      expect(incCall?.store.updatedAt).toBeInstanceOf(Date)
 
       expect(
         adapters.incrementAllProductTagRelationCountsByTagIds,
@@ -213,7 +221,7 @@ describe("Product repository", () => {
         dbClient: mockDbClient,
       })
 
-      expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
+      expect(adapters.incrementProductCountByStoreId).toHaveBeenCalledTimes(1)
       expect(
         adapters.incrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
@@ -244,7 +252,7 @@ describe("Product repository", () => {
         threw = true
       }
       expect(threw).toBe(true)
-      expect(adapters.setProductCountByStoreId).not.toHaveBeenCalled()
+      expect(adapters.incrementProductCountByStoreId).not.toHaveBeenCalled()
       expect(
         adapters.incrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
@@ -255,7 +263,7 @@ describe("Product repository", () => {
         ok: true,
         value: 2,
       }))
-      adapters.setProductCountByStoreId.mockImplementation(async () => {
+      adapters.incrementProductCountByStoreId.mockImplementation(async () => {
         throw new Error("db error")
       })
       adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
@@ -808,10 +816,13 @@ describe("Product repository", () => {
       })
 
       expect(adapters.deleteAllProductTagsByIds).toHaveBeenCalledTimes(1)
-      expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
-      const setCall = adapters.setProductTagCountByStoreId.mock.calls[0]?.[0]
-      expect(setCall?.store.value).toBe(4)
-      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
+      expect(adapters.decrementProductTagCountByStoreId).toHaveBeenCalledTimes(
+        1,
+      )
+      const decCall =
+        adapters.decrementProductTagCountByStoreId.mock.calls[0]?.[0]
+      expect(decCall?.store.delta).toBe(1)
+      expect(decCall?.store.updatedAt).toBeInstanceOf(Date)
     })
 
     it("タグが更新された際、削除されたタグの商品数のカウントを0とする", async () => {
@@ -1230,7 +1241,7 @@ describe("Product repository", () => {
         ok: true,
         value: 1,
       }))
-      adapters.setProductCountByStoreId.mockImplementation(async () => {
+      adapters.decrementProductCountByStoreId.mockImplementation(async () => {
         throw new Error("db error")
       })
       let threw3 = false
@@ -1272,10 +1283,10 @@ describe("Product repository", () => {
         product: { id: 1 },
         dbClient: mockDbClient,
       })
-      expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
-      const setCall = adapters.setProductCountByStoreId.mock.calls[0]?.[0]
-      expect(setCall?.store.value).toBe(0)
-      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
+      expect(adapters.decrementProductCountByStoreId).toHaveBeenCalledTimes(1)
+      const decCall = adapters.decrementProductCountByStoreId.mock.calls[0]?.[0]
+      expect(decCall?.store.delta).toBe(1)
+      expect(decCall?.store.updatedAt).toBeInstanceOf(Date)
     })
 
     it("商品削除時に店舗の商品数とタグごとの商品数が更新される", async () => {
@@ -1304,10 +1315,10 @@ describe("Product repository", () => {
         product: { id: 1 },
         dbClient: mockDbClient,
       })
-      expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
-      const setCall = adapters.setProductCountByStoreId.mock.calls[0]?.[0]
-      expect(setCall?.store.value).toBe(4)
-      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
+      expect(adapters.decrementProductCountByStoreId).toHaveBeenCalledTimes(1)
+      const decCall = adapters.decrementProductCountByStoreId.mock.calls[0]?.[0]
+      expect(decCall?.store.delta).toBe(1)
+      expect(decCall?.store.updatedAt).toBeInstanceOf(Date)
 
       expect(
         adapters.decrementAllProductTagRelationCountsByTagIds,
@@ -1346,7 +1357,7 @@ describe("Product repository", () => {
         dbClient: mockDbClient,
       })
 
-      expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
+      expect(adapters.decrementProductCountByStoreId).toHaveBeenCalledTimes(1)
       expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
     })
 
@@ -1388,7 +1399,7 @@ describe("Product repository", () => {
         ok: true,
         value: 2,
       }))
-      adapters.setProductCountByStoreId.mockImplementation(async () => {
+      adapters.decrementProductCountByStoreId.mockImplementation(async () => {
         throw new Error("db error")
       })
       adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
@@ -1447,10 +1458,13 @@ describe("Product repository", () => {
         dbClient: mockDbClient,
       })
       expect(createResult.ok).toBe(true)
-      expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
-      const setCall = adapters.setProductTagCountByStoreId.mock.calls[0]?.[0]
-      expect(setCall?.store.value).toBe(3)
-      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
+      expect(adapters.incrementProductTagCountByStoreId).toHaveBeenCalledTimes(
+        1,
+      )
+      const incCall =
+        adapters.incrementProductTagCountByStoreId.mock.calls[0]?.[0]
+      expect(incCall?.store.delta).toBe(1)
+      expect(incCall?.store.updatedAt).toBeInstanceOf(Date)
     })
 
     it("タグ作成時にタグ数取得が失敗した場合は処理を中止する", async () => {
@@ -1467,7 +1481,7 @@ describe("Product repository", () => {
         dbClient: mockDbClient,
       })
       expect(result.ok).toBe(false)
-      expect(adapters.setProductTagCountByStoreId).not.toHaveBeenCalled()
+      expect(adapters.incrementProductTagCountByStoreId).not.toHaveBeenCalled()
     })
 
     it("タグ作成時にタグ数更新が失敗した場合は処理を中止する", async () => {
@@ -1479,16 +1493,20 @@ describe("Product repository", () => {
         ok: true,
         value: { ...productTag, id: 123 },
       }))
-      adapters.setProductTagCountByStoreId.mockImplementation(async () => {
-        throw new Error("db error")
-      })
+      adapters.incrementProductTagCountByStoreId.mockImplementation(
+        async () => {
+          throw new Error("db error")
+        },
+      )
       await expect(
         repository.createProductTag({
           productTag: { name: "新しいタグ" },
           dbClient: mockDbClient,
         }),
       ).rejects.toThrow("db error")
-      expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
+      expect(adapters.incrementProductTagCountByStoreId).toHaveBeenCalledTimes(
+        1,
+      )
     })
 
     it("タグ名が空ならエラーを返す", async () => {
@@ -1763,10 +1781,13 @@ describe("Product repository", () => {
         dbClient: mockDbClient,
       })
       expect(deleteResult.ok).toBe(true)
-      expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
-      const setCall2 = adapters.setProductTagCountByStoreId.mock.calls[0]?.[0]
-      expect(setCall2?.store.value).toBe(3)
-      expect(setCall2?.store.updatedAt).toBeInstanceOf(Date)
+      expect(adapters.decrementProductTagCountByStoreId).toHaveBeenCalledTimes(
+        1,
+      )
+      const decCall2 =
+        adapters.decrementProductTagCountByStoreId.mock.calls[0]?.[0]
+      expect(decCall2?.store.delta).toBe(2)
+      expect(decCall2?.store.updatedAt).toBeInstanceOf(Date)
     })
 
     it("タグ削除時にタグ数取得が失敗した場合は処理を中止する", async () => {
@@ -1783,7 +1804,7 @@ describe("Product repository", () => {
         dbClient: mockDbClient,
       })
       expect(result.ok).toBe(false)
-      expect(adapters.setProductTagCountByStoreId).not.toHaveBeenCalled()
+      expect(adapters.decrementProductTagCountByStoreId).not.toHaveBeenCalled()
     })
 
     it("タグ削除時にタグ数更新が失敗した場合は処理を中止する", async () => {
@@ -1795,16 +1816,20 @@ describe("Product repository", () => {
         ok: true,
         value: undefined,
       }))
-      adapters.setProductTagCountByStoreId.mockImplementation(async () => {
-        throw new Error("db error")
-      })
+      adapters.decrementProductTagCountByStoreId.mockImplementation(
+        async () => {
+          throw new Error("db error")
+        },
+      )
       await expect(
         repository.deleteAllProductTagsByIds({
           productTag: { ids: [1, 2] },
           dbClient: mockDbClient,
         }),
       ).rejects.toThrow("db error")
-      expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
+      expect(adapters.decrementProductTagCountByStoreId).toHaveBeenCalledTimes(
+        1,
+      )
     })
   })
 })

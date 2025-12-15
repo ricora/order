@@ -436,32 +436,92 @@ export const adapters = {
     return { ok: true, value: undefined }
   },
 
-  setProductCountByStoreId: async ({ dbClient, store }) => {
+  incrementProductCountByStoreId: async ({ dbClient, store }) => {
     await dbClient
       .insert(productCountPerStoreTable)
       .values({
         storeId: store.id,
-        productCount: store.value,
+        productCount: store.delta,
         updatedAt: store.updatedAt,
       })
       .onConflictDoUpdate({
         target: [productCountPerStoreTable.storeId],
-        set: { productCount: store.value, updatedAt: store.updatedAt },
+        set: {
+          productCount: sql.raw(
+            `product_count_per_store.${productCountPerStoreTable.productCount.name} + excluded.${productCountPerStoreTable.productCount.name}`,
+          ),
+          updatedAt: sql.raw(
+            `excluded.${productCountPerStoreTable.updatedAt.name}`,
+          ),
+        },
       })
     return { ok: true, value: undefined }
   },
 
-  setProductTagCountByStoreId: async ({ dbClient, store }) => {
+  decrementProductCountByStoreId: async ({ dbClient, store }) => {
+    const absDelta = Math.abs(store.delta)
+    await dbClient
+      .insert(productCountPerStoreTable)
+      .values({
+        storeId: store.id,
+        productCount: absDelta,
+        updatedAt: store.updatedAt,
+      })
+      .onConflictDoUpdate({
+        target: [productCountPerStoreTable.storeId],
+        set: {
+          productCount: sql.raw(
+            `GREATEST(0, product_count_per_store.${productCountPerStoreTable.productCount.name} - excluded.${productCountPerStoreTable.productCount.name})`,
+          ),
+          updatedAt: sql.raw(
+            `excluded.${productCountPerStoreTable.updatedAt.name}`,
+          ),
+        },
+      })
+    return { ok: true, value: undefined }
+  },
+
+  incrementProductTagCountByStoreId: async ({ dbClient, store }) => {
     await dbClient
       .insert(productTagCountPerStoreTable)
       .values({
         storeId: store.id,
-        productTagCount: store.value,
+        productTagCount: store.delta,
         updatedAt: store.updatedAt,
       })
       .onConflictDoUpdate({
         target: [productTagCountPerStoreTable.storeId],
-        set: { productTagCount: store.value, updatedAt: store.updatedAt },
+        set: {
+          productTagCount: sql.raw(
+            `product_tag_count_per_store.${productTagCountPerStoreTable.productTagCount.name} + excluded.${productTagCountPerStoreTable.productTagCount.name}`,
+          ),
+          updatedAt: sql.raw(
+            `excluded.${productTagCountPerStoreTable.updatedAt.name}`,
+          ),
+        },
+      })
+    return { ok: true, value: undefined }
+  },
+
+  decrementProductTagCountByStoreId: async ({ dbClient, store }) => {
+    const absDelta = Math.abs(store.delta)
+    await dbClient
+      .insert(productTagCountPerStoreTable)
+      .values({
+        storeId: store.id,
+        productTagCount: absDelta,
+        updatedAt: store.updatedAt,
+      })
+      .onConflictDoUpdate({
+        target: [productTagCountPerStoreTable.storeId],
+        set: {
+          productTagCount: sql.raw(
+            `GREATEST(0, product_tag_count_per_store.${productTagCountPerStoreTable.productTagCount.name} - excluded.${productTagCountPerStoreTable.productTagCount.name})`,
+          ),
+          updatedAt: sql.raw(
+            `excluded.${productTagCountPerStoreTable.updatedAt.name}`,
+          ),
+        },
       })
     return { ok: true, value: undefined }
   },
