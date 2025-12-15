@@ -731,7 +731,7 @@ describe("Product repository", () => {
       expect(adapters.findAllProductTags).toHaveBeenCalledTimes(1)
     })
 
-    it("タグが更新された際、削除されたタグのrelation行が存在する場合に孤立していれば削除される", async () => {
+    it("タグが更新された際、relationのカウント行が存在する場合にタグが孤立していれば削除される", async () => {
       adapters.findProductById.mockImplementation(async () => ({
         ok: true,
         value: {
@@ -1176,7 +1176,7 @@ describe("Product repository", () => {
       expect(adapters.deleteProduct).not.toHaveBeenCalled()
     })
 
-    it("商品削除時に孤立したタグが削除される", async () => {
+    it("商品削除時にrelationのカウント行が存在しcountが0の場合、タグが孤立していれば削除される", async () => {
       adapters.findProductById.mockImplementation(async () => ({
         ok: true,
         value: {
@@ -1265,6 +1265,42 @@ describe("Product repository", () => {
 
       expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
       expect(adapters.deleteProductImageByProductId).toHaveBeenCalledTimes(1)
+    })
+
+    it("商品削除時に削除されたタグのrelation行が存在しない場合でも孤立していれば削除される", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "削除対象商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.findAllProductTagsByIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ id, name: `タグ${id}` })),
+        }),
+      )
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids
+            .filter((id) => id === 1)
+            .map((id) => ({ tagId: id, count: 1 })),
+        }),
+      )
+
+      await repository.deleteProduct({
+        product: { id: 1 },
+        dbClient: mockDbClient,
+      })
+
+      expect(adapters.deleteAllProductTagsByIds).toHaveBeenCalledTimes(1)
+      const calls = adapters.deleteAllProductTagsByIds.mock.calls
+      expect(calls[0]?.[0]?.productTag?.ids).toEqual([2])
     })
 
     it("商品の削除時に商品数取得エラーが発生したら処理を中止する", async () => {
