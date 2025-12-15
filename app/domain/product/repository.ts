@@ -377,7 +377,7 @@ export const createRepository = (adapters: Repository) => {
     tagIds: number[],
     delta: number,
   ): Promise<Result<void, "エラーが発生しました。">> => {
-    if (!tagIds || tagIds.length === 0) return { ok: true, value: undefined }
+    if (tagIds.length === 0) return { ok: true, value: undefined }
     const tagCountsRes =
       await repository.getAllProductTagRelationCountsByTagIds({
         dbClient,
