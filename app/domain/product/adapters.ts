@@ -1,4 +1,4 @@
-import { asc, desc, eq, inArray } from "drizzle-orm"
+import { asc, desc, eq, inArray, sql } from "drizzle-orm"
 import {
   productCountPerProductTagTable,
   productCountPerStoreTable,
@@ -486,11 +486,20 @@ export const adapters = {
     }
 
     if (positiveRows.length > 0) {
-      const positiveIds = positiveRows.map((r) => r.tagId)
       await dbClient
-        .delete(productCountPerProductTagTable)
-        .where(inArray(productCountPerProductTagTable.tagId, positiveIds))
-      await dbClient.insert(productCountPerProductTagTable).values(positiveRows)
+        .insert(productCountPerProductTagTable)
+        .values(positiveRows)
+        .onConflictDoUpdate({
+          target: [productCountPerProductTagTable.tagId],
+          set: {
+            productCount: sql.raw(
+              `excluded.${productCountPerProductTagTable.productCount.name}`,
+            ),
+            updatedAt: sql.raw(
+              `excluded.${productCountPerProductTagTable.updatedAt.name}`,
+            ),
+          },
+        })
     }
     return { ok: true, value: undefined }
   },
