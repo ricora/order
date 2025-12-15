@@ -731,7 +731,7 @@ describe("Product repository", () => {
       expect(adapters.findAllProductTags).toHaveBeenCalledTimes(1)
     })
 
-    it("タグが更新された際、削除されたタグが孤立していれば削除される", async () => {
+    it("タグが更新された際、削除されたタグのrelation行が存在する場合に孤立していれば削除される", async () => {
       adapters.findProductById.mockImplementation(async () => ({
         ok: true,
         value: {
@@ -756,8 +756,59 @@ describe("Product repository", () => {
           ok: true,
           value: productTag.ids.map((id) => ({
             tagId: id,
-            count: id === 2 ? 1 : 2,
+            count: id === 2 ? 0 : 2,
           })),
+        }),
+      )
+      adapters.updateProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: applyPartialToDefaultProduct(product),
+      }))
+
+      await repository.updateProduct({
+        product: { id: 1, tagIds: [1] },
+        dbClient: mockDbClient,
+      })
+
+      expect(adapters.deleteAllProductTagsByIds).toHaveBeenCalledTimes(1)
+      const calls = adapters.deleteAllProductTagsByIds.mock.calls
+      expect(calls[0]?.[0]?.productTag?.ids).toEqual([2])
+
+      expect(adapters.updateProduct).toHaveBeenCalledTimes(1)
+      const callOrder: string[] = []
+      adapters.updateProduct.mockImplementation(async () => {
+        callOrder.push("updateProduct")
+        return { ok: true, value: applyPartialToDefaultProduct({ id: 1 }) }
+      })
+      adapters.deleteAllProductTagsByIds.mockImplementation(async () => {
+        callOrder.push("deleteAllProductTagsByIds")
+        return { ok: true, value: undefined }
+      })
+
+      await repository.updateProduct({
+        product: { id: 1, tagIds: [1] },
+        dbClient: mockDbClient,
+      })
+      expect(callOrder).toEqual(["updateProduct", "deleteAllProductTagsByIds"])
+    })
+
+    it("タグが更新された際、削除されたタグのrelation行が存在しない場合でも孤立していれば削除される", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "既存商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids
+            .filter((id) => id === 1)
+            .map((id) => ({ tagId: id, count: 1 })),
         }),
       )
       adapters.updateProduct.mockImplementation(async ({ product }) => ({
@@ -797,7 +848,7 @@ describe("Product repository", () => {
           ok: true,
           value: productTag.ids.map((id) => ({
             tagId: id,
-            count: id === 2 ? 1 : 2,
+            count: id === 2 ? 0 : 2,
           })),
         }),
       )
@@ -1148,7 +1199,7 @@ describe("Product repository", () => {
       adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
         async ({ productTag }) => ({
           ok: true,
-          value: productTag.ids.map((id) => ({ tagId: id, count: 1 })),
+          value: productTag.ids.map((id) => ({ tagId: id, count: 0 })),
         }),
       )
 

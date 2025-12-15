@@ -374,9 +374,12 @@ export const createRepository = (adapters: Repository) => {
     if (!tagRelationCountsResult.ok) return
     const tagRelationCounts = tagRelationCountsResult.value
 
-    const orphanedTagIds = tagRelationCounts
-      .filter((tagCount) => tagCount.count <= 1)
-      .map((tagCount) => tagCount.tagId)
+    const tagCountMap = new Map<number, number>()
+    for (const t of tagRelationCounts) tagCountMap.set(t.tagId, t.count)
+    const orphanedTagIds = tagIds.filter((id) => {
+      const count = tagCountMap.get(id) ?? 0
+      return count === 0
+    })
 
     if (orphanedTagIds.length > 0) {
       await repository.deleteAllProductTagsByIds({
@@ -596,27 +599,29 @@ export const createRepository = (adapters: Repository) => {
         const addedTagIds = (product.tagIds || []).filter(
           (tagId) => !oldTagIds.includes(tagId),
         )
-        if (addedTagIds.length > 0 || removedTagIds.length > 0) {
-          if (addedTagIds.length > 0) {
-            const addedRes = await adjustTagRelationCounts(
-              dbClient,
-              addedTagIds,
-              1,
-            )
-            if (!addedRes.ok)
-              return { ok: false, message: "エラーが発生しました。" }
-          }
-          if (removedTagIds.length > 0) {
-            const removedRes = await adjustTagRelationCounts(
-              dbClient,
-              removedTagIds,
-              -1,
-            )
-            if (!removedRes.ok)
-              return { ok: false, message: "エラーが発生しました。" }
-          }
+        const updateRes = await adapters.updateProduct({ product, dbClient })
+        if (!updateRes.ok) return updateRes
+
+        if (addedTagIds.length > 0) {
+          const addedRes = await adjustTagRelationCounts(
+            dbClient,
+            addedTagIds,
+            1,
+          )
+          if (!addedRes.ok)
+            return { ok: false, message: "エラーが発生しました。" }
+        }
+        if (removedTagIds.length > 0) {
+          const removedRes = await adjustTagRelationCounts(
+            dbClient,
+            removedTagIds,
+            -1,
+          )
+          if (!removedRes.ok)
+            return { ok: false, message: "エラーが発生しました。" }
         }
         await deleteOrphanedTags(dbClient, removedTagIds)
+        return updateRes
       }
 
       return adapters.updateProduct({ product, dbClient })
