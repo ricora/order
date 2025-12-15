@@ -360,10 +360,8 @@ export const createRepository = (adapters: Repository) => {
   const deleteOrphanedTags = async (
     dbClient: TransactionDbClient,
     tagIds: number[],
-  ) => {
-    if (tagIds.length === 0) {
-      return
-    }
+  ): Promise<Result<void, never>> => {
+    if (tagIds.length === 0) return { ok: true, value: undefined }
 
     const tagRelationCountsResult =
       await repository.getAllProductTagRelationCountsByTagIds({
@@ -371,7 +369,9 @@ export const createRepository = (adapters: Repository) => {
         productTag: { ids: tagIds },
         pagination: { offset: 0, limit: tagIds.length },
       })
-    if (!tagRelationCountsResult.ok) return
+    if (!tagRelationCountsResult.ok)
+      return { ok: false, message: "エラーが発生しました。" }
+
     const tagRelationCounts = tagRelationCountsResult.value
 
     const tagCountMap = new Map<number, number>()
@@ -382,11 +382,13 @@ export const createRepository = (adapters: Repository) => {
     })
 
     if (orphanedTagIds.length > 0) {
-      await repository.deleteAllProductTagsByIds({
+      const delRes = await repository.deleteAllProductTagsByIds({
         productTag: { ids: orphanedTagIds },
         dbClient,
       })
+      if (!delRes.ok) return { ok: false, message: "エラーが発生しました。" }
     }
+    return { ok: true, value: undefined }
   }
 
   const adjustTagRelationCounts = async (
@@ -620,7 +622,8 @@ export const createRepository = (adapters: Repository) => {
           if (!removedRes.ok)
             return { ok: false, message: "エラーが発生しました。" }
         }
-        await deleteOrphanedTags(dbClient, removedTagIds)
+        const orphanRes = await deleteOrphanedTags(dbClient, removedTagIds)
+        if (!orphanRes.ok) return orphanRes
         return updateRes
       }
 
@@ -663,7 +666,8 @@ export const createRepository = (adapters: Repository) => {
       const deleteResult = await adapters.deleteProduct({ product, dbClient })
       if (!deleteResult.ok) return deleteResult
 
-      await deleteOrphanedTags(dbClient, foundProduct.tagIds)
+      const orphanRes = await deleteOrphanedTags(dbClient, foundProduct.tagIds)
+      if (!orphanRes.ok) return orphanRes
       return deleteResult
     },
     createProductTag: async ({ dbClient, productTag }) => {

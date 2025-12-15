@@ -826,6 +826,42 @@ describe("Product repository", () => {
       expect(calls[0]?.[0]?.productTag?.ids).toEqual([2])
     })
 
+    it("deleteOrphanedTags のタグ取得が失敗した場合は更新を中止する", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "既存商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementationOnce(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({
+            tagId: id,
+            count: id === 2 ? 0 : 2,
+          })),
+        }),
+      )
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementationOnce(
+        async () => ({ ok: false, message: "エラーが発生しました。" }),
+      )
+      adapters.updateProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: applyPartialToDefaultProduct(product),
+      }))
+
+      const res = await repository.updateProduct({
+        product: { id: 1, tagIds: [1] },
+        dbClient: mockDbClient,
+      })
+      expect(res.ok).toBe(false)
+      expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
+    })
+
     it("タグが更新された際、孤立したタグが削除され店舗のタグ数が減少する", async () => {
       adapters.findProductById.mockImplementation(async () => ({
         ok: true,
@@ -1265,6 +1301,43 @@ describe("Product repository", () => {
 
       expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
       expect(adapters.deleteProductImageByProductId).toHaveBeenCalledTimes(1)
+    })
+
+    it("deleteOrphanedTags のタグ取得が失敗した場合は削除後にエラーを返す", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "削除対象商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementationOnce(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({
+            tagId: id,
+            count: id === 2 ? 0 : 2,
+          })),
+        }),
+      )
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementationOnce(
+        async () => ({ ok: false, message: "エラーが発生しました。" }),
+      )
+
+      adapters.deleteProduct.mockImplementation(async () => ({
+        ok: true,
+        value: undefined,
+      }))
+
+      const res = await repository.deleteProduct({
+        product: { id: 1 },
+        dbClient: mockDbClient,
+      })
+      expect(res.ok).toBe(false)
+      expect(adapters.deleteProduct).toHaveBeenCalledTimes(1)
     })
 
     it("商品削除時に削除されたタグのrelation行が存在しない場合でも孤立していれば削除される", async () => {
