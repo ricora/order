@@ -259,68 +259,7 @@ describe("Product repository", () => {
       ).not.toHaveBeenCalled()
     })
 
-    it("商品の作成時に商品数取得に失敗したら処理を中止する", async () => {
-      adapters.getProductCountByStoreId.mockImplementation(async () => {
-        throw new Error("db error")
-      })
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
-        async ({ productTag }) => ({
-          ok: true,
-          value: productTag.ids.map((id) => ({ tagId: id, count: 0 })),
-        }),
-      )
-      adapters.createProduct.mockImplementation(async ({ product }) => ({
-        ok: true,
-        value: { ...product, id: 99 },
-      }))
-
-      let threw3 = false
-      try {
-        await repository.createProduct({
-          product: validProduct,
-          dbClient: mockDbClient,
-        })
-      } catch {
-        threw3 = true
-      }
-      expect(threw3).toBe(true)
-      expect(adapters.setProductCountByStoreId).not.toHaveBeenCalled()
-    })
-
-    it("商品の作成時に商品数更新に失敗したら処理を中止する", async () => {
-      adapters.getProductCountByStoreId.mockImplementation(async () => ({
-        ok: true,
-        value: 2,
-      }))
-      adapters.setProductCountByStoreId.mockImplementation(async () => {
-        throw new Error("db error")
-      })
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
-        async ({ productTag }) => ({
-          ok: true,
-          value: productTag.ids.map((id) => ({ tagId: id, count: 0 })),
-        }),
-      )
-      adapters.createProduct.mockImplementation(async ({ product }) => ({
-        ok: true,
-        value: { ...product, id: 99 },
-      }))
-
-      let threw4 = false
-      try {
-        await repository.createProduct({
-          product: validProduct,
-          dbClient: mockDbClient,
-        })
-      } catch {
-        threw4 = true
-      }
-      expect(threw4).toBe(true)
-      // adjustTagRelationCounts should not be called because set failed
-      expect(
-        adapters.setAllProductTagRelationCountsByTagIds,
-      ).not.toHaveBeenCalled()
-    })
+    // NOTE: duplicate tests removed — same scenarios covered above
 
     it("タグカウント取得が失敗した場合は作成を失敗させカウント更新は行われない", async () => {
       adapters.getProductCountByStoreId.mockImplementation(async () => ({
@@ -817,7 +756,10 @@ describe("Product repository", () => {
       adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
         async ({ productTag }) => ({
           ok: true,
-          value: productTag.ids.map((id) => ({ tagId: id, count: id === 2 ? 1 : 2 })),
+          value: productTag.ids.map((id) => ({
+            tagId: id,
+            count: id === 2 ? 1 : 2,
+          })),
         }),
       )
       adapters.getProductTagCountByStoreId.mockImplementation(async () => ({
@@ -829,7 +771,10 @@ describe("Product repository", () => {
         value: applyPartialToDefaultProduct(product),
       }))
 
-      await repository.updateProduct({ product: { id: 1, tagIds: [1] }, dbClient: mockDbClient })
+      await repository.updateProduct({
+        product: { id: 1, tagIds: [1] },
+        dbClient: mockDbClient,
+      })
 
       expect(adapters.deleteAllProductTagsByIds).toHaveBeenCalledTimes(1)
       expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
