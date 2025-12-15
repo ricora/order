@@ -797,6 +797,47 @@ describe("Product repository", () => {
       expect(calls[0]?.[0]?.productTag?.ids).toEqual([2])
     })
 
+    it("タグが更新された際、孤立したタグが削除され店舗のタグ数が減少する", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "既存商品",
+          tagIds: [1, 2],
+          price: 1000,
+          stock: 5,
+        },
+      }))
+      adapters.findAllProductTagsByIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ id, name: `タグ${id}` })),
+        }),
+      )
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ tagId: id, count: id === 2 ? 1 : 2 })),
+        }),
+      )
+      adapters.getProductTagCountByStoreId.mockImplementation(async () => ({
+        ok: true,
+        value: 5,
+      }))
+      adapters.updateProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: applyPartialToDefaultProduct(product),
+      }))
+
+      await repository.updateProduct({ product: { id: 1, tagIds: [1] }, dbClient: mockDbClient })
+
+      expect(adapters.deleteAllProductTagsByIds).toHaveBeenCalledTimes(1)
+      expect(adapters.setProductTagCountByStoreId).toHaveBeenCalledTimes(1)
+      const setCall = adapters.setProductTagCountByStoreId.mock.calls[0]?.[0]
+      expect(setCall?.store.value).toBe(4)
+      expect(setCall?.store.updatedAt).toBeInstanceOf(Date)
+    })
+
     it("タグが更新された際、削除されたタグの商品数のカウントを0とする", async () => {
       adapters.findProductById.mockImplementation(async () => ({
         ok: true,
