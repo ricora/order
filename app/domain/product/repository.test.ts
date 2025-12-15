@@ -194,6 +194,27 @@ describe("Product repository", () => {
       }
     })
 
+    it("タグを持たない商品を作成した場合、店舗の商品数のみが更新される", async () => {
+      adapters.getProductCountByStoreId.mockImplementation(async () => ({
+        ok: true,
+        value: 2,
+      }))
+      adapters.createProduct.mockImplementation(async ({ product }) => ({
+        ok: true,
+        value: { ...product, id: 99, tagIds: [] },
+      }))
+
+      await repository.createProduct({
+        product: { ...validProduct, tagIds: [] },
+        dbClient: mockDbClient,
+      })
+
+      expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
+      expect(
+        adapters.setAllProductTagRelationCountsByTagIds,
+      ).not.toHaveBeenCalled()
+    })
+
     it("商品の作成時に商品数取得エラーが発生したら処理を中止する", async () => {
       adapters.getProductCountByStoreId.mockImplementation(async () => {
         throw new Error("db error")
@@ -1285,6 +1306,32 @@ describe("Product repository", () => {
       for (const t of tagsCall?.productTags ?? []) {
         expect(t.updatedAt).toBeInstanceOf(Date)
       }
+    })
+
+    it("タグを持たない商品を削除した場合、店舗の商品数のみが更新される", async () => {
+      adapters.findProductById.mockImplementation(async () => ({
+        ok: true,
+        value: {
+          id: 1,
+          name: "削除対象商品",
+          tagIds: [],
+          price: 1000,
+          stock: 1,
+        },
+      }))
+      adapters.getProductCountByStoreId.mockImplementation(async () => ({
+        ok: true,
+        value: 5,
+      }))
+
+      await repository.deleteProduct({
+        product: { id: 1 },
+        dbClient: mockDbClient,
+      })
+
+      expect(adapters.setProductCountByStoreId).toHaveBeenCalledTimes(1)
+      expect(adapters.setAllProductTagRelationCountsByTagIds).not.toHaveBeenCalled()
+      expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
     })
 
     it("商品の削除時に商品数取得に失敗したら処理を中止する", async () => {
