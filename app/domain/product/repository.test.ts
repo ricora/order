@@ -1387,7 +1387,7 @@ describe("Product repository", () => {
           stock: 5,
         },
       }))
-      adapters.getProductCountByStoreId.mockImplementation(async () => {
+      adapters.decrementProductCountByStoreId.mockImplementation(async () => {
         throw new Error("db error")
       })
       let threw2 = false
@@ -1444,10 +1444,6 @@ describe("Product repository", () => {
           price: 1000,
           stock: 5,
         },
-      }))
-      adapters.getProductCountByStoreId.mockImplementation(async () => ({
-        ok: true,
-        value: 0,
       }))
       adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
         async ({ productTag }) => ({
@@ -1536,29 +1532,6 @@ describe("Product repository", () => {
 
       expect(adapters.decrementProductCountByStoreId).toHaveBeenCalledTimes(1)
       expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
-    })
-
-    it("商品の削除時に商品数取得に失敗したら処理を中止する", async () => {
-      adapters.findProductById.mockImplementation(async () => ({
-        ok: true,
-        value: {
-          id: 1,
-          name: "削除対象商品",
-          tagIds: [1, 2],
-          price: 1000,
-          stock: 1,
-        },
-      }))
-      adapters.getProductCountByStoreId.mockImplementation(async () => ({
-        ok: false,
-        message: "エラーが発生しました。",
-      }))
-      const res = await repository.deleteProduct({
-        product: { id: 1 },
-        dbClient: mockDbClient,
-      })
-      expect(res.ok).toBe(false)
-      expect(adapters.deleteProduct).not.toHaveBeenCalled()
     })
 
     it("商品の削除時に商品数更新に失敗したら処理を中止する", async () => {
@@ -1967,21 +1940,25 @@ describe("Product repository", () => {
       expect(decCall2?.store.updatedAt).toBeInstanceOf(Date)
     })
 
-    it("タグ削除時にタグ数取得が失敗した場合は処理を中止する", async () => {
-      adapters.getProductTagCountByStoreId.mockImplementation(async () => ({
-        ok: false,
-        message: "エラーが発生しました。",
-      }))
+    it("タグ削除時にタグ数更新が失敗した場合は処理を中止する", async () => {
       adapters.deleteAllProductTagsByIds.mockImplementation(async () => ({
         ok: true,
         value: undefined,
       }))
-      const result = await repository.deleteAllProductTagsByIds({
-        productTag: { ids: [1, 2] },
-        dbClient: mockDbClient,
-      })
-      expect(result.ok).toBe(false)
-      expect(adapters.decrementProductTagCountByStoreId).not.toHaveBeenCalled()
+      adapters.decrementProductTagCountByStoreId.mockImplementation(
+        async () => {
+          throw new Error("db error")
+        },
+      )
+      await expect(
+        repository.deleteAllProductTagsByIds({
+          productTag: { ids: [1, 2] },
+          dbClient: mockDbClient,
+        }),
+      ).rejects.toThrow("db error")
+      expect(adapters.decrementProductTagCountByStoreId).toHaveBeenCalledTimes(
+        1,
+      )
     })
 
     it("タグ削除時にタグ数更新が失敗した場合は処理を中止する", async () => {

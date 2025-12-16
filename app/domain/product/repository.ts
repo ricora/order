@@ -540,13 +540,6 @@ export const createRepository = (adapters: Repository) => {
       const createResult = await adapters.createProduct({ product, dbClient })
       if (!createResult.ok) return createResult
 
-      const productCountRes = await repository.getProductCountByStoreId({
-        dbClient,
-        store: { id: 1 },
-      })
-      if (!productCountRes.ok) {
-        return { ok: false, message: "エラーが発生しました。" }
-      }
       const incRes = await repository.incrementProductCountByStoreId({
         dbClient,
         store: { id: 1, delta: 1, updatedAt: new Date() },
@@ -644,12 +637,6 @@ export const createRepository = (adapters: Repository) => {
         dbClient,
       })
 
-      const productCountRes = await repository.getProductCountByStoreId({
-        dbClient,
-        store: { id: 1 },
-      })
-      if (!productCountRes.ok)
-        return { ok: false, message: "エラーが発生しました。" }
       const decRes = await repository.decrementProductCountByStoreId({
         dbClient,
         store: { id: 1, delta: 1, updatedAt: new Date() },
@@ -696,13 +683,6 @@ export const createRepository = (adapters: Repository) => {
       })
       if (!deleteResult.ok) return deleteResult
 
-      const tagCountRes = await repository.getProductTagCountByStoreId({
-        dbClient,
-        store: { id: 1 },
-      })
-      if (!tagCountRes.ok) {
-        return { ok: false, message: "エラーが発生しました。" }
-      }
       const decRes = await repository.decrementProductTagCountByStoreId({
         dbClient,
         store: { id: 1, delta: productTag.ids.length, updatedAt: new Date() },
