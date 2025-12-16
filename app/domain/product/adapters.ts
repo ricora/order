@@ -459,12 +459,12 @@ export const adapters = {
   },
 
   decrementProductCountByStoreId: async ({ dbClient, store }) => {
-    const absDelta = Math.abs(store.delta)
+    const delta = store.delta
     await dbClient
       .insert(productCountPerStoreTable)
       .values({
         storeId: store.id,
-        productCount: absDelta,
+        productCount: delta,
         updatedAt: store.updatedAt,
       })
       .onConflictDoUpdate({
@@ -504,12 +504,12 @@ export const adapters = {
   },
 
   decrementProductTagCountByStoreId: async ({ dbClient, store }) => {
-    const absDelta = Math.abs(store.delta)
+    const delta = store.delta
     await dbClient
       .insert(productTagCountPerStoreTable)
       .values({
         storeId: store.id,
-        productTagCount: absDelta,
+        productTagCount: delta,
         updatedAt: store.updatedAt,
       })
       .onConflictDoUpdate({
@@ -530,9 +530,8 @@ export const adapters = {
     dbClient,
     productTags,
   }) => {
-    const positives = productTags.filter((p) => p.delta > 0)
-    if (positives.length > 0) {
-      const rows = positives.map((p) => ({
+    if (productTags.length > 0) {
+      const rows = productTags.map((p) => ({
         tagId: p.id,
         productCount: p.delta,
         updatedAt: p.updatedAt,
@@ -559,11 +558,10 @@ export const adapters = {
     dbClient,
     productTags,
   }) => {
-    const negatives = productTags.filter((p) => p.delta < 0)
-    if (negatives.length > 0) {
-      const rows = negatives.map((p) => ({
+    if (productTags.length > 0) {
+      const rows = productTags.map((p) => ({
         tagId: p.id,
-        productCount: Math.abs(p.delta),
+        productCount: p.delta,
         updatedAt: p.updatedAt,
       }))
       await dbClient
@@ -580,15 +578,13 @@ export const adapters = {
             ),
           },
         })
-    }
 
-    const negativeTagIds = negatives.map((p) => p.id)
-    if (negativeTagIds.length > 0) {
+      const tagIds = productTags.map((p) => p.id)
       await dbClient
         .delete(productCountPerProductTagTable)
         .where(
           and(
-            inArray(productCountPerProductTagTable.tagId, negativeTagIds),
+            inArray(productCountPerProductTagTable.tagId, tagIds),
             lte(productCountPerProductTagTable.productCount, 0),
           ),
         )

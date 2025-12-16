@@ -170,32 +170,32 @@ export type Repository = {
   incrementProductCountByStoreId: CommandRepositoryFunction<
     { store: { id: 1; delta: number; updatedAt: Date } },
     void,
-    never
+    "ステップサイズは正の整数である必要があります。"
   >
   decrementProductCountByStoreId: CommandRepositoryFunction<
     { store: { id: 1; delta: number; updatedAt: Date } },
     void,
-    never
+    "ステップサイズは正の整数である必要があります。"
   >
   incrementProductTagCountByStoreId: CommandRepositoryFunction<
     { store: { id: 1; delta: number; updatedAt: Date } },
     void,
-    never
+    "ステップサイズは正の整数である必要があります。"
   >
   decrementProductTagCountByStoreId: CommandRepositoryFunction<
     { store: { id: 1; delta: number; updatedAt: Date } },
     void,
-    never
+    "ステップサイズは正の整数である必要があります。"
   >
   incrementAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
     { productTags: { id: ProductTag["id"]; delta: number; updatedAt: Date }[] },
     void,
-    never
+    "ステップサイズは正の整数である必要があります。"
   >
   decrementAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
     { productTags: { id: ProductTag["id"]; delta: number; updatedAt: Date }[] },
     void,
-    never
+    "ステップサイズは正の整数である必要があります。"
   >
 }
 
@@ -406,20 +406,20 @@ export const createRepository = (adapters: Repository) => {
     if (!tagCountsRes.ok) {
       return { ok: false, message: "エラーが発生しました。" }
     }
-    const updates = tagIds.map((id) => ({
+    const positiveUpdates = tagIds.map((id) => ({
       id,
-      delta,
+      delta: Math.abs(delta),
       updatedAt: new Date(),
     }))
     const adjustRes =
       delta > 0
         ? await repository.incrementAllProductTagRelationCountsByTagIds({
             dbClient,
-            productTags: updates,
+            productTags: positiveUpdates,
           })
         : await repository.decrementAllProductTagRelationCountsByTagIds({
             dbClient,
-            productTags: updates,
+            productTags: positiveUpdates,
           })
     if (!adjustRes.ok) return { ok: false, message: "エラーが発生しました。" }
     return { ok: true, value: undefined }
@@ -716,21 +716,51 @@ export const createRepository = (adapters: Repository) => {
       })
     },
     incrementProductCountByStoreId: async ({ dbClient, store }) => {
+      if (!Number.isFinite(store.delta) || store.delta <= 0) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
       return adapters.incrementProductCountByStoreId({ dbClient, store })
     },
     decrementProductCountByStoreId: async ({ dbClient, store }) => {
+      if (!Number.isFinite(store.delta) || store.delta <= 0) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
       return adapters.decrementProductCountByStoreId({ dbClient, store })
     },
     incrementProductTagCountByStoreId: async ({ dbClient, store }) => {
+      if (!Number.isFinite(store.delta) || store.delta <= 0) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
       return adapters.incrementProductTagCountByStoreId({ dbClient, store })
     },
     decrementProductTagCountByStoreId: async ({ dbClient, store }) => {
+      if (!Number.isFinite(store.delta) || store.delta <= 0) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
       return adapters.decrementProductTagCountByStoreId({ dbClient, store })
     },
     incrementAllProductTagRelationCountsByTagIds: async ({
       dbClient,
       productTags,
     }) => {
+      if (productTags.some((p) => !Number.isFinite(p.delta) || p.delta <= 0)) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
       return adapters.incrementAllProductTagRelationCountsByTagIds({
         dbClient,
         productTags,
@@ -740,6 +770,12 @@ export const createRepository = (adapters: Repository) => {
       dbClient,
       productTags,
     }) => {
+      if (productTags.some((p) => !Number.isFinite(p.delta) || p.delta <= 0)) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
       return adapters.decrementAllProductTagRelationCountsByTagIds({
         dbClient,
         productTags,

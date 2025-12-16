@@ -292,6 +292,32 @@ describe("Product repository", () => {
       ).not.toHaveBeenCalled()
     })
 
+    it("店舗の商品数のインクリメントでdeltaが正でない場合はエラーを返す", async () => {
+      const res = await repository.incrementProductCountByStoreId({
+        dbClient: mockDbClient,
+        store: { id: 1, delta: 0, updatedAt: new Date() },
+      })
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+      expect(adapters.incrementProductCountByStoreId).not.toHaveBeenCalled()
+    })
+
+    it("店舗の商品数のデクリメントでdeltaが正でない場合はエラーを返す", async () => {
+      const res = await repository.decrementProductCountByStoreId({
+        dbClient: mockDbClient,
+        store: { id: 1, delta: 0, updatedAt: new Date() },
+      })
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+      expect(adapters.decrementProductCountByStoreId).not.toHaveBeenCalled()
+    })
+
     // NOTE: duplicate tests removed — same scenarios covered above
 
     it("タグカウント取得が失敗した場合は作成を失敗させカウント更新は行われない", async () => {
@@ -952,7 +978,7 @@ describe("Product repository", () => {
         adapters.decrementAllProductTagRelationCountsByTagIds.mock.calls
       const arg = calls[0]?.[0]
       expect(arg?.productTags.map(({ id, delta }) => ({ id, delta }))).toEqual([
-        { id: 1, delta: -1 },
+        { id: 1, delta: 1 },
       ])
       for (const t of arg?.productTags ?? []) {
         expect(t.updatedAt).toBeInstanceOf(Date)
@@ -996,6 +1022,34 @@ describe("Product repository", () => {
       })
 
       expect(adapters.deleteAllProductTagsByIds).not.toHaveBeenCalled()
+    })
+
+    it("タグの関係数のインクリメントでdeltaが正でない場合はエラーを返す", async () => {
+      const res = await repository.incrementAllProductTagRelationCountsByTagIds(
+        {
+          dbClient: mockDbClient,
+          productTags: [{ id: 1, delta: 0, updatedAt: new Date() }],
+        },
+      )
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+    })
+
+    it("タグの関係数のデクリメントでdeltaが正でない場合はエラーを返す", async () => {
+      const res = await repository.decrementAllProductTagRelationCountsByTagIds(
+        {
+          dbClient: mockDbClient,
+          productTags: [{ id: 1, delta: 0, updatedAt: new Date() }],
+        },
+      )
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
     })
 
     it("更新時に価格が上限を超える場合はエラーを返す", async () => {
@@ -1165,7 +1219,7 @@ describe("Product repository", () => {
       ).toEqual(
         expect.arrayContaining([
           { id: 3, delta: 1 },
-          { id: 1, delta: -1 },
+          { id: 1, delta: 1 },
         ]),
       )
     })
@@ -1501,8 +1555,8 @@ describe("Product repository", () => {
       expect(
         tagsCall?.productTags.map(({ id, delta }) => ({ id, delta })),
       ).toEqual([
-        { id: 1, delta: -1 },
-        { id: 2, delta: -1 },
+        { id: 1, delta: 1 },
+        { id: 2, delta: 1 },
       ])
       for (const t of tagsCall?.productTags ?? []) {
         expect(t.updatedAt).toBeInstanceOf(Date)
@@ -1657,6 +1711,32 @@ describe("Product repository", () => {
       expect(adapters.incrementProductTagCountByStoreId).toHaveBeenCalledTimes(
         1,
       )
+    })
+
+    it("店舗のタグ数のインクリメントでdeltaが正でない場合はエラーを返す", async () => {
+      const res = await repository.incrementProductTagCountByStoreId({
+        dbClient: mockDbClient,
+        store: { id: 1, delta: 0, updatedAt: new Date() },
+      })
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+      expect(adapters.incrementProductTagCountByStoreId).not.toHaveBeenCalled()
+    })
+
+    it("店舗のタグ数のデクリメントでdeltaが正でない場合はエラーを返す", async () => {
+      const res = await repository.decrementProductTagCountByStoreId({
+        dbClient: mockDbClient,
+        store: { id: 1, delta: 0, updatedAt: new Date() },
+      })
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+      expect(adapters.decrementProductTagCountByStoreId).not.toHaveBeenCalled()
     })
 
     it("タグ名が空ならエラーを返す", async () => {
