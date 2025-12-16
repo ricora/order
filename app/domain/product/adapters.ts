@@ -530,10 +530,6 @@ export const adapters = {
     dbClient,
     productTags,
   }) => {
-    if (!productTags || productTags.length === 0) {
-      return { ok: true, value: undefined }
-    }
-
     const positives = productTags.filter((p) => p.delta > 0)
     if (positives.length > 0) {
       const rows = positives.map((p) => ({
@@ -563,10 +559,6 @@ export const adapters = {
     dbClient,
     productTags,
   }) => {
-    if (!productTags || productTags.length === 0) {
-      return { ok: true, value: undefined }
-    }
-
     const negatives = productTags.filter((p) => p.delta < 0)
     if (negatives.length > 0) {
       const rows = negatives.map((p) => ({
