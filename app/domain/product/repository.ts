@@ -265,6 +265,9 @@ export const createRepository = (adapters: Repository) => {
     }
     return { ok: true, value: undefined }
   }
+
+  const isPositiveInteger = (n: number) =>
+    Number.isFinite(n) && Number.isInteger(n) && n > 0
   const verifyAllTagIdsExist = async (
     dbClient: TransactionDbClient,
     tagIds: Product["tagIds"],
@@ -707,11 +710,7 @@ export const createRepository = (adapters: Repository) => {
       })
     },
     incrementProductCountByStoreId: async ({ dbClient, store }) => {
-      if (
-        !Number.isFinite(store.delta) ||
-        !Number.isInteger(store.delta) ||
-        store.delta <= 0
-      ) {
+      if (!isPositiveInteger(store.delta)) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -720,11 +719,7 @@ export const createRepository = (adapters: Repository) => {
       return adapters.incrementProductCountByStoreId({ dbClient, store })
     },
     decrementProductCountByStoreId: async ({ dbClient, store }) => {
-      if (
-        !Number.isFinite(store.delta) ||
-        !Number.isInteger(store.delta) ||
-        store.delta <= 0
-      ) {
+      if (!isPositiveInteger(store.delta)) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -733,11 +728,7 @@ export const createRepository = (adapters: Repository) => {
       return adapters.decrementProductCountByStoreId({ dbClient, store })
     },
     incrementProductTagCountByStoreId: async ({ dbClient, store }) => {
-      if (
-        !Number.isFinite(store.delta) ||
-        !Number.isInteger(store.delta) ||
-        store.delta <= 0
-      ) {
+      if (!isPositiveInteger(store.delta)) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -746,11 +737,7 @@ export const createRepository = (adapters: Repository) => {
       return adapters.incrementProductTagCountByStoreId({ dbClient, store })
     },
     decrementProductTagCountByStoreId: async ({ dbClient, store }) => {
-      if (
-        !Number.isFinite(store.delta) ||
-        !Number.isInteger(store.delta) ||
-        store.delta <= 0
-      ) {
+      if (!isPositiveInteger(store.delta)) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -762,14 +749,7 @@ export const createRepository = (adapters: Repository) => {
       dbClient,
       productTags,
     }) => {
-      if (
-        productTags.some(
-          (p) =>
-            !Number.isFinite(p.delta) ||
-            !Number.isInteger(p.delta) ||
-            p.delta <= 0,
-        )
-      ) {
+      if (productTags.some((p) => !isPositiveInteger(p.delta))) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -784,14 +764,7 @@ export const createRepository = (adapters: Repository) => {
       dbClient,
       productTags,
     }) => {
-      if (
-        productTags.some(
-          (p) =>
-            !Number.isFinite(p.delta) ||
-            !Number.isInteger(p.delta) ||
-            p.delta <= 0,
-        )
-      ) {
+      if (productTags.some((p) => !isPositiveInteger(p.delta))) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
