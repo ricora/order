@@ -46,6 +46,12 @@ type UpdateProductImageValidationError =
   | CommonProductImageValidationError
   | "商品画像が見つかりません。"
 
+type ProductCountUpdateError = "商品数の更新に失敗しました。"
+type TagRelationUpdateError = "タグの関連数の更新に失敗しました。"
+type TagRelationGetError = "タグの関連数の取得に失敗しました。"
+type OrphanTagDeleteError = "孤立タグの削除に失敗しました。"
+type TagCountUpdateError = "タグ数の更新に失敗しました。"
+
 type CreateProductValidationError =
   | CommonProductValidationError
   | CreateProductTagValidationError
@@ -87,7 +93,6 @@ export type Repository = {
     Pick<Product, "stock">,
     never
   >
-  countProducts: QueryRepositoryFunction<unknown, number, never>
   findProductTagById: QueryRepositoryFunction<
     { productTag: Pick<ProductTag, "id"> },
     ProductTag,
@@ -103,12 +108,21 @@ export type Repository = {
     ProductTag,
     never
   >
-  findAllProductTagRelationCountsByTagIds: PaginatedQueryRepositoryFunction<
+  getProductCountByStoreId: QueryRepositoryFunction<
+    { store: { id: 1 } },
+    number,
+    never
+  >
+  getProductTagCountByStoreId: QueryRepositoryFunction<
+    { store: { id: 1 } },
+    number,
+    never
+  >
+  getAllProductTagRelationCountsByTagIds: PaginatedQueryRepositoryFunction<
     { productTag: { ids: ProductTag["id"][] } },
     { tagId: ProductTag["id"]; count: number },
     never
   >
-  countProductTags: QueryRepositoryFunction<unknown, number, never>
   findProductImageByProductId: QueryRepositoryFunction<
     { productImage: Pick<ProductImage, "productId"> },
     ProductImage,
@@ -119,27 +133,35 @@ export type Repository = {
   createProduct: CommandRepositoryFunction<
     { product: Omit<Product, "id"> },
     Product,
-    CreateProductValidationError
+    | CreateProductValidationError
+    | ProductCountUpdateError
+    | TagRelationUpdateError
   >
   updateProduct: CommandRepositoryFunction<
     { product: Pick<Product, "id"> & Partial<Omit<Product, "id">> },
     Product,
-    UpdateProductValidationError
+    | UpdateProductValidationError
+    | TagRelationGetError
+    | OrphanTagDeleteError
+    | TagRelationUpdateError
   >
   deleteProduct: CommandRepositoryFunction<
     { product: Pick<Product, "id"> },
     void,
-    never
+    | ProductCountUpdateError
+    | TagRelationGetError
+    | OrphanTagDeleteError
+    | TagRelationUpdateError
   >
   createProductTag: CommandRepositoryFunction<
     { productTag: Omit<ProductTag, "id"> },
     ProductTag,
-    CreateProductTagValidationError
+    CreateProductTagValidationError | TagCountUpdateError
   >
   deleteAllProductTagsByIds: CommandRepositoryFunction<
     { productTag: { ids: ProductTag["id"][] } },
     void,
-    never
+    TagCountUpdateError
   >
   createProductImage: CommandRepositoryFunction<
     { productImage: Omit<ProductImage, "id"> },
@@ -158,6 +180,36 @@ export type Repository = {
     { productImage: Pick<ProductImage, "productId"> },
     void,
     never
+  >
+  incrementProductCountByStoreId: CommandRepositoryFunction<
+    { store: { id: 1; delta: number; updatedAt: Date } },
+    void,
+    "ステップサイズは正の整数である必要があります。"
+  >
+  decrementProductCountByStoreId: CommandRepositoryFunction<
+    { store: { id: 1; delta: number; updatedAt: Date } },
+    void,
+    "ステップサイズは正の整数である必要があります。"
+  >
+  incrementProductTagCountByStoreId: CommandRepositoryFunction<
+    { store: { id: 1; delta: number; updatedAt: Date } },
+    void,
+    "ステップサイズは正の整数である必要があります。"
+  >
+  decrementProductTagCountByStoreId: CommandRepositoryFunction<
+    { store: { id: 1; delta: number; updatedAt: Date } },
+    void,
+    "ステップサイズは正の整数である必要があります。"
+  >
+  incrementAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
+    { productTags: { id: ProductTag["id"]; delta: number; updatedAt: Date }[] },
+    void,
+    "ステップサイズは正の整数である必要があります。"
+  >
+  decrementAllProductTagRelationCountsByTagIds: CommandRepositoryFunction<
+    { productTags: { id: ProductTag["id"]; delta: number; updatedAt: Date }[] },
+    void,
+    "ステップサイズは正の整数である必要があります。"
   >
 }
 
@@ -227,6 +279,10 @@ export const createRepository = (adapters: Repository) => {
     }
     return { ok: true, value: undefined }
   }
+
+  const isPositiveInteger = (n: number) =>
+    Number.isFinite(n) && Number.isInteger(n) && n > 0
+
   const verifyAllTagIdsExist = async (
     dbClient: TransactionDbClient,
     tagIds: Product["tagIds"],
@@ -271,7 +327,10 @@ export const createRepository = (adapters: Repository) => {
   const verifyProductCountLimit = async (
     dbClient: TransactionDbClient,
   ): Promise<Result<void, CommonProductValidationError>> => {
-    const totalProductsResult = await repository.countProducts({ dbClient })
+    const totalProductsResult = await repository.getProductCountByStoreId({
+      dbClient,
+      store: { id: 1 },
+    })
     if (!totalProductsResult.ok)
       return {
         ok: false,
@@ -299,7 +358,10 @@ export const createRepository = (adapters: Repository) => {
   const verifyProductTagCountLimit = async (
     dbClient: TransactionDbClient,
   ): Promise<Result<void, CommonProductTagValidationError>> => {
-    const totalTagsResult = await repository.countProductTags({ dbClient })
+    const totalTagsResult = await repository.getProductTagCountByStoreId({
+      dbClient,
+      store: { id: 1 },
+    })
     if (!totalTagsResult.ok)
       return {
         ok: false,
@@ -316,30 +378,62 @@ export const createRepository = (adapters: Repository) => {
   const deleteOrphanedTags = async (
     dbClient: TransactionDbClient,
     tagIds: number[],
-  ) => {
-    if (tagIds.length === 0) {
-      return
-    }
+  ): Promise<Result<void, TagRelationGetError | OrphanTagDeleteError>> => {
+    if (tagIds.length === 0) return { ok: true, value: undefined }
 
     const tagRelationCountsResult =
-      await repository.findAllProductTagRelationCountsByTagIds({
+      await repository.getAllProductTagRelationCountsByTagIds({
         dbClient,
         productTag: { ids: tagIds },
         pagination: { offset: 0, limit: tagIds.length },
       })
-    if (!tagRelationCountsResult.ok) return
+    if (!tagRelationCountsResult.ok)
+      return { ok: false, message: "タグの関連数の取得に失敗しました。" }
+
     const tagRelationCounts = tagRelationCountsResult.value
 
-    const orphanedTagIds = tagRelationCounts
-      .filter((tagCount) => tagCount.count <= 1)
-      .map((tagCount) => tagCount.tagId)
+    const tagCountMap = new Map<number, number>()
+    for (const t of tagRelationCounts) tagCountMap.set(t.tagId, t.count)
+    const orphanedTagIds = tagIds.filter((id) => {
+      const count = tagCountMap.get(id) ?? 0
+      return count === 0
+    })
 
     if (orphanedTagIds.length > 0) {
-      await repository.deleteAllProductTagsByIds({
+      const delRes = await repository.deleteAllProductTagsByIds({
         productTag: { ids: orphanedTagIds },
         dbClient,
       })
+      if (!delRes.ok)
+        return { ok: false, message: "孤立タグの削除に失敗しました。" }
     }
+    return { ok: true, value: undefined }
+  }
+
+  const adjustTagRelationCounts = async (
+    dbClient: TransactionDbClient,
+    tagIds: number[],
+    delta: number,
+  ): Promise<Result<void, TagRelationUpdateError>> => {
+    if (tagIds.length === 0) return { ok: true, value: undefined }
+    const positiveUpdates = tagIds.map((id) => ({
+      id,
+      delta: Math.abs(delta),
+      updatedAt: new Date(),
+    }))
+    const adjustRes =
+      delta > 0
+        ? await repository.incrementAllProductTagRelationCountsByTagIds({
+            dbClient,
+            productTags: positiveUpdates,
+          })
+        : await repository.decrementAllProductTagRelationCountsByTagIds({
+            dbClient,
+            productTags: positiveUpdates,
+          })
+    if (!adjustRes.ok)
+      return { ok: false, message: "タグの関連数の更新に失敗しました。" }
+    return { ok: true, value: undefined }
   }
 
   const validateProductImage = (
@@ -397,9 +491,6 @@ export const createRepository = (adapters: Repository) => {
     findAllProductStocks: async ({ dbClient, pagination }) => {
       return adapters.findAllProductStocks({ dbClient, pagination })
     },
-    countProducts: async ({ dbClient }) => {
-      return adapters.countProducts({ dbClient })
-    },
     findProductTagById: async ({ dbClient, productTag }) => {
       return adapters.findProductTagById({ dbClient, productTag })
     },
@@ -413,24 +504,27 @@ export const createRepository = (adapters: Repository) => {
         pagination,
       })
     },
-    findAllProductTagRelationCountsByTagIds: async ({
-      dbClient,
-      productTag,
-      pagination,
-    }) => {
-      return adapters.findAllProductTagRelationCountsByTagIds({
-        dbClient,
-        productTag,
-        pagination,
-      })
-    },
-    countProductTags: async ({ dbClient }) => {
-      return adapters.countProductTags({ dbClient })
-    },
     findProductImageByProductId: async ({ dbClient, productImage }) => {
       return adapters.findProductImageByProductId({
         dbClient,
         productImage,
+      })
+    },
+    getProductCountByStoreId: async ({ dbClient, store }) => {
+      return adapters.getProductCountByStoreId({ dbClient, store })
+    },
+    getProductTagCountByStoreId: async ({ dbClient, store }) => {
+      return adapters.getProductTagCountByStoreId({ dbClient, store })
+    },
+    getAllProductTagRelationCountsByTagIds: async ({
+      dbClient,
+      productTag,
+      pagination,
+    }) => {
+      return adapters.getAllProductTagRelationCountsByTagIds({
+        dbClient,
+        productTag,
+        pagination,
       })
     },
     createProduct: async ({ dbClient, product }) => {
@@ -454,7 +548,25 @@ export const createRepository = (adapters: Repository) => {
         if (!tagExistResult.ok) return tagExistResult
       }
 
-      return adapters.createProduct({ product, dbClient })
+      const createResult = await adapters.createProduct({ product, dbClient })
+      if (!createResult.ok) return createResult
+
+      const incRes = await repository.incrementProductCountByStoreId({
+        dbClient,
+        store: { id: 1, delta: 1, updatedAt: new Date() },
+      })
+      if (!incRes.ok)
+        return { ok: false, message: "商品数の更新に失敗しました。" }
+
+      if (createResult.value.tagIds && createResult.value.tagIds.length > 0) {
+        const adjustRes = await adjustTagRelationCounts(
+          dbClient,
+          createResult.value.tagIds,
+          1,
+        )
+        if (!adjustRes.ok) return { ok: false, message: adjustRes.message }
+      }
+      return createResult
     },
     updateProduct: async ({ dbClient, product }) => {
       const validateCommonResult = validateCommonProduct(product)
@@ -490,7 +602,31 @@ export const createRepository = (adapters: Repository) => {
         const removedTagIds = oldTagIds.filter(
           (tagId) => !product.tagIds?.includes(tagId),
         )
-        await deleteOrphanedTags(dbClient, removedTagIds)
+        const addedTagIds = (product.tagIds || []).filter(
+          (tagId) => !oldTagIds.includes(tagId),
+        )
+        const updateRes = await adapters.updateProduct({ product, dbClient })
+        if (!updateRes.ok) return updateRes
+
+        if (addedTagIds.length > 0) {
+          const addedRes = await adjustTagRelationCounts(
+            dbClient,
+            addedTagIds,
+            1,
+          )
+          if (!addedRes.ok) return { ok: false, message: addedRes.message }
+        }
+        if (removedTagIds.length > 0) {
+          const removedRes = await adjustTagRelationCounts(
+            dbClient,
+            removedTagIds,
+            -1,
+          )
+          if (!removedRes.ok) return { ok: false, message: removedRes.message }
+        }
+        const orphanRes = await deleteOrphanedTags(dbClient, removedTagIds)
+        if (!orphanRes.ok) return orphanRes
+        return updateRes
       }
 
       return adapters.updateProduct({ product, dbClient })
@@ -510,8 +646,25 @@ export const createRepository = (adapters: Repository) => {
         dbClient,
       })
 
-      await deleteOrphanedTags(dbClient, foundProduct.tagIds)
-      return adapters.deleteProduct({ product, dbClient })
+      const decRes = await repository.decrementProductCountByStoreId({
+        dbClient,
+        store: { id: 1, delta: 1, updatedAt: new Date() },
+      })
+      if (!decRes.ok)
+        return { ok: false, message: "商品数の更新に失敗しました。" }
+
+      if (foundProduct.tagIds && foundProduct.tagIds.length > 0) {
+        const tagIds = foundProduct.tagIds
+        const adjustRes = await adjustTagRelationCounts(dbClient, tagIds, -1)
+        if (!adjustRes.ok) return { ok: false, message: adjustRes.message }
+      }
+
+      const deleteResult = await adapters.deleteProduct({ product, dbClient })
+      if (!deleteResult.ok) return deleteResult
+
+      const orphanRes = await deleteOrphanedTags(dbClient, foundProduct.tagIds)
+      if (!orphanRes.ok) return orphanRes
+      return deleteResult
     },
     createProductTag: async ({ dbClient, productTag }) => {
       const validateTagResult = validateProductTag(productTag)
@@ -520,13 +673,33 @@ export const createRepository = (adapters: Repository) => {
       const tagCountLimitResult = await verifyProductTagCountLimit(dbClient)
       if (!tagCountLimitResult.ok) return tagCountLimitResult
 
-      return adapters.createProductTag({ productTag, dbClient })
+      const createTagResult = await adapters.createProductTag({
+        productTag,
+        dbClient,
+      })
+      if (!createTagResult.ok) return createTagResult
+      const incRes = await repository.incrementProductTagCountByStoreId({
+        dbClient,
+        store: { id: 1, delta: 1, updatedAt: new Date() },
+      })
+      if (!incRes.ok)
+        return { ok: false, message: "タグ数の更新に失敗しました。" }
+      return createTagResult
     },
     deleteAllProductTagsByIds: async ({ dbClient, productTag }) => {
-      return adapters.deleteAllProductTagsByIds({
+      const deleteResult = await adapters.deleteAllProductTagsByIds({
         dbClient,
         productTag,
       })
+      if (!deleteResult.ok) return deleteResult
+
+      const decRes = await repository.decrementProductTagCountByStoreId({
+        dbClient,
+        store: { id: 1, delta: productTag.ids.length, updatedAt: new Date() },
+      })
+      if (!decRes.ok)
+        return { ok: false, message: "タグ数の更新に失敗しました。" }
+      return deleteResult
     },
     createProductImage: async ({ dbClient, productImage }) => {
       const validateImageResult = validateProductImage({
@@ -551,6 +724,72 @@ export const createRepository = (adapters: Repository) => {
       return adapters.deleteProductImageByProductId({
         dbClient,
         productImage,
+      })
+    },
+    incrementProductCountByStoreId: async ({ dbClient, store }) => {
+      if (!isPositiveInteger(store.delta)) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
+      return adapters.incrementProductCountByStoreId({ dbClient, store })
+    },
+    decrementProductCountByStoreId: async ({ dbClient, store }) => {
+      if (!isPositiveInteger(store.delta)) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
+      return adapters.decrementProductCountByStoreId({ dbClient, store })
+    },
+    incrementProductTagCountByStoreId: async ({ dbClient, store }) => {
+      if (!isPositiveInteger(store.delta)) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
+      return adapters.incrementProductTagCountByStoreId({ dbClient, store })
+    },
+    decrementProductTagCountByStoreId: async ({ dbClient, store }) => {
+      if (!isPositiveInteger(store.delta)) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
+      return adapters.decrementProductTagCountByStoreId({ dbClient, store })
+    },
+    incrementAllProductTagRelationCountsByTagIds: async ({
+      dbClient,
+      productTags,
+    }) => {
+      if (productTags.some((p) => !isPositiveInteger(p.delta))) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
+      return adapters.incrementAllProductTagRelationCountsByTagIds({
+        dbClient,
+        productTags,
+      })
+    },
+    decrementAllProductTagRelationCountsByTagIds: async ({
+      dbClient,
+      productTags,
+    }) => {
+      if (productTags.some((p) => !isPositiveInteger(p.delta))) {
+        return {
+          ok: false,
+          message: "ステップサイズは正の整数である必要があります。",
+        }
+      }
+      return adapters.decrementAllProductTagRelationCountsByTagIds({
+        dbClient,
+        productTags,
       })
     },
   } satisfies Repository

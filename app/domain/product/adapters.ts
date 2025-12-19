@@ -1,7 +1,10 @@
-import { asc, count, desc, eq, inArray } from "drizzle-orm"
+import { and, asc, desc, eq, inArray, lte, sql } from "drizzle-orm"
 import {
+  productCountPerProductTagTable,
+  productCountPerStoreTable,
   productImageTable,
   productTable,
+  productTagCountPerStoreTable,
   productTagRelationTable,
   productTagTable,
 } from "../../libs/db/schema"
@@ -151,11 +154,6 @@ export const adapters = {
     }
   },
 
-  countProducts: async ({ dbClient }) => {
-    const c = await dbClient.$count(productTable)
-    return { ok: true, value: c }
-  },
-
   findProductTagById: async ({ dbClient, productTag }) => {
     const dbProductTag = await dbClient.query.productTagTable.findFirst({
       where: eq(productTagTable.id, productTag.id),
@@ -196,33 +194,34 @@ export const adapters = {
     }
   },
 
-  countProductTags: async ({ dbClient }) => {
-    const c = await dbClient.$count(productTagTable)
-    return { ok: true, value: c }
+  getProductCountByStoreId: async ({ dbClient, store }) => {
+    const row = await dbClient.query.productCountPerStoreTable.findFirst({
+      where: eq(productCountPerStoreTable.storeId, store.id),
+    })
+    return { ok: true, value: row ? row.productCount : 0 }
   },
 
-  findAllProductTagRelationCountsByTagIds: async ({
+  getProductTagCountByStoreId: async ({ dbClient, store }) => {
+    const row = await dbClient.query.productTagCountPerStoreTable.findFirst({
+      where: eq(productTagCountPerStoreTable.storeId, store.id),
+    })
+    return { ok: true, value: row ? row.productTagCount : 0 }
+  },
+
+  getAllProductTagRelationCountsByTagIds: async ({
     dbClient,
     productTag,
     pagination,
   }) => {
-    const results = await dbClient
-      .select({
-        tagId: productTagRelationTable.tagId,
-        count: count(),
-      })
-      .from(productTagRelationTable)
-      .where(inArray(productTagRelationTable.tagId, productTag.ids))
-      .groupBy(productTagRelationTable.tagId)
-      .offset(pagination.offset)
-      .limit(pagination.limit)
-
+    const rows = await dbClient.query.productCountPerProductTagTable.findMany({
+      where: inArray(productCountPerProductTagTable.tagId, productTag.ids),
+      orderBy: [asc(productCountPerProductTagTable.tagId)],
+      offset: pagination.offset,
+      limit: pagination.limit,
+    })
     return {
       ok: true,
-      value: results.map((result) => ({
-        tagId: result.tagId,
-        count: result.count,
-      })),
+      value: rows.map((r) => ({ tagId: r.tagId, count: r.productCount })),
     }
   },
 
@@ -434,6 +433,161 @@ export const adapters = {
     await dbClient
       .delete(productImageTable)
       .where(eq(productImageTable.productId, productImage.productId))
+    return { ok: true, value: undefined }
+  },
+
+  incrementProductCountByStoreId: async ({ dbClient, store }) => {
+    await dbClient
+      .insert(productCountPerStoreTable)
+      .values({
+        storeId: store.id,
+        productCount: store.delta,
+        updatedAt: store.updatedAt,
+      })
+      .onConflictDoUpdate({
+        target: [productCountPerStoreTable.storeId],
+        set: {
+          productCount: sql.raw(
+            `product_count_per_store.${productCountPerStoreTable.productCount.name} + excluded.${productCountPerStoreTable.productCount.name}`,
+          ),
+          updatedAt: sql.raw(
+            `excluded.${productCountPerStoreTable.updatedAt.name}`,
+          ),
+        },
+      })
+    return { ok: true, value: undefined }
+  },
+
+  decrementProductCountByStoreId: async ({ dbClient, store }) => {
+    await dbClient
+      .insert(productCountPerStoreTable)
+      .values({
+        storeId: store.id,
+        productCount: store.delta,
+        updatedAt: store.updatedAt,
+      })
+      .onConflictDoUpdate({
+        target: [productCountPerStoreTable.storeId],
+        set: {
+          productCount: sql.raw(
+            `GREATEST(0, product_count_per_store.${productCountPerStoreTable.productCount.name} - excluded.${productCountPerStoreTable.productCount.name})`,
+          ),
+          updatedAt: sql.raw(
+            `excluded.${productCountPerStoreTable.updatedAt.name}`,
+          ),
+        },
+      })
+    return { ok: true, value: undefined }
+  },
+
+  incrementProductTagCountByStoreId: async ({ dbClient, store }) => {
+    await dbClient
+      .insert(productTagCountPerStoreTable)
+      .values({
+        storeId: store.id,
+        productTagCount: store.delta,
+        updatedAt: store.updatedAt,
+      })
+      .onConflictDoUpdate({
+        target: [productTagCountPerStoreTable.storeId],
+        set: {
+          productTagCount: sql.raw(
+            `product_tag_count_per_store.${productTagCountPerStoreTable.productTagCount.name} + excluded.${productTagCountPerStoreTable.productTagCount.name}`,
+          ),
+          updatedAt: sql.raw(
+            `excluded.${productTagCountPerStoreTable.updatedAt.name}`,
+          ),
+        },
+      })
+    return { ok: true, value: undefined }
+  },
+
+  decrementProductTagCountByStoreId: async ({ dbClient, store }) => {
+    await dbClient
+      .insert(productTagCountPerStoreTable)
+      .values({
+        storeId: store.id,
+        productTagCount: store.delta,
+        updatedAt: store.updatedAt,
+      })
+      .onConflictDoUpdate({
+        target: [productTagCountPerStoreTable.storeId],
+        set: {
+          productTagCount: sql.raw(
+            `GREATEST(0, product_tag_count_per_store.${productTagCountPerStoreTable.productTagCount.name} - excluded.${productTagCountPerStoreTable.productTagCount.name})`,
+          ),
+          updatedAt: sql.raw(
+            `excluded.${productTagCountPerStoreTable.updatedAt.name}`,
+          ),
+        },
+      })
+    return { ok: true, value: undefined }
+  },
+
+  incrementAllProductTagRelationCountsByTagIds: async ({
+    dbClient,
+    productTags,
+  }) => {
+    if (productTags.length > 0) {
+      const rows = productTags.map((p) => ({
+        tagId: p.id,
+        productCount: p.delta,
+        updatedAt: p.updatedAt,
+      }))
+      await dbClient
+        .insert(productCountPerProductTagTable)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: [productCountPerProductTagTable.tagId],
+          set: {
+            productCount: sql.raw(
+              `product_count_per_product_tag.${productCountPerProductTagTable.productCount.name} + excluded.${productCountPerProductTagTable.productCount.name}`,
+            ),
+            updatedAt: sql.raw(
+              `excluded.${productCountPerProductTagTable.updatedAt.name}`,
+            ),
+          },
+        })
+    }
+    return { ok: true, value: undefined }
+  },
+
+  decrementAllProductTagRelationCountsByTagIds: async ({
+    dbClient,
+    productTags,
+  }) => {
+    if (productTags.length > 0) {
+      const rows = productTags.map((p) => ({
+        tagId: p.id,
+        productCount: p.delta,
+        updatedAt: p.updatedAt,
+      }))
+      await dbClient
+        .insert(productCountPerProductTagTable)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: [productCountPerProductTagTable.tagId],
+          set: {
+            productCount: sql.raw(
+              `GREATEST(0, product_count_per_product_tag.${productCountPerProductTagTable.productCount.name} - excluded.${productCountPerProductTagTable.productCount.name})`,
+            ),
+            updatedAt: sql.raw(
+              `excluded.${productCountPerProductTagTable.updatedAt.name}`,
+            ),
+          },
+        })
+
+      const tagIds = productTags.map((p) => p.id)
+      await dbClient
+        .delete(productCountPerProductTagTable)
+        .where(
+          and(
+            inArray(productCountPerProductTagTable.tagId, tagIds),
+            lte(productCountPerProductTagTable.productCount, 0),
+          ),
+        )
+    }
+
     return { ok: true, value: undefined }
   },
 } satisfies Repository

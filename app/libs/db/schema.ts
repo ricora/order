@@ -134,6 +134,70 @@ export const productToProductTagRelations = relations(
   }),
 )
 
+/** 店舗単位の商品数 */
+export const productCountPerStoreTable = pgTable(
+  "product_count_per_store",
+  {
+    // NOTE: マルチテナント化を見据えてstoreIdカラムを設けているが、現状は単一店舗運用のため常に1が入る。
+    storeId: integer("store_id").notNull().primaryKey().default(1),
+    productCount: integer("product_count").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    check(
+      "product_count_per_store_product_count_positive",
+      sql`${table.productCount} >= 0`,
+    ),
+    check("product_count_per_store_store_id_valid", sql`${table.storeId} = 1`),
+  ],
+)
+
+/** 店舗単位の商品タグ数 */
+export const productTagCountPerStoreTable = pgTable(
+  "product_tag_count_per_store",
+  {
+    // NOTE: マルチテナント化を見据えてstoreIdカラムを設けているが、現状は単一店舗運用のため常に1が入る。
+    storeId: integer("store_id").notNull().primaryKey().default(1),
+    productTagCount: integer("product_tag_count").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    check(
+      "product_tag_count_per_store_product_tag_count_positive",
+      sql`${table.productTagCount} >= 0`,
+    ),
+    check(
+      "product_tag_count_per_store_store_id_valid",
+      sql`${table.storeId} = 1`,
+    ),
+  ],
+)
+
+/** タグ単位の商品数 */
+export const productCountPerProductTagTable = pgTable(
+  "product_count_per_product_tag",
+  {
+    tagId: integer("tag_id")
+      .notNull()
+      .primaryKey()
+      .references(() => productTagTable.id, { onDelete: "cascade" }),
+    productCount: integer("product_count").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    check(
+      "product_count_per_tag_product_count_positive",
+      sql`${table.productCount} >= 0`,
+    ),
+  ],
+)
+
 // order
 export const orderStatusEnum = pgEnum("order_status", [
   "pending",
