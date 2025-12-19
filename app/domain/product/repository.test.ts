@@ -2021,27 +2021,6 @@ describe("Product repository", () => {
     })
 
     it("タグ削除時にタグ数更新が失敗した場合は処理を中止する", async () => {
-      adapters.deleteAllProductTagsByIds.mockImplementation(async () => ({
-        ok: true,
-        value: undefined,
-      }))
-      adapters.decrementProductTagCountByStoreId.mockImplementation(
-        async () => {
-          throw new Error("db error")
-        },
-      )
-      await expect(
-        repository.deleteAllProductTagsByIds({
-          productTag: { ids: [1, 2] },
-          dbClient: mockDbClient,
-        }),
-      ).rejects.toThrow("db error")
-      expect(adapters.decrementProductTagCountByStoreId).toHaveBeenCalledTimes(
-        1,
-      )
-    })
-
-    it("タグ削除時にタグ数更新が失敗した場合は処理を中止する", async () => {
       adapters.getProductTagCountByStoreId.mockImplementation(async () => ({
         ok: true,
         value: 5,
