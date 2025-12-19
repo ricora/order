@@ -305,10 +305,36 @@ describe("Product repository", () => {
       expect(adapters.incrementProductCountByStoreId).not.toHaveBeenCalled()
     })
 
+    it("店舗の商品数のインクリメントでdeltaが整数でない場合はエラーを返す", async () => {
+      const res = await repository.incrementProductCountByStoreId({
+        dbClient: mockDbClient,
+        store: { id: 1, delta: 1.5, updatedAt: new Date() },
+      })
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+      expect(adapters.incrementProductCountByStoreId).not.toHaveBeenCalled()
+    })
+
     it("店舗の商品数のデクリメントでdeltaが正でない場合はエラーを返す", async () => {
       const res = await repository.decrementProductCountByStoreId({
         dbClient: mockDbClient,
         store: { id: 1, delta: 0, updatedAt: new Date() },
+      })
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+      expect(adapters.decrementProductCountByStoreId).not.toHaveBeenCalled()
+    })
+
+    it("店舗の商品数のデクリメントでdeltaが整数でない場合はエラーを返す", async () => {
+      const res = await repository.decrementProductCountByStoreId({
+        dbClient: mockDbClient,
+        store: { id: 1, delta: 2.2, updatedAt: new Date() },
       })
       expect(res.ok).toBe(false)
       if (!res.ok)
@@ -1050,11 +1076,39 @@ describe("Product repository", () => {
         )
     })
 
+    it("タグの関係数のインクリメントでdeltaが整数でない場合はエラーを返す", async () => {
+      const res = await repository.incrementAllProductTagRelationCountsByTagIds(
+        {
+          dbClient: mockDbClient,
+          productTags: [{ id: 1, delta: 1.5, updatedAt: new Date() }],
+        },
+      )
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+    })
+
     it("タグの関係数のデクリメントでdeltaが正でない場合はエラーを返す", async () => {
       const res = await repository.decrementAllProductTagRelationCountsByTagIds(
         {
           dbClient: mockDbClient,
           productTags: [{ id: 1, delta: 0, updatedAt: new Date() }],
+        },
+      )
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+    })
+
+    it("タグの関係数のデクリメントでdeltaが整数でない場合はエラーを返す", async () => {
+      const res = await repository.decrementAllProductTagRelationCountsByTagIds(
+        {
+          dbClient: mockDbClient,
+          productTags: [{ id: 1, delta: 2.75, updatedAt: new Date() }],
         },
       )
       expect(res.ok).toBe(false)
@@ -1729,10 +1783,36 @@ describe("Product repository", () => {
       expect(adapters.incrementProductTagCountByStoreId).not.toHaveBeenCalled()
     })
 
+    it("店舗のタグ数のインクリメントでdeltaが整数でない場合はエラーを返す", async () => {
+      const res = await repository.incrementProductTagCountByStoreId({
+        dbClient: mockDbClient,
+        store: { id: 1, delta: 1.1, updatedAt: new Date() },
+      })
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+      expect(adapters.incrementProductTagCountByStoreId).not.toHaveBeenCalled()
+    })
+
     it("店舗のタグ数のデクリメントでdeltaが正でない場合はエラーを返す", async () => {
       const res = await repository.decrementProductTagCountByStoreId({
         dbClient: mockDbClient,
         store: { id: 1, delta: 0, updatedAt: new Date() },
+      })
+      expect(res.ok).toBe(false)
+      if (!res.ok)
+        expect(res.message).toBe(
+          "ステップサイズは正の整数である必要があります。",
+        )
+      expect(adapters.decrementProductTagCountByStoreId).not.toHaveBeenCalled()
+    })
+
+    it("店舗のタグ数のデクリメントでdeltaが整数でない場合はエラーを返す", async () => {
+      const res = await repository.decrementProductTagCountByStoreId({
+        dbClient: mockDbClient,
+        store: { id: 1, delta: 3.14, updatedAt: new Date() },
       })
       expect(res.ok).toBe(false)
       if (!res.ok)

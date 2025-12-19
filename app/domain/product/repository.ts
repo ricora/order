@@ -707,7 +707,11 @@ export const createRepository = (adapters: Repository) => {
       })
     },
     incrementProductCountByStoreId: async ({ dbClient, store }) => {
-      if (!Number.isFinite(store.delta) || store.delta <= 0) {
+      if (
+        !Number.isFinite(store.delta) ||
+        !Number.isInteger(store.delta) ||
+        store.delta <= 0
+      ) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -716,7 +720,11 @@ export const createRepository = (adapters: Repository) => {
       return adapters.incrementProductCountByStoreId({ dbClient, store })
     },
     decrementProductCountByStoreId: async ({ dbClient, store }) => {
-      if (!Number.isFinite(store.delta) || store.delta <= 0) {
+      if (
+        !Number.isFinite(store.delta) ||
+        !Number.isInteger(store.delta) ||
+        store.delta <= 0
+      ) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -725,7 +733,11 @@ export const createRepository = (adapters: Repository) => {
       return adapters.decrementProductCountByStoreId({ dbClient, store })
     },
     incrementProductTagCountByStoreId: async ({ dbClient, store }) => {
-      if (!Number.isFinite(store.delta) || store.delta <= 0) {
+      if (
+        !Number.isFinite(store.delta) ||
+        !Number.isInteger(store.delta) ||
+        store.delta <= 0
+      ) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -734,7 +746,11 @@ export const createRepository = (adapters: Repository) => {
       return adapters.incrementProductTagCountByStoreId({ dbClient, store })
     },
     decrementProductTagCountByStoreId: async ({ dbClient, store }) => {
-      if (!Number.isFinite(store.delta) || store.delta <= 0) {
+      if (
+        !Number.isFinite(store.delta) ||
+        !Number.isInteger(store.delta) ||
+        store.delta <= 0
+      ) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -746,7 +762,14 @@ export const createRepository = (adapters: Repository) => {
       dbClient,
       productTags,
     }) => {
-      if (productTags.some((p) => !Number.isFinite(p.delta) || p.delta <= 0)) {
+      if (
+        productTags.some(
+          (p) =>
+            !Number.isFinite(p.delta) ||
+            !Number.isInteger(p.delta) ||
+            p.delta <= 0,
+        )
+      ) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
@@ -761,7 +784,14 @@ export const createRepository = (adapters: Repository) => {
       dbClient,
       productTags,
     }) => {
-      if (productTags.some((p) => !Number.isFinite(p.delta) || p.delta <= 0)) {
+      if (
+        productTags.some(
+          (p) =>
+            !Number.isFinite(p.delta) ||
+            !Number.isInteger(p.delta) ||
+            p.delta <= 0,
+        )
+      ) {
         return {
           ok: false,
           message: "ステップサイズは正の整数である必要があります。",
