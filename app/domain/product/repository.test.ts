@@ -318,14 +318,26 @@ describe("Product repository", () => {
       expect(adapters.decrementProductCountByStoreId).not.toHaveBeenCalled()
     })
 
-    // NOTE: duplicate tests removed — same scenarios covered above
-
-    it("タグカウント取得が失敗した場合は作成を失敗させカウント更新は行われない", async () => {
+    it("タグ数更新でエラーが発生した場合は作成を失敗させる", async () => {
       adapters.getProductCountByStoreId.mockImplementation(async () => ({
         ok: true,
         value: 2,
       }))
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+      adapters.findAllProductTagsByIds.mockImplementation(
+        async ({ productTag }) => ({
+          ok: true,
+          value: productTag.ids.map((id) => ({ id, name: `タグ${id}` })),
+        }),
+      )
+      adapters.findAllProductTags.mockImplementation(async () => ({
+        ok: true,
+        value: [
+          { id: 1, name: "タグ1" },
+          { id: 2, name: "タグ2" },
+          { id: 3, name: "タグ3" },
+        ],
+      }))
+      adapters.incrementAllProductTagRelationCountsByTagIds.mockImplementation(
         async () => ({ ok: false, message: "エラーが発生しました。" }),
       )
       adapters.createProduct.mockImplementation(async ({ product }) => ({
@@ -338,9 +350,10 @@ describe("Product repository", () => {
         dbClient: mockDbClient,
       })
       expect(result.ok).toBe(false)
+      expect(adapters.incrementProductCountByStoreId).toHaveBeenCalledTimes(1)
       expect(
         adapters.incrementAllProductTagRelationCountsByTagIds,
-      ).not.toHaveBeenCalled()
+      ).toHaveBeenCalledTimes(1)
       expect(
         adapters.decrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
@@ -641,7 +654,7 @@ describe("Product repository", () => {
       expect(adapters.findProductByName).toHaveBeenCalledTimes(1)
     })
 
-    it("タグカウント取得が失敗した場合は更新を失敗させる", async () => {
+    it("タグ数更新でエラーが発生した場合は更新を失敗させる", async () => {
       adapters.findProductById.mockImplementation(async () => ({
         ok: true,
         value: {
@@ -652,7 +665,15 @@ describe("Product repository", () => {
           stock: 5,
         },
       }))
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+      adapters.findAllProductTags.mockImplementation(async () => ({
+        ok: true,
+        value: [
+          { id: 1, name: "人気" },
+          { id: 2, name: "メイン" },
+          { id: 3, name: "新商品" },
+        ],
+      }))
+      adapters.incrementAllProductTagRelationCountsByTagIds.mockImplementation(
         async () => ({ ok: false, message: "エラーが発生しました。" }),
       )
       adapters.updateProduct.mockImplementation(async ({ product }) => ({
@@ -667,7 +688,7 @@ describe("Product repository", () => {
       expect(result.ok).toBe(false)
       expect(
         adapters.incrementAllProductTagRelationCountsByTagIds,
-      ).not.toHaveBeenCalled()
+      ).toHaveBeenCalledTimes(1)
       expect(
         adapters.decrementAllProductTagRelationCountsByTagIds,
       ).not.toHaveBeenCalled()
@@ -863,16 +884,7 @@ describe("Product repository", () => {
           stock: 5,
         },
       }))
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementationOnce(
-        async ({ productTag }) => ({
-          ok: true,
-          value: productTag.ids.map((id) => ({
-            tagId: id,
-            count: id === 2 ? 0 : 2,
-          })),
-        }),
-      )
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementationOnce(
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
         async () => ({ ok: false, message: "エラーが発生しました。" }),
       )
       adapters.updateProduct.mockImplementation(async ({ product }) => ({
@@ -1253,7 +1265,7 @@ describe("Product repository", () => {
           stock: 5,
         },
       }))
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
+      adapters.decrementAllProductTagRelationCountsByTagIds.mockImplementation(
         async () => ({ ok: false, message: "エラーが発生しました。" }),
       )
 
@@ -1368,16 +1380,7 @@ describe("Product repository", () => {
           stock: 5,
         },
       }))
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementationOnce(
-        async ({ productTag }) => ({
-          ok: true,
-          value: productTag.ids.map((id) => ({
-            tagId: id,
-            count: id === 2 ? 0 : 2,
-          })),
-        }),
-      )
-      adapters.getAllProductTagRelationCountsByTagIds.mockImplementationOnce(
+      adapters.getAllProductTagRelationCountsByTagIds.mockImplementation(
         async () => ({ ok: false, message: "エラーが発生しました。" }),
       )
 

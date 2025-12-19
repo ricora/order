@@ -397,15 +397,6 @@ export const createRepository = (adapters: Repository) => {
     delta: number,
   ): Promise<Result<void, "エラーが発生しました。">> => {
     if (tagIds.length === 0) return { ok: true, value: undefined }
-    const tagCountsRes =
-      await repository.getAllProductTagRelationCountsByTagIds({
-        dbClient,
-        productTag: { ids: tagIds },
-        pagination: { offset: 0, limit: tagIds.length },
-      })
-    if (!tagCountsRes.ok) {
-      return { ok: false, message: "エラーが発生しました。" }
-    }
     const positiveUpdates = tagIds.map((id) => ({
       id,
       delta: Math.abs(delta),
