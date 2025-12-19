@@ -459,12 +459,11 @@ export const adapters = {
   },
 
   decrementProductCountByStoreId: async ({ dbClient, store }) => {
-    const delta = store.delta
     await dbClient
       .insert(productCountPerStoreTable)
       .values({
         storeId: store.id,
-        productCount: delta,
+        productCount: store.delta,
         updatedAt: store.updatedAt,
       })
       .onConflictDoUpdate({
@@ -504,12 +503,11 @@ export const adapters = {
   },
 
   decrementProductTagCountByStoreId: async ({ dbClient, store }) => {
-    const delta = store.delta
     await dbClient
       .insert(productTagCountPerStoreTable)
       .values({
         storeId: store.id,
-        productTagCount: delta,
+        productTagCount: store.delta,
         updatedAt: store.updatedAt,
       })
       .onConflictDoUpdate({
