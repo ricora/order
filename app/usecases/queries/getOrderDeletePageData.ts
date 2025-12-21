@@ -4,11 +4,16 @@ import type { UsecaseFunction } from "../types"
 
 const { findOrderById } = orderRepository
 
-export const getOrderDeletePageData: UsecaseFunction<
+export type GetOrderDeletePageData = UsecaseFunction<
   { order: Pick<Order, "id"> },
   { order: Order | null },
   "エラーが発生しました。" | "注文が見つかりません。"
-> = async ({ dbClient, order }) => {
+>
+
+export const getOrderDeletePageData: GetOrderDeletePageData = async ({
+  dbClient,
+  order,
+}) => {
   try {
     const foundOrderResult = await findOrderById({ dbClient, order })
     if (!foundOrderResult.ok) {
