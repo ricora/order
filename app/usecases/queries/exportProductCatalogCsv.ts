@@ -123,7 +123,7 @@ const buildProductRows = async (
 export type ExportProductCatalogCsv = UsecaseFunction<
   { imageBaseUrl: string },
   { csv: string; exportedAt: Date; productCount: number },
-  "エラーが発生しました。"
+  never
 >
 
 export const exportProductCatalogCsv: ExportProductCatalogCsv = async ({

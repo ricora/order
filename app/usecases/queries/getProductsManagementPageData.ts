@@ -29,7 +29,7 @@ export type GetProductsManagementPageData = UsecaseFunction<
     currentPage: number
     pageSize: number
   },
-  "エラーが発生しました。"
+  never
 >
 const calculateProductStatus = (stock: number): ProductStatus => {
   if (stock > LOW_STOCK_THRESHOLD) {

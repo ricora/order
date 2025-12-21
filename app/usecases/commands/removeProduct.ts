@@ -7,7 +7,7 @@ const { deleteProduct } = productRepository
 export type RemoveProduct = UsecaseFunction<
   { product: Pick<Product, "id"> },
   void,
-  "エラーが発生しました。"
+  never
 >
 
 export const removeProduct: RemoveProduct = async ({ dbClient, product }) => {

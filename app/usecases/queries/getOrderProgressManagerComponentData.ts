@@ -20,7 +20,7 @@ export type GetOrderProgressManagerComponentData = UsecaseFunction<
     completedOrders: Order[]
     cancelledOrders: Order[]
   },
-  "エラーが発生しました。"
+  never
 >
 
 export const getOrderProgressManagerComponentData: GetOrderProgressManagerComponentData =

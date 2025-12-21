@@ -16,7 +16,7 @@ export type OrderRegistrationFormComponentData = {
 export type GetOrderRegistrationFormComponentData = UsecaseFunction<
   unknown,
   OrderRegistrationFormComponentData,
-  "エラーが発生しました。"
+  never
 >
 
 export const getOrderRegistrationFormComponentData: GetOrderRegistrationFormComponentData =

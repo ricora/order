@@ -8,7 +8,7 @@ const { findAllProductTags } = productRepository
 export type GetProductRegistrationFormComponentData = UsecaseFunction<
   unknown,
   { tags: ProductTag[] },
-  "エラーが発生しました。"
+  never
 >
 
 export const getProductRegistrationFormComponentData: GetProductRegistrationFormComponentData =

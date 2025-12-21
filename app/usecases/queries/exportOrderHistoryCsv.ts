@@ -31,7 +31,7 @@ export const ORDER_HISTORY_HEADER = [...ORDER_HISTORY_COLUMNS]
 export type ExportOrderHistoryCsv = UsecaseFunction<
   unknown,
   { csv: string; exportedAt: Date; orderCount: number; rowCount: number },
-  "エラーが発生しました."
+  never
 >
 
 const fetchAllOrders = async (
