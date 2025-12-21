@@ -1,21 +1,19 @@
 import type { Order } from "../../domain/order/entities"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { orderRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { updateOrder } = orderRepository
 
-export type SetOrderStatusParams = {
-  dbClient: DbClient
-  order: Pick<Order, "id" | "status">
-}
+export type SetOrderStatusError =
+  | "エラーが発生しました。"
+  | "注文が見つかりません。"
+export type SetOrderStatus = UsecaseFunction<
+  { order: Pick<Order, "id" | "status"> },
+  Order,
+  SetOrderStatusError
+>
 
-export const setOrderStatus = async ({
-  dbClient,
-  order,
-}: SetOrderStatusParams): Promise<
-  Result<Order, "エラーが発生しました。" | "注文が見つかりません。">
-> => {
+export const setOrderStatus: SetOrderStatus = async ({ dbClient, order }) => {
   const errorMessage = "エラーが発生しました。"
   const txResult = await dbClient.transaction(async (tx) => {
     const result = await (async () => {

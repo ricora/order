@@ -1,7 +1,6 @@
 import type { Order } from "../../domain/order/entities"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { orderRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { updateOrder: updateOrderRepo } = orderRepository
 
@@ -21,18 +20,17 @@ const WHITELISTED_ERRORS = new Set<string>(
 const isWhitelistedError = (v: unknown): v is WhitelistedError =>
   typeof v === "string" && WHITELISTED_ERRORS.has(v)
 
-export type SetOrderDetailsParams = {
-  dbClient: DbClient
-  order: Pick<Order, "id"> &
-    Partial<Pick<Order, "customerName" | "comment" | "status">>
-}
+export type SetOrderDetailsError = "エラーが発生しました。" | WhitelistedError
+export type SetOrderDetails = UsecaseFunction<
+  {
+    order: Pick<Order, "id"> &
+      Partial<Pick<Order, "customerName" | "comment" | "status">>
+  },
+  Order,
+  SetOrderDetailsError
+>
 
-export const setOrderDetails = async ({
-  dbClient,
-  order,
-}: SetOrderDetailsParams): Promise<
-  Result<Order, "エラーが発生しました。" | WhitelistedError>
-> => {
+export const setOrderDetails: SetOrderDetails = async ({ dbClient, order }) => {
   const errorMessage = "エラーが発生しました。"
   const txResult = await dbClient.transaction(async (tx) => {
     const result = await (async () => {

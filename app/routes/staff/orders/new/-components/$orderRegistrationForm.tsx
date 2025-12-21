@@ -1,7 +1,7 @@
 import type { FC } from "hono/jsx"
 import { useCallback, useEffect, useMemo, useState } from "hono/jsx"
 import { tv } from "tailwind-variants"
-import type { RegisterOrderParams } from "../../../../../usecases/commands/registerOrder"
+import type { RegisterOrder } from "../../../../../usecases/commands/registerOrder"
 import type { OrderRegistrationFormComponentData } from "../../../../../usecases/queries/getOrderRegistrationFormComponentData"
 import { formatCurrencyJPY } from "../../../../../utils/money"
 import RotateCwIcon from "../../../../-components/icons/lucide/rotateCwIcon"
@@ -16,7 +16,7 @@ import Input from "../../../../-components/ui/input"
 import Label from "../../../../-components/ui/label"
 import { createHonoClient } from "../../../../-helpers/api/hono-client"
 
-type OrderItem = RegisterOrderParams["order"]["orderItems"][number] & {
+type OrderItem = Parameters<RegisterOrder>[0]["order"]["orderItems"][number] & {
   productName: string
   unitAmount: number
 }

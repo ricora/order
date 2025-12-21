@@ -1,33 +1,26 @@
 import { MAX_TAGS_PER_PRODUCT } from "../../domain/product/constants"
 import type { Product, ProductTag } from "../../domain/product/entities"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { findProductById, findAllProductTagsByIds } = productRepository
 
-export type GetProductDeletePageDataParams = {
-  dbClient: DbClient
-  product: Pick<Product, "id">
-}
+export type GetProductDeletePageData = UsecaseFunction<
+  { product: Pick<Product, "id"> },
+  {
+    product:
+      | (Pick<Product, "id" | "name" | "price" | "stock"> & {
+          tags: ProductTag["name"][]
+        })
+      | null
+  },
+  "エラーが発生しました。" | "商品が見つかりません。"
+>
 
-export type ProductDeletePageData = {
-  product:
-    | (Pick<Product, "id" | "name" | "price" | "stock"> & {
-        tags: ProductTag["name"][]
-      })
-    | null
-}
-
-export const getProductDeletePageData = async ({
+export const getProductDeletePageData: GetProductDeletePageData = async ({
   dbClient,
   product,
-}: GetProductDeletePageDataParams): Promise<
-  Result<
-    ProductDeletePageData,
-    "エラーが発生しました。" | "商品が見つかりません。"
-  >
-> => {
+}) => {
   try {
     const foundProductResult = await findProductById({ dbClient, product })
     if (!foundProductResult.ok) {

@@ -1,28 +1,19 @@
 import type { Product } from "../../domain/product/entities"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { findProductById } = productRepository
 
-export type GetProductEditPageDataParams = {
-  dbClient: DbClient
-  product: Pick<Product, "id">
-}
+export type GetProductEditPageData = UsecaseFunction<
+  { product: Pick<Product, "id"> },
+  { product: Product },
+  "エラーが発生しました。" | "商品が見つかりません。"
+>
 
-export type ProductEditPageData = {
-  product: Product
-}
-
-export const getProductEditPageData = async ({
+export const getProductEditPageData: GetProductEditPageData = async ({
   dbClient,
   product,
-}: GetProductEditPageDataParams): Promise<
-  Result<
-    ProductEditPageData,
-    "エラーが発生しました。" | "商品が見つかりません。"
-  >
-> => {
+}) => {
   try {
     const foundProductResult = await findProductById({ dbClient, product })
     if (!foundProductResult.ok) {

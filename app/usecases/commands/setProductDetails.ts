@@ -1,8 +1,9 @@
 import { MAX_STORE_PRODUCT_TAG_COUNT } from "../../domain/product/constants"
 import type { Product, ProductImage } from "../../domain/product/entities"
 import type { Result } from "../../domain/types"
-import type { DbClient, TransactionDbClient } from "../../libs/db/client"
+import type { TransactionDbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const {
   updateProduct,
@@ -97,17 +98,16 @@ const resolveTagNamesToIds = async ({
   return { ok: true, value: tagIds }
 }
 
-export type SetProductDetailsParams = {
-  dbClient: DbClient
-  product: UpdateProductPayload
-}
+export type SetProductDetails = UsecaseFunction<
+  { product: UpdateProductPayload },
+  Product,
+  SetProductDetailsError
+>
 
-export const setProductDetails = async ({
+export const setProductDetails: SetProductDetails = async ({
   dbClient,
   product,
-}: SetProductDetailsParams): Promise<
-  Result<Product, SetProductDetailsError>
-> => {
+}) => {
   try {
     const updatePayload = product
     const txResult = await dbClient.transaction<
