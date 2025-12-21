@@ -4,6 +4,7 @@ import type { DbClient } from "../../libs/db/client"
 import { toCsv } from "../../utils/csv"
 import { formatDateTimeIsoJP } from "../../utils/date"
 import { orderRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { findAllOrdersOrderByIdAsc } = orderRepository
 
@@ -27,16 +28,11 @@ export const ORDER_HISTORY_COLUMNS = [
 
 export const ORDER_HISTORY_HEADER = [...ORDER_HISTORY_COLUMNS]
 
-export type ExportOrderHistoryCsvParams = {
-  dbClient: DbClient
-}
-
-export type ExportOrderHistoryCsvResult = {
-  csv: string
-  exportedAt: Date
-  orderCount: number
-  rowCount: number
-}
+export type ExportOrderHistoryCsv = UsecaseFunction<
+  unknown,
+  { csv: string; exportedAt: Date; orderCount: number; rowCount: number },
+  "エラーが発生しました."
+>
 
 const fetchAllOrders = async (
   dbClient: DbClient,
@@ -119,11 +115,9 @@ const buildOrderRows = (orders: Order[]) => {
   return rows
 }
 
-export const exportOrderHistoryCsv = async ({
+export const exportOrderHistoryCsv: ExportOrderHistoryCsv = async ({
   dbClient,
-}: ExportOrderHistoryCsvParams): Promise<
-  Result<ExportOrderHistoryCsvResult, "エラーが発生しました。">
-> => {
+}) => {
   const ordersResult = await fetchAllOrders(dbClient)
   if (!ordersResult.ok) return { ok: false, message: "エラーが発生しました。" }
   const orders = ordersResult.value

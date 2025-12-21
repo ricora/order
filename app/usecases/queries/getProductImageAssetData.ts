@@ -1,23 +1,19 @@
 import type { ProductImage } from "../../domain/product/entities"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { productRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { findProductImageByProductId } = productRepository
 
-export type GetProductImageAssetParams = {
-  dbClient: DbClient
-  productImage: Pick<ProductImage, "productId">
-}
-export const getProductImageAssetData = async ({
+export type GetProductImageAsset = UsecaseFunction<
+  { productImage: Pick<ProductImage, "productId"> },
+  { productImage: ProductImage },
+  "エラーが発生しました。" | "商品画像が見つかりません。"
+>
+
+export const getProductImageAssetData: GetProductImageAsset = async ({
   dbClient,
   productImage,
-}: GetProductImageAssetParams): Promise<
-  Result<
-    { productImage: ProductImage },
-    "エラーが発生しました。" | "商品画像が見つかりません。"
-  >
-> => {
+}) => {
   try {
     const foundProductImage = await findProductImageByProductId({
       dbClient,

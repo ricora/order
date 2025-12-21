@@ -1,19 +1,16 @@
 import type { Order } from "../../domain/order/entities"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { orderRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { deleteOrder } = orderRepository
 
-export type RemoveOrderParams = {
-  dbClient: DbClient
-  order: Pick<Order, "id">
-}
+export type RemoveOrder = UsecaseFunction<
+  { order: Pick<Order, "id"> },
+  void,
+  "エラーが発生しました。"
+>
 
-export const removeOrder = async ({
-  dbClient,
-  order,
-}: RemoveOrderParams): Promise<Result<void, "エラーが発生しました。">> => {
+export const removeOrder: RemoveOrder = async ({ dbClient, order }) => {
   const errorMessage = "エラーが発生しました。"
   const txResult = await dbClient.transaction(async (tx) => {
     const result = await (async () => {

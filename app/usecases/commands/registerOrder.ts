@@ -1,8 +1,7 @@
 import type { Order } from "../../domain/order/entities"
 import { MAX_STORE_PRODUCT_COUNT } from "../../domain/product/constants"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { orderRepository, productRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const PRODUCT_NOT_FOUND = "注文に存在しない商品が含まれています。" as const
 const INSUFFICIENT_STOCK = "注文の個数が在庫を上回っています。" as const
@@ -35,20 +34,20 @@ type RegisterOrderError =
   | typeof ORDER_ITEM_QUANTITY_MIN_ERROR
   | typeof INTERNAL_ERROR
 
-export type RegisterOrderParams = {
-  dbClient: DbClient
-  order: Pick<Order, "customerName" | "comment"> & {
-    orderItems: {
-      quantity: Order["orderItems"][number]["quantity"]
-      productId: NonNullable<Order["orderItems"][number]["productId"]>
-    }[]
-  }
-}
+export type RegisterOrder = UsecaseFunction<
+  {
+    order: Pick<Order, "customerName" | "comment"> & {
+      orderItems: {
+        quantity: Order["orderItems"][number]["quantity"]
+        productId: NonNullable<Order["orderItems"][number]["productId"]>
+      }[]
+    }
+  },
+  Order,
+  RegisterOrderError
+>
 
-export const registerOrder = async ({
-  dbClient,
-  order,
-}: RegisterOrderParams): Promise<Result<Order, RegisterOrderError>> => {
+export const registerOrder: RegisterOrder = async ({ dbClient, order }) => {
   const ids = order.orderItems.map((item) => item.productId)
   try {
     const txResult = await dbClient.transaction(async (tx) => {

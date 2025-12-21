@@ -3,6 +3,7 @@ import type { Result } from "../../domain/types"
 import type { DbClient } from "../../libs/db/client"
 import { toCsv } from "../../utils/csv"
 import { productRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { findAllProductsOrderByIdAsc, findAllProductTagsByIds } =
   productRepository
@@ -21,17 +22,6 @@ export const PRODUCT_CATALOG_COLUMNS = [
 ] as const
 
 export const PRODUCT_CATALOG_HEADER = [...PRODUCT_CATALOG_COLUMNS]
-
-export type ExportProductCatalogCsvParams = {
-  dbClient: DbClient
-  imageBaseUrl: string
-}
-
-export type ExportProductCatalogCsvResult = {
-  csv: string
-  exportedAt: Date
-  productCount: number
-}
 
 const fetchAllProducts = async (
   dbClient: DbClient,
@@ -130,12 +120,16 @@ const buildProductRows = async (
   )
 }
 
-export const exportProductCatalogCsv = async ({
+export type ExportProductCatalogCsv = UsecaseFunction<
+  { imageBaseUrl: string },
+  { csv: string; exportedAt: Date; productCount: number },
+  "エラーが発生しました。"
+>
+
+export const exportProductCatalogCsv: ExportProductCatalogCsv = async ({
   dbClient,
   imageBaseUrl,
-}: ExportProductCatalogCsvParams): Promise<
-  Result<ExportProductCatalogCsvResult, "エラーが発生しました。">
-> => {
+}) => {
   const productsResult = await fetchAllProducts(dbClient)
   if (!productsResult.ok)
     return { ok: false, message: "エラーが発生しました。" }

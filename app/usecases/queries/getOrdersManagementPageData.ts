@@ -1,31 +1,26 @@
 import type { Order } from "../../domain/order/entities"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { orderRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { findAllOrdersOrderByIdAsc, findAllOrdersOrderByIdDesc } =
   orderRepository
 
-export type GetOrdersManagementPageDataParams = {
-  dbClient: DbClient
-  page?: number
-  sort?: "asc" | "desc"
-}
+export type GetOrdersManagementPageData = UsecaseFunction<
+  { page?: number; sort?: "asc" | "desc" },
+  {
+    orders: Order[]
+    hasNextPage: boolean
+    currentPage: number
+    pageSize: number
+  },
+  "エラーが発生しました。"
+>
 
-export type OrdersManagementPageData = {
-  orders: Order[]
-  hasNextPage: boolean
-  currentPage: number
-  pageSize: number
-}
-
-export const getOrdersManagementPageData = async ({
+export const getOrdersManagementPageData: GetOrdersManagementPageData = async ({
   dbClient,
   page = 1,
   sort = "asc",
-}: GetOrdersManagementPageDataParams): Promise<
-  Result<OrdersManagementPageData, "エラーが発生しました。">
-> => {
+}) => {
   const pageSize = 50
   const offset = Math.max(0, (page - 1) * pageSize)
 

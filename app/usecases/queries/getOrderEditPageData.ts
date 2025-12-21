@@ -1,25 +1,19 @@
 import type { Order } from "../../domain/order/entities"
-import type { Result } from "../../domain/types"
-import type { DbClient } from "../../libs/db/client"
 import { orderRepository } from "../repositories-provider"
+import type { UsecaseFunction } from "../types"
 
 const { findOrderById } = orderRepository
 
-export type GetOrderEditPageDataParams = {
-  dbClient: DbClient
-  order: Pick<Order, "id">
-}
+export type GetOrderEditPageData = UsecaseFunction<
+  { order: Pick<Order, "id"> },
+  { order: Order | null },
+  "エラーが発生しました。" | "注文が見つかりません。"
+>
 
-export type OrderEditPageData = {
-  order: Order | null
-}
-
-export const getOrderEditPageData = async ({
+export const getOrderEditPageData: GetOrderEditPageData = async ({
   dbClient,
   order,
-}: GetOrderEditPageDataParams): Promise<
-  Result<OrderEditPageData, "エラーが発生しました。" | "注文が見つかりません。">
-> => {
+}) => {
   try {
     const foundOrderResult = await findOrderById({ dbClient, order })
     if (!foundOrderResult.ok) {
