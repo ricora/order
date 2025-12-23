@@ -76,6 +76,6 @@ describe("removeProduct", () => {
     if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
 
     expect(transactionSpy).toHaveBeenCalledTimes(1)
-    expect(transactionSpy.mock.results[0].value).rejects.toThrow()
+    await expect(transactionSpy.mock.results[0].value).rejects.toThrow()
   })
 })
