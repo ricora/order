@@ -14,25 +14,25 @@ export type SetOrderStatus = UsecaseFunction<
 >
 
 export const setOrderStatus: SetOrderStatus = async ({ dbClient, order }) => {
-  const errorMessage = "エラーが発生しました。"
-  const txResult = await dbClient.transaction(async (tx) => {
-    const result = await (async () => {
-      try {
-        return await updateOrder({
-          dbClient: tx,
-          order: { id: order.id, status: order.status, updatedAt: new Date() },
-        })
-      } catch {
-        return { ok: false, message: errorMessage } as const
+  let errorMessage: SetOrderStatusError = "エラーが発生しました。"
+  try {
+    const txResult = await dbClient.transaction(async (tx) => {
+      const result = await updateOrder({
+        dbClient: tx,
+        order: { id: order.id, status: order.status, updatedAt: new Date() },
+      })
+
+      if (!result.ok) {
+        if (result.message === "注文が見つかりません。") {
+          errorMessage = "注文が見つかりません。"
+        }
+        throw new Error()
       }
-    })()
-    if (!result.ok) {
-      if (result.message === "注文が見つかりません。") {
-        return { ok: false, message: result.message } as const
-      }
-      return { ok: false, message: errorMessage } as const
-    }
-    return { ok: true, value: result.value } as const
-  })
-  return txResult
+      return { ok: true, value: result.value } as const
+    })
+
+    return txResult
+  } catch {
+    return { ok: false, message: errorMessage } as const
+  }
 }
