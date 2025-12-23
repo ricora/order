@@ -103,7 +103,7 @@ const SidebarInternal = ({
     <div className="flex items-center border-sidebar-border border-b px-0 py-5">
       <div className="ml-4 grid aspect-square size-8 place-items-center rounded-md bg-sidebar-accent">
         <div className="size-6">
-          <ChefHatIcon />
+          <ShoppingCartIcon />
         </div>
       </div>
       <div className="ml-2 flex flex-col gap-0.5 leading-none">
