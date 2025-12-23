@@ -104,9 +104,7 @@ export const registerProduct: RegisterProduct = async ({
   let errorMessage: RegisterProductError = INTERNAL_ERROR
   try {
     const createPayload = product
-    const txResult = await dbClient.transaction<
-      Result<Product, RegisterProductError>
-    >(async (tx) => {
+    const txResult = await dbClient.transaction(async (tx) => {
       const tagResult = await resolveTagNamesToIds({
         dbClient: tx,
         tagNames: createPayload.tags,
@@ -154,7 +152,7 @@ export const registerProduct: RegisterProduct = async ({
           throw new Error()
         }
       }
-      return { ok: true, value: createdProductResult.value }
+      return { ok: true, value: createdProductResult.value } as const
     })
     return txResult
   } catch {
