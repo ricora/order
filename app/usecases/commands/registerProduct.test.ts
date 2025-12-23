@@ -285,6 +285,7 @@ describe("registerProduct", () => {
     })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+    await expect(transactionSpy.mock.results[0].value).rejects.toThrow()
   })
 
   it("createProductImageが例外を投げた場合は汎用エラーにフォールバックする", async () => {
@@ -353,6 +354,7 @@ describe("registerProduct", () => {
     })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+    await expect(transactionSpy.mock.results[0].value).rejects.toThrow()
     expect(productRepository.createProductImage).not.toHaveBeenCalled()
   })
 })

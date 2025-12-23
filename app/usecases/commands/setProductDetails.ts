@@ -108,18 +108,22 @@ export const setProductDetails: SetProductDetails = async ({
   dbClient,
   product,
 }) => {
+  let errorMessage: SetProductDetailsError = INTERNAL_ERROR
   try {
     const updatePayload = product
-    const txResult = await dbClient.transaction<
-      Result<Product, SetProductDetailsError>
-    >(async (tx) => {
+    const txResult = await dbClient.transaction(async (tx) => {
       let tagIds: number[] | undefined
       if (updatePayload.tags !== undefined) {
         const tagResult = await resolveTagNamesToIds({
           dbClient: tx,
           tagNames: updatePayload.tags,
         })
-        if (!tagResult.ok) return tagResult
+        if (!tagResult.ok) {
+          if (isWhitelistedError(tagResult.message)) {
+            errorMessage = tagResult.message
+          }
+          throw new Error()
+        }
         tagIds = tagResult.value
       }
       const updatedProductResult = await updateProduct({
@@ -138,12 +142,11 @@ export const setProductDetails: SetProductDetails = async ({
       if (!updatedProductResult.ok) {
         const msg = updatedProductResult.message
         if (msg === PRODUCT_NOT_FOUND) {
-          return { ok: false, message: PRODUCT_NOT_FOUND }
+          errorMessage = PRODUCT_NOT_FOUND
+        } else if (isWhitelistedError(msg)) {
+          errorMessage = msg
         }
-        if (isWhitelistedError(msg)) {
-          return { ok: false, message: msg }
-        }
-        return { ok: false, message: INTERNAL_ERROR }
+        throw new Error()
       }
       if (updatePayload.image !== undefined) {
         const isNullImage =
@@ -176,8 +179,10 @@ export const setProductDetails: SetProductDetails = async ({
             })
             if (!imageRes.ok) {
               const msg = imageRes.message
-              if (isWhitelistedError(msg)) return { ok: false, message: msg }
-              return { ok: false, message: INTERNAL_ERROR }
+              if (isWhitelistedError(msg)) {
+                errorMessage = msg
+              }
+              throw new Error()
             }
           } else {
             const imageRes = await createProductImage({
@@ -192,16 +197,18 @@ export const setProductDetails: SetProductDetails = async ({
             })
             if (!imageRes.ok) {
               const msg = imageRes.message
-              if (isWhitelistedError(msg)) return { ok: false, message: msg }
-              return { ok: false, message: INTERNAL_ERROR }
+              if (isWhitelistedError(msg)) {
+                errorMessage = msg
+              }
+              throw new Error()
             }
           }
         }
       }
-      return { ok: true, value: updatedProductResult.value }
+      return { ok: true, value: updatedProductResult.value } as const
     })
     return txResult
   } catch {
-    return { ok: false, message: INTERNAL_ERROR }
+    return { ok: false, message: errorMessage }
   }
 }

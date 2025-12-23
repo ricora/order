@@ -101,16 +101,20 @@ export const registerProduct: RegisterProduct = async ({
   dbClient,
   product,
 }) => {
+  let errorMessage: RegisterProductError = INTERNAL_ERROR
   try {
     const createPayload = product
-    const txResult = await dbClient.transaction<
-      Result<Product, RegisterProductError>
-    >(async (tx) => {
+    const txResult = await dbClient.transaction(async (tx) => {
       const tagResult = await resolveTagNamesToIds({
         dbClient: tx,
         tagNames: createPayload.tags,
       })
-      if (!tagResult.ok) return tagResult
+      if (!tagResult.ok) {
+        if (isWhitelistedError(tagResult.message)) {
+          errorMessage = tagResult.message
+        }
+        throw new Error()
+      }
       const tagIds = tagResult.value
       const createdProductResult = await createProduct({
         product: {
@@ -124,9 +128,9 @@ export const registerProduct: RegisterProduct = async ({
       if (!createdProductResult.ok) {
         const msg = createdProductResult.message
         if (isWhitelistedError(msg)) {
-          return { ok: false, message: msg }
+          errorMessage = msg
         }
-        return { ok: false, message: INTERNAL_ERROR }
+        throw new Error()
       }
       if (createPayload.image) {
         const now = new Date()
@@ -143,15 +147,15 @@ export const registerProduct: RegisterProduct = async ({
         if (!imageResult.ok) {
           const msg = imageResult.message
           if (isWhitelistedError(msg)) {
-            return { ok: false, message: msg }
+            errorMessage = msg
           }
-          return { ok: false, message: INTERNAL_ERROR }
+          throw new Error()
         }
       }
-      return { ok: true, value: createdProductResult.value }
+      return { ok: true, value: createdProductResult.value } as const
     })
     return txResult
   } catch {
-    return { ok: false, message: INTERNAL_ERROR }
+    return { ok: false, message: errorMessage }
   }
 }

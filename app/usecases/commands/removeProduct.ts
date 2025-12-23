@@ -11,19 +11,18 @@ export type RemoveProduct = UsecaseFunction<
 >
 
 export const removeProduct: RemoveProduct = async ({ dbClient, product }) => {
-  const errorMessage = "エラーが発生しました。"
-  const txResult = await dbClient.transaction(async (tx) => {
-    const result = await (async () => {
-      try {
-        return await deleteProduct({ dbClient: tx, product })
-      } catch {
-        return { ok: false, message: errorMessage } as const
+  const errorMessage = "エラーが発生しました。" as const
+  try {
+    const txResult = await dbClient.transaction(async (tx) => {
+      const result = await deleteProduct({ dbClient: tx, product })
+      if (!result.ok) {
+        throw new Error()
       }
-    })()
-    if (!result.ok) {
-      return { ok: false, message: errorMessage } as const
-    }
-    return { ok: true, value: result.value } as const
-  })
-  return txResult
+
+      return { ok: true, value: result.value } as const
+    })
+    return txResult
+  } catch {
+    return { ok: false, message: errorMessage } as const
+  }
 }
