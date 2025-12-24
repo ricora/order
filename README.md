@@ -40,7 +40,7 @@
 - Database: PostgreSQL / [PGLite](https://github.com/electric-sql/pglite)
 - ORM: [Drizzle ORM](https://orm.drizzle.team/)
 - Styling: [Tailwind CSS](https://tailwindcss.com/)
-- Testing: [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/)
+- Testing: [Bun](https://bun.com/docs/test), [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/)
 - Linting: [Biome](https://biomejs.dev/), [Prettier](https://prettier.io/)
 
 ## 開発ガイドライン
