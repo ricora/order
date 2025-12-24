@@ -5,6 +5,19 @@
 >
 > ドキュメントは人間とLLMの双方にとって分かりやすく、意図や設計方針が正確に伝わるよう記述してください。
 
+## 技術スタック
+
+- Runtime: [Node.js](https://nodejs.org/), [Bun](https://bun.sh/)
+- Meta-framework: [HonoX](https://github.com/honojs/honox)
+- Routing: [Hono](https://honojs.dev/)
+- Build: [Vite](https://vitejs.dev/)
+- Database: [PostgreSQL](https://www.postgresql.org/), [PGlite](https://pglite.dev/)
+- ORM: [Drizzle ORM](https://orm.drizzle.team/)
+- UI: [Hono JSX](https://hono.dev/docs/guides/jsx)
+- Styling: [Tailwind CSS](https://tailwindcss.com/), [Tailwind Variants](https://tailwind-variants.org/)
+- Testing: [Bun Test](https://bun.com/docs/test), [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/)
+- Linting: [Biome](https://biomejs.dev/), [Prettier](https://prettier.io/), [tsgo](https://github.com/microsoft/typescript-go), [dependency-cruiser](https://github.com/sverweij/dependency-cruiser)
+
 ## 基本方針
 
 - Nodeモジュールの依存関係は最小限にする
