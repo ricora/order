@@ -107,4 +107,4 @@ bun run check:write
 
 ## アーキテクチャ
 
-詳細は [docs/architecture.md](docs/architecture.md) を参照してください。
+詳細は[ARCHITECTURE.md](docs/architecture.md)を参照してください。
