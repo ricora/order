@@ -43,7 +43,9 @@
 - Testing: [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/)
 - Linting: [Biome](https://biomejs.dev/), [Prettier](https://prettier.io/)
 
-## セットアップ
+## 開発ガイドライン
+
+詳細は[CONTRIBUTING.md](docs/contributing.md)を参照してください。
 
 ### 必要条件
 
