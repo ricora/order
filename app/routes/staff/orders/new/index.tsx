@@ -60,8 +60,11 @@ export const POST = createRoute(
           if (q === undefined) return null
           return parseAndValidate(id, q)
         })
-        if (items.some((it) => it === null)) return null
-        return items as { productId: number; quantity: number }[]
+        const validItems = items.filter(
+          (it): it is { productId: number; quantity: number } => it !== null,
+        )
+        if (validItems.length !== items.length) return null
+        return validItems
       }
 
       return null
