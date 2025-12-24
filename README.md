@@ -1,6 +1,8 @@
-# Order Management System
-
-学園祭の模擬店のための注文・在庫管理システム。
+<div align="center">
+  <img alt="" src="./public/icon.svg" width="128" height="128">
+  <h1>Order</h1>
+  <p>学園祭の模擬店のための注文・在庫管理システム。</p>
+</div>
 
 ## 機能
 
