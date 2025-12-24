@@ -58,9 +58,7 @@ const Input: FC<InputProps> = ({
       onCompositionStart={onCompositionStart}
       onCompositionEnd={onCompositionEnd}
       onPaste={onPaste}
-      className={
-        "mt-1 w-full rounded border border-input px-3 py-2 text-fg text-sm placeholder:text-muted-fg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary-subtle"
-      }
+      className="mt-1 w-full rounded border border-input px-3 py-2 text-fg text-sm placeholder:text-muted-fg focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary-subtle"
     />
   )
 }

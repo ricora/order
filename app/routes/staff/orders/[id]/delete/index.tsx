@@ -11,27 +11,22 @@ import Layout from "../../../-components/layout"
 import OrderSummary from "../-components/orderSummary"
 
 export const POST = createRoute(async (c) => {
-  try {
-    const id = Number(c.req.param("id"))
-    if (!Number.isInteger(id) || id <= 0) {
-      return c.notFound()
-    }
+  const id = Number(c.req.param("id"))
+  if (!Number.isInteger(id) || id <= 0) {
+    return c.notFound()
+  }
 
-    const res = await removeOrder({
-      dbClient: c.get("dbClient"),
-      order: { id },
-    })
-    if (!res.ok) {
-      setToastCookie(c, "error", res.message)
-      return c.redirect(c.req.url)
-    }
-
-    setToastCookie(c, "success", "注文を削除しました")
-    return c.redirect("/staff/orders")
-  } catch (e) {
-    setToastCookie(c, "error", String(e))
+  const res = await removeOrder({
+    dbClient: c.get("dbClient"),
+    order: { id },
+  })
+  if (!res.ok) {
+    setToastCookie(c, "error", res.message)
     return c.redirect(c.req.url)
   }
+
+  setToastCookie(c, "success", "注文を削除しました")
+  return c.redirect("/staff/orders")
 })
 
 export default createRoute(async (c) => {
@@ -52,7 +47,7 @@ export default createRoute(async (c) => {
   const { order } = res.value
   if (!order) return c.notFound()
   return c.render(
-    <Layout title={"注文削除"} description={"注文情報の削除を行います。"}>
+    <Layout title="注文削除" description="注文情報の削除を行います。">
       <div class="rounded-lg border bg-bg p-6">
         <h2 class="mb-2 font-semibold text-lg">注文削除</h2>
         <div class="p-4">
