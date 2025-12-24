@@ -43,7 +43,7 @@
     "@types/node": "24.10.0",
     "@typescript/native-preview": "7.0.0-dev.20251128.1",
     "dependency-cruiser": "^17.3.1",
-    "drizzle-kit": "0.31.6",
+    "drizzle-kit": "0.31.8",
     "prettier": "3.6.2",
     "prettier-plugin-toml": "2.0.6",
     "tailwindcss": "4.1.17",
