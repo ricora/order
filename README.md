@@ -32,17 +32,6 @@
 
 過去の注文履歴をテーブル形式で一覧表示する画面です。注文ID、登録日時、更新日時、顧客名、注文内容、合計金額、コメント、ステータスを確認でき、個別の編集、削除も可能です。
 
-## 技術スタック
-
-- Runtime: [Bun](https://bun.sh/)
-- Framework: [HonoX](https://github.com/honojs/honox)
-- Build: [Vite](https://vitejs.dev/)
-- Database: PostgreSQL / [PGLite](https://github.com/electric-sql/pglite)
-- ORM: [Drizzle ORM](https://orm.drizzle.team/)
-- Styling: [Tailwind CSS](https://tailwindcss.com/)
-- Testing: [Bun](https://bun.com/docs/test), [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/)
-- Linting: [Biome](https://biomejs.dev/), [Prettier](https://prettier.io/)
-
 ## 開発ガイドライン
 
 詳細は[CONTRIBUTING.md](docs/contributing.md)を参照してください。
