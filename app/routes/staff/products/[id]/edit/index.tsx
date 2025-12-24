@@ -9,36 +9,30 @@ import { parseProductRegistrationFormData } from "../../-helpers/parseProductReg
 
 export const POST = createRoute(
   validator("form", async (value, c) => {
-    try {
-      const parsed = await parseProductRegistrationFormData(value)
-      return { product: parsed }
-    } catch (e) {
-      setToastCookie(c, "error", String(e))
+    const parsed = await parseProductRegistrationFormData(value)
+    if (parsed === null) {
+      setToastCookie(c, "error", "不正なリクエストです")
       return c.redirect(c.req.url)
     }
+    return { product: parsed }
   }),
   async (c) => {
-    try {
-      const id = Number(c.req.param("id"))
-      if (!Number.isInteger(id) || id <= 0) {
-        return c.notFound()
-      }
+    const id = Number(c.req.param("id"))
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.notFound()
+    }
 
-      const { product } = c.req.valid("form")
-      const res = await setProductDetails({
-        dbClient: c.get("dbClient"),
-        product: { id, ...product },
-      })
-      if (!res.ok) {
-        setToastCookie(c, "error", res.message)
-        return c.redirect(c.req.url)
-      }
-      setToastCookie(c, "success", "商品を更新しました")
-      return c.redirect(`/staff/products`)
-    } catch (e) {
-      setToastCookie(c, "error", String(e))
+    const { product } = c.req.valid("form")
+    const res = await setProductDetails({
+      dbClient: c.get("dbClient"),
+      product: { id, ...product },
+    })
+    if (!res.ok) {
+      setToastCookie(c, "error", res.message)
       return c.redirect(c.req.url)
     }
+    setToastCookie(c, "success", "商品を更新しました")
+    return c.redirect("/staff/products")
   },
 )
 

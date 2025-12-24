@@ -19,16 +19,20 @@ export type ParsedProductRegistrationFormData = {
 
 export const parseProductRegistrationFormData = async (
   value: unknown,
-): Promise<ParsedProductRegistrationFormData> => {
-  const record = ensureRecord(value)
+): Promise<ParsedProductRegistrationFormData | null> => {
+  try {
+    const record = ensureRecord(value)
 
-  const name = parseName(record.name)
-  const price = parseNonNegativeInteger(record.price)
-  const stock = parseNonNegativeInteger(record.stock)
-  const tags = parseOptionalTags(record.tags) ?? []
-  const image = await parseCreateImage(record.image)
+    const name = parseName(record.name)
+    const price = parseNonNegativeInteger(record.price)
+    const stock = parseNonNegativeInteger(record.stock)
+    const tags = parseOptionalTags(record.tags) ?? []
+    const image = await parseCreateImage(record.image)
 
-  return { name, price, stock, tags, image }
+    return { name, price, stock, tags, image }
+  } catch {
+    return null
+  }
 }
 
 const ensureRecord = (value: unknown): Record<string, unknown> => {

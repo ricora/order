@@ -11,26 +11,21 @@ import { setToastCookie } from "../../../../-helpers/ui/toast"
 import Layout from "../../../-components/layout"
 
 export const POST = createRoute(async (c) => {
-  try {
-    const id = Number(c.req.param("id"))
-    if (!Number.isInteger(id) || id <= 0) {
-      return c.notFound()
-    }
+  const id = Number(c.req.param("id"))
+  if (!Number.isInteger(id) || id <= 0) {
+    return c.notFound()
+  }
 
-    const res = await removeProduct({
-      dbClient: c.get("dbClient"),
-      product: { id },
-    })
-    if (!res.ok) {
-      setToastCookie(c, "error", res.message)
-      return c.redirect(c.req.url)
-    }
-    setToastCookie(c, "success", "商品を削除しました")
-    return c.redirect("/staff/products")
-  } catch (e) {
-    setToastCookie(c, "error", String(e))
+  const res = await removeProduct({
+    dbClient: c.get("dbClient"),
+    product: { id },
+  })
+  if (!res.ok) {
+    setToastCookie(c, "error", res.message)
     return c.redirect(c.req.url)
   }
+  setToastCookie(c, "success", "商品を削除しました")
+  return c.redirect("/staff/products")
 })
 
 export default createRoute(async (c) => {
