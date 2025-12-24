@@ -177,28 +177,24 @@ const OrderStatusBadge = ({ status }: OrderStatusBadgeProps) => {
 
 export const POST = createRoute(
   validator("form", async (value, c) => {
-    try {
-      const parsed = await parseProductRegistrationFormData(value)
-      return { product: parsed }
-    } catch (e) {
-      setToastCookie(c, "error", String(e))
+    const parsed = await parseProductRegistrationFormData(value)
+    if (parsed === null) {
+      setToastCookie(c, "error", "不正なリクエストです")
       return c.redirect(c.req.url)
     }
+    return { product: parsed }
   }),
   async (c) => {
-    try {
-      const { product } = c.req.valid("form")
-      const res = await registerProduct({
-        dbClient: c.get("dbClient"),
-        product,
-      })
-      if (!res.ok) {
-        throw new Error(res.message)
-      }
-      setToastCookie(c, "success", "商品を登録しました")
-    } catch (e) {
-      setToastCookie(c, "error", String(e))
+    const { product } = c.req.valid("form")
+    const res = await registerProduct({
+      dbClient: c.get("dbClient"),
+      product,
+    })
+    if (!res.ok) {
+      setToastCookie(c, "error", res.message)
+      return c.redirect(c.req.url)
     }
+    setToastCookie(c, "success", "商品を登録しました")
     return c.redirect(c.req.url)
   },
 )
