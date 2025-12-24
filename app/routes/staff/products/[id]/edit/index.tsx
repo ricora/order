@@ -32,7 +32,7 @@ export const POST = createRoute(
       return c.redirect(c.req.url)
     }
     setToastCookie(c, "success", "商品を更新しました")
-    return c.redirect(`/staff/products`)
+    return c.redirect("/staff/products")
   },
 )
 
