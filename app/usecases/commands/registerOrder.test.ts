@@ -272,6 +272,7 @@ describe("registerOrder", () => {
 
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+    await expect(transactionSpy.mock.results[0].value).rejects.toThrow()
     expect(orderRepository.createOrder).not.toHaveBeenCalled()
   })
 

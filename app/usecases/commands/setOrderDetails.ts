@@ -31,37 +31,31 @@ export type SetOrderDetails = UsecaseFunction<
 >
 
 export const setOrderDetails: SetOrderDetails = async ({ dbClient, order }) => {
-  const errorMessage = "エラーが発生しました。"
-  const txResult = await dbClient.transaction(async (tx) => {
-    const result = await (async () => {
-      try {
-        return await updateOrderRepo({
-          dbClient: tx,
-          order: {
-            id: order.id,
-            customerName: order.customerName,
-            comment: order.comment,
-            status: order.status,
-            updatedAt: new Date(),
-          },
-        })
-      } catch {
-        return { ok: false, message: errorMessage } as const
+  let errorMessage: SetOrderDetailsError = "エラーが発生しました。"
+  try {
+    const txResult = await dbClient.transaction(async (tx) => {
+      const result = await updateOrderRepo({
+        dbClient: tx,
+        order: {
+          id: order.id,
+          customerName: order.customerName,
+          comment: order.comment,
+          status: order.status,
+          updatedAt: new Date(),
+        },
+      })
+
+      if (!result.ok) {
+        if (isWhitelistedError(result.message)) {
+          errorMessage = result.message
+        }
+        throw new Error()
       }
-    })()
-    if (!result.ok) {
-      if (isWhitelistedError(result.message)) {
-        return { ok: false, message: result.message } as const
-      }
-      return { ok: false, message: errorMessage } as const
-    }
-    return { ok: true, value: result.value } as const
-  })
-  if (!txResult.ok) {
-    if (isWhitelistedError(txResult.message)) {
-      return { ok: false as const, message: txResult.message }
-    }
+      return { ok: true, value: result.value } as const
+    })
+
+    return txResult
+  } catch {
     return { ok: false as const, message: errorMessage }
   }
-  return { ok: true as const, value: txResult.value }
 }

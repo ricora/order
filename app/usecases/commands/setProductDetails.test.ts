@@ -366,6 +366,7 @@ describe("setProductDetails", () => {
 
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
+    await expect(transactionSpy.mock.results[0].value).rejects.toThrow()
   })
 
   it("画像作成がホワイトリストのバリデーションエラーを返す場合はそのまま返す", async () => {

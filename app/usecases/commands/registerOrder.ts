@@ -49,6 +49,7 @@ export type RegisterOrder = UsecaseFunction<
 
 export const registerOrder: RegisterOrder = async ({ dbClient, order }) => {
   const ids = order.orderItems.map((item) => item.productId)
+  let errorMessage: RegisterOrderError = INTERNAL_ERROR
   try {
     const txResult = await dbClient.transaction(async (tx) => {
       const productsResult = await productRepository.findAllProductsByIds({
@@ -57,7 +58,7 @@ export const registerOrder: RegisterOrder = async ({ dbClient, order }) => {
         pagination: { offset: 0, limit: MAX_STORE_PRODUCT_COUNT },
       })
       if (!productsResult.ok) {
-        return { ok: false, message: INTERNAL_ERROR }
+        throw new Error()
       }
       const products = productsResult.value
       const productById = new Map<number, (typeof products)[number]>(
@@ -77,23 +78,26 @@ export const registerOrder: RegisterOrder = async ({ dbClient, order }) => {
         })
         .filter((item) => item !== null)
       if (orderItems.length !== order.orderItems.length) {
-        return { ok: false as const, message: PRODUCT_NOT_FOUND }
+        errorMessage = PRODUCT_NOT_FOUND
+        throw new Error()
       }
       for (const orderItem of orderItems) {
         const product = productById.get(orderItem.productId)
         if (!product) {
-          return { ok: false as const, message: PRODUCT_NOT_FOUND }
+          errorMessage = PRODUCT_NOT_FOUND
+          throw new Error()
         }
         const newStock = product.stock - orderItem.quantity
         if (newStock < 0) {
-          return { ok: false as const, message: INSUFFICIENT_STOCK }
+          errorMessage = INSUFFICIENT_STOCK
+          throw new Error()
         }
         const updatedProductResult = await productRepository.updateProduct({
           dbClient: tx,
           product: { id: orderItem.productId, stock: newStock },
         })
         if (!updatedProductResult.ok) {
-          return { ok: false as const, message: INTERNAL_ERROR }
+          throw new Error()
         }
       }
       const totalAmount = orderItems.reduce(
@@ -116,28 +120,14 @@ export const registerOrder: RegisterOrder = async ({ dbClient, order }) => {
       if (!createOrderResult.ok) {
         const msg = createOrderResult.message
         if (isWhitelistedError(msg)) {
-          return { ok: false as const, message: msg }
+          errorMessage = msg
         }
-        return { ok: false as const, message: INTERNAL_ERROR }
+        throw new Error()
       }
       return { ok: true as const, value: createOrderResult.value }
     })
-    if (txResult.ok) {
-      if (txResult.value !== undefined) {
-        return { ok: true as const, value: txResult.value }
-      }
-      return { ok: false as const, message: INTERNAL_ERROR }
-    }
-    const msg = txResult.message
-    if (
-      msg === PRODUCT_NOT_FOUND ||
-      msg === INSUFFICIENT_STOCK ||
-      isWhitelistedError(msg)
-    ) {
-      return { ok: false as const, message: msg }
-    }
-    return { ok: false as const, message: INTERNAL_ERROR }
+    return txResult
   } catch {
-    return { ok: false as const, message: INTERNAL_ERROR }
+    return { ok: false as const, message: errorMessage }
   }
 }

@@ -106,11 +106,12 @@ describe("setOrderStatus", () => {
     if (!res.ok) expect(res.message).toBe("注文が見つかりません。")
 
     expect(transactionSpy).toHaveBeenCalledTimes(1)
+    await expect(transactionSpy.mock.results[0].value).rejects.toThrow()
     expect(orderRepository.updateOrder).toHaveBeenCalledTimes(1)
   })
 
-  it("内部エラーが発生してもResultでエラーを返し内部のメッセージが漏洩しない", async () => {
-    orderRepository.updateOrder?.mockImplementationOnce(async (_params) => {
+  it("内部エラーが発生したときに汎用エラーが返りトランザクションがrollbackされる", async () => {
+    orderRepository.updateOrder?.mockImplementationOnce(async () => {
       throw new Error("unexpected internal error")
     })
 
@@ -118,10 +119,12 @@ describe("setOrderStatus", () => {
       dbClient,
       order: { id: 20, status: "processing" },
     })
+
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
 
     expect(transactionSpy).toHaveBeenCalledTimes(1)
+    await expect(transactionSpy.mock.results[0].value).rejects.toThrow()
     expect(orderRepository.updateOrder).toHaveBeenCalledTimes(1)
   })
 
@@ -139,6 +142,7 @@ describe("setOrderStatus", () => {
     if (!res.ok) expect(res.message).toBe("エラーが発生しました。")
 
     expect(transactionSpy).toHaveBeenCalledTimes(1)
+    await expect(transactionSpy.mock.results[0].value).rejects.toThrow()
     expect(orderRepository.updateOrder).toHaveBeenCalledTimes(1)
   })
 })
