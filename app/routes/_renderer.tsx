@@ -20,7 +20,7 @@ export default jsxRenderer(({ children }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: must inline pre-render color scheme script to prevent FOUC (Flash of Unstyled Content) */}
         <script dangerouslySetInnerHTML={{ __html: colorSchemeInitScript }} />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         {/* Preload frequently used fonts to prevent FOUT (Flash of Unstyled Text) */}
         <link
           rel="preload"
