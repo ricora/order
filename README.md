@@ -49,3 +49,7 @@
 ## アーキテクチャ
 
 詳細は[ARCHITECTURE.md](docs/architecture.md)を参照してください。
+
+## ライセンス
+
+詳細は[LICENSE](LICENSE)を参照してください。
