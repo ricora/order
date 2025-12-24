@@ -160,7 +160,7 @@ const ItemCard = ({ item, columns }: { item: Item; columns: Column[] }) => {
             const isImage = field.type === "image"
 
             if (isImage) {
-              return <FieldValueCell field={field} isCard={true} />
+              return <FieldValueCell field={field} isCard />
             }
 
             return (
@@ -169,7 +169,7 @@ const ItemCard = ({ item, columns }: { item: Item; columns: Column[] }) => {
                   <div className={styles.cardFieldLabel()}>{column.header}</div>
                 )}
                 <div className={styles.cardFieldValue()}>
-                  <FieldValueCell field={field} isCard={true} />
+                  <FieldValueCell field={field} isCard />
                 </div>
               </div>
             )

@@ -366,8 +366,8 @@ const Card: FC<{
               {order.status === "completed" || order.status === "cancelled" ? (
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <ActionButton
-                    toStatus={"processing"}
-                    btnStatus={"processing"}
+                    toStatus="processing"
+                    btnStatus="processing"
                   >
                     <span className="flex w-full items-center justify-between">
                       <div className="h-4 w-4">
@@ -376,7 +376,7 @@ const Card: FC<{
                       <span className="flex-1 text-center">処理中に移動</span>
                     </span>
                   </ActionButton>
-                  <ActionButton toStatus={"pending"} btnStatus={"pending"}>
+                  <ActionButton toStatus="pending" btnStatus="pending">
                     <span className="flex w-full items-center justify-between">
                       <div className="h-4 w-4">
                         <ChevronLeftIcon />
@@ -443,7 +443,7 @@ const Card: FC<{
       {!loadingToStatus &&
         (order.status === "pending" || order.status === "processing") && (
           <div className="mt-3 flex justify-center">
-            <ActionButton toStatus={"cancelled"} btnStatus={"cancelled"}>
+            <ActionButton toStatus="cancelled" btnStatus="cancelled">
               <div className="h-4 w-4">
                 <CircleXIcon />
               </div>

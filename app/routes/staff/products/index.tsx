@@ -228,7 +228,7 @@ export default createRoute(async (c) => {
   } = res.value
 
   return c.render(
-    <Layout title={"商品管理"} description={"商品情報の登録や編集を行います。"}>
+    <Layout title="商品管理" description="商品情報の登録や編集を行います。">
       <ProductStockStatusCards
         totalProducts={totalProducts}
         inStockCount={inStockCount}

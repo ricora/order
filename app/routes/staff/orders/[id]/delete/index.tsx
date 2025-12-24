@@ -52,7 +52,7 @@ export default createRoute(async (c) => {
   const { order } = res.value
   if (!order) return c.notFound()
   return c.render(
-    <Layout title={"注文削除"} description={"注文情報の削除を行います。"}>
+    <Layout title="注文削除" description="注文情報の削除を行います。">
       <div class="rounded-lg border bg-bg p-6">
         <h2 class="mb-2 font-semibold text-lg">注文削除</h2>
         <div class="p-4">

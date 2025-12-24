@@ -61,7 +61,7 @@ export default createRoute(async (c) => {
   if (!product) return c.notFound()
 
   return c.render(
-    <Layout title={"商品編集"} description={"商品情報の編集を行います。"}>
+    <Layout title="商品編集" description="商品情報の編集を行います。">
       <ProductRegistrationForm initialValues={product} mode="edit" />
     </Layout>,
   )
