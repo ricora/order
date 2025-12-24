@@ -47,64 +47,6 @@
 
 詳細は[CONTRIBUTING.md](docs/contributing.md)を参照してください。
 
-### 必要条件
-
-- [mise](https://mise.jdx.dev/) (ツールバージョン管理)
-
-### インストール
-
-```bash
-# ツールのセットアップ
-mise install
-
-# 依存関係のインストール
-bun install
-```
-
-### 開発サーバーの起動
-
-```bash
-bun run dev
-```
-
-### ビルド
-
-```bash
-bun run build
-```
-
-### プレビュー
-
-```bash
-bun run preview
-```
-
-## テスト
-
-```bash
-# 全テストの実行
-bun run test
-
-# ユニットテストのみ
-bun run test:unit
-
-# 結合テストのみ
-bun run test:integration
-
-# E2Eテスト
-bun run test:e2e
-```
-
-## コード品質
-
-```bash
-# Formatter, Linter, Import Sortingの実行
-bun run check
-
-# Formatting, Linting, Import Sortingの自動修正
-bun run check:write
-```
-
 ## アーキテクチャ
 
 詳細は[ARCHITECTURE.md](docs/architecture.md)を参照してください。
