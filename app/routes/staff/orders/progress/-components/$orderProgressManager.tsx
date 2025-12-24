@@ -365,10 +365,7 @@ const Card: FC<{
             <div className="flex w-full flex-col gap-2 sm:flex-1">
               {order.status === "completed" || order.status === "cancelled" ? (
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <ActionButton
-                    toStatus="processing"
-                    btnStatus="processing"
-                  >
+                  <ActionButton toStatus="processing" btnStatus="processing">
                     <span className="flex w-full items-center justify-between">
                       <div className="h-4 w-4">
                         <ChevronLeftIcon />
