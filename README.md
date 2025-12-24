@@ -96,7 +96,7 @@ bun run test:e2e
 ## コード品質
 
 ```bash
-# 全チェックの実行
+# Formatter, Linter, Import Sortingの実行
 bun run check
 
 # フォーマットの自動修正
