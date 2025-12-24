@@ -9,67 +9,57 @@ import OrderEditForm from "./-components/$orderEditForm"
 
 export const POST = createRoute(
   validator("form", (value, c) => {
-    try {
-      const customerNameRaw = value.customerName
-      const commentRaw = value.comment
-      const statusRaw = value.status
-      const customerName =
-        typeof customerNameRaw === "string"
-          ? customerNameRaw.trim().length > 0
-            ? customerNameRaw.trim()
-            : null
+    const customerNameRaw = value.customerName
+    const commentRaw = value.comment
+    const statusRaw = value.status
+    const customerName =
+      typeof customerNameRaw === "string"
+        ? customerNameRaw.trim().length > 0
+          ? customerNameRaw.trim()
           : null
+        : null
 
-      const comment =
-        typeof commentRaw === "string"
-          ? commentRaw.trim().length > 0
-            ? commentRaw.trim()
-            : null
+    const comment =
+      typeof commentRaw === "string"
+        ? commentRaw.trim().length > 0
+          ? commentRaw.trim()
           : null
+        : null
 
-      const allowedStatuses = new Set<
-        "pending" | "processing" | "completed" | "cancelled"
-      >(["pending", "processing", "completed", "cancelled"])
-      if (typeof statusRaw !== "string") {
-        throw new Error("不正なリクエストです")
-      }
-      const candidateStatus = statusRaw as
-        | "pending"
-        | "processing"
-        | "completed"
-        | "cancelled"
-      if (!allowedStatuses.has(candidateStatus)) {
-        throw new Error("不正なリクエストです")
-      }
-      const status = candidateStatus
-      return { order: { customerName, comment, status } }
-    } catch (e) {
-      setToastCookie(c, "error", String(e))
+    const allowedStatuses = [
+      "pending",
+      "processing",
+      "completed",
+      "cancelled",
+    ] as const
+    type OrderStatus = (typeof allowedStatuses)[number]
+    const isOrderStatus = (v: unknown): v is OrderStatus =>
+      typeof v === "string" && allowedStatuses.some((s) => s === v)
+
+    if (!isOrderStatus(statusRaw)) {
+      setToastCookie(c, "error", "不正なリクエストです")
       return c.redirect(c.req.url)
     }
+    const status = statusRaw
+    return { order: { customerName, comment, status } }
   }),
   async (c) => {
-    try {
-      const id = Number(c.req.param("id"))
-      if (!Number.isInteger(id) || id <= 0) {
-        return c.notFound()
-      }
+    const id = Number(c.req.param("id"))
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.notFound()
+    }
 
-      const { order } = c.req.valid("form")
-      const res = await setOrderDetails({
-        dbClient: c.get("dbClient"),
-        order: { id, ...order },
-      })
-      if (!res.ok) {
-        setToastCookie(c, "error", res.message)
-        return c.redirect(c.req.url)
-      }
-      setToastCookie(c, "success", "注文を更新しました")
-      return c.redirect(`/staff/orders`)
-    } catch (e) {
-      setToastCookie(c, "error", String(e))
+    const { order } = c.req.valid("form")
+    const res = await setOrderDetails({
+      dbClient: c.get("dbClient"),
+      order: { id, ...order },
+    })
+    if (!res.ok) {
+      setToastCookie(c, "error", res.message)
       return c.redirect(c.req.url)
     }
+    setToastCookie(c, "success", "注文を更新しました")
+    return c.redirect("/staff/orders")
   },
 )
 
