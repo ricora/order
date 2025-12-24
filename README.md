@@ -1,6 +1,14 @@
 <div align="center">
-  <img alt="" src="./public/icon.svg" width="128" height="128">
+  <img alt="" src="./public/icon.svg" width="128" height="128" />
   <h1>Order</h1>
+  <a href="https://github.com/ricora/order/actions/workflows/ci.yml">
+    <p>
+      <img
+        alt="CI"
+        src="https://github.com/ricora/order/actions/workflows/ci.yml/badge.svg"
+      />
+    </p>
+  </a>
   <p>学園祭の模擬店のための注文・在庫管理システム。</p>
 </div>
 
