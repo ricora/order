@@ -99,7 +99,7 @@ bun run test:e2e
 # Formatter, Linter, Import Sortingの実行
 bun run check
 
-# フォーマットの自動修正
+# Formatting, Linting, Import Sortingの自動修正
 bun run check:write
 ```
 
