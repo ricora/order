@@ -28,7 +28,7 @@ export default createRoute(async (c) => {
   const { orders, hasNextPage, currentPage } = res.value
 
   return c.render(
-    <Layout title={"注文一覧"} description={"注文の一覧を表示します。"}>
+    <Layout title="注文一覧" description="注文の一覧を表示します。">
       <ItemCollectionViewer
         title="注文一覧"
         sort={sort}

@@ -104,7 +104,7 @@ export const POST = createRoute(
 
 export default createRoute(async (c) => {
   return c.render(
-    <Layout title={"注文登録"} description={"注文情報の登録を行います。"}>
+    <Layout title="注文登録" description="注文情報の登録を行います。">
       <div className="rounded-lg border bg-bg p-6">
         <h2 className="mb-4 font-bold text-lg">注文登録</h2>
         <OrderRegistrationForm />
