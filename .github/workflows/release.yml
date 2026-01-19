@@ -25,7 +25,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup tools
-        uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a # v3.5.0
+        uses: jdx/mise-action@c53b9236f0b3370f31520f8b142f141256d839c6 # v3.6.0
         with:
           cache: false
 
