@@ -48,7 +48,7 @@
     "prettier-plugin-toml": "2.0.6",
     "tailwindcss": "4.1.17",
     "typescript": "^5.9.3",
-    "vite": "7.2.2",
+    "vite": "7.3.1",
     "vitest": "4.0.8"
   }
 }
