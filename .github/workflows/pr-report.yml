@@ -79,7 +79,7 @@ jobs:
           fi
       - name: Post dependency graph as PR comment
         if: ${{ steps.commit.outputs.changed == 'true'}}
-        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
+        uses: peter-evans/create-or-update-comment@57232238742e38b2ccc27136ce596ccae7ca28b4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
