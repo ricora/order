@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Setup tools
-        uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a
+        uses: jdx/mise-action@d93325ba61f24ca3ee5ac7d689cf8bdefdd2f354
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Install graphviz
