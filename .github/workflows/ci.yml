@@ -68,7 +68,7 @@ jobs:
     timeout-minutes: 120
     services:
       postgres:
-        image: postgres:18
+        image: postgres:18@sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328
         env:
           POSTGRES_PASSWORD: mypassword
         options: >-
